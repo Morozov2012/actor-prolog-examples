@@ -1,0 +1,113 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+RefArrayIndex	= INTEGER.
+--
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(ArrayIndicesRange)	- (i);
+test3;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+	my_array	= 'MyArray'[1 .. 5] of ('Report');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test3,
+	test2([[1,10]]),
+	test1,
+	test3,
+	test2([[-3,3]]),
+	test1,
+	test3,
+	test2([['none',2]]),
+	test1,
+	test2([[0,'none']]),
+	test1,
+	test2([['none','none']]),
+	test1.
+--
+test0:-
+	set_color('RoyalBlue'),
+	writeln("Test 0."),
+	set_color('default'),
+	my_array ? get_indices_range(),!,
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+test0:-
+	set_color('Red'),
+	writeln("Failed!"),
+	set_color('default').
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test 1."),
+	set_color('default'),
+	Range== my_array?get_indices_range(),!,
+	write("Indices range: "),
+	set_color('Violet'),
+	writeln(Range),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+test1:-
+	set_color('Red'),
+	writeln("Failed!"),
+	set_color('default').
+--
+test2(Range):-
+	set_color('RoyalBlue'),
+	writeln("Test 2."),
+	set_color('default'),
+	my_array ? set_indices_range(Range),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("Test 3."),
+	set_color('default'),
+	write("Indices:"),
+	_ == my_array[Index],
+		write(" "),
+		set_color('Violet'),
+		write(Index),
+		set_color('default'),
+		write(";"),
+		fail.
+test3:-
+	nl,
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyArray' (specialized 'DynamicWorlds'):
+[
+DOMAINS:
+Target	= ('Report').
+PREDICATES:
+nondeterm:
+element(RefArrayIndex*) = Target	- (o);
+]
+-----------------------------------------------------------------------

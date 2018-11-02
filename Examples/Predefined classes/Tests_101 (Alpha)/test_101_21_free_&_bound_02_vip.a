@@ -1,0 +1,147 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+Value	= f(N).
+N	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+create_values(Value,Value)	- (o,o);
+test0;
+--
+transfer1(Value*)		- (i);
+transfer2(Value*)		- (i);
+transfer3(Value*)		- (i);
+transfer4(Value*)		- (i);
+transfer5(Value*)		- (i);
+transfer6(Value*)		- (i);
+transfer7(Value*)		- (i);
+transfer8(Value*)		- (i);
+--
+test1(Value*)		- (i);
+test2(Value*)		- (i);
+test3(Value*)		- (i);
+test4(Value*)		- (i);
+test5(Value*)		- (i);
+test6(Value*)		- (i);
+test7(Value*)		- (i);
+test8(Value*)		- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	create_values(V1,V2),
+	test0,
+	transfer1(V1),
+	transfer2(V1),
+	transfer3(V2),
+	transfer4(V2),
+	transfer5(V1,V1),
+	transfer6(V1,V2),
+	transfer7(V1,V2),
+	transfer8(V2,V2).
+--
+create_values(_,f(_)).
+--
+test0:-
+	con ? writeln("Test 0:"),
+	?free(),
+	?bound(),!,
+	con ? writeln("   O.K.").
+test0:-
+	con ? writeln("Failure").
+--
+transfer1(A*):-
+	test1(A*).
+transfer2(A*):-
+	test2(A*).
+transfer3(A*):-
+	test3(A*).
+transfer4(A*):-
+	test4(A*).
+transfer5(A*):-
+	test5(A*).
+transfer6(A*):-
+	test6(A*).
+transfer7(A*):-
+	test7(A*).
+transfer8(A*):-
+	test8(A*).
+--
+test1(X*):-
+	con ? writeln("Test 1:"),
+	con ? writeln("   x=",X*),
+	?free(X*),!,
+	con ? writeln("   O.K.: x is free.").
+test1(_*):-
+	con ? writeln("Failure").
+--
+test2(X*):-
+	con ? writeln("Test 2:"),
+	con ? writeln("   x=",X*),
+	?bound(X*),!,
+	con ? writeln("Failure").
+test2(_*):-
+	con ? writeln("   O.K.: x is not bound.").
+--
+test3(X*):-
+	con ? writeln("Test 3:"),
+	con ? writeln("   x=",X*),
+	?free(X*),!,
+	con ? writeln("Failure").
+test3(_*):-
+	con ? writeln("   O.K.: x is not free.").
+--
+test4(X*):-
+	con ? writeln("Test 3:"),
+	con ? writeln("   x=",X*),
+	?bound(X*),!,
+	con ? writeln("   O.K.: x is bound.").
+test4(_*):-
+	con ? writeln("Failure").
+--
+test5(XY*):-
+	con ? writeln("Test 5:"),
+	con ? writeln("   x,y =",XY*),
+	?free(XY*),!,
+	con ? writeln("   O.K.: x and y are free.").
+test5(_*):-
+	con ? writeln("Failure").
+--
+test6(XY*):-
+	con ? writeln("Test 6:"),
+	con ? writeln("   x,y =",XY*),
+	?bound(XY*),!,
+	con ? writeln("Failure").
+test6(_*):-
+	con ? writeln("   O.K.: x or y is not bound.").
+--
+test7(XY*):-
+	con ? writeln("Test 7:"),
+	con ? writeln("   x,y =",XY*),
+	?free(XY*),!,
+	con ? writeln("Failure").
+test7(_*):-
+	con ? writeln("   O.K.: x or y is not free.").
+--
+test8(XY*):-
+	con ? writeln("Test 8:"),
+	con ? writeln("   x,y =",XY*),
+	?bound(XY*),!,
+	con ? writeln("   O.K.: x and y are bound.").
+test8(_*):-
+	con ? writeln("Failure").
+]

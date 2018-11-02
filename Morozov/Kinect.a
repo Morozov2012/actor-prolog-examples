@@ -1,0 +1,411 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2016 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Kinect":
+
+--------------------------------------------------------------------
+-- The 'Kinect' class is specialized class 'DataAbstraction'.     --
+--------------------------------------------------------------------
+
+class 'Kinect' (specialized 'DataAbstraction'):
+--
+skeleton_release_time		= 3;
+--
+horizontal_correction		= 'default';
+vertical_correction		= 'default';
+--
+[
+SOURCE:
+	"morozov.built_in.Kinect";
+
+CLAUSES:
+
+activate:
+	[external "activate"].
+stop:
+	[external "stop"].
+--
+set_skeleton_release_time(Frames):
+	[external "setSkeletonReleaseTime"].
+get_skeleton_release_time() = Frames:
+	[external "getSkeletonReleaseTime"].
+--
+set_horizontal_correction(PixelNumber):
+	[external "setHorizontalCorrection"].
+get_horizontal_correction() = PixelNumber:
+	[external "getHorizontalCorrection"].
+--
+set_vertical_correction(PixelNumber):
+	[external "setVerticalCorrection"].
+get_vertical_correction() = PixelNumber:
+	[external "getVerticalCorrection"].
+--
+set_correction(HorizontalCorrection,VerticalCorrection):
+	[external "setCorrection"].
+get_correction(HorizontalCorrection,VerticalCorrection):
+	[external "getCorrection"].
+--
+get_correction_in_pixels(HorizontalCorrection,VerticalCorrection):
+	[external "getCorrectionInPixels"].
+]
+
+--------------------------------------------------------------------
+-- The 'KinectBuffer' class is                                    --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+class 'KinectBuffer' (specialized 'DataAbstraction'):
+--
+constant:
+--
+operating_mode			= 'LISTENING';
+--
+displaying_mode			= 'default';
+--
+input_device			= 'none';
+data_acquisition_optimization	= 'default';
+description			= 'default';
+copyright			= 'default';
+registration_date		= 'default';
+registration_time		= 'default';
+--
+color_map			= [];
+people_colors			= [];
+write_buffer_size		= 50;
+read_buffer_size		= 0;
+maximal_chronicle_length	= -1;
+slow_motion_coefficient		= 1;
+maximal_frame_delay		= 'default';
+scene_depth_threshold		= 0.05;
+scene_surface_type		= 'default';
+
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+image_encoding_attributes	= {};
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+maximal_waiting_time		= 'default';
+--
+-- The implementation of the 'OperatingSystemResource' interface:
+--
+name				= "a-prolog.k2j";
+extension			= ".k2j";
+--
+-- The implementation of the 'AccessibleDataResource' interface:
+--
+character_set			= 'none';
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+backslash_always_is_separator			= 'yes';
+accept_only_uniform_resource_identifiers	= 'no';
+--
+[
+SOURCE:
+	"morozov.built_in.KinectBuffer";
+
+MODEL:
+
+?frame_obtained().
+?data_transfer_completion().
+?buffer_overflow().
+?buffer_deallocation().
+?data_transfer_error(ExceptionName).
+
+CLAUSES:
+--
+start:
+	[external "start"].
+start(RequireExclusiveAccess):
+	[external "start"].
+pause:
+	[external "pause"].
+stop:
+	[external "stop"].
+--
+connect:
+	[external "connect"].
+connect(RequireExclusiveAccess):
+	[external "connect"].
+--
+is_active:
+	[external "isActive"].
+is_suspended:
+	[external "isSuspended"].
+--
+retrieve_buffered_frame(NumberOfFrameInTheBuffer):
+	[external "retrieveBufferedFrame"].
+--
+eof:
+	[external "eof"].
+--
+commit:
+	[external "commit"].
+--
+get_recent_frame_number(Number):
+	[external "getRecentFrameNumber"].
+--
+get_recent_frame_time(Milliseconds):
+	[external "getRecentFrameTime"].
+--
+get_recent_frame_relative_time(Milliseconds):
+	[external "getRecentFrameRelativeTime"].
+--
+get_recent_frame_rate(FrameRate):
+	[external "getRecentFrameRate"].
+--
+get_recent_image(BufferedImage):
+	[external "getRecentImage"].
+--
+get_recent_scene(BufferedScene):
+	[external "getRecentScene"].
+get_recent_scene(BufferedScene,TextureImage):
+	[external "getRecentScene"].
+--
+get_recent_mapping(MappedImage):
+	[external "getRecentMapping"].
+get_recent_mapping(MappedImage,TextureImage):
+	[external "getRecentMapping"].
+--
+set_lookup_table(FileName):
+	[external "setLookupTable"].
+set_lookup_table(FileName,CorrectionX,CorrectionY):
+	[external "setLookupTable"].
+--
+reset_lookup_table:
+	[external "resetLookupTable"].
+--
+set_scene_appearance(Appearance):
+	[external "setSceneAppearance"].
+--
+reset_scene_appearance:
+	[external "resetSceneAppearance"].
+--
+get_skeletons(Skeletons):
+	[external "getSkeletons"].
+get_chronicle(SkeletonChronicle):
+	[external "getChronicle"].
+get_tracks(TracksOfSkeletons):
+	[external "getTracks"].
+--
+get_depth_image_size_in_pixels(Width,Height):
+	[external "getDepthImageSizeInPixels"].
+get_color_image_size_in_pixels(Width,Height):
+	[external "getColorImageSizeInPixels"].
+--
+get_computed_correction(Horizontal,Vertical):
+	[external "getComputedCorrection"].
+--
+get_delivered_data_acquisition_mode(DataAcquisitionMode):
+	[external "getDeliveredDataAcquisitionMode"].
+get_delivered_people_index_mode(KinectPeopleIndexMode):
+	[external "getDeliveredPeopleIndexMode"].
+get_delivered_circumscription_modes(KinectCircumscriptionModes):
+	[external "getDeliveredCircumscriptionModes"].
+get_delivered_skeletons_mode(KinectSkeletonsMode):
+	[external "getDeliveredSkeletonsMode"].
+get_delivered_description(Text):
+	[external "getDeliveredDescription"].
+get_delivered_copyright(Text):
+	[external "getDeliveredCopyright"].
+get_delivered_registration_date(Text):
+	[external "getDeliveredRegistrationDate"].
+get_delivered_registration_time(Text):
+	[external "getDeliveredRegistrationTime"].
+--
+recent_reading_error(NumberOfFrameToBeRead,ExceptionName):
+	[external "recentReadingError"].
+--
+set_operating_mode(KinectBufferOperatingMode):
+	[external "setOperatingMode"].
+get_operating_mode() = KinectBufferOperatingMode:
+	[external "getOperatingMode"].
+--
+set_displaying_mode(KinectDisplayingMode):
+	[external "setDisplayingMode"].
+get_displaying_mode() = KinectDisplayingMode:
+	[external "getDisplayingMode"].
+--
+set_input_device(KinectDevice):
+	[external "setInputDevice"].
+get_input_device() = KinectDevice:
+	[external "getInputDevice"].
+--
+set_data_acquisition_optimization(KinectPerformanceOptimization):
+	[external "setDataAcquisitionOptimization"].
+get_data_acquisition_optimization() = KinectPerformanceOptimization:
+	[external "getDataAcquisitionOptimization"].
+--
+set_description(TextAttribute):
+	[external "setDescription"].
+get_description() = TextAttribute:
+	[external "getDescription"].
+--
+set_copyright(TextAttribute):
+	[external "setCopyright"].
+get_copyright() = TextAttribute:
+	[external "getCopyright"].
+--
+set_registration_date(TextAttribute):
+	[external "setRegistrationDate"].
+get_registration_date() = TextAttribute:
+	[external "getRegistrationDate"].
+--
+set_registration_time(TextAttribute):
+	[external "setRegistrationTime"].
+get_registration_time() = TextAttribute:
+	[external "getRegistrationTime"].
+--
+set_color_map(ColorMap):
+	[external "setColorMap"].
+get_color_map() = ColorMap:
+	[external "getColorMap"].
+--
+set_people_colors(ColorMap):
+	[external "setPeopleColors"].
+get_people_colors() = ColorMap:
+	[external "getPeopleColors"].
+--
+set_write_buffer_size(Size):
+	[external "setWriteBufferSize"].
+get_write_buffer_size() = Size:
+	[external "getWriteBufferSize"].
+--
+set_read_buffer_size(Size):
+	[external "setReadBufferSize"].
+get_read_buffer_size() = Size:
+	[external "getReadBufferSize"].
+--
+set_maximal_chronicle_length(Seconds):
+	[external "setMaximalChronicleLength"].
+get_maximal_chronicle_length() = Seconds:
+	[external "getMaximalChronicleLength"].
+--
+set_slow_motion_coefficient(Coefficient):
+	[external "setSlowMotionCoefficient"].
+get_slow_motion_coefficient() = Coefficient:
+	[external "getSlowMotionCoefficient"].
+--
+set_maximal_frame_delay(Milliseconds):
+	[external "setMaximalFrameDelay"].
+get_maximal_frame_delay() = Milliseconds:
+	[external "getMaximalFrameDelay"].
+--
+set_scene_depth_threshold(MaximalDepthDifference):
+	[external "setSceneDepthThreshold"].
+get_scene_depth_threshold() = MaximalDepthDifference:
+	[external "getSceneDepthThreshold"].
+--
+set_scene_surface_type(KinectSurfaceType):
+	[external "setSceneSurfaceType"].
+get_scene_surface_type() = KinectSurfaceType:
+	[external "getSceneSurfaceType"].
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+set_image_encoding_attributes(ImageAttributes):
+	[external "setImageEncodingAttributes"].
+get_image_encoding_attributes() = ImageAttributes:
+	[external "getImageEncodingAttributes"].
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+set_maximal_waiting_time(TimeInterval):
+	[external "setMaximalWaitingTime"].
+get_maximal_waiting_time() = TimeInterval:
+	[external "getMaximalWaitingTime"].
+--
+-- The implementation of the 'OperatingSystemResource' interface:
+--
+delete:
+	[external "delete"].
+delete(FileName):
+	[external "delete"].
+rename(NewName):
+	[external "rename"].
+rename(OldName,NewName):
+	[external "rename"].
+copy(Destination):
+	[external "copy"].
+copy(Origin,Destination):
+	[external "copy"].
+is_standard_file:
+	[external "isStandardFile"].
+is_standard_file(FileName):
+	[external "isStandardFile"].
+set_current_directory(Path):
+	[external "setCurrentDirectory"].
+get_current_directory() = Path:
+	[external "getCurrentDirectory"].
+extract_path(Path,FileName):
+	[external "extractPath"].
+extract_path(OldFileName,Path,NewFileName):
+	[external "extractPath"].
+extract_extension(Name,Extension):
+	[external "extractExtension"].
+extract_extension(FileName,Name,Extension):
+	[external "extractExtension"].
+replace_extension(Extension) = NewFileName:
+	[external "replaceExtension"].
+replace_extension(OldFileName,Extension) = NewFileName:
+	[external "replaceExtension"].
+set_name(Name):
+	[external "setName"].
+get_name() = Name:
+	[external "getName"].
+set_extension(Extension):
+	[external "setExtension"].
+get_extension() = Extension:
+	[external "getExtension"].
+--
+-- The implementation of the 'AccessibleDataResource' interface:
+--
+does_exist:
+	[external "doesExist"].
+does_exist(FileName):
+	[external "doesExist"].
+is_local_resource:
+	[external "isLocalResource"].
+is_local_resource(FileName):
+	[external "isLocalResource"].
+get_full_name = FullName:
+	[external "getFullName"].
+get_full_name(ShortName) = FullName:
+	[external "getFullName"].
+get_URL = FileName:
+	[external "getURL"].
+get_URL(ShortName) = FullName:
+	[external "getURL"].
+set_character_set(CharacterSet):
+	[external "setCharacterSet"].
+get_character_set() = CharacterSet:
+	[external "getCharacterSet"].
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+set_backslash_always_is_separator(YesNo):
+	[external "setBackslashAlwaysIsSeparator"].
+get_backslash_always_is_separator() = YesNo:
+	[external "getBackslashAlwaysIsSeparator"].
+set_accept_only_uniform_resource_identifiers(YesNo):
+	[external "setAcceptOnlyUniformResourceIdentifiers"].
+get_accept_only_uniform_resource_identifiers() = YesNo:
+	[external "getAcceptOnlyUniformResourceIdentifiers"].
+--
+-- The default implementation of programmer-defined clauses:
+--
+frame_obtained:
+	[external "frameObtained"].
+data_transfer_completion:
+	[external "dataTransferCompletion"].
+buffer_overflow:
+	[external "bufferOverflow"].
+buffer_deallocation:
+	[external "bufferDeallocation"].
+data_transfer_error(ExceptionName):
+	[external "dataTransferError"].
+]

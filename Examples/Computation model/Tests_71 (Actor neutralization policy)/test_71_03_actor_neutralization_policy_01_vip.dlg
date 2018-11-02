@@ -1,0 +1,9 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',14)
+
+dialog 'Main'("Actor Testbed",default,default,default,centered,centered,default)
+vbox('center')
+	editinteger(output_slot_1,10,1)
+end_of_vbox
+end_of_dialog

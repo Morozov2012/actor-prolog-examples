@@ -1,0 +1,37 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: append a list.              --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Disassembling of a list.           --
+-- 2) An input argument.                 --
+-- 3) Output assembling of a list.       --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+p(List,List,List)	- (i,i,o);
+
+CLAUSES:
+
+goal:-
+	p([1,2],[3,4,5],Y),
+	writeln(Y).
+
+p([],SecondList,SecondList).
+p([X|Rest1],SecondList,[X|Rest2]):-
+	p(Rest1,SecondList,Rest2).

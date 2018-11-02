@@ -1,0 +1,251 @@
+package "Morozov/Web/Scanning/Counter":
+---------------------------------------------------------------------
+--          The "SCANNING/COUNTER" Actor Prolog package.           --
+--           (c) 2002-2005, IRE RAS, Alexei A. Morozov.            --
+---------------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import "Morozov/Web/Data/Keywords";
+import 'GenericReport' from "Morozov/Web/Scanning/Messages";
+---------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N			= INTEGER.
+Size			= INTEGER; STRING.
+N_List			= N*.
+--
+DummyValue		= 'no_value'.
+DummyList		= DummyValue*.
+--
+lazy:
+--
+SpecialReport		= ('GenericReport'); #.
+--
+ground:
+--
+SpecialPageRegistry	= ('PageRegistry'); #.
+--
+---------------------------------------------------------------------
+interface 'Statistics' (specialized 'Database'):
+--
+internal:
+--
+	local_counter	: 'Counter';
+	text_operations	: 'WebText';
+--
+	old_nodes	: 'WebAddressRegistry';
+--
+constant:
+--
+	report		: SpecialReport;
+	found_pages	: SpecialPageRegistry;	-- SpecialReport;
+--
+[
+DOMAINS:
+--
+mixed:
+--
+	Target	=
+		current_resource(
+			WebAddressSegment,WebResourceAttributes);
+		number_of_pages(WebAddressSegment,N);
+		current_size(WebAddressSegment,Size);
+		recent_date(WebAddressSegment,WebResourceDate);
+		number_of_HTML_leafs(WebAddressSegment,N);
+		number_of_picture_leafs(WebAddressSegment,N);
+		number_of_binary_leafs(WebAddressSegment,N);
+		number_of_errors(WebAddressSegment,N);
+		current_NList(WebAddressSegment,N_List).
+--
+PREDICATES:
+--
+imperative:
+--
+reset(WebAddressSegment,WebResourceAttributes);
+add_old_node(WebAddressSegment,WebAddressList);
+--
+determ:
+--
+is_old_node(WebAddressSegment,WebAddressList);
+--
+imperative:
+--
+register_parameters(
+	WebAddressSegment,
+	WebAddressList,
+	PlainContent,
+	KeywordList,
+	ContentParameters);
+--
+count_keywords(
+	WebAddressList,
+	PlainContent,
+	KeywordList,
+	N_List)			- (i,i,i,o);
+--
+count_keyword(
+	WebAddressList,
+	PlainContent,
+	STRING,
+	N)			- (i,i,i,o);
+--
+search_keyword(
+	WebAddressList,
+	PlainContent,
+	STRING,
+	N)			- (i,i,i,o);
+--
+register_keywords(WebAddressSegment,N_List);
+--
+'+'(N,N) = N				- (i,i);
+'+'(Size,Size) = Size			- (i,i);
+'+'(N_List,N_List) = N_List		- (i,i);
+--
+determ:
+--
+'>'(N,N)				- (i,i);
+'>'(Size,Size)				- (i,i);
+'<'(WebResourceDate,WebResourceDate)	- (i,i);
+--
+imperative:
+--
+register_date(WebAddressSegment,WebResourceDate);
+--
+update_recent_date(
+	WebAddressSegment,
+	WebResourceDate,
+	WebResourceDate);
+--
+determ:
+--
+is_less(WebResourceDate,WebResourceDate);
+--
+imperative:
+--
+increase_page_counter(WebAddressSegment);
+register_size(WebAddressSegment,Size);
+update_recent_size(WebAddressSegment,Size,Size);
+register_error(WebAddressSegment);
+--
+-- determ:
+nondeterm:
+--
+get_parameters(
+	WebResourceAttributes,
+	WebResourceDate,
+	N,
+	Size,
+	N,N,N,N,
+	N_List)		- (o,o,o,o,o,o,o,o,o);
+--
+determ:
+--
+get_target_parameters(
+	WebAddressSegment,
+	WebResourceDate,
+	N,
+	Size,
+	N,N,N,N,
+	N_List)		- (i,o,o,o,o,o,o,o,o);
+--
+imperative:
+--
+count_HTML_leaf(WebAddressSegment);
+count_binary_leaf(WebAddressSegment);
+count_picture_leaf(WebAddressSegment);
+--
+]
+---------------------------------------------------------------------
+interface 'Counter' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+reset;
+increase;
+value(Target)		- (o);
+--
+]
+---------------------------------------------------------------------
+interface 'WebResourceRegistry' (specialized 'Database'):
+[
+DOMAINS:
+--
+reference:
+--
+Target			= WebResourceAttributes.
+--
+]
+---------------------------------------------------------------------
+-- This class implements the output of the collected information.  --
+---------------------------------------------------------------------
+interface 'StatisticsReporter' (specialized 'Alpha'):
+--
+internal:
+--
+	site_statistics		: 'Statistics';
+	found_pages		: 'PageRegistry';
+--
+variable:
+--
+	output			: OutputDeviceInstance;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+write_report = DummyValue;
+--
+imperative:
+--
+create_report;
+--
+]
+---------------------------------------------------------------------
+interface 'WebAddressRegistry' (specialized 'Database'):
+[
+DOMAINS:
+--
+reference:
+--
+Target	= old(WebAddressSegment,WebAddressList).
+--
+]
+---------------------------------------------------------------------
+interface 'PageRegistry' (specialized 'Database'):
+[
+DOMAINS:
+--
+mixed:
+--
+Target	= page_contains_keyword(WebAddressList,Keyword,N).
+--
+]
+---------------------------------------------------------------------
+interface 'WebText' (specialized 'Text'):
+[
+PREDICATES:
+--
+imperative:
+--
+lower(Keyword)			= STRING	- (i);
+--
+nondeterm:
+--
+search(WebAddressList,STRING) = INTEGER		- (i,i);
+search(PlainContent,STRING) = INTEGER		- (i,i);
+--
+determ:
+--
+split(INTEGER,WebAddressList,STRING,STRING)	- (i,i,o,o);
+split(INTEGER,Keyword,STRING,STRING)		- (i,i,o,o);
+]
+---------------------------------------------------------------------

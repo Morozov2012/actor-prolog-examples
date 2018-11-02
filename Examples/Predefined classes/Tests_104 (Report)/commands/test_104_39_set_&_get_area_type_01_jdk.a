@@ -1,0 +1,63 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= ('MyWindow',
+		x= 0,
+		new_area_type= 'separate');
+w2	= ('MyWindow',
+		x= 1,
+		new_area_type= 'common');
+w3	= ('MyWindow',
+		x= 2,
+		new_area_type= 'separate');
+w4	= ('MyWindow',
+		x= 3,
+		new_area_type= 'common');
+w5	= ('MyWindow',
+		x= 4,
+		new_area_type= 'separate');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	y			= 0;
+	width			= 1;
+	height			= 1;
+	font_size		= 10;
+	area_type		= 'common';
+--
+	new_area_type		: AreaType;
+--
+[
+IMPERATIVES:
+--
+write_lines(INTEGER,INTEGER)		- (i,i);
+--
+CLAUSES:
+--
+goal:-!,
+	set_area_type(new_area_type),
+	AT== ?get_area_type(),
+	set_title(?format("%s",AT)),
+	writeln("Hello world!"),
+	writeln("area_type= ",AT),
+	write_lines(1,5).
+--
+write_lines(N,Max):-
+	N <= Max,!,
+	writeln("-- line ",N," --"),
+	write_lines(N+1,Max).
+write_lines(_,_).
+]
+-----------------------------------------------------------------------

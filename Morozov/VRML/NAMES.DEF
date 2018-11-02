@@ -1,0 +1,21 @@
+package "Morozov/VRML/Names":
+-----------------------------------------------------------------------
+--                                                                   --
+--              The "VRML/NAMES" Actor Prolog package.               --
+--            (c) 2002-2005, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package is intended for generating contracted names.         --
+-----------------------------------------------------------------------
+interface 'ShortName' (specialized 'Text'):
+[
+PREDICATES:
+--
+imperative:
+--
+make_short_name(STRING,STRING)			- (i,o);
+make_short_name(INTEGER,STRING,STRING)		- (i,i,o);
+--
+replace_spaces(INTEGER,STRING,STRING)		- (i,i,o);
+]
+-----------------------------------------------------------------------

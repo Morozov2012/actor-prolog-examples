@@ -1,0 +1,78 @@
+----------------------------------------------------
+-- An example of Actor Prolog program.            --
+-- (c) 2002-2011, IRE RAS, Alexei A. Morozov.     --
+-- Retrieving Web information with the help       --
+-- of the RAMBLER search engine.                  --
+----------------------------------------------------
+import "Morozov/Web/Data/Address";
+import "Morozov/Web/Data/Keywords";
+import 'Rambler'  as 'Engine'
+		 from "Morozov/Web/Engines/Rambler";
+import 'SearchEngine'
+		 from "Morozov/Web/Engines/Core";
+import 'EngineOutput'
+		 from "Morozov/Web/Engines/Core";
+import 'TextWindow'
+		 from "Morozov/Web/Engines/Core";
+import 'Request' from "Morozov/Web/Engines/Request";
+import 'List'    from "Morozov/Web/Browsing/List";
+----------------------------------------------------
+project: (('Main'))
+----------------------------------------------------
+class 'Main' (specialized 'TextWindow'):
+--
+internal:
+--
+	control	= ('Request',
+			engine=self);
+--
+	engine	= ('Engine',
+			engine_output=self,
+			debug_output=self);
+--
+constant:
+--
+	demo	= (('Demonstrator',
+			suspending:
+				results));
+--
+protecting:
+--
+	results	= engine ?? get_resource;
+--
+[
+goal:-!,
+	control ? show.
+--
+search(Keywords):-!,
+	engine << search(Keywords),
+	demo << show.
+--
+find_reference(URL):-!,
+	writeln("Retrieved link: ",URL).
+--
+next_page(N,URL):-!,
+	writeln("Next page (",N,"): ",URL).
+]
+----------------------------------------------------
+class 'Demonstrator':
+--
+variable:
+--
+	results;
+--
+internal:
+--
+	dialog	= ('List',
+			list_of_resources=results);
+--
+[
+goal:-!.
+--
+show:-!,
+	dialog ? show.
+--
+alarm(_):-
+	fail.
+]
+----------------------------------------------------

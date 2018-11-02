@@ -1,0 +1,17 @@
+
+dialog_font("Arial",14)
+
+padding(1.5,1.5)
+
+dialog 'Request' (
+	"Parameters of Search",default,default,default,
+	centered,centered,default)
+vbox(center)
+	" Please enter keywords "
+	editname(keywords,35,"Actor Prolog")
+	hbox(center)
+		ok("start","&Start search")
+		button(close,"&Cancel")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

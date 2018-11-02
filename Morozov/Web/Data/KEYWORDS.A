@@ -1,0 +1,116 @@
+package "Morozov/Web/Data/Keywords":
+---------------------------------------------------------------
+--           The "KEYWORDS" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains a collection of some useful         --
+-- keywords related to the logic programming and Prolog.     --
+---------------------------------------------------------------
+class 'LogicProgrammingKeywords' (specialized 'Alpha'):
+--
+variable:
+--
+	output;
+	list	= self ?? keyword;
+--
+internal:
+--
+	log	= ('KeywordStore');
+--
+[
+goal:-!,
+	save_keywords(list).
+--
+keywords(list):-!.
+--
+save_keywords(List):-
+	check_list(List),
+	output== List,!,
+	save_list(List),
+	log ? save("Keywords.log").
+save_keywords(_):-!.
+--
+check_list(#):-!,
+	fail.
+check_list([]):-!,
+	fail.
+check_list(_):-!.
+--
+save_list([Text|Rest]):-!,
+	log ? append(keyword(Text)),
+	save_list(Rest).
+save_list(_):-!.
+--
+keyword= "XML".
+keyword= "Web tool".
+keyword= "Web agent".
+keyword= "Web".
+keyword= "VRML".
+keyword= "visual program".
+keyword= "visual".
+keyword= "virtual machine".
+keyword= "verification".
+keyword= "validation".
+keyword= "types".
+keyword= "theory".
+keyword= "speculative".
+keyword= "software engineering".
+keyword= "semantic Web".
+keyword= "semantic foundation".
+keyword= "semantic".
+keyword= "SADT".
+keyword= "refinement".
+keyword= "RDF".
+keyword= "protein".
+keyword= "programming technique".
+keyword= "programming".
+keyword= "program transformation".
+keyword= "program analysis".
+keyword= "perturbation".
+keyword= "parallel".
+keyword= "OOP".
+keyword= "object-oriented".
+keyword= "object".
+keyword= "NLP".
+keyword= "natural language".
+keyword= "monotonic".
+keyword= "monad".
+keyword= "molecular biology".
+keyword= "modifiable reasoning".
+keyword= "modes".
+keyword= "mobility".
+keyword= "memory management".
+keyword= "linear logic".
+keyword= "language".
+keyword= "knowledge".
+keyword= "Java ".
+keyword= "Java3d".
+keyword= "JVM".
+keyword= " 3D ".
+keyword= "Internet agent".
+keyword= "inductive".
+keyword= "ILP".
+keyword= "higher order".
+keyword= "formalism".
+keyword= "flow analysis".
+keyword= "DNA".
+keyword= "deductive database".
+keyword= "debugging".
+keyword= "data mining".
+keyword= "coordination".
+keyword= "constructive negation".
+keyword= "constraints".
+keyword= "concurr".
+keyword= "compilation".
+keyword= "artificial intelligence".
+keyword= "agent".
+keyword= "Actor Prolog".
+keyword= ".net".
+keyword= " IDEF".
+keyword= " actor".
+]
+---------------------------------------------------------------
+class 'KeywordStore' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------

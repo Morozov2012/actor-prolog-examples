@@ -1,0 +1,235 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+A1	= f(INTEGER,A2,REAL); g(A2).
+A2	= {name:SYMBOL,text:STRING,list:A3}.
+A3	= A4*.
+A4	= {a:INTEGER,b:A5,c:SYMBOL,d:STRING}.
+--
+A5	= 'WrongTerm'; REAL.
+--
+A1_List	= A1*.
+--
+IMPERATIVES:
+--
+test1;
+test2;
+test3;
+--
+-----------------------------------------------------------------------
+class 'DataStoreA' (specialized 'File'):
+--
+constant:
+--
+name	= "ErrorTest.txt";
+--
+[
+]
+-----------------------------------------------------------------------
+class 'DataStoreB' (specialized 'File'):
+--
+constant:
+--
+name	= "ErrorTest.txt";
+--
+internal:
+--
+trap	: 'SpecialStoreTrap'	= ('Trap',
+					world=self,
+					handler=self);
+con				= ('Console');
+--
+[
+DOMAINS:
+--
+PREDICATES:
+--
+imperative:
+--
+consult;
+--
+determ:
+--
+read_list_of_terms = A1_List;
+--
+imperative:
+--
+list_terms(A1_List)				- (i);
+--
+determ:
+--
+check_if_file_does_exist;
+--
+imperative:
+--
+alarm(_*)					- (i);
+report_reading_recent_error_if_necessary;
+--
+determ:
+--
+report_reading_recent_error_or_Fail;
+--
+imperative:
+--
+extract_text_segment(STRING,INTEGER,STRING)	- (i,i,o);
+write_error_message(ExceptionName,STRING)	- (i,i);
+--
+CLAUSES:
+--
+consult:-
+	check_if_file_does_exist,
+	open('reading'),
+	Terms== trap ? read_list_of_terms,!,
+	close,
+	report_reading_recent_error_if_necessary,
+	con ? writeln("\n\tList of terms:"),
+	list_terms(Terms),
+	con ? writeln("\tEnd of list.").
+consult:-
+	report_reading_recent_error_or_Fail,!.
+consult.
+--
+read_list_of_terms= ?cast("A1_List",?read_terms).
+--
+list_terms([Item|Rest]):-!,
+	con ? set_color('Emerald'),
+	con ? writeln("\t",Item),
+	con ? set_color('default'),
+	list_terms(Rest).
+list_terms(_).
+--
+check_if_file_does_exist:-
+	does_exist,!,
+	con ? writeln("\tReading the ",name," file...").
+check_if_file_does_exist:-
+	con ? set_color('Red'),
+	con ? writeln("\tThe ",name," file does not exist!"),
+	con ? set_color('default'),
+	fail.
+--
+alarm(_,_*):-
+	report_reading_recent_error_or_Fail,!.
+alarm(Error,Arguments*):-!,
+	con ? set_color('Red'),
+	con ? writeln("\tI cannot read the ",name," file."),
+	con ? writeln("\tError: ",Error," ",Arguments),
+	con ? set_color('default').
+alarm(Arguments*):-!,
+	con ? writeln(Arguments).
+--
+report_reading_recent_error_if_necessary:-
+	report_reading_recent_error_or_Fail,!.
+report_reading_recent_error_if_necessary.
+--
+report_reading_recent_error_or_Fail:-
+	recent_reading_error(Text,Position,Error,Message),!,
+	-- con ? writeln("Text: ",Text),
+	-- con ? writeln("Position: ",Position),
+	-- con ? writeln("Error message: ",Message),
+	extract_text_segment(Text,Position,Segment),
+	con ? set_color('Red'),
+	con ? writeln("\tI cannot read the ",name," file."),
+	write_error_message(Error,Message),
+	con ? write("\t>>> "),
+	con ? set_color('Purple'),
+	con ? writeln(Segment),
+	con ? set_color('default').
+--
+extract_text_segment(Text,P0,Segment):-
+	con ? split(P0,Text,_,Rest),
+	Lines== con?extract_lines(Rest),
+	Lines == [Segment|_],!.
+extract_text_segment(Text,P0,Segment):-
+	con ? split(P0,Text,_,Segment),!.
+extract_text_segment(Text,_,Text).
+--
+write_error_message(ExceptionName,Message):-
+	Message == ?val("STRING",ExceptionName),!,
+	con ? writeln("\tError: ",Message).
+write_error_message(Error,Message):-
+	con ? writeln("\tError: ",Error," ",Message).
+]
+-----------------------------------------------------------------------
+interface 'SpecialStoreTrap' (specialized 'Trap'):
+--
+[
+PREDICATES:
+--
+determ:
+--
+read_list_of_terms() = A1_List;
+--
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+store1	= ('DataStoreA');
+store2	= ('DataStoreB');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+write_term(A1)		- (i);
+--
+CLAUSES:
+--
+goal:-
+	test1,
+	test2,
+	test3.
+--
+test1:-
+	writeln("Test 1:"),
+	writeln("\tI will save data to the TestError.txt file."),
+	store1 ? open('writing'),
+	write_term(
+		f(1,{	name:'n1',
+			list:[{a:1,b:11.0,c:'symb1'}]
+			},3.0)),
+	write_term(
+		f(-10,{	list:[
+				{a:3,b:3.14,c:'symb2'}],
+			name:'n2'
+			},9.0)),
+	write_term(
+		f(17,{	name:'n3',
+			list:[{a:5,b:1.0,c:'symb3'}]
+			},11.0)),
+	store1 ? close,
+	writeln("\tDone.").
+--
+write_term(Term):-
+	Text== ?convert_to_string(Term),
+	split(12,Text,Front,_),!,
+	store1 ? writeln(Front).
+write_term(Term):-
+	store1 ? writeln(Term).
+--
+test2:-
+	writeln("Test 2:"),
+	writeln("\tI will check the TestError.txt file:\n"),
+	Text== store1?get_string(),
+	set_color('Blue'),
+	writeln(Text),
+	set_color('default'),
+	fail.
+test2:-
+	writeln("\tDone.").
+--
+test3:-
+	writeln("Test 3:"),
+	writeln("\tI read data from the TestError.txt file."),
+	store2 ? consult,
+	writeln("\tDone.").
+]
+-----------------------------------------------------------------------

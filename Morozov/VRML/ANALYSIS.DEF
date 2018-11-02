@@ -1,0 +1,205 @@
+package "Morozov/VRML/Analysis":
+-----------------------------------------------------------------------
+--                                                                   --
+--             The "VRML/ANALYSIS" Actor Prolog package.             --
+--             (c) 2002-2007, IRE RAS, Alexei A. Morozov.            --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package is intended for analyzing tables of the attributes   --
+-- of Web Sites.                                                     --
+-----------------------------------------------------------------------
+import 'Report_Mode'	from "Morozov/VRML/Mode";
+import 'ResultTable'	from "Morozov/VRML/Items";
+import "Morozov/VRML/Vectors";
+import "Morozov/VRML/Toolbox";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+SizeScalingMode		= [0..2].
+ValueScalingMode	= [0..2].
+--
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+reset_analyzer;
+analyze_table;
+--
+increase_number_of_items(WebResourceName)	- (i);
+get_number_of_items(N)				- (o);
+--
+refine_min_size(ItemHeight)			- (i);
+refine_min_size(ItemHeight,ItemHeight)		- (i,i);
+refine_max_size(ItemHeight)			- (i);
+refine_max_size(ItemHeight,ItemHeight)		- (i,i);
+--
+refine_min_date(ExtendedWebResourceDate)	- (i);
+refine_max_date(ExtendedWebResourceDate)	- (i);
+--
+refine_min_value(N)				- (i);
+refine_min_value(N,N)				- (i,i);
+refine_max_value(N)				- (i);
+refine_max_value(N,N)				- (i,i);
+--
+determine_width_of_item;
+determine_width_of_item(N)			- (i);
+--
+maximize_width(ItemWidth,ItemWidth)		- (i,o);
+minimize_width(ItemWidth,ItemWidth,ItemWidth)	- (i,i,o);
+--
+determine_absolute_height;
+--
+determine_size_scaling_mode;
+determine_size_scaling_mode
+	(ItemHeight,ItemHeight,SizeScalingMode)	- (i,i,o);
+get_mode_of_size_scaling(SizeScalingMode)	- (o);
+--
+determine_value_scaling_mode;
+determine_value_scaling_mode(N,N,ValueScalingMode)	- (i,i,o);
+get_mode_of_value_scaling(ValueScalingMode)		- (o);
+--
+scale_number(N,N,PZ,PZ)				- (i,i,i,o);
+--
+scale_date(
+	ExtendedWebResourceDate,
+	ExtendedWebResourceDate,
+	ExtendedWebResourceDate,PX)		- (i,i,i,o);
+--
+calculate_coefficient(N,Brightness)		- (i,o);
+--
+scale_real(
+	SizeScalingMode,
+	REAL,ItemHeight,ItemHeight,
+	ItemHeight)				- (i,i,i,i,o);
+scale_real(
+	ValueScalingMode,
+	REAL,N,N,
+	ItemHeight)				- (i,i,i,i,o);
+--
+-----------------------------------------------------------------------
+interface 'Web_Analyzer' (specialized 'Alpha'):
+--
+mode					: 'Report_Mode';
+--
+main_table				: 'ResultTable';
+counters				: 'ItemCounter';
+--
+con					: 'Console';
+--
+absolute_depth_of_graph			: PX;
+base_depth_of_graph			: PX;
+--
+absolute_width_of_graph			: PZ;
+base_width_of_graph			: PZ;
+--
+default_absolute_height_of_graph	: PY;
+default_base_height_of_graph		: PY;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+analyze_data(FileName)				- (i);
+--
+select_Y_parameter(SourceTable,N)		- (i,o);
+--
+get_real_width_of_item(ItemWidth)		- (o);
+get_real_absolute_height(ItemHeight)		- (o);
+get_real_base_height(ItemHeight)		- (o);
+--
+report_results;
+--
+nondeterm:
+--
+get_item(	WebResourceName,
+		WebAddressList,
+		ExtendedWebResourceDate,
+		N,
+		Hue,
+		SourceTable)			- (o,o,o,o,o,o);
+--
+determ:
+--
+is_keyword_scene;
+is_selected_keyword_scene;
+is_general_keyword_scene;
+--
+imperative:
+--
+get_units(SceneUnit)				- (o);
+--
+get_absolute_depth_of_graph(PX)			- (o);
+get_absolute_width_of_graph(PZ)			- (o);
+get_base_depth_of_graph(PX)			- (o);
+get_base_width_of_graph(PZ)			- (o);
+--
+determ:
+--
+get_selected_keyword(Keyword)			- (o);
+--
+imperative:
+--
+scale_number(WebResourceName,PZ)		- (i,o);
+scale_date(ExtendedWebResourceDate,PX)		- (i,o);
+scale_size(ItemHeight,ItemHeight)		- (i,o);
+scale_value(N,Brightness)			- (i,o);
+--
+'+'(N,N) = N					- (i,i);
+'+'(X,ItemWidth) = X				- (i,i);
+--
+'-'(N,N) = N					- (i,i);
+'-'(X,X) = X					- (i,i);
+'-'(Y,Y) = Y					- (i,i);
+--
+'-'(	ExtendedWebResourceDate,
+	ExtendedWebResourceDate) = INTEGER;
+--
+'*'(PX,REAL) = PX				- (i,i);
+--
+'/'(N,N) = REAL					- (i,i);
+'/'(ItemHeight,ItemHeight) = REAL		- (i,i);
+'/'(PX,INTEGER) = PX				- (i,i);
+'/'(PY,ItemWidth) = REAL			- (i,i);
+--
+'/'(	ExtendedWebResourceDate,
+	ExtendedWebResourceDate) = REAL;
+--
+determ:
+--
+'>'(N,N);
+'>'(N,REAL);
+'>'(ExtendedWebResourceDate,ExtendedWebResourceDate);
+--
+'<'(N,N);
+'<'(ExtendedWebResourceDate,ExtendedWebResourceDate);
+--
+'<='(N,N);
+--
+'<>'(ExtendedWebResourceDate,ExtendedWebResourceDate);
+]
+-----------------------------------------------------------------------
+interface 'ItemCounter' (specialized 'Database'):
+[
+DOMAINS:
+--
+mixed:
+--
+Target	= number_of_items(N);
+	  item_number(WebResourceName,N);
+	  min_size(ItemHeight);
+	  max_size(ItemHeight);
+	  min_date(ExtendedWebResourceDate);
+	  max_date(ExtendedWebResourceDate);
+	  min_value(N);
+	  max_value(N);
+	  width_of_item(ItemWidth);
+	  absolute_height_of_graph(ItemHeight);
+	  base_height_of_graph(ItemHeight);
+	  mode_of_size_scaling(SizeScalingMode);
+	  mode_of_value_scaling(ValueScalingMode).
+]
+-----------------------------------------------------------------------

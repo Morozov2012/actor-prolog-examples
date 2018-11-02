@@ -1,0 +1,62 @@
+--------------------------------------------------------------------
+--                                                                --
+--      A generic benchmark harness                               --
+--      (c) 2011, IRE RAS, Alexei A. Morozov                      --
+--                                                                --
+--------------------------------------------------------------------
+--
+DOMAINS:
+--
+Count		= INTEGER.
+--
+-- reference:
+--
+Number		= REAL.
+TestData	= Number*.
+--
+reference:
+--
+RefNumber	= REAL.
+--
+PREDICATES:
+--
+imperative:
+--
+bench(Count)				- (i);
+dodummy(Count)				- (i);
+dobench(Count)				- (i);
+--
+nondeterm:
+--
+repeat(Count)				- (i);
+--
+imperative:
+--
+dummy_benchmark(TestData,TestData)	- (i,o);
+--
+--------------------------------------------------------------------
+interface 'TestFacilities' (specialized 'Alpha'):
+--
+internal:
+--
+con		: 'Console';
+window		: 'Report';
+timer		: 'Timer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+data(TestData)			- (o);
+--
+nondeterm:
+--
+benchmark(TestData,TestData)	- (i,o);
+--
+determ:
+--
+'<='(Number,Number)		- (i,i);
+--
+]
+--------------------------------------------------------------------

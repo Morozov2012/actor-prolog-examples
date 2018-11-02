@@ -1,0 +1,52 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+RefBufferedImage	= ('BufferedImage').
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	panel		: 'MyPanel';
+	text		: 'Text';
+	con		: 'Console';
+	text_file	: 'File';
+--
+variable:
+--
+	buffered_image : RefBufferedImage;
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'MyPanel' (specialized 'Canvas2D'):
+--
+internal:
+--
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+draw_buffered_image(RefBufferedImage)		- (i);
+--
+draw_image(
+	RefBufferedImage,
+	PointX,		-- The x coordinate.
+	PointY,		-- The y coordinate.
+	PointX,		-- The width of the rectangle.
+	PointY)		-- The height of the rectangle.
+			- (i,i,i,i,i);
+]
+-----------------------------------------------------------------------

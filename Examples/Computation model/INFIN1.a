@@ -1,0 +1,134 @@
+---------------------------------------------------
+-- An example of Actor Prolog program.           --
+-- (c) 2008, IRE RAS, Alexei A. Morozov.         --
+-- Creation of an arbitrary number of processes. --
+---------------------------------------------------
+class 'Main' (specialized 'Dialog'):
+--
+constant:
+--
+	list	= ('ListOfNodes',
+			number_of_nodes,
+			list_of_nodes);
+--
+variable:
+--
+	number_of_nodes;
+	list_of_nodes;
+--
+	results	= list_of_nodes ?? get_data;
+--
+constant:
+--
+	output	= ('Reporter',
+			results);
+--
+[
+goal:-!,
+	show.
+--
+action(_):-!,
+	list << display.
+]
+---------------------------------------------------
+class 'Reporter' (specialized 'Console'):
+--
+variable:
+--
+	results;
+--
+[
+goal:-!,
+	set_color('RoyalBlue'),
+	writeln(results),
+	set_color('default').
+]
+---------------------------------------------------
+class 'ListOfNodes' (specialized 'Alpha'):
+--
+constant:
+--
+	world	= (('W',
+			n1,
+			list_of_nodes));
+--
+variable:
+--
+	number_of_nodes;
+	n1;
+	list_of_nodes;
+--
+[
+goal:-!,
+	check_number_of_processes(
+		number_of_nodes,n1).
+--
+check_number_of_processes(#,#):-!.
+check_number_of_processes(N,#):-
+	?val("INTEGER",N) <= 0,!.
+check_number_of_processes(N,N).
+--
+display:-
+	world << display.
+--
+alarm(_):-!.
+]
+---------------------------------------------------
+class 'W' (specialized 'Dialog'):
+--
+constant:
+--
+	world	= (('W',
+			n1=n2,
+			list_of_nodes=r2));
+--
+suspending:
+--
+	n1;
+--
+variable:
+--
+	n2;
+--
+protecting:
+--
+	list_of_nodes;
+--
+variable:
+--
+	r2;
+	target_value;
+--
+protecting:
+--
+	x	= _;
+	y	= _;
+--
+constant:
+--
+[
+goal:-!,
+	check_number(n1,n2,List,r2),
+	list_of_nodes== List,
+	set_coordinates(x,y),
+	show.
+--
+check_number(N,#,[self],_):-
+	?val("INTEGER",N) <= 1,!.
+check_number(N1,N2,[self|List],List):-
+	N2== ?val("INTEGER",N1)-1,!.
+check_number(_,_,_,_).
+--
+set_coordinates(X,Y):-
+	Distance== ?mod(?val("INTEGER",n1)*2,10),
+	X== ?val("RefX",35 - Distance),
+	Y== ?val("RefY",17 - Distance),!.
+set_coordinates(_,_).
+--
+display:-
+	show,
+	world << display.
+--
+get_data= d(n1,target_value).
+]
+---------------------------------------------------

@@ -1,0 +1,65 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+N	= SYMBOL.
+R	= REAL.
+S	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+--
+-----------------------------------------------------------------------
+class 'MyHashMap' (specialized 'LinkedHashMap'):
+[
+DOMAINS:
+--
+TargetValue	= f(N,R,S).
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyHashMap');
+--
+[
+goal:-!,
+	test1,
+	test2.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("I will store data items."),
+	set_color('default'),
+	store ? append(map(10000,f('symvol1',3.14,"Text1"))),
+	store ? append(map(30000,f('symvol1',7.00,"Text1"))),
+	store ? append(map(10000,f('symvol1',3.14,"Text2"))),
+	store ? append(map(50000,f('symvol3',3.14,"Text3"))),
+	store ? append(map(10000,f('symvol1',3.14,"Text3"))),
+	store ? append(map(70000,f('symvol1',3.14,"Text2"))),
+	store ? append(map(90000,f('symvol5',9.00,"Text3"))),
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("I will retrieve data items:"),
+	set_color('Blue'),
+	store ? find(Item),
+		writeln(Item),
+		fail.
+test2:-
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+]
+-----------------------------------------------------------------------

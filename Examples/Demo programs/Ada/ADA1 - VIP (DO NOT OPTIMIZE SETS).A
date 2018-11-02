@@ -1,0 +1,736 @@
+------------------------------------------------------------------
+--              An example of Actor Prolog program.             --
+--          (c) 1990-2011, IRE RAS, Alexei A. Morozov.          --
+------------------------------------------------------------------
+-- SYNTHESIS OF MULTIPLICATION ALGORITHMS WITH THE HELP OF THE  --
+-- UNDERDETERMINED SETS AND FUNCTIONS IN ACTOR PROLOG.          --
+-- Input data of the program:                                   --
+-- 1) Target function including integer multiplication and      --
+--    adding operations.                                        --
+-- 2) Definition of the multiplication and the adding.          --
+-- 3) Rules of use of cycles and branches in the programs       --
+--    (all second order rules are defined with the help of      --
+--    the underdetermined sets).                                --
+-- THE PROBLEM TO BE SOLVED BY THE PROGRAM:                     --
+-- The program must create algorithms implementing given target --
+-- function with the help of adding and shift commands only.    --
+-- Particularly, it must synthesize cycles for implementing     --
+-- the multiplying operations.                                  --
+-- The algorithms must be written in the Ada language.          --
+------------------------------------------------------------------
+--		The goal statement of the program		--
+------------------------------------------------------------------
+project:
+--
+	(('TRANSLATOR',
+		function = ('*',
+			input1 = ('DATA',
+				name="a"),
+			input2 = ('DATA',
+				name="b")),
+		report = ('ADA')))
+--
+------------------------------------------------------------------
+--		The 'TRANSLATOR' class				--
+------------------------------------------------------------------
+class 'TRANSLATOR' (specialized 'RULES'):
+--
+con		= ('Console');
+help_1		= ('Report',
+			title="TARGET",x=0,y=0,width=20,height=3);
+function	= ('TEST');
+report;
+format_output	= ('FORMAT',device=help_1);
+--
+[
+------------------------------------------------------------------
+--		The problem to be solved			--
+------------------------------------------------------------------
+goal:-
+	con ? show,
+	synthesis(Heading,Program),
+	spy_point('no_trace'),
+	report ? target_program(0,Heading,Program),
+	fail.
+goal:-!.
+--
+synthesis(TARGET_FUNCTION,
+		program([
+			declare([R|VARIABLES]),
+			input_list(VARIABLES),
+			'is'(R,X),
+			output(R)])):-
+	TARGET_FUNCTION== function ? value(),
+	create_list_of_variables(TARGET_FUNCTION,[],VARIABLES),
+	R == {value:"r"},
+	show_help_windows(TARGET_FUNCTION),
+	X == ?compute(TARGET_FUNCTION,0,_).
+--
+show_help_windows(TARGET_FUNCTION):-
+	help_1 ? write(" "),
+	format_output ? output(TARGET_FUNCTION),
+	report ? show_help_2,
+	fail.
+show_help_windows(_).
+------------------------------------------------------------------
+--		Analysis of target function			--
+------------------------------------------------------------------
+create_list_of_variables('*'(Right,Left),L1,L3):-!,
+	create_list_of_variables(Right,L1,L2),
+	create_list_of_variables(Left,L2,L3).
+create_list_of_variables('+'(Right,Left),L1,L3):-!,
+	create_list_of_variables(Right,L1,L2),
+	create_list_of_variables(Left,L2,L3).
+create_list_of_variables(Variable,Rest,Rest):-
+	is_member(Variable,Rest),!.
+create_list_of_variables(Variable,Rest,[Variable|Rest]):-
+	Variable == {value:Symbol|_},
+	symbol(Symbol),!.
+create_list_of_variables(Variable,Rest,[Variable|Rest]):-
+	Variable == {value:String|_},
+	string(String),!.
+create_list_of_variables(_,Rest,Rest).
+--
+is_member(Variable,[Variable|_]):-!.
+is_member(Variable,[_|Rest]):-
+	is_member(Variable,Rest).
+------------------------------------------------------------------
+]
+------------------------------------------------------------------
+--		The 'TEST' class				--
+------------------------------------------------------------------
+class 'TEST' (specialized 'TARGET'):
+--
+value_A		= {value:'a',even:'all',positive:'yes'};
+value_B		= {value:'b',even:'all',positive:'yes'};
+value_C		= {value:'c',even:'all',positive:'yes'};
+value_D		= {value:'d',even:'all',positive:'yes'};
+test_value	= '*'(value_A,'+'(value_B,'*'(value_C,value_D)));
+--
+[
+value() = test_value.
+]
+------------------------------------------------------------------
+--		Some dummy classes for definition		--
+--		of the target function ('*', '+', 'DATA')	--
+------------------------------------------------------------------
+class '*' (specialized 'F'):
+[
+f({value:X|_},{value:Y|_})
+		= {value:Z,even:Ze,positive:Zp}
+	:-
+	integer(X),
+	integer(Y),!,
+	Z== X * Y,
+	is_even(Z,Ze),
+	is_positive(Z,Zp).
+f(X,Y)	= '*'(X,Y).
+]
+------------------------------------------------------------------
+class '+' (specialized 'F'):
+[
+f({value:X|_},{value:Y|_})
+		= {value:Z,even:Ze,positive:Zp}
+	:-
+	integer(X),
+	integer(Y),!,
+	Z== X + Y,
+	is_even(Z,Ze),
+	is_positive(Z,Zp).
+f(X,Y)	= '+'(X,Y).
+]
+------------------------------------------------------------------
+class 'F' (specialized 'TARGET'):
+--
+input1;
+input2;
+--
+[
+value()	= ?f(X,Y) :-
+	X== input1 ? value(),
+	Y== input2 ? value().
+]
+------------------------------------------------------------------
+class 'DATA' (specialized 'TARGET'):
+--
+name;
+window	= ('Report',
+		title= "[Syntax error]",
+		height= 5,
+		width= 31,
+		y= 11,
+		x= 25);
+--
+[
+value()= {value:name,even:Flag1,positive:Flag2}
+	:-
+	integer(name),!,
+	is_even(name,Flag1),
+	is_positive(name,Flag2).
+value()= _ :-
+	real(name),!,
+	window ? write("\n Real values are not allowed !"),
+	fail.
+value()= {value:name,even:'all',positive:'yes'}.
+]
+------------------------------------------------------------------
+class 'TARGET' (specialized 'Alpha'):
+[
+is_even(X,'yes'):- even(X),!.
+is_even(_,'no').
+--
+is_positive(X,'yes'):- X > 0,!.
+is_positive(0,'zero_valued'):-!.
+is_positive(_,'no').
+]
+------------------------------------------------------------------
+--		Definition of the '*' operation			--
+------------------------------------------------------------------
+class 'RULES' (specialized 'SECOND_ORDER_RULES'):
+[
+'*'{index:A|_} = {value:0} :-
+	is_zero(A).
+'*'{index:A,argument_2:B|REST}
+		= ?'*'{index:?half(A),argument_2:('+'(B,B))|REST}
+	:-
+	positive(A),
+	is_even(A).
+'*'{index:A,argument_2:B|REST}
+		= {value:'+'(
+			?get_value(
+				?'*'{
+					index:?plus(A,-1),
+					argument_2:B|REST} ),
+			B)}
+	:-
+	positive(A),
+	is_odd(A).
+--
+is_zero(0).
+is_zero({positive:'zero_valued'|_}).
+--
+get_value({value:X})
+	= X :-!.
+]
+------------------------------------------------------------------
+--		Second order rules				--
+------------------------------------------------------------------
+class 'SECOND_ORDER_RULES' (specialized 'Alpha'):
+--
+w	= ('Report',
+		title="RESOLUTION TREE",
+		x=35,y=0,height=3,width=45);
+--
+con	= ('Console');
+--
+[
+------------------------------------------------------------------
+--		Definition of the block operator		--
+------------------------------------------------------------------
+compute({value:V|R},VN,VN)
+	= {value:V|R}.
+compute('+'(A,B),VN1,VN5)
+		= ?internal_block(ANALOG_A,ANALOG_B,R1,R2,R3)
+	:-
+	ANALOG_A == ?analog(A,VN1,VN2),
+	ANALOG_B == ?analog(B,VN2,VN3),
+	R1 == ?compute(A,VN3,VN4),
+	R2 == ?compute(B,VN4,VN5),
+	w ? write(" {}"),
+	R3 == {value:'+'(ANALOG_A,ANALOG_B)}.
+compute('*'(A,B),VN1,VN6)
+		= ?internal_block(ANALOG_A,ANALOG_B,R1,R2,R3)
+	:-
+	positive(A),!,
+	ANALOG_A == ?analog(A,VN1,VN2),
+	ANALOG_B == ?analog(B,VN2,VN3),
+	R1 == ?compute(A,VN3,VN4),
+	R2 == ?compute(B,VN4,VN5),
+	w ? write(" {"),
+	R3 == ?'*'{
+		index:ANALOG_A,
+		argument_2:ANALOG_B,
+		vn:vn(VN5,VN6) },
+	w ? write(" }").
+compute('*'(B,A),VN1,VN6)
+		= ?internal_block(ANALOG_A,ANALOG_B,R1,R2,R3)
+	:-
+	positive(A),!,
+	ANALOG_A == ?analog(A,VN1,VN2),
+	ANALOG_B == ?analog(B,VN2,VN3),
+	R1 == ?compute(A,VN3,VN4),
+	R2 == ?compute(B,VN4,VN5),
+	w ? write(" {"),
+	R3 == ?'*'{
+		index:ANALOG_A,
+		argument_2:ANALOG_B,
+		result:R3,
+		vn:vn(VN5,VN6) },
+	w ? write(" }").
+--
+internal_block(ANALOG_A,ANALOG_B,R1,R2,R3)
+	=	block([
+		declare([ANALOG_A,ANALOG_B]),
+		'is'(ANALOG_A,R1),
+		'is'(ANALOG_B,R2),
+		R3
+		]).
+------------------------------------------------------------------
+--		Definition of the DO-OD operation		--
+--								--
+-- Invariant: (For all S,Arg,XNew) F(X,A)=S+F(Arg,XNew)		--
+-- The guard: (XNew=0) => S=F(X,A) because F(0,_)=0 & Invariant	--
+-- Loop beginning:						--
+--	F(XNew,ArgEnd)=SEnd					--
+--	F(XNew,Arg)=S1 <= F(XEnd,ArgEnd)=SEnd & '*' definition  --
+-- For all loops:						--
+--	F(X,A)=F(XNew,Arg)+S =>					--
+--			F(X,A)=F(XEnd,ArgEnd)+SEnd		--
+------------------------------------------------------------------
+loop_result(X,XNew,X1,A,Arg,A1,S,S1)
+	=	block([
+		?declare_do_od(S,XNew,Arg),
+		'is'(S,0),
+		'is'(XNew,X),
+		'is'(Arg,A),
+		?do_od_block(XNew,X1,Arg,A1,S,S1),
+		S]).
+
+declare_do_od(S,XNew,Arg)
+	= declare([S,XNew,Arg]).
+--
+do_od_block(XNew,X1,Arg,A1,S,S1)
+	= do(	neq(XNew,0),
+			['is'(S,S1),'is'(Arg,A1),'is'(XNew,X1)]).
+--
+F{index:X,argument_2:A,vn:vn(VN1,VN5)|REST}
+		= {value:RESULT}
+	:-
+	positive(X),
+	XNew == ?analog(X,VN1,VN2),
+	S == ?newname(VN2,VN3),
+	Arg == ?newname(VN3,VN4),
+	0 == ?get_value(?F{
+			index:0,
+			argument_2:'any',
+			in_loop:b(XNew,S)|REST }),
+	w ? write(" DO"),
+	S1 == ?get_value(?F{
+			index:XNew,
+			argument_2:Arg,
+			in_loop:b(XNew,S),
+			inner:p(X1,A1),
+			vn:vn(VN4,VN5)|REST }),
+	RESULT == ?loop_result(X,XNew,X1,A,Arg,A1,S,S1),
+	w ? write(" OD").
+--
+_{index:XEnd,argument_2:ArgEnd,
+		in_loop:b(XNew,SEnd),
+		inner:p(XEnd,ArgEnd),vn:vn(VN,VN)|_}
+  			= {value:SEnd}
+  	:-
+	is_less(XEnd,XNew).
+------------------------------------------------------------------
+--		Definition of the IF-FI operation		--
+------------------------------------------------------------------
+F{index:Q,
+  inner:p('if'([guard(odd(Q),P1),guard(even(Q),P2)]),
+	    'if'([guard(odd(Q),A1),guard(even(Q),A2)]))|REST}
+		= {value:'if'([
+			guard(odd(Q),Z1),guard(even(Q),Z2)])}
+	:-
+	Q == {even:'all'|_},
+	Q1 == ?synonym1(Q),
+	Q2 == ?synonym1(Q),
+	is_odd(Q1),
+	is_even(Q2),
+	w ? write(" IF"),
+	Z1 == ?get_value(?F{index:Q1,inner:p(P1,A1)|REST}),
+	Z2 == ?get_value(?F{index:Q2,inner:p(P2,A2)|REST}),
+	w ? write(" FI").
+------------------------------------------------------------------
+--		Other operations				--
+------------------------------------------------------------------
+half(0)	= {value:0}.
+half(s(s(A)))
+	= {value:s(?get_value(?half(A)))}.
+half({value:N,even:'yes',positive:U})
+	= {value:half(N),even:'no',positive:U}.
+--
+plus(s(A),-1)
+	= {value:A}.
+plus({value:A,even:E|_},-1)
+		= {value:'+'(A,-1),even:NoE}
+	:-
+	not(E,NoE).
+--
+not('yes','no').
+not('no','yes').
+--
+positive(s(0)).
+positive(half(A)):-
+	positive(A).
+positive(s(A)):-
+	positive(A).
+positive({positive:'yes'|_}).
+--
+is_even(0).
+is_even(s(A)):-
+	is_odd(A).
+is_even({even:'yes'|_}).
+--
+is_odd(s(A)):-
+	is_even(A).
+is_odd({even:'no'|_}).
+--
+is_less(half(X),X):-!.
+is_less({value:half(X)|_},{value:X|_}):-!.
+is_less({value:half(X)|_},{value:X1|_}):-!,
+	is_less(X,X1).
+is_less('+'(X,-1),X):-!.
+is_less({value:'+'(X,-1)|_},{value:X|_}):-!.
+is_less({value:'+'(X,-1)|_},{value:X1|_}):-
+	is_less(X,X1).
+--
+synonym1({value:A,even:_|R})
+	= {value:A,even:_|R}
+	:- !.
+synonym1(A)
+	= {value:A,even:_}.
+--
+analog({value:_|REST},VN1,VN2)
+	= {value:?newname(VN1,VN2)|REST}.
+analog('+'(_,_),VN1,VN2)
+	= {value:?newname(VN1,VN2),even:'all',positive:'yes'}.
+analog('*'(_,_),VN1,VN2)
+	= {value:?newname(VN1,VN2),even:'all',positive:'yes'}.
+--
+neq(A,A):-!,
+	fail.
+neq(_,_).
+--
+newname(VN1,VN2) = name(VN1) :-
+	VN2== VN1 + 1.
+]
+------------------------------------------------------------------
+--		Syntax of target language			--
+------------------------------------------------------------------
+class 'LANGUAGE' (specialized 'Report'):
+--
+help_2	= ('Report',title="OUTPUT",x=20,y=0,width=15,height=3);
+--
+title	= "PROGRAM";
+x	= 0;
+y	= 3;
+height	= 22;
+--
+env	= ('Timer');
+con	= ('Console');
+--
+[
+target_program(T,Heading,program(P)):-!,
+	nl(),
+	write_heading(T,Heading),
+	main_block(T,"",P),
+	write_end_of_program(T).
+target_program(_,_,_):-
+	write("Error!"),
+	break('illegal_target_program').
+target_program(_,_,_).
+--
+tab(0):-!.
+tab(T):-!,
+	write("   "),
+	T1== T - 1,
+	tab(T1).
+]
+------------------------------------------------------------------
+--		Syntax of the Ada language			--
+------------------------------------------------------------------
+class 'ADA' (specialized 'LANGUAGE'):
+--
+internal:
+--
+	help_2;
+--
+constant:
+--
+	comment		= "14.3.1994";
+--
+internal:
+--
+	env;
+	format_output	= ('FORMAT',device=self);
+--
+[
+show_help_2:-
+	help_2 ? write(" ADA").
+--
+write_heading(T,Heading):-
+	env ? date(Year,_,_),
+	tab(T),
+	writeln("----------------------------------------------"),
+	tab(T),
+	writeln("--        Multiplication algorithm          --"),
+	tab(T),
+	writeln("--         created by Actor Prolog.         --"),
+	tab(T),
+	writef(	"--  (c) %4d, %s.   --\n",
+		Year,"IRE RAS, Alexei A. Morozov"),
+	tab(T),
+	writeln("----------------------------------------------"),
+	tab(T),
+	writeln("-- The begining of the program"),
+	tab(T),
+	write("-- Target function: "),
+	format_output ? output(Heading),
+	nl,
+	tab(T),
+	writeln("with TEXT_IO;"),
+	tab(T),
+	writeln("use TEXT_IO;"),
+	tab(T),
+	writeln("procedure EXAMPLE is"),
+	tab(T),
+	writeln("package IO_INT is new INTEGER_IO(INTEGER);"),
+	tab(T),
+	writeln("use IO_INT;"),
+	fail.
+write_heading(_,_).
+--
+write_end_of_program(T):-
+	tab(T),
+	writeln("-- The end of the program").
+--
+variable_name(S):-
+	symbol(S),!,
+	write(S).
+variable_name(S):-
+	string(S),!,
+	write(S).
+variable_name({value:Object|_}):-!,
+	variable_name(Object).
+variable_name(name(N)):-!,
+	write("VAR",N).
+variable_name(_):-
+	write("Error!"),
+	break('illegal_variable_name').
+variable_name(_).
+--
+declarations([]):-!,
+	writeln(": INTEGER;").
+declarations([S]):-!,
+	variable_name(S),
+	declarations([]).
+declarations([S|REST]):-!,
+	variable_name(S),
+	write(","),
+	declarations(REST).
+declarations(_):-
+	write("Error!"),
+	break('illegal_declarations').
+declarations(_).
+--
+main_block(T,Value,[declare(VARIABLES)|BODY]):-!,
+	tab(T), declarations(VARIABLES),
+	T1== T + 1,
+	tab(T), writeln("begin"),
+	operators(T1,Value,BODY),
+	tab(T), writeln("end;").
+main_block(T,Value,Block):-
+	block_operator(T,Value,Block).
+--
+block_operator(T,Value,[declare(VARIABLES)|BODY]):-!,
+	tab(T), writeln("declare"),
+	tab(T), declarations(VARIABLES),
+	T1== T + 1,
+	tab(T), writeln("begin"),
+	operators(T1,Value,BODY),
+	tab(T), writeln("end;").
+block_operator(T,Value,BODY):-!,
+	T1== T + 1,
+	tab(T), writeln("begin"),
+	operators(T1,Value,BODY),
+	tab(T), writeln("end;").
+--
+operators(_,_,[]):-!.
+operators(T,Value,[OP|REST]):-!,
+	ada_operator(T,Value,OP),
+	operators(T,Value,REST).
+operators(_,_,_):-
+	write("Error!"),
+	break('illegal_operators').
+operators(_,_,_).
+--
+ada_operator(_,_,Value):-
+	free(Value),
+	write("Error!\n"),
+	break('unbound_value').
+ada_operator(T,_,input_list(LIST)):-
+	input_list(T,LIST),
+	fail.
+ada_operator(T,_,output({value:A|_})):-
+	tab(T), write("put(\"Variable "),
+	variable_name(A),
+	writeln(" : \");"),
+	tab(T), write("put("),
+	variable_name(A),
+	writeln(");"),
+	fail.
+ada_operator(T,_,'is'(Value,Expression)):-
+	ada_operator(T,Value,Expression),
+	fail.
+ada_operator(T,Value,do(BB,OPERATORS)):-
+	tab(T), write("while "),
+	logic_expression(BB),
+	writeln(" loop"),
+	block_operator(T,Value,OPERATORS),
+	tab(T), writeln("end loop;"),
+	fail.
+ada_operator(T,Value,'if'(OPERATORS)):-
+	tab(T),
+	write("if "),
+	if_operator(T,Value,OPERATORS),
+	fail.
+ada_operator(T,Value,block(OPERATORS)):-
+	block_operator(T,Value,OPERATORS),
+	fail.
+ada_operator(T,Value,{value:Object|_}):-
+	ada_operator(T,Value,Object),
+	fail.
+ada_operator(T,Value,Object):-
+	is_arithmetic_expression(Object),
+	tab(T), variable_name(Value),
+	write(" := "),
+	arithmetic_expression(Object),
+	writeln(";"),
+	fail.
+ada_operator(_,_,_).
+--
+input_list(_,[]):-!.
+input_list(T,[{value:A|_}|Rest]):-!,
+	input_value(T,A),
+	input_list(T,Rest).
+input_list(_,_):-
+	write("Error!"),
+	break('illegal_input_list').
+input_list(_,_).
+--
+input_value(T,A):-
+	tab(T), write("put(\"Enter unsigned number '"),
+	variable_name(A),
+	writeln("', please: \");"),
+	tab(T), write("get("),
+	variable_name(A),
+	writeln(");"),
+	fail.
+input_value(_,_).
+--
+is_arithmetic_expression(Object):- integer(Object),!.
+is_arithmetic_expression(Object):- symbol(Object),!.
+is_arithmetic_expression(Object):- string(Object),!.
+is_arithmetic_expression(name(_)):-!.
+is_arithmetic_expression(s(_)):-!.
+is_arithmetic_expression('+'(_,_)):-!.
+is_arithmetic_expression(half(_)):-!.
+--
+arithmetic_expression({value:Object|_}):-
+	arithmetic_expression(Object),
+	fail.
+arithmetic_expression(Object):-
+	integer(Object),
+	Object < 0,
+	write("(",Object,")"),
+	fail.
+arithmetic_expression(Object):-
+	integer(Object),
+	Object >= 0,
+	write(Object),
+	fail.
+arithmetic_expression(Object):-
+	symbol(Object),
+	write(Object),
+	fail.
+arithmetic_expression(Object):-
+	string(Object),
+	write(Object),
+	fail.
+arithmetic_expression(name(N)):-
+	write("VAR",N),
+	fail.
+arithmetic_expression(s(Object)):-
+	write("("),
+	arithmetic_expression(Object),
+	write("+1)"),
+	fail.
+arithmetic_expression('+'(A,B)):-
+	write("("),
+	arithmetic_expression(A),
+	write(" + "),
+	arithmetic_expression(B),
+	write(")"),
+	fail.
+arithmetic_expression(half(Object)):-
+	arithmetic_expression(Object),
+	write(" /2"),
+	fail.
+arithmetic_expression(_).
+--
+logic_expression(neq(H1,H2)):-
+	arithmetic_expression(H1),
+	write(" /= "),
+	arithmetic_expression(H2),
+	fail.
+logic_expression(odd(H)):-
+	arithmetic_expression(H),
+	write(" rem 2 = 1"),
+	fail.
+logic_expression(even(H)):-
+	arithmetic_expression(H),
+	write(" rem 2 = 0"),
+	fail.
+logic_expression(_).
+--
+if_operator(T1,Value,[guard(G,P)]):-!,
+	logic_expression(G),
+	writeln(" then"),
+	T2== T1 + 1,
+	ada_operator(T2,Value,P),
+	tab(T1), writeln("end if;").
+if_operator(T1,Value,[guard(G,P)|REST]):-!,
+	logic_expression(G),
+	writeln(" then"),
+	T2== T1 + 1,
+	ada_operator(T2,Value,P),
+	tab(T1), write("elsif "),
+	if_operator(T1,Value,REST).
+if_operator(_,_,_):-
+	write("Error!"),
+	break('illegal_if_operator').
+if_operator(_,_,_).
+]
+------------------------------------------------------------------
+class 'FORMAT' (specialized 'Alpha'):
+--
+internal:
+--
+	device;
+--
+[
+output({value:Name|_}):-!,
+	device ? write(Name).
+output('*'(Value1,Value2)):-!,
+	output(Value1),
+	device ? write(" * "),
+	output(Value2).
+output('+'(Value1,Value2)):-!,
+	device? write("("),
+	output(Value1),
+	device ? write(" + "),
+	output(Value2),
+	device ? write(")").
+output(_):-
+	break('illegal_output_value').
+output(_).
+]
+------------------------------------------------------------------

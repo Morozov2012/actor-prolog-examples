@@ -1,0 +1,56 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+loop(INTEGER,INTEGER)	- (i,i);
+--
+class 'Main' (specialized 'Alpha'):
+--
+process1	= (('MainProcess'));
+process2	= (('AuxiliaryProcess'));
+--
+[
+]
+-----------------------------------------------------------------------
+class 'MainProcess' (specialized 'Timer'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	loop(1,150).
+--
+loop(N,M):-
+	N <= M,!,
+	sleep(0.1),
+	Time== ?time(),
+	con ? writeln("Main Proccess :: Loop ",N," :: Time: ",Time),
+	loop(N+1,M).
+loop(_,_):-
+	con ? writeln("Main Proccess :: end of cycle.").
+]
+-----------------------------------------------------------------------
+class 'AuxiliaryProcess' (specialized 'Timer'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	set_period(3),
+	activate.
+--
+tick:-!,
+	Time== ?time(),
+	con ? writeln("Auxiliary Proccess :: Tick :: Time: ",Time).
+]
+-----------------------------------------------------------------------
+

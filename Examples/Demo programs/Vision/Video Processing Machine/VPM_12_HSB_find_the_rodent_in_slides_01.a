@@ -1,0 +1,266 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+-----------------------------------------------------------------------
+project: (('DialogHSB'))
+-----------------------------------------------------------------------
+class 'DialogHSB' (specialized 'Dialog'):
+--
+constant:
+--
+	data_directory =
+		"L:/= Video =/W_L_Object 10 07 2017/"
+		"22 object/2 session";
+--
+	file_name_format	= "time 17-07-10 15-16-42 %04d.jpg";
+	frame_rate		= 30.0;
+	subsampling		= 1;
+--
+internal:
+--
+	vpm		= ('VideoProcessingMachine',
+				minimal_training_interval= -1,
+				-- maximal_training_interval= 100,
+				synthesized_image_transparency= 48);
+	timer		= ('SpecialTimer',
+				target_world= self);
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	text		= ('Text');
+	image1		= ('BufferedImage');
+	image2		= ('BufferedImage');
+	state		= ('ProgramState');
+	con		= ('Console');
+--
+variable:
+--
+	first_frame;
+	last_frame;
+	minimal_hue;
+	maximal_hue;
+	minimal_saturation;
+	maximal_saturation;
+	minimal_brightness;
+	maximal_brightness;
+--
+[
+goal:-!,
+	maximize,
+	Time0== timer?milliseconds(),
+	state ? set_beginning_time(Time0),
+	timer ? set_period(1/(frame_rate*2),0),
+	detect_minimal_file_number(1,MinFileNumber),
+	detect_maximal_file_number(1,MaxFileNumber,MinFileNumber),
+	put(2011,[MinFileNumber,MaxFileNumber]),
+	put(2012,[MinFileNumber,MaxFileNumber]),
+	put('first_frame',MinFileNumber),
+	put('last_frame',MaxFileNumber),
+	modified_control(0),
+	timer ? activate.
+--
+detect_minimal_file_number(N,N):-
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N),
+	image1 ? does_exist(ImageToBeLoaded),!.
+detect_minimal_file_number(N1,N2):-
+	N1 < 1_000_000,!,
+	detect_minimal_file_number(N1+1,N2).
+detect_minimal_file_number(_,1).
+--
+detect_maximal_file_number(N1,N3,Min):-
+	N2== N1 + 1,
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N2),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	show_frame_range_if_necessary(Min,N2),
+	detect_maximal_file_number(N2,N3,Min).
+detect_maximal_file_number(N,N,_).
+--
+show_frame_range_if_necessary(Min,Max):-
+	?mod(Max,1000) == 0,!,
+	put(2012,[Min,Max]),
+	put('last_frame',Max).
+show_frame_range_if_necessary(_,_).
+--
+modified_control(_):-
+	MinimalHue== ?val("INTEGER",?get('minimal_hue')),
+	MaximalHue== ?val("INTEGER",?get('maximal_hue')),
+	MinimalSaturation==
+		?val("INTEGER",?get('minimal_saturation')),
+	MaximalSaturation==
+		?val("INTEGER",?get('maximal_saturation')),
+	MinimalBrightness==
+		?val("INTEGER",?get('minimal_brightness')),
+	MaximalBrightness==
+		?val("INTEGER",?get('maximal_brightness')),!,
+	vpm ? suspend_processing,
+	vpm ? retract_all_instructions,
+	L11== [	p(57,89),p(589,61),p(606,212),p(602,411),
+		p(357,409),p(217,421),p(51,417)],
+	divide_list(subsampling,L11,L12),
+	vpm ? msk_select_polygon(L12),
+	vpm ? msk_select_foreground(
+		'HUE',MinimalHue,MaximalHue),
+	vpm ? msk_select_foreground(
+		'SATURATION',MinimalSaturation,MaximalSaturation),
+	vpm ? msk_select_foreground(
+		'BRIGHTNESS',MinimalBrightness,MaximalBrightness),
+	vpm ? process_now.
+--
+divide_list(K,[p(X,Y)|R1],[p(X/K,Y/K)|R2]):-!,
+	divide_list(K,R1,R2).
+divide_list(_,_,[]).
+--
+tick:-
+	T2== timer?milliseconds(),
+	state ? get_beginning_time(T1),
+	Delta== (T2 - T1) / 1000.0 * frame_rate,
+	N== ?convert_to_integer(?round(Delta)),
+	FFN== ?val("INTEGER",?get('first_frame')),!,
+	load_figure(N+FFN-1,T2).
+tick.
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	LFN== ?val("INTEGER",?get('last_frame')),
+	N <= LFN,
+	state ? set_current_frame(N),
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	image1 ? load(	ImageToBeLoaded,
+			subsampling,subsampling,0,0),
+	vpm ? process_realtime_frame(image1),
+	state ? increase_global_counter,
+	draw_scene.
+load_figure(_,T2):-
+	state ? set_beginning_time(T2).
+--
+draw_scene:-
+	vpm ? commit,
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	-- vpm ? get_recent_image(image2),
+	-- vpm ? get_preprocessed_image(image2),
+	-- vpm ? get_background_image(image2),
+	-- vpm ? get_sigma_image(image2),
+	vpm ? get_foreground_image(image2),
+	-- vpm ? get_synthesized_image(image2),
+	graphic_window ? draw_image(image2,0,0,1,1),
+	draw_legend,
+	graphic_window ? draw_now.
+--
+draw_legend:-
+	state ? get_current_frame(FrameNumber),!,
+	state ? get_stopwatch_time(Delay),
+	state ? get_frame_counter(FrameQuantity),
+	state ? get_global_counter(GlobalCounter),
+	Time== Delay / 1000.0,
+	FrameRate== FrameQuantity / Time,
+	graphic_window ? set_brush('Red'),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('LEFT','TOP'),
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %3.2f [sec]; Frame: %d (%d)",
+			Time,FrameNumber,GlobalCounter)),
+	graphic_window ? set_text_alignment('RIGHT','TOP'),
+	graphic_window ? draw_text(
+		0.98, 0.02,
+		text?format(
+			"Frame Rate: %3.2f [Hz]",
+			FrameRate)).
+draw_legend.
+]
+-----------------------------------------------------------------------
+class 'SpecialTimer' (specialized 'Timer'):
+--
+internal:
+--
+target_world;
+--
+[
+tick:-!,
+	target_world ? tick.
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		= ('Timer');
+--
+[
+CLAUSES:
+--
+get_beginning_time(Time):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(Time),!.
+--
+set_beginning_time(Time):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(Time)),
+	reset_stopwatch,
+	reset_frame_counter.
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)),
+	increase_frame_counter.
+--
+reset_stopwatch:-
+	retract_all(stop_watch_time(_)),
+	append(stop_watch_time(timer?milliseconds())).
+--
+get_stopwatch_time(Delay):-
+	T2== timer?milliseconds(),
+	Item== ?match(stop_watch_time(_)),
+	Item == stop_watch_time(T1),!,
+	Delay== T2 - T1.
+get_stopwatch_time(0).
+--
+reset_frame_counter:-
+	retract_all(frame_counter(_)).
+--
+increase_frame_counter:-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!,
+	retract_all(frame_counter(_)),
+	append(frame_counter(N+1)).
+increase_frame_counter:-
+	append(frame_counter(1)).
+--
+get_frame_counter(N):-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!.
+get_frame_counter(0).
+--
+increase_global_counter:-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!,
+	retract_all(global_counter(_)),
+	append(global_counter(N+1)).
+increase_global_counter:-
+	append(global_counter(1)).
+--
+get_global_counter(N):-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!.
+get_global_counter(0).
+]
+-----------------------------------------------------------------------

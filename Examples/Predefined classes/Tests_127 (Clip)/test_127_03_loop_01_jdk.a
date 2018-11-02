@@ -1,0 +1,67 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'Clip' from "morozov/Sound";
+
+PREDICATES:
+--
+imperative:
+--
+check_resource_state;
+check_if_resource_is_open;
+check_if_resource_is_active;
+check_if_resource_is_running;
+
+class 'Main' (specialized 'Clip'):
+--
+internal:
+--
+timer	= ('Timer');
+con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("Start the test..."),
+	check_resource_state,
+	con ? writeln("Open the resource..."),
+	open("jar:data/9.wav"),
+	check_resource_state,
+	con ? writeln("Start the loop(2) procedure..."),
+	loop(2),
+	check_resource_state,
+	con ? writeln("Sleep..."),
+	timer ? sleep(5),
+	check_resource_state,
+	-- con ? writeln("Stop the play..."),
+	-- stop,
+	-- check_resource_state,
+	con ? writeln("Close the resource..."),
+	close,
+	check_resource_state,
+	con ? writeln("Done!").
+--
+check_resource_state:-
+	check_if_resource_is_open,
+	check_if_resource_is_active,
+	check_if_resource_is_running.
+--
+check_if_resource_is_open:-
+	is_open,!,
+	con ? writeln("\tThe clip is open.").
+check_if_resource_is_open:-
+	con ? writeln("\tThe clip is not open.").
+--
+check_if_resource_is_active:-
+	is_active,!,
+	con ? writeln("\tThe clip is active.").
+check_if_resource_is_active:-
+	con ? writeln("\tThe clip is not active.").
+--
+check_if_resource_is_running:-
+	is_running,!,
+	con ? writeln("\tThe clip is running.").
+check_if_resource_is_running:-
+	con ? writeln("\tThe clip is not running.").
+]

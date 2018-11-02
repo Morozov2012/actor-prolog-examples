@@ -1,0 +1,101 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Dialog'):
+--
+variable:
+--
+	i;
+	j;
+--
+internal:
+--
+	w1	= ('TextPage',
+			variable:
+				value_1=i,
+				value_2=j,
+			constant:
+				text_color='White',
+				background_color='Red',
+				x=9,
+				y=4);
+	w2	= ('TextPage',
+			variable:
+				value_1=i,
+			constant:
+				text_color='White',
+				background_color='Orange',
+				x=27,
+				y=1);
+	w3	= ('TextPage',
+			variable:
+				value_1=i,
+				value_2=j,
+			constant:
+				text_color='Black',
+				background_color='Yellow',
+				x=45,
+				y=4);
+	w4	= ('TextPage',
+			variable:
+				value_1=i,
+			constant:
+				text_color='Black',
+				background_color='Green',
+				x=47,
+				y=9);
+	w5	= ('TextPage',
+			variable:
+				value_1=i,
+				value_2=j,
+			constant:
+				text_color='Black',
+				background_color='Cyan',
+				x=41,
+				y=12);
+	w6	= ('TextPage',
+			variable:
+				value_1=i,
+			constant:
+				text_color='White',
+				background_color='Blue',
+				x=13,
+				y=12);
+	w7	= ('TextPage',
+			variable:
+				value_1=i,
+				value_2=j,
+			constant:
+				text_color='White',
+				background_color='Violet',
+				x=7,
+				y=9);
+--
+[
+goal:-
+	show.
+]
+-----------------------------------------------------------------------
+class 'TextPage' (specialized 'Report'):
+--
+constant:
+--
+	width	= 27;
+	height	= 10;
+--
+variable:
+--
+	value_1;
+	value_2;
+--
+[
+goal:-
+	write_value("i",value_1),
+	write_value("j",value_2).
+--
+write_value(_,#).
+write_value(Name,V):-
+	writeln(Name,"= ",V).
+]
+-----------------------------------------------------------------------

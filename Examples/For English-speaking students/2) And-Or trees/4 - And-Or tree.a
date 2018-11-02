@@ -1,0 +1,113 @@
+-----------------------------------------------------
+--                                                 --
+--              Actor Prolog lessons               --
+--           (c) 2015 Alexei A. Morozov            --
+--                                                 --
+-- The topic: And-Or trees. Who is your grandpapa? --
+--                                                 --
+-----------------------------------------------------
+
+CLAUSES:
+
+father("Alexander","Alexei").
+father("Michael","Alexander").
+father("Boris","Ludmila").
+
+mother("Nina","Alexander").
+mother("Ludmila","Alexei").
+mother("Zoya","Ludmila").
+
+grandpapa(X,Y):-
+        father(FatherName,Y),
+        father(X,FatherName).
+grandpapa(X,Y):-
+        mother(MotherName,Y),
+        father(X,MotherName).
+
+goal:-
+        grandpapa(X,"Alexei"),
+        writeln(X," is grandpapa of Alexei."),
+        fail.
+
+/*
+This program corresponds to several
+(two) And trees (proof trees).
+
+Here is the first And tree:
+
+               the goal statement
+                 of the program
+                  /     |     \
+                 /      |      \
+             grandpapa  writeln  fail
+              /   \
+            father  father
+
+This is the second And tree:
+
+               the goal statement
+                 of the program
+                  /     |     \
+                 /      |      \
+             grandpapa  writeln  fail
+              /   \
+            mother  father
+
+(Arguments of sub-goals are not
+showed for the sake of simplicity.)
+
+Here is the Or tree (the search tree) of
+the program:
+
+                Sub-goals: grandpapa(X,"Alexei"), writeln(...), fail.
+                (the goal statement of the program)
+                                 / \
+grandpapa(X,Y):-                /   \  grandpapa(X,Y):-
+        father(FatherName,Y),  /     \         mother(MotherName,Y),
+        father(X,FatherName). /       \        father(X,MotherName).
+                             /         \
+                            /           \
+                           /             \
+                          /               \
+                         /                 \
+                        /                   \
+                       /                     \
+                      /                       \
+                     /                         \
+                    /                           \
+Sub-goals:                                Sub-goals:
+father(FatherName,"Alexei"),              mother(MotherName,"Alexei"),
+father(X,FatherName),                     father(X,MotherName),
+writeln(X,...),                           writeln(X,...),
+fail.                                     fail.
+|                                         |
+| father("Alexander","Alexei").           | mother("Ludmila","Alexei").
+|                                         |
+Sub-goals:                                Sub-goals:
+father(X,"Alexander"),                    father(X,"Ludmila"),
+writeln(X,...),                           writeln(X,...),
+fail.                                     fail.
+|                                         |
+| father("Michael","Alexander").          | father("Boris","Ludmila").
+|                                         |
+Sub-goals:                                Sub-goals:
+writeln(                                  writeln(
+     "Michael",                                "Boris",
+     " is grandpapa of Alexei."),              " is grandpapa of Alexei."),
+fail.                                     fail.
+|                                         |
+| Output results                          | Output results
+|                                         |
+Sub-goals:                                Sub-goals:
+fail.                                     fail.
+|                                         |
+This branch of the Or tree                This branch of the Or tree
+of the program is terminated              of the program is terminated
+with a failure.                           with a failure too.
+
+Here are the results of the logic program:
+
+Michael is grandpapa of Alexei.
+Boris is grandpapa of Alexei.
+
+*/

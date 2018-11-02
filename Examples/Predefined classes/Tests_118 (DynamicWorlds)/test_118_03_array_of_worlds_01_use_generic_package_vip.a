@@ -1,0 +1,16 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+
+import 'WorldArray' as 'WindowArray'
+	from "Arrays"('TargetClass':='Report');
+
+class 'Main' (specialized 'Alpha'):
+--
+w	= 'WindowArray'[..] of ('Report');
+--
+[
+goal:-
+	w[1000] ? writeln("Hi!"),!.
+]

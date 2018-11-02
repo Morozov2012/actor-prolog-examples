@@ -1,0 +1,161 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+draft('off')
+
+dialog 'VideoRecorder' (
+	"2.5D Video Recorder",
+	default,default,default,centered,centered,default)
+vbox(justify)
+	hbox(up)
+		vbox(center)
+			custom(5011,15,22,"Control2D")
+			button("Calibrate","Cali&brate")
+			button("Reset","Reset")
+			edittext['ReadOnly','AlignCenter'](5014,15,1,"")
+			edittext['ReadOnly','AlignCenter'](5015,15,1,"")
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			edittext['ReadOnly','AlignCenter'](5016,15,1,"")
+			edittext['ReadOnly','AlignCenter'](5017,15,1,"")
+			edittext['ReadOnly','AlignCenter'](5018,15,1,"")
+			edittext['ReadOnly','AlignCenter'](5019,15,1,"")
+		end_of_vbox
+		custom['KeepProportions'](main_window,70,65,"Control2D")
+		vbox(left)
+			custom(legend_window,15,22,"Control2D")
+			checkbox(1011,"D&epth Maps",'no')
+			checkbox(1012,"Colored Dept&h Maps",'no')
+			checkbox(1013,"In&frared",'no')
+			checkbox(1014,"&Long Exposure Infrared",'no')
+			checkbox(1015,"M&apped Color",'no')
+			checkbox(1016,"Point Clo&uds",'no')
+			checkbox(1017,"&Color",'no')
+			-- custom(0000,1,1,"Control2D")
+			statictext(0000,1,"")
+			checkbox(1021,"Total Rectangles",'no')
+			checkbox(1022,"Skeleton Rectangles",'no')
+			checkbox(1023,"Total Parallelepipeds",'no')
+			checkbox(1024,"Skeleton Parallelepipeds",'no')
+		end_of_vbox
+	end_of_hbox
+	hbox(justify)
+		listbutton(0,2010,15,9,
+			[
+			"Depth Maps",
+			"Colored Depth Maps",
+			"Infrared",
+			"Long Exposure Infrared",
+			"Mapped Color",
+			"Point Clouds",
+			"Color",
+			"Device Tuning",
+			"None"
+			],
+			"Colored Depth Maps"
+			)
+		listbutton(0,2020,16,7,
+			[
+			"Tincture People",
+			"Paint People",
+			"Extract People",
+			"Adaptively Extract People",
+			"Project People",
+			"None"
+			],
+			"Tincture People"
+			)
+		listbutton(0,2030,16,7,
+			[
+			"Total Rectangles",
+			"Skeleton Rectangles",
+			"Total Parallelepipeds",
+			"Skeleton Parallelepipeds",
+			"None"
+			],
+			"None"
+			)
+		listbutton(0,2040,12,7,
+			[
+			"Detect Skeletons",
+			"Track Skeletons",
+			"None"
+			],
+			"Track Skeletons"
+			)
+		listbutton(0,2050,10,9,
+			[
+			"Aqua",
+			"Autumn",
+			"Blackhot",
+			"Blaze",
+			"BlueRed",
+			"Bone",
+			"Bright Rainbow",
+			"Cool",
+			"Copper",
+			"Gray",
+			"Green",
+			"Hot",
+			"HSV",
+			"Iron",
+			"Jet",
+			"LightJet",
+			"Medical",
+			"Ocean",
+			"Parula",
+			"Pink",
+			"Prism",
+			"Purple",
+			"Red",
+			"Reptiloid",
+			"Soft Rainbow",
+			"Spring",
+			"Summer",
+			"Winter",
+			"Optical",
+			"None"
+			],
+			"Ocean"
+			)
+		listbutton(0,2060,7,9,
+			[
+			"Rainbow",
+			"Red",
+			"Orange",
+			"Yellow",
+			"Green",
+			"Cyan",
+			"Blue",
+			"Magenta"
+			],
+			"Green"
+			)
+	end_of_hbox
+	hscroll(3011,3012,50,[0,255],0)
+	hbox(justify)
+	scaling(1.5,1.0)
+		button("Connect","Co&nnect")
+		button("Choose","Ch&oose")
+		ok("Play","&Play")
+		button("Pause","Pau&se")
+		button("Record","&Record")
+		button("Stop","S&top")
+		button("Save","Sa&ve")
+		button("Export","E&xport")
+		button(close,"&Quit")
+	end_of_scaling
+	end_of_hbox
+	padding(0,0)
+		statictext(
+			"The project is supported by the Russian "
+			"Foundation for Basic Research, "
+			"grant 16-29-09626-ofi_m. "
+			"WebSite: www.fullvision.ru")
+	end_of_padding
+end_of_vbox
+end_of_dialog

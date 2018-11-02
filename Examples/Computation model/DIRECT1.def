@@ -1,0 +1,35 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, Alexei A. Morozov, IRE RAS. --
+-- Transmission of direct message.       --
+-------------------------------------------
+DOMAINS:
+--
+N	= INTEGER.
+--
+-------------------------------------------
+interface 'Direct1':
+--
+p1	: 'Receiver';
+p2	: 'Sender';
+[
+]
+-------------------------------------------
+interface 'Receiver':
+--
+con	: 'Report';
+--
+[
+PREDICATES:
+--
+p(N,N,N)	- (i,i,i);
+q(N,N,N)	- (i,i,i);
+]
+-------------------------------------------
+interface 'Sender':
+--
+target	: 'Receiver';
+--
+[
+]
+-------------------------------------------

@@ -1,0 +1,167 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+TextLabel	= STRING.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha', 'CommunicationOperations'):
+--
+internal:
+--
+	datastore	: 'DataStore';
+	database	: '3DDataSources';
+	dialog		: 'MainDialog';
+	graphic_window	: 'Canvas3D';
+	video_producer	: '3DVideoSupplier';
+	state		: 'DataSupplierState';
+	con		: 'Console';
+	trap		: 'CommunicationOperations';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+register_consumer('ThermalDataConsumer')		- (i);
+forget_consumer('ThermalDataConsumer')			- (i);
+--
+notify_all_consumers(Skeletons,BINARY)			- (i,i);
+reset_all_consumers;
+--
+determ:
+--
+alarm(	ExceptionName,
+	SYMBOL,
+	'ThermalDataConsumer')		- (i,i,i);
+alarm(	ExceptionName,
+	SYMBOL,
+	'ThermalDataConsumer',
+	Skeletons,
+	BINARY)				- (i,i,i,i,i);
+]
+-----------------------------------------------------------------------
+interface '3DVideoSupplier' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	first_frame	: INTEGER;
+	end_frame	: INTEGER;
+	frame_type	: KinectFrameType;
+	people_index	: KinectPeopleIndexMode;
+	skeletons	: KinectSkeletonsMode;
+--
+internal:
+--
+	main_label	: NodeLabel;
+	communicator	: 'Main';
+	graphic_window	: 'Canvas3D';
+	buffer2D	: 'BufferedImage';
+	buffer3D	: 'BufferedScene';
+	image		: 'BufferedImage';
+	frame_info	: 'FirstFrameInformation';
+	text		: 'Text';
+	con		: 'Console';
+--
+constant:
+--
+	texture_file_format		: STRING;
+	texture_directory		: STRING;
+	texture_frame_rate		: REAL;
+	texture_frame_number_shift	: INTEGER;
+	lookup_table_file_name		: STRING;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+initialize;
+process_frame(FrameNumber,INTEGER)			- (i,i);
+--
+create_list_of_nodes(NodeList)				- (o);
+create_main_group(Node)					- (o);
+]
+-----------------------------------------------------------------------
+interface 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	communicator	: 'Main';
+	graphic_window	: 'Canvas3D';
+	message_window	: 'Report';
+--
+[
+]
+-----------------------------------------------------------------------
+interface '3DDataSources' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= ('Main').
+--
+]
+-----------------------------------------------------------------------
+interface 'DataSupplierState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= consumer('ThermalDataConsumer').
+--
+PREDICATES:
+--
+imperative:
+--
+register_consumer('ThermalDataConsumer')		- (i);
+forget_consumer('ThermalDataConsumer')			- (i);
+--
+nondeterm:
+--
+get_any_consumer('ThermalDataConsumer')			- (o);
+]
+-----------------------------------------------------------------------
+interface 'FirstFrameInformation' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+set_first_frame_time(INTEGER)				- (i);
+get_first_frame_time(INTEGER)				- (o);
+]
+-----------------------------------------------------------------------
+interface 'ThermalDataConsumer':
+[
+PREDICATES:
+--
+imperative:
+--
+new_frame(Skeletons,BINARY)				- (i,i);
+reset();
+]
+-----------------------------------------------------------------------
+interface 'CommunicationOperations':
+[
+PREDICATES:
+--
+determ:
+--
+notify_consumer('ThermalDataConsumer',Skeletons,BINARY)	- (i,i,i);
+reset_consumer('ThermalDataConsumer')			- (i);
+]
+-----------------------------------------------------------------------

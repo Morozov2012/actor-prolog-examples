@@ -1,0 +1,22 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+nondeterm:
+
+p(INTEGER)	- (o);
+
+CLAUSES:
+
+goal:-
+	p(X),
+	writeln("X= ",X),
+	fail.
+
+p(1).
+p(2).
+p(3):-!.
+p(4).

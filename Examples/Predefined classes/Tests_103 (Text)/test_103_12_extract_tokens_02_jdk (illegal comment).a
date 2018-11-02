@@ -1,0 +1,64 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+N	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+test11;
+test12;
+--
+write_tokens(S_List,N)		- (i,i);
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test11,
+	test12.
+--
+test11:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.1"),
+	Text== " -- Comment without line end",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Tokens== ?extract_tokens(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test11.
+--
+test12:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.2"),
+	Text== " /* Comment without line end",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Tokens== ?extract_tokens(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test12.
+--
+write_tokens([Token|Rest],N):-!,
+	con ? writeln("\tToken ",N,": >>>",Token,"<<<"),
+	write_tokens(Rest,N+1).
+write_tokens(_,_).
+]

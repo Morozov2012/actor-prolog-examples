@@ -1,0 +1,68 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',14)
+
+dialog 'MyDialog'("Scroll Demo",default,default,default,centered,centered,default)
+vbox(center)
+	hscroll(1010,output_slot_1,15,[0,40],10)
+	grid
+		row
+			column
+				button("action11","Set range: [1,10]")
+			end_of_column
+			column
+				button("action12","Set position: 3")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action21","Set range: [-100,100]")
+			end_of_column
+			column
+				button("action22","Set position: 11.5")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action31","Set range: [0,7.3]")
+			end_of_column
+			column
+				button("action32","Set position: 0")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action41","Set range: [ ]")
+			end_of_column
+			column
+				button("action42","Set position: -1")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action51","Set range: #")
+			end_of_column
+			column
+				button("action52","Set position: #")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action61","Set range: _")
+			end_of_column
+			column
+				button("action62","Set position: _")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action71","Get range")
+			end_of_column
+			column
+				button("action72","Get position")
+			end_of_column
+		end_of_row
+	end_of_grid
+end_of_vbox
+vscroll(1020,output_slot_2,15,[0,40],10)
+end_of_dialog

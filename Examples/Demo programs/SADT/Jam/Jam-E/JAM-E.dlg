@@ -1,0 +1,46 @@
+mesh(80,25)
+failure_color('Red','White')
+diagram_font("Arial",15)
+dialog_font("Arial",12)
+
+dialog '_Analysis_of_model:_What_kitchen_utensils_are_we_need?' (
+          "Cooking battery",default,default,default,
+          centered,centered,default)
+     vbox(center)
+          listbox['Sort'](instruments,3000,20,9,[],[])
+          button(close,"&Close")
+     end_of_vbox
+end_of_dialog
+
+dialog '_Choose_berries_and_fruits' (
+          "Choose berries and fruits",default,default,default,
+          centered,centered,default)
+     vbox(center)
+          listbox(1000,value_o1,20,4,
+               [
+               "Black rowan",
+               "The \"Antonovka\" apples",
+               "Strawberry"
+               ],
+               [
+               "Black rowan"
+               ])
+          ok(close,"&Close")
+     end_of_vbox
+end_of_dialog
+
+dialog 'HeatUpMixture' (
+          "Heat the mixture",'Blue',default,default,
+          centered,centered,default)
+     vbox(center)
+          "For selected berries and fruits "
+          text['AlignCenter'](fruits,15,1)
+          "you should heat sugar mixture "
+          hbox
+               "about"
+               text['AlignCenter'](time,3,1)
+               "minutes"
+          end_of_hbox
+          ok(close,"&Close")
+     end_of_vbox
+end_of_dialog

@@ -1,0 +1,37 @@
+package "Morozov/Web/Scanning/_Anlsr"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------------
+--              The "ANALYSER" Actor Prolog package.               --
+--           (c) 2002-2005, IRE RAS, Alexei A. Morozov.            --
+---------------------------------------------------------------------
+-- This package provides an engine for analyzing Web Sites and     --
+-- collecting information about them.                              --
+---------------------------------------------------------------------
+import "Morozov/Web/Data/Keywords";
+import 'ControlDialog'	    from "Morozov/Web/Scanning/Control";
+import 'Scanner'	    from "Morozov/Web/Scanning/Core";
+import 'Plain_Report'	    from "Morozov/Web/Scanning/Messages";
+import 'AnalyserMessages'   from "Morozov/Web/Scanning/Messages";
+import 'Statistics'	    from "Morozov/Web/Scanning/Counter";
+import 'StatisticsReporter' from "Morozov/Web/Scanning/Counter";
+import 'ScanSite'           from "Morozov/Web/Scanning/Analyser";
+import '_AnalyserControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+---------------------------------------------------------------------
+interface '_Scan_Site' (specialized '_Block', '_AnalyserControl'):
+--
+variable:
+--
+	value_i1	: WebAddressList;
+	value_c1	: KeywordList;
+--
+	keywords	: KeywordList;
+	location	: WebAddressList;
+--
+internal:
+--
+	world		: 'ScanSite';
+--
+[
+]
+---------------------------------------------------------------------

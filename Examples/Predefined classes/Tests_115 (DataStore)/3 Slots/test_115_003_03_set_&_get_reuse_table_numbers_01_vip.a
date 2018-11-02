@@ -1,0 +1,67 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(YesNo)		- (i);
+test3;
+--
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('DataStore',
+		name="MyDataStore.dat");
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2('no'),
+	test1,
+	test2('yes'),
+	test1.
+--
+test0:-
+	set_color('RoyalBlue'),
+	writeln("Test 0."),
+	set_color('default'),
+	store?get_reuse_table_numbers(),!,
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+test0:-
+	set_color('Red'),
+	writeln("Failed!"),
+	set_color('default').
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test 1."),
+	set_color('default'),
+	Mode== store?get_reuse_table_numbers(),!,
+	writeln("Mode= ",Mode),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+test1:-
+	set_color('Red'),
+	writeln("Failed!"),
+	set_color('default').
+--
+test2(Mode):-
+	set_color('RoyalBlue'),
+	writeln("Test 2."),
+	set_color('default'),
+	store ? set_reuse_table_numbers(Mode),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+]
+-----------------------------------------------------------------------

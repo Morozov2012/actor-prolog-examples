@@ -1,0 +1,155 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving and output of information from    --
+--       arbitrary number of Web resources by         --
+--       concurrent processes.                        --
+--------------------------------------------------------
+project: (('Main'))
+--------------------------------------------------------
+class 'Main' (specialized 'WebReceptor'):
+--
+constant:
+--
+	location =
+		"http://www.cplire.ru/Lab144/"
+		"selected.html";
+--
+variable:
+--
+	target_list;
+--
+constant:
+--
+	chain	 = (('ReceptorChain',
+			target_list,
+			previous_receptors=[]));
+--
+[
+goal:-!,
+	check_list(?get_references).
+--
+check_list([]):-!.
+check_list(target_list).
+]
+--------------------------------------------------------
+class 'ReceptorChain':
+--
+suspending:
+--
+	target_list;
+--
+variable:
+--
+	rest_of_list;
+--
+constant:
+--
+	chain	 = (('ReceptorChain',
+			target_list=rest_of_list,
+			previous_receptors=
+				[receiver|previous_receptors]));
+--
+suspending:
+--
+	previous_receptors;
+--
+variable:
+--
+	location;
+--
+constant:
+--
+	receiver = (('CheckPage',
+			location));
+--
+-- variable:
+protecting:
+--
+	all_receptors;
+--
+constant:
+--
+	out	 = (('Output',
+			suspending: all_receptors));
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-
+	-- con ? writeln(target_list,all_receptors),
+	check_list(target_list,all_receptors).
+--
+check_list([location],[receiver|previous_receptors]):-!.
+check_list([location|rest_of_list],_).
+--
+alarm(_):-
+	fail.
+]
+--------------------------------------------------------
+class 'CheckPage' (specialized 'WebReceptor'):
+--
+suspending:
+--
+	location;
+--
+variable:
+--
+	parameters;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	-- con ? writeln("CheckPage: ",location),
+	-- con ? writeln("CheckPage GET PARAMETERS: ",?get_parameters()),
+	[parameters],
+	-- con ? writeln("CheckPage PARAMETERS: ",parameters),
+	parameters == ?get_parameters.
+	-- con ? writeln("CheckPage GET_PARAMETERS: ",?get_parameters()).
+--
+get_data= Line
+	:-
+	[parameters],
+	-- con ? writeln(">>> ",parameters),
+	parameters == entry(URL,Date,_,_),
+	Line== ?format(
+		"%s\t%s",
+		URL,
+		?date_to_string(Date)).
+--
+date_to_string(date(Year,Month,Day))=
+	?format("%d-%02d-%04d",Day,Month,Year)
+	:-!.
+date_to_string(_)= "".
+]
+--------------------------------------------------------
+class 'Output' (specialized 'Dialog'):
+--
+constant:
+--
+--	identifier		= "out";
+--
+	background_color	= 'Yellow';
+--
+variable:
+--
+	all_receptors;
+--
+	results	 = all_receptors ?? get_data();
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	[all_receptors],
+	-- con ? writeln("ALL: ",all_receptors),
+	show.
+]
+--------------------------------------------------------

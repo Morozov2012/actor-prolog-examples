@@ -1,0 +1,28 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, IRE RAS, Alexei A. Morozov. --
+-------------------------------------------
+
+DOMAINS:
+
+N	= INTEGER.
+List	= N*.
+
+PREDICATES:
+
+imperative:
+
+append(List,List) = List	- (i,i);
+
+CLAUSES:
+
+goal:-
+	L1== [1,2,3],
+	L2== [4,5,6,7],
+	writeln("Front list: ",L1),
+	writeln("Rest list:  ",L2),
+	L3== ?append(L1,L2),
+	writeln("Result:     ",L3).
+
+append([],L)= L.
+append([H|R1],L2)= [H|?append(R1,L2)].

@@ -1,0 +1,156 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+import .. from "morozov/Java3D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	sampling_rate	= 10;
+	width		= 640;
+	height		= 480;
+--
+internal:
+--
+	canvas		= ('DemoWindow');
+	image		= ('BufferedImage');
+	writer		= ('FFmpeg',
+				operating_mode='WRITING',
+				name="Test01.avi");
+	counter		= ('Counter');
+	con		= ('Console');
+--
+[
+goal:-!,
+	canvas ? show,
+	canvas ? get_image(image),
+	canvas ? attach_offscreen_canvas,
+	writer ? open({
+		codec_type: 'AVMEDIA_TYPE_VIDEO',
+		destination_image_width: width,
+		destination_image_height: height,
+		time_base: q(1,sampling_rate),
+		bit_rate: 5_000_000
+		}),
+	set_period(1/sampling_rate),
+	activate.
+--
+tick:-
+	counter?read_and_increase > 100,!,
+	suspend,
+	canvas ? hide,
+	writer ? close,
+	canvas ? detach_offscreen_canvas,
+	con ? writeln("Done.").
+tick:-!,
+	canvas ? get_image(image,width,height),
+	writer ? write_image(image).
+]
+-----------------------------------------------------------------------
+class 'DemoWindow' (specialized 'Canvas3D'):
+--
+internal:
+--
+	text_tools			= ('Text');
+--
+constant:
+--
+	background_color		= color3(0.05,0.05,0.5);
+	enable_scene_antialiasing	= 'yes';
+--
+[
+goal:-!,
+	Text== "Actor Prolog",
+	SL== text_tools?length(Text),
+	Scale== 1.2 / SL,
+	X== - (SL) / 2.0,
+	MaximumAngle== ?pi()*2.0,
+	Bounds== 'BoundingSphere'({
+			center: p(0.0,0.0,0.0),
+			radius: 100.0
+			}),
+	show([
+		'TransformGroup'({
+			transform3D: 'Transform3D'({
+				scale: Scale
+				}),
+			branches: [
+				'TransformGroup'({
+					allowTransformWrite: 'yes',
+					allowTransformRead: 'yes',
+					branches: [
+						'Shape3D'({
+							geometry: 'Text3D'({
+								font3D: 'Font3D'({
+									fontName: 'helvetica',
+									fontSize: 2,
+									fontStyle: [],
+									extrudePath: 'FontExtrusion'({})
+									}),
+								string: Text,
+								position: p(X,-1,-1),
+								horizontalAlignment: 'ALIGN_FIRST',
+								path: 'PATH_RIGHT',
+								characterSpacing: 0.0
+								}),
+							appearance: 'Appearance'({
+								material: 'Material'({
+									lightingEnable: 'yes'
+									})
+								})
+							}),
+						'RotationInterpolator'({
+							alpha: 'Alpha3D'({
+								loopCount: -1,
+								increasingEnable: 'yes',
+								increasingAlphaDuration: 4000
+								}),
+							transformAxis: 'Transform3D'({}),
+							minimumAngle: 0.0,
+							maximumAngle: MaximumAngle,
+							schedulingBounds: Bounds
+							})
+						]
+					})
+				]
+			}),
+		'Background'({
+			color: background_color,
+			applicationBounds: Bounds
+			}),
+		'AmbientLight'({
+			color: color3(0.3,0.3,0.3),
+			influencingBounds: Bounds
+			}),
+		'DirectionalLight'({
+			color: color3(1.0,1.0,0.9),
+			direction: [1.0,1.0,1.0],
+			influencingBounds: Bounds
+			}),
+		'DirectionalLight'({
+			color: color3(1.0,1.0,0.9),
+			direction: [-1.0,-1.0,-1.0],
+			influencingBounds: Bounds
+			}),
+		'OrbitBehavior'({
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			})
+		]).
+]
+-----------------------------------------------------------------------
+class 'Counter' (specialized 'Database'):
+[
+read_and_increase = N :-
+	retract(N),!,
+	insert(N+1).
+read_and_increase = 1 :-
+	insert(2).
+]
+-----------------------------------------------------------------------

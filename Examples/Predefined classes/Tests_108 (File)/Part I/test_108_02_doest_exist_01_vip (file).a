@@ -1,0 +1,93 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3(YesNo)		- (i);
+test4;
+
+class 'Main':
+--
+internal:
+--
+	file1	= ('Test',
+			name= "test.asc",
+			try_to_delete_this_file= 'yes');
+	file2	= ('Test',
+			name= 'stdin');
+	file3	= ('Test',
+			name= 'stdout');
+	file4	= ('Test',
+			name= 'stderr');
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'File'):
+--
+constant:
+--
+	name			: FileName;
+--
+	try_to_delete_this_file	: YesNo		= 'no';
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("=== File: ",name," ==="),
+	test1,
+	test2,
+	test3(try_to_delete_this_file),
+	test1,
+	test2,
+	test4,
+	test1,
+	test2.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tDoes the file exist?"),
+	?does_exist(),!,
+	con ? writeln("\tYes, it does!").
+test1:-
+	con ? writeln("\tNo, it doesn't.").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tDoes the file exist?"),
+	?does_exist(name),!,
+	con ? writeln("\tYes, it does!").
+test2:-
+	con ? writeln("\tNo, it doesn't.").
+--
+test3('no'):-!,
+	con ? writeln("A standard file cannot be deleted.").
+test3(_):-
+	con ? writeln("Test 3"),
+	con ? writeln("\tI will try to delete the file."),
+	?delete(name),!,
+	con ? writeln("\tThe file was deleted successfully.").
+test3(_):-
+	con ? writeln("\tI cannot delete it.").
+--
+test4:-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to clear the file."),
+	?clear(),
+	con ? writeln("\tDone!").
+]

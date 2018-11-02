@@ -1,0 +1,217 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-----------------------------------------------------------------------
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Thanks to Andrew Davison                                          --
+-- Davison A. Kinect Open Source Programming Secrets (KOPS). -       --
+-- McGraw Hill, 2012.                                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	name	=	"J:/J4K (2018-05-07-Sixth_attempt)"
+			"/Kinect2/Video/"
+			"006.k2j";
+	first_frame	= 1;
+	end_frame	= 841;
+--
+	operating_mode	= 'PLAYING';
+	frame_type	= 'POINT_CLOUDS';
+	people_index	= 'EXTRACT_PEOPLE';
+--
+	skeletons	= 'DETECT_SKELETONS';
+	-- skeletons	= 'NONE';
+--
+	displaying_mode	= {
+		frame_type,
+		people_index,
+		skeletons};
+--
+	color_map	= 'OPTICAL';
+	-- color_map	= 'NONE';
+--
+internal:
+--
+	window		= ('Canvas2D');
+	dialog		= ('MainDialog',
+				kinect_buffer= self,
+				graphic_window= window,
+				thermal_data);
+	buffer		= ('BufferedImage');
+	image		= ('BufferedImage');
+	state		= ('ProgramState');
+	text		= ('Text');
+	thermal_data	= ('ThermalData');
+	con		= ('Console');
+--
+constant:
+--
+	main_label		= "Skeletons";
+	cylinder_radius		= 0.02;
+	joint_radius		= 0.03;
+	head_radius		= 0.05;
+	limb_transparency	= 0.1;
+	up_vector		= p(0,1,0);
+--
+	texture_file_format	= "%08d.jpeg";
+--
+	texture_directory	=
+		"J:/J4K (2018-05-07-Sixth_attempt)"
+		"/TEV1/Video/"
+		-- "2018-05-07-00-37-47-medical";
+		-- "2018-05-07-00-37-47-purple";
+		"2018-05-07-00-37-47-gray";
+	texture_frame_rate	= 8.845074812967582;
+	texture_time_shift	= 2161;
+--
+	lookup_table_file_name	=
+		"J:/J4K (2018-05-07-Sixth_attempt)/stereo-2/"
+		"LookUpTable.txt";
+--
+[
+goal:-!,
+	dialog ? maximize,
+	set_lookup_table(lookup_table_file_name),
+	start.
+--
+frame_obtained:-
+	commit,!,
+	get_recent_frame_number(FrameNumber1),
+	get_recent_frame_time(Time1),
+	state ? set_first_frame_time(FrameNumber1,Time1),
+	process_frame(FrameNumber1,Time1).
+--
+process_frame(N1,Time1):-
+	N1 >= first_frame,
+	N1 <= end_frame,
+	state ? get_first_frame_time(N0,Time0),
+	compute_time(N1,Time1,N0,Time0,Time2),
+	FileNumber== texture_frame_rate * Time2 / 1000,
+	-- con ? writeln(Time1," -> ",FileNumber),!.
+	ShortFileName== text?format(
+		texture_file_format,?round(FileNumber)),
+	ImageToBeLoaded==
+		texture_directory + "/" +
+		ShortFileName,
+	image ? does_exist(ImageToBeLoaded),!,
+	image ? load(ImageToBeLoaded),
+	get_recent_mapping(buffer,image),
+	get_skeletons(Skeletons),
+	analyse_skeletons(Skeletons,buffer,Time1),
+	window ? draw_image(buffer,0,0,1,1).
+process_frame(FrameNumber,_):-
+	FrameNumber > end_frame,!,
+	stop,
+	start.
+process_frame(_,_).
+--
+compute_time(N0,_,N0,_,Time):-!,
+	Time== 0.0 - texture_time_shift.
+compute_time(N1,Time1,N0,Time0,Time3):-
+	Time2== N1 * (Time1-Time0) / (N1-N0),
+	Time3== Time2 - texture_time_shift.
+--
+data_transfer_completion:-!,
+	stop,
+	start.
+-----------------------------------------------------------------------
+analyse_skeletons([Skeleton|_],Image,Time):-!,
+	analyse_skeleton(Skeleton,Image,Time).
+analyse_skeletons(_,_,_).
+--
+analyse_skeleton(Skeleton,Image,Time):-
+	Skeleton == {
+		head: Head,
+		-- spine: Spine,
+		left_arm: LeftArm,
+		right_arm: RightArm
+		-- left_leg: LeftLeg,
+		-- right_leg: RightLeg
+		|_},!,
+	analyse_head(Head,Image,ValueH),
+	analyse_left_arm(LeftArm,Image,ValueLA),
+	analyse_right_arm(RightArm,Image,ValueRA),
+	thermal_data ? remember_value(Time,ValueH,ValueLA,ValueRA).
+analyse_skeleton(_,_,_).
+--
+analyse_head({position:{mapping1:p(X,Y)|_}|_},Image,Value):-
+	Image ? get_pixel(X,Y,Value,_,_),!.
+analyse_head(_,_,0).
+--
+analyse_left_arm({hand:Hand|_},Image,Value):-
+	Hand == {position:{mapping1:p(X,Y)|_}|_},
+	Image ? get_pixel(X,Y,Value,_,_),!.
+analyse_left_arm(_,_,0).
+--
+analyse_right_arm({hand:Hand|_},Image,Value):-
+	Hand == {position:{mapping1:p(X,Y)|_}|_},
+	Image ? get_pixel(X,Y,Value,_,_),!.
+analyse_right_arm(_,_,0).
+]
+-----------------------------------------------------------------------
+class 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	kinect_buffer;
+	graphic_window;
+	thermal_data;
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+action("play"):-!,
+	kinect_buffer ? start.
+action("pause"):-!,
+	kinect_buffer ? pause.
+action("save"):-!,
+	thermal_data ? save_data.
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+[
+set_first_frame_time(_,_):-
+	find(_),!.
+set_first_frame_time(Number,Time):-
+	insert(f(Number,Time)).
+--
+get_first_frame_time(Number,Time):-
+	Item== ?match(_),!,
+	Item == f(Number,Time).
+get_first_frame_time(0,0).
+]
+-----------------------------------------------------------------------
+class 'ThermalData' (specialized 'Database'):
+--
+internal:
+--
+	file	= ('File',
+			name= "ThermalData.txt");
+--
+[
+remember_value(Time,ValueH,ValueLA,ValueRA):-
+	append(value(Time,ValueH,ValueLA,ValueRA)).
+--
+save_data:-
+	file ? open('writing'),
+	list_data,
+	file ? close.
+--
+list_data:-
+	find(Value),
+		Value == value(Time,H,LA,RA),
+		file ? writeln(Time," ",H," ",LA," ",RA),
+		fail.
+list_data.
+]
+-----------------------------------------------------------------------

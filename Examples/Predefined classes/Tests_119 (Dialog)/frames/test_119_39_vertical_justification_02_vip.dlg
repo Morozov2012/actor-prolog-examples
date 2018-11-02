@@ -1,0 +1,24 @@
+mesh(80,25)
+dialog_font(default,12)
+padding(1,1)
+
+modeless dialog 'DemoPanel' ("Demo Panel",default,default,default,centered,centered,default)
+hbox(justify)
+	vbox(left)
+		groupbox
+			"FIRST"
+			checkbox(1002,"CheckBox")
+			statictext("THIRD_CONTROL")
+			hbox(down)
+				scaling(1,3)
+					button(1004,"FOURTH")
+				end_of_scaling
+				"FIFTH"
+			end_of_hbox
+		end_of_groupbox
+	end_of_vbox
+	scaling(0.5,15)
+		button(1010,"B")
+	end_of_scaling
+end_of_hbox
+end_of_dialog

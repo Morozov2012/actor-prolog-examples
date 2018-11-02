@@ -1,0 +1,330 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+List			= N; N*.
+N			= INTEGER; RefTime; RefDate.
+--
+RefTime			= time(	RefHours,
+				RefMinutes,
+				RefSeconds,
+				RefMilliseconds).
+--
+RefHours		= [0..23].
+RefMinutes		= [0..59].
+RefSeconds		= [0..59].
+RefMilliseconds		= [0..999].
+--
+RefDate			= date(	RefYear,
+				RefMonth,
+				RefDay).
+--
+RefYear			= INTEGER.
+RefMonth		= [1..12].
+RefDay			= [1..31].
+RefDayOfWeek		= [1..7].
+
+PREDICATES:
+
+imperative:
+
+test0(List)	- (i);
+test1(List)	- (i);
+test2(List)	- (i);
+test3(List)	- (i);
+test4(List)	- (i);
+test5(List)	- (i);
+test6(List)	- (i);
+test7(List)	- (i);
+test8(List)	- (i);
+test9(List)	- (i);
+test10(List)	- (i);
+test11(List)	- (i);
+test12(List)	- (i);
+test13(List)	- (i);
+test14(List)	- (i);
+test15(List)	- (i);
+test16(List)	- (i);
+test17(List)	- (i);
+test18(List)	- (i);
+test19(List)	- (i);
+test20(List)	- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+	con	= ('Console');
+--
+constant:
+--
+	list1	: List	= [1,2,3|list2];
+--
+variable:
+--
+	list2	: List;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+inc(List) = List		- (i);
+dec(List) = List		- (i);
+'+'(List,List) = List		- (i,i);
+'-'(List,List) = List		- (i,i);
+'-'(List) = List		- (i);
+'*'(List,List) = List		- (i,i);
+'/'(List,List) = List		- (i,i);
+div(List,List) = List		- (i,i);
+mod(List,List) = List		- (i,i);
+random(List) = List		- (i);
+abs(List) = List		- (i);
+round(List) = List		- (i);
+trunc(List) = List		- (i);
+pi() = List;
+sqrt(List) = List		- (i);
+power(List,List) = List		- (i,i);
+hypot(List,List) = List		- (i,i);
+ln(List) = List			- (i);
+log10(List) = List		- (i);
+exp(List) = List		- (i);
+sin(List) = List		- (i);
+cos(List) = List		- (i);
+tan(List) = List		- (i);
+arctan(List) = List		- (i);
+signum(List) = List		- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	X== [1,2,3,4,5],
+	con ? writeln("x=",X),
+	test0(X),
+	test1(X),
+	test2(X),
+	test3(X),
+	test4(X),
+	test5(X),
+	test6(X),
+	test7(X),
+	test8(X),
+	test9(X),
+	test10(X),
+	test11(X),
+	test12(X),
+	test13(X),
+	test14(X),
+	test15(X),
+	test16(X),
+	test17(X),
+	test18(X),
+	test19(X),
+	test20(X).
+--
+test0(X):-
+	con ? writeln("Test 0:"),
+	?sin(X),
+	?cos(X),
+	?tan(X),
+	?arctan(X),
+	?signum(X),
+	?pi,
+	?exp(X),
+	?ln(X),
+	?log10(X),
+	?sqrt(X),
+	?power(X,5),
+	?hypot(X,X),
+	?round(X),
+	?trunc(X),
+	?abs(X),
+	?random,
+	?random(X),
+	?inc(X),
+	?dec(X),
+	-(X),
+	X+X,
+	X*X,
+	X-X,
+	X/X,
+	?div(X,3),
+	?mod(X,3),
+	con ? writeln("   O.K.").
+--
+test1(X):-
+	con ? writeln("Test 1:"),
+	A== ?sin(2*?pi+X) * ?sin(2*?pi+X),
+	B== ?cos(X+2*?pi) * ?cos(X+2*?pi),
+	con ? writeln("   sin(2pi+x)^2+cos(x+2pi)^2=",A+B),
+	Y== 1-(X-(-(X)/10)),
+	con ? writeln("   1-(x-(-x/10))=",Y),
+	C== ?hypot(?sin(X),?cos(X)),
+	con ? writeln("   hypot(sin(x),cos(x))=",C).
+--
+test2(X):-
+	con ? writeln("Test 2:"),
+	E== ?tan(?arctan(X)),
+	con ? writeln("   tan(arctan(x))=",E).
+--
+test3(_):-
+	con ? writeln("Test 3:"),
+	con ? writeln("   pi=",?pi).
+--
+test4(X):-
+	con ? writeln("Test 4:"),
+	C== ?exp(2*?ln(?sqrt(X))),
+	con ? writeln("   e^(2*ln(sqrt(x)))=",C),
+	D== ?exp(?log10(X)*?ln(10)),
+	con ? writeln("   e^(log10(x)*ln(10))=",D),
+	E== ?power(X,-2/3),
+	con ? writeln("   x^(-2/3)=",E),
+	F== ?exp((-2/3)*?ln(X)),
+	con ? writeln("   exp((-2/3)*ln(x))=",F).
+--
+test5(_):-
+	con ? writeln("Test 5:"),
+	Y== -1.8,
+	con ? writeln("   y=",Y),
+	F== ?round(Y),
+	con ? writeln("   round(y)=",F),
+	G== ?trunc(Y),
+	con ? writeln("   trunc(y)=",G),
+	H== ?abs(Y),
+	con ? writeln("   abs(y)=",H).
+--
+test6(_):-
+	con ? writeln("Test 6:"),
+	I== ?random(),
+	con ? writeln("   random()=",I),
+	Bound== 100,
+	con ? writeln("   bound=",Bound),
+	J== ?random(Bound),
+	con ? writeln("   random(x)=",J).
+--
+test7(X):-
+	con ? writeln("Test 7:"),
+	K== ?inc(X),
+	con ? writeln("   inc(x)=",K),
+	L== ?dec(X),
+	con ? writeln("   dec(x)=",L),
+	M== ?'-'(X),
+	con ? writeln("   -(x)=",M).
+--
+test8(X):-
+	con ? writeln("Test 8:"),
+	A== X * X,
+	con ? writeln("   x*x=",A),
+	B== A + X,
+	con ? writeln("   (x*x)+x=",B),
+	C== B / X,
+	con ? writeln("   ((x*x)+x)/x=",C),
+	D== C - X,
+	con ? writeln("   ((x*x)+x/x)-x=",D).
+--
+test9(X):-
+	con ? writeln("Test 9:"),
+	A== ?div(X,3),
+	con ? writeln("   x div 2=",A),
+	B== ?mod(X,3),
+	con ? writeln("   x mod 3",B).
+--
+test10(X):-
+	con ? writeln("Test 10:"),
+	A== ?signum(X),
+	con ? writeln("   signum(x)=",A),
+	B== ?signum(-(X)),
+	con ? writeln("   signum(-x)=",B),
+	C== ?signum(0),
+	con ? writeln("   signum(x)=",C).
+--
+test11(X):-
+	con ? writeln("Test 11:"),
+	Y== [1000,2000,3000,4000,5000],
+	con ? writeln("   x=",X," (a list)"),
+	con ? writeln("   y=",Y," (a list)"),
+	C== X - Y,
+	con ? writeln("   x-y=",C).
+--
+test12(X):-
+	con ? writeln("Test 12:"),
+	Y== 1,
+	con ? writeln("   x=",X," (a list)"),
+	con ? writeln("   y=",Y," (an integer)"),
+	C== X - Y,
+	con ? writeln("   x-y=",C).
+--
+test13(X):-
+	con ? writeln("Test 13:"),
+	Y== 1,
+	con ? writeln("   x=",X," (a list)"),
+	con ? writeln("   y=",Y," (an integer)"),
+	C== Y - X,
+	con ? writeln("   y-x=",C).
+--
+test14(X):-
+	con ? writeln("Test 14:"),
+	Y== date(2010,08,27),
+	con ? writeln("   x=",X," (a list)"),
+	con ? writeln("   y=",Y," (a date)"),
+	C== X - Y,
+	con ? writeln("   x-y=",C).
+--
+test15(X):-
+	con ? writeln("Test 15:"),
+	Y== date(2010,08,27),
+	con ? writeln("   x=",X," (a list)"),
+	con ? writeln("   y=",Y," (a date)"),
+	C== Y - X,
+	con ? writeln("   y-x=",C).
+--
+test16(X):-
+	con ? writeln("Test 16:"),
+	Y== time(16,47,01,0),
+	con ? writeln("   x=",X," (a list)"),
+	con ? writeln("   y=",Y," (a time)"),
+	C== X - Y,
+	con ? writeln("   x-y=",C).
+--
+test17(X):-
+	con ? writeln("Test 17:"),
+	Y== time(16,47,01,0),
+	con ? writeln("   x=",X," (a list)"),
+	con ? writeln("   y=",Y," (a time)"),
+	C== Y - X,
+	con ? writeln("   y-x=",C).
+--
+test18(_):-
+	con ? writeln("Test 18:"),
+	A== [date(2011,01,10)],
+	B== [date(2010,08,27)],
+	con ? writeln("   a=",A," (dates)"),
+	con ? writeln("   b=",B," (dates)"),
+	C== A - B,
+	con ? writeln("   a-b=",C).
+--
+test19(_):-
+	con ? writeln("Test 19:"),
+	A== [time(19,09,01,100)],
+	B== [time(16,47,01,0)],
+	con ? writeln("   a=",A," (a time list)"),
+	con ? writeln("   b=",B," (a time list)"),
+	C== A - B,
+	con ? writeln("   a-b=",C).
+--
+test20(_):-
+	con ? writeln("Test 20:"),
+	A== [1000,2000,3000,4000,5000,6000,7000,8000,9000],
+	list2== [4,5,6,7,8,9],!,
+	B== list1,
+	con ? writeln("   A=",A," (a list)"),
+	con ? writeln("   B=",B," (a list)"),
+	C== A - B,
+	con ? writeln("   a-b=",C).
+test20(_).
+]

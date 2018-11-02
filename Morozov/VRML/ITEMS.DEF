@@ -1,0 +1,54 @@
+package "Morozov/VRML/Items":
+-----------------------------------------------------------------------
+--                                                                   --
+--              The "VRML/ITEMS" Actor Prolog package.               --
+--            (c) 2002-2007, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This is dummy package that contains definition of table format    --
+-- for storing results of analysis of given Web Sites.               --
+-----------------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import "Morozov/Web/Data/Keywords";
+import "Morozov/VRML/Colors";
+import "Morozov/Web/Scanning/Counter";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+mixed:
+--
+SourceTable	=
+		selected_keyword(Keyword,Hue);
+		'all_keywords';
+		compare(SceneCriterion,SceneUnit);
+		list_of_keywords(KeywordList);
+		item(	WebResourceName,
+			WebAddressList,
+			ExtendedWebResourceDate,
+			N,	-- Items Number
+			N,	-- Text Size
+			N,	-- Hyper Links Number
+			N,	-- Pictures Number
+			N,	-- Other Links Number
+			N,	-- Error Links Number
+			N_List,
+			N,Hue).
+--
+SceneCriterion	= 'richness'; 'size'; 'inexactitude'.
+SceneUnit	= 'letters'; 'size'; 'pages';
+		  'hyper_links'; 'pictures';
+		  'other_links'; 'errors'.
+--
+ExtendedWebResourceDate	= WebResourceDate; 'no_date'.
+--
+-----------------------------------------------------------------------
+interface 'ResultTable' (specialized 'Database'):
+[
+DOMAINS:
+--
+mixed:
+--
+Target	= SourceTable.
+]
+-----------------------------------------------------------------------

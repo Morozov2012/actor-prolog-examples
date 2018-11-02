@@ -1,0 +1,5 @@
+f(1,{name:'n1',list:[{a:1,b:11.0,c:'symb1'}]},3.0)
+f(10,{list:[{a:3,b:3.14,c:'symb2'}],name:'n2'},9.0)
+f(1,{name:'n1',list:[{a:1,b:11.0,c:'symb1'}]},3.0)
+f(17,{name:'n3',list:[{a:5,b:1.0,c:'symb3'}]},11.0)
+f(1,{list:[{a:1,b:11.0,c:'symb1'}],name:'n1'},3.0)

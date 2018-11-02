@@ -1,0 +1,36 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'WebResource'):
+--
+constant:
+--
+	location= "data.dir/report1.html";
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1.
+--
+test0:-
+	?get_string().
+--
+test1:-
+	Content== ?get_string(),
+	con ? writeln(Content).
+]
+-----------------------------------------------------------------------

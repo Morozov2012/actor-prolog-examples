@@ -1,0 +1,92 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+WindowCoordinate	= INTEGER; STRING.
+MessageString		= STRING.
+
+-----------------------------------------------------------------------
+
+interface 'TextPage' (specialized 'Report'):
+
+internal:
+
+	link	: 'Link';
+
+constant:
+
+	x	: WindowCoordinate;
+	y	: WindowCoordinate;
+
+protecting:
+
+	title	: MessageString;
+
+[
+PREDICATES:
+
+nondeterm:
+
+write_value(MessageString)	- (i);
+
+nondeterm:
+
+goal;
+]
+
+-----------------------------------------------------------------------
+
+interface 'Main' (specialized 'Dialog'):
+
+variable:
+
+	i	: WindowCoordinate;
+	j	: WindowCoordinate;
+	value	: MessageString;
+
+internal:
+
+	link	: 'Link';
+
+	w1	: 'TextPage';
+	w2	: 'TextPage';
+	w3	: 'TextPage';
+	w4	: 'TextPage';
+	w5	: 'TextPage';
+	w6	: 'TextPage';
+	w7	: 'TextPage';
+
+[
+PREDICATES:
+
+nondeterm:
+
+goal;
+
+imperative:
+
+send_value(WindowCoordinate,WindowCoordinate,MessageString);
+]
+
+-----------------------------------------------------------------------
+
+interface 'Link' (specialized 'BacktrackableArray'):
+[
+DOMAINS:
+
+reference:
+
+Target		= MessageString.
+
+PREDICATES:
+
+nondeterm:
+
+element(WindowCoordinate*)	= MessageString	- (i);
+]
+-----------------------------------------------------------------------

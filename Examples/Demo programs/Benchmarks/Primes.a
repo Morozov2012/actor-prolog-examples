@@ -1,0 +1,87 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  PRI2                                                             --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  2015.06.28 02:32                                                 --
+--  Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB         --
+--  Windows7 - PM.64 (RUS)                                           --
+--  ========================================================         --
+--  AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                           --
+--                                                                   --
+--  g:\temp1\jv>java -version                                        --
+--  java version "1.7.0_80"                                          --
+--  Java(TM) SE Runtime Environment (build 1.7.0_80-b15)             --
+--  Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)  --
+--                                                                   --
+--  java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation            --
+--  -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch       --
+--                                                                   --
+--  100000 iterations take 3734 msec                                 --
+--  0.037340 milliseconds per iteration                              --
+--                                                                   --
+--  EXE file:                                                        --
+--                                                                   --
+--  100000 iterations take 15050 msec                                --
+--  0.1505 milliseconds per iteration                                --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities'
+from "HARNESS"(TestData:=INTEGER,Result:=N_List);
+-----------------------------------------------------------------------
+DOMAINS:
+--
+N_List		= INTEGER*.
+--
+PREDICATES:
+--
+imperative:
+--
+primes(INTEGER,N_List)			- (i,o);
+integers(INTEGER,INTEGER,N_List)	- (i,i,o);
+sift(N_List,N_List)			- (i,o);
+remove(INTEGER,N_List,N_List)		- (i,i,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+[
+DOMAINS:
+--
+-- TestData	= INTEGER.
+-- Result	= N_List.
+--
+CLAUSES:
+--
+benchmark(Data,Out):-
+	primes(Data,Out).
+--
+data(98).
+--
+primes(Limit,Ps):-
+	integers(2,Limit,Is),
+	sift(Is,Ps).
+--
+integers(Low,High,[Low|Rest]):-
+	Low <= High,!,
+	M== Low + 1,
+	integers(M,High,Rest).
+integers(_,_,[]).
+--
+sift([],[]).
+sift([I|Is],[I|Ps]):-
+	remove(I,Is,New),
+	sift(New,Ps).
+--
+remove(_,[],[]).
+remove(P,[I|Is],Nis0):-
+	?mod(I,P) <> 0,!,
+	-- Nis0== [I|Nis1],
+	remove(P,Is,Nis1),
+	Nis0== [I|Nis1].
+remove(P,[_|Is],Nis):-
+	remove(P,Is,Nis).
+]
+-----------------------------------------------------------------------

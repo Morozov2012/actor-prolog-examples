@@ -1,0 +1,199 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',14)
+draft('off')
+
+dialog 'ImageAnalyzer'("Image Subtractor Demo",default,default,default,centered,centered,default)
+vbox(justify)
+hbox(center)
+	vbox(right)
+		custom['KeepProportions'](graphic_window,50,53,"Control2D")
+	end_of_vbox
+	vbox(center)
+		button("SelectDirectory","&Select Data Set")
+		listbutton(0,target_objects,15,7,
+			[
+			"Nothing",
+			"Extract Blobs",
+			"Extract Tracks",
+			"Extract Graphs",
+			"Scene Analysis 1",
+			"Scene Analysis 2",
+			"Scene Analysis 3",
+			"Scene Analysis 4"
+			],
+			"Scene Analysis 3"
+			)
+		listbutton(0,target_image,15,7,
+			[
+			"Recent Image",
+			"Background Image",
+			"Sigma Image",
+			"Foreground Image",
+			"Synthesized Image",
+			"Background+Synthesized"
+			],
+			"Recent Image"
+			)
+		grid
+		row
+			column(left)
+			checkbox("UseGrayscaleColors","Use grayscale colors",'yes')
+			end_of_column
+		end_of_row
+		row
+			column(left)
+			checkbox("ApplyGaussianFilteringToBackground","Apply gaussian filtering to background",'yes')
+			end_of_column
+		end_of_row
+		row
+			column(justify)
+			statictext(
+				"Prompting:BackgroundGaussianFilterRadius",
+				"     Radius: ")
+			vbox(right)
+			hbox
+				editinteger("BackgroundGaussianFilterRadius",7,1)
+				"     "
+			end_of_hbox
+			end_of_vbox
+			end_of_column
+		end_of_row
+		row
+			column(left)
+			checkbox("ApplyRankFilteringToBackground","Apply rank filtering to background",'yes')
+			end_of_column
+		end_of_row
+		row
+		column(justify)
+			grid
+			row
+				column(left)
+					statictext(
+						"Prompting:BackgroundRankFilterThreshold",
+						"     Threshold: ")
+				end_of_column
+				column(right)
+					editinteger("BackgroundRankFilterThreshold",7,4)
+					"     "
+				end_of_column
+			end_of_row
+			row
+				column(left)
+					"Sigma factor: "
+				end_of_column
+				column(right)
+					editreal("BackgroundStandardDeviationFactor",7,1.2)
+					"     "
+				end_of_column
+			end_of_row
+			end_of_grid
+		end_of_column
+		end_of_row
+		row
+			column(left)
+			checkbox("ApplyMedianFilteringToVelocity","Apply median filtering to velocity",'yes')
+			end_of_column
+		end_of_row
+		row
+			column(justify)
+			statictext(
+				"Prompting:VelocityMedianFilterHalfwidth",
+				"     Halfwidth: ")
+			vbox(right)
+			hbox
+				editinteger("VelocityMedianFilterHalfwidth",7,3)
+				"     "
+			end_of_hbox
+			end_of_vbox
+			end_of_column
+		end_of_row
+		row
+			column(left)
+			checkbox("RefuseSlowTracks","Refuse slow tracks",'yes')
+			end_of_column
+		end_of_row
+		row
+		column(justify)
+			grid
+			row
+				column(left)
+					statictext(
+						"Prompting:FuzzyVelocityThreshold",
+						"     Velocity threshold: ")
+				end_of_column
+				column(right)
+					editreal("FuzzyVelocityThreshold",7,0.001)
+					"     "
+				end_of_column
+			end_of_row
+			row
+				column(left)
+					statictext(
+						"Prompting:FuzzyDistanceThreshold",
+						"     Distance threshold: ")
+				end_of_column
+				column(right)
+					editreal("FuzzyDistanceThreshold",7,150.0)
+					"     "
+				end_of_column
+			end_of_row
+			row
+				column(left)
+					statictext(
+						"Prompting:FuzzyThresholdBorder",
+						"     Threshold border: ")
+				end_of_column
+				column(right)
+					editreal("FuzzyThresholdBorder",7,0.50)
+					"     "
+				end_of_column
+			end_of_row
+			end_of_grid
+		end_of_column
+		end_of_row
+		end_of_grid
+		grid
+		row
+			column(right)
+				button("ResetSettings","Reset S&ettings")
+			end_of_column
+			column(left)
+				button("ResetStatistics","Reset St&atistics")
+			end_of_column
+		end_of_row
+		row
+			column(right)
+				button("ResetResults","Reset &Results")
+			end_of_column
+			column(left)
+				button("ResetAll","Reset A&ll")
+			end_of_column
+		end_of_row
+		row
+			column(right)
+				button("DumpGraph","&Dump Graph")
+			end_of_column
+			column(left)
+				button("QuitProgram","&Quit Program")
+			end_of_column
+		end_of_row
+		end_of_grid
+	end_of_vbox
+end_of_hbox
+	padding(0,0)
+	statictext(
+		"The project is supported by RFBR, Russia, "
+		"RFBR-DST 13-07-92694, "
+		"and Govt. of India, DST-RFBR P-159.")
+	statictext(
+		"The data are coming from the BEHAVE "
+		"project, EPSRC GR/S98146 "
+		"(http://homepages.inf.ed.ac.uk/rbf/BEHAVE/).")
+	end_of_padding
+end_of_vbox
+end_of_dialog

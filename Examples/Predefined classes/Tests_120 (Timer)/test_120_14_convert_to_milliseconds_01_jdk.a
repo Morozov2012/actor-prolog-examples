@@ -1,0 +1,90 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support
+-- the convert_to_date function.
+--
+PREDICATES:
+--
+imperative:
+--
+test10;
+test11;
+test20;
+test21;
+--
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	delay(1).
+--
+tick:-!,
+	test10,
+	test11,
+	test20,
+	test21.
+--
+test10:-
+	con ? writeln("Test 1.0:"),
+	T== ?time(),
+	D== ?date(),
+	?convert_to_milliseconds(T,D),
+	con ? writeln("\tDone.").
+--
+test11:-
+	con ? writeln("Test 1.1:"),
+	T1== ?time(),
+	D1== ? date(),
+	con ? set_color('RoyalBlue'),
+	con ? writeln("\tCurrent time: ",T1),
+	con ? writeln("\tCurrent date: ",D1),
+	M== ?convert_to_milliseconds(T1,D1),
+	con ? set_color('Blue'),
+	con ? writeln("\tCurrent time: ",M," [ms]"),
+	T2== ?convert_to_time(M),
+	D2== ?convert_to_date(M),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tCurrent time: ",T2),
+	con ? writeln("\tCurrent date: ",D2),
+	con ? set_color('default').
+--
+test20:-
+	con ? writeln("Test 2.0:"),
+	time(Hours,Minutes,Seconds,Milliseconds),
+	date(Year,Month,Day),
+	?convert_to_milliseconds(
+		time(Hours,Minutes,Seconds,Milliseconds),
+		date(Year,Month,Day)),
+	con ? writeln("\tDone.").
+--
+test21:-
+	con ? writeln("Test 2.1:"),
+	time(Hours1,Minutes1,Seconds1,Milliseconds),
+	date(Year1,Month1,Day1),
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"\tCurrent time: ",
+		Hours1,":",Minutes1,":",Seconds1,".",Milliseconds),
+	con ? writeln(
+		"\tCurrent date: ",
+		Year1,"-",Month1,"-",Day1),
+	M== ?convert_to_milliseconds(
+		time(Hours1,Minutes1,Seconds1,Milliseconds),
+		date(Year1,Month1,Day1)),
+	con ? set_color('Blue'),
+	con ? writeln("\tCurrent time: ",M," [ms]"),
+	T2== ?convert_to_time(M),
+	D2== ?convert_to_date(M),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tCurrent time: ",T2),
+	con ? writeln("\tCurrent date: ",D2),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

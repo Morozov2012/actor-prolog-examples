@@ -1,0 +1,170 @@
+package "Morozov/VRML/Report":
+-----------------------------------------------------------------------
+--                                                                   --
+--              The "VRML/REPORT" Actor Prolog package.              --
+--             (c) 2002-2007, IRE RAS, Alexei A. Morozov.            --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package is intended for creation of VRML reports.            --
+-----------------------------------------------------------------------
+import 'Report_Mode'	from "Morozov/VRML/Mode";
+import 'Web_Analyzer'	from "Morozov/VRML/Analysis";
+import 'VRML_Toolbox'	from "Morozov/VRML/Toolbox";
+import 'Trajectory'	from "Morozov/VRML/Path";
+import 'ShortName'	from "Morozov/VRML/Names";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ItemDescription	= STRING.
+--
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+create_name_of_target_file
+	(FileName,FileName,FileName)		- (i,i,o);
+--
+-----------------------------------------------------------------------
+interface 'Jewel_Report':
+--
+internal:
+--
+	mode		: 'Report_Mode';
+--
+	analyzer	: 'Web_Analyzer';
+--
+	generator	: 'VRML_Generator';
+--
+	target_files	: 'TargetFilesDatabase';
+	file_operations	: 'File';
+--
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+create_report(
+	FileName,
+	VRML_GeneratorMode,
+	FileName);
+--
+nondeterm:
+--
+get_any_target_file(FileName)			- (o);
+--
+]
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+generate_all_elements_of_scene;
+generate_items;
+--
+make_description(
+	WebResourceName,
+	ExtendedWebResourceDate,
+	ItemHeight,
+	N,
+	ItemDescription)	- (i,i,i,i,o);
+--
+make_description(
+	WebResourceName,
+	ExtendedWebResourceDate,
+	ItemHeight,
+	SceneUnit,
+	N,
+	ItemDescription)	- (i,i,i,i,i,o);
+--
+make_description(
+	WebResourceName,
+	ExtendedWebResourceDate,
+	ItemHeight,
+	SceneUnit,
+	STRING,
+	N,
+	ItemDescription)	- (i,i,i,i,i,i,o);
+--
+scene_unit_to_string(SceneUnit,STRING)		- (i,o);
+--
+date_to_string(ExtendedWebResourceDate,STRING)	- (i,o);
+month_to_string(WebResourceMonth,STRING)	- (i,o);
+size_to_string(ItemHeight,STRING)		- (i,o);
+--
+write_Axis(Indentation)				- (i);
+write_SystemColor(Indentation)			- (i);
+--
+calculate_size_of_text(Keyword,Brightness)	- (i,o);
+--
+write_front_planes_if_need(Indentation)		- (i);
+--
+write_VBox(	Indentation,
+		WebResourceName,
+		WebAddressList,
+		PX,PZ,ItemHeight,
+		ItemDescription,
+		Brightness,Hue)		- (i,i,i,i,i,i,i,i,i);
+--
+check_type_of_scene(UseWhiteLabels)		- (o);
+make_URL(WebResourceName,WebAddressList,STRING)	- (i,i,o);
+--
+register_viewpoint_position(WebResourceName,PX,PZ,ItemHeight);
+--
+-----------------------------------------------------------------------
+interface 'VRML_Generator' (specialized 'Alpha'):
+--
+internal:
+--
+	mode		: 'Report_Mode';
+	analyzer	: 'Web_Analyzer';
+--
+	target_file	: 'File';
+--
+variable:
+--
+	name		: FileName;
+--
+internal:
+--
+	toolbox		: 'VRML_Toolbox';
+--
+	path		: 'Trajectory';
+--
+	text_operations	: 'Text';
+	name_operations	: 'ShortName';
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+generate_scene(FileName)			- (i);
+--
+'+'(PX,PX) = PX					- (i,i);
+'+'(PY,PY) = PY					- (i,i);
+'*'(PX,PX) = PX					- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'TargetFilesDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	= target_file(FileName).
+]
+-----------------------------------------------------------------------
+interface 'TargetFile' (specialized 'File'):
+--
+variable:
+--
+	name	: FileName;
+--
+[
+]
+-----------------------------------------------------------------------

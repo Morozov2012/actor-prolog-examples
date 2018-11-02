@@ -1,0 +1,43 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: delete all instances of an  --
+-- element from a list.                  --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Disassembling of a list.           --
+-- 2) Output assembling of a list.       --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+p(INTEGER,List,List)	- (i,i,o);
+
+CLAUSES:
+
+goal:-
+	X== 100,
+	writeln("Target element: ",X),
+	L1== [1,5,1,100,3,2,4,100,5,2,100],
+	writeln("L1=",L1),
+	p(X,L1,L2),
+	writeln("L2=",L2).
+
+p(X,[X|Rest1],Rest2):-!,
+	p(X,Rest1,Rest2).
+p(X,[Head|Rest1],[Head|Rest2]):-
+	p(X,Rest1,Rest2).
+p(_,[],[]).

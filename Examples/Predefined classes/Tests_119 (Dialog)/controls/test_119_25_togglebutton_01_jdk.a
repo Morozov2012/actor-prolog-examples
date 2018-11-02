@@ -1,0 +1,159 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import 'ColoredReport' from "report_toolbox";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+w	= ('MyDialog');
+--
+[
+goal:-
+	w ? test2,
+	w ? test1('no','yes'),
+	w ? test2,
+	w ? show.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	report1		= ('ColoredReport',
+				title= "Tests",
+				x= 0,
+				y= 0,
+				height= 17,
+				width= 32);
+	report2		= ('ToggleButtonValueWatch',
+				target_slot= output_slot_1,
+				title= "ToggleButton 1 Watch",
+				x= 32,
+				y= 0,
+				height= 17,
+				width= 24);
+	report3		= ('ToggleButtonValueWatch',
+				target_slot= output_slot_2,
+				title= "ToggleButton 2 Watch",
+				x= 56,
+				y= 0,
+				height= 17,
+				width= 24);
+	report4		= ('ColoredReport',
+				title= "Creation & Update Events",
+				y= 17);
+	con		= ('Console');
+--
+variable:
+--
+	output_slot_1;
+	output_slot_2;
+--
+[
+DOMAINS:
+--
+reference:
+--
+ToggleButtonValue	= SYMBOL; STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1(ToggleButtonValue,ToggleButtonValue)	- (i,i);
+test2;
+create_term(ToggleButtonValue)			- (o);
+--
+CLAUSES:
+--
+action("action11"):-!,
+	test1('yes','yes').
+action("action12"):-!,
+	test1('no','no').
+action("action21"):-!,
+	test1("yEs","yEs").
+action("action22"):-!,
+	test1("nO","nO").
+action("action31"):-!,
+	test1('unknown','unknown').
+action("action32"):-!,
+	test1('X','X').
+action("action41"):-!,
+	test1(#,#).
+action("action42"):-!,
+	create_term(FreeVariable),
+	test1(FreeVariable,FreeVariable).
+action("action5"):-!,
+	test2.
+action(Name):-!,
+	con ? note(Name).
+--
+created_control(Address):-!,
+	Value== ?get(Address),
+	report4 ? write("The "),
+	report4 ? write_colored_term(Address),
+	report4 ? write(
+		" control is created ",
+		"with initial value: "),
+	report4 ? write_colored_term(Value),
+	report4 ? nl.
+--
+modified_control(Address):-!,
+	Value== ?get(Address),
+	report4 ? write("The "),
+	report4 ? write_colored_term(Address),
+	report4 ? write(" control has a new value: "),
+	report4 ? write_colored_term(Value),
+	report4 ? nl.
+--
+goal:-!,
+	test0.
+--
+test0:-
+	report1 ? writeln("Test 0:"),
+	report1 ? writeln("\tI will get value."),
+	?get('output_slot_1'),
+	?get('output_slot_2'),!,
+	report1 ? writeln("\tDone.").
+test0:-
+	report1 ? write_error_message("\tFailure!").
+--
+test1(Value1,Value2):-
+	report1 ? writeln("Test 1:"),
+	report1 ? writeln("\tI will put values:"),
+	report1 ? write_value("\t",Value1),
+	report1 ? write_value("\t",Value2),
+	put('output_slot_1',Value1),
+	put('output_slot_2',Value2),!,
+	report1 ? writeln("\tDone.").
+test1(_,_):-
+	report1 ? write_error_message("\tFailure!").
+--
+test2:-
+	report1 ? writeln("Test 2:"),
+	report1 ? writeln("\tI will get values:"),
+	Value1== ?cast("ToggleButtonValue",?get('output_slot_1')),
+	Value2== ?cast("ToggleButtonValue",?get('output_slot_2')),!,
+	report1 ? write_value("\tValue 1: ",Value1),
+	report1 ? write_value("\tValue 2: ",Value2).
+test2:-
+	report1 ? write_error_message("\tFailure!").
+--
+create_term(_).
+]
+-----------------------------------------------------------------------
+class 'ToggleButtonValueWatch' (specialized 'ColoredReport'):
+--
+variable:
+--
+target_slot;
+--
+[
+goal:-!,
+	write_value("Slot value: ",target_slot).
+]
+-----------------------------------------------------------------------

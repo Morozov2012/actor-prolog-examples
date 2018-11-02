@@ -1,0 +1,36 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+nondeterm:
+
+p(INTEGER,INTEGER,INTEGER)	- (i,i,i);
+q(INTEGER,INTEGER)		- (i,i);
+r(INTEGER)			- (i);
+
+CLAUSES:
+
+goal:-
+	spy_point('trace'),
+	p(1,2,3),
+	spy_point('no_trace'),
+	q(7,8),
+	spy_point('trace'),
+	r(9),
+	fail.
+goal:-
+	writeln("O.K.").
+
+p(1,2,_):-
+	spy_point("We are in P#1").
+p(_,2,3):-
+	spy_point("we are in P#2").
+
+q(7,_):-
+	spy_point("we are in Q").
+
+r(_):-
+	spy_point("we are in R").

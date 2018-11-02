@@ -1,0 +1,518 @@
+-----------------------------------------------------------------------
+--                                                                   --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+--                                                                   --
+-- Predicate calls testing.                                          --
+--                                                                   --
+-- Requested: 1 argument, asterisk.                                  --
+-- Exists:    1 argument, asterisk.                                  --
+-- Flow direction: input.                                            --
+--                                                                   --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+D1	= INTEGER; REAL; SYMBOL; STRING.
+--
+reference:
+--
+D2	= INTEGER; REAL; SYMBOL; STRING.
+--
+lazy:
+--
+D3	= ('Testbed'); #.
+D4	= ('Testbed'); INTEGER; #.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+world1		= ('Test1');
+world2		= ('Test2',
+			first_test= world1);
+world3		= ('Test3',
+			second_test= world2);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Test1' (specialized 'Testbed'):
+--
+internal:
+--
+	world1	: 'Testbed';
+--
+variable:
+--
+	world21	: D3;
+	world22	: D3;
+	world23	: D3;
+	world24	: D3;
+--
+	world31	: D4;
+	world32	: D4;
+	world33	: D4;
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+internal:
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 1"),
+	fail.
+--
+loop_D1(H,R*):-!,
+	--
+	con ? writeln("loop_D1: ",H),
+	--
+	self <- p(R*),
+	self <- p(-0101,R*),
+	self <- p(-0101,-0102,R*),
+	self <- p(-0101,-0102,-0103,R*),
+	--
+	world1 <- p(R*),
+	world1 <- p(-1001,R*),
+	world1 <- p(-1001,-1002,R*),
+	world1 <- p(-1001,-1002,-1003,R*),
+	--
+	loop_D1(R*).
+loop_D1(_*).
+--
+loop_D2(H,R*):-
+	--
+	con ? writeln("loop_D2: ",H),
+	--
+	self <- q(R*),
+	self <- q(-0201,R*),
+	self <- q(-0201,-0202,R*),
+	self <- q(-0201,-0202,-0203,R*),
+	--
+	world1 <- q(-1101,R*),
+	world1 <- q(-1101,-1102,R*),
+	world1 <- q(-1101,-1102,-1103,R*),
+	--
+	world21 <- r(R*),
+	world21 <- r(-2101,R*),
+	world21 <- r(-2101,-2102,R*),
+	world21 <- r(-2101,-2102,-2103,R*),
+	--
+	world22 <- r(R*),
+	world22 <- r(-2201,R*),
+	world22 <- r(-2201,-2202,R*),
+	world22 <- r(-2201,-2202,-2203,R*),
+	--
+	world23 <- r(R*),
+	world23 <- r(-2301,R*),
+	world23 <- r(-2301,-2302,R*),
+	world23 <- r(-2301,-2302,-2303,R*),
+	--
+	world24 <- r(R*),
+	world24 <- r(-2401,R*),
+	world24 <- r(-2401,-2402,R*),
+	world24 <- r(-2401,-2402,-2403,R*),
+	--
+	world31 <- r(R*),
+	world31 <- r(-3101,R*),
+	world31 <- r(-3101,-3102,R*),
+	world31 <- r(-3101,-3102,-3103,R*),
+	--
+	world32 <- r(R*),
+	world32 <- r(-3201,R*),
+	world32 <- r(-3201,-3202,R*),
+	world32 <- r(-3201,-3202,-3203,R*),
+	--
+	world33 <- r(R*),
+	world33 <- r(-3301,R*),
+	world33 <- r(-3301,-3302,R*),
+	world33 <- r(-3301,-3302,-3303,R*),
+	--
+	world34 <- r(R*),
+	world34 <- r(-3401,R*),
+	world34 <- r(-3401,-3402,R*),
+	world34 <- r(-3401,-3402,-3403,R*),
+	--
+	world35 <- r(R*),
+	world35 <- r(-3501,R*),
+	world35 <- r(-3501,-3502,R*),
+	world35 <- r(-3501,-3502,-3503,R*),
+	--
+	world36 <- r(R*),
+	world36 <- r(-3601,R*),
+	world36 <- r(-3601,-3602,R*),
+	world36 <- r(-3601,-3602,-3603,R*),!,
+	--
+	loop_D2(R*).
+loop_D2(_*).
+--
+p(N*):-
+	con ? writeln("Test1 (1): p/1, N=",N).
+--
+q(N*):-
+	con ? writeln("Test1 (2): q/1, N=",N).
+--
+r(N*):-!,
+	con ? writeln("Test1 (3): r/1, N=",N*).
+--
+r(K,N*):-
+	con ? writeln("Test1 (4): r/2, K=",K,", N=",N).
+]
+-----------------------------------------------------------------------
+class 'Test2' (specialized 'Testbed'):
+--
+internal:
+--
+	world1	: 'Testbed';
+--
+variable:
+--
+	world21	: D3;
+	world22	: D3;
+	world23	: D3;
+	world24	: D3;
+--
+	world31	: D4;
+	world32	: D4;
+	world33	: D4;
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+internal:
+--
+	first_test;
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 2"),
+	fail.
+--
+loop_D1(H,R*):-!,
+	--
+	con ? writeln("loop_D1: ",H),
+	--
+	self <- p(R*),
+	self <- p(-0101,R*),
+	self <- p(-0101,-0102,R*),
+	self <- p(-0101,-0102,-0103,R*),
+	--
+	world1 <- p(R*),
+	world1 <- p(-1001,R*),
+	world1 <- p(-1001,-1002,R*),
+	world1 <- p(-1001,-1002,-1003,R*),
+	--
+	loop_D1(R*).
+loop_D1(_*):-!.
+--
+loop_D2(H,R*):-
+	--
+	con ? writeln("loop_D2: ",H),
+	--
+	self <- q(R*),
+	self <- q(-0201,R*),
+	self <- q(-0201,-0202,R*),
+	self <- q(-0201,-0202,-0203,R*),
+	--
+	world1 <- q(-1101,R*),
+	world1 <- q(-1101,-1102,R*),
+	world1 <- q(-1101,-1102,-1103,R*),
+	--
+	world21 <- r(R*),
+	world21 <- r(-2101,R*),
+	world21 <- r(-2101,-2102,R*),
+	world21 <- r(-2101,-2102,-2103,R*),
+	--
+	world22 <- r(R*),
+	world22 <- r(-2201,R*),
+	world22 <- r(-2201,-2202,R*),
+	world22 <- r(-2201,-2202,-2203,R*),
+	--
+	world23 <- r(R*),
+	world23 <- r(-2301,R*),
+	world23 <- r(-2301,-2302,R*),
+	world23 <- r(-2301,-2302,-2303,R*),
+	--
+	world24 <- r(R*),
+	world24 <- r(-2401,R*),
+	world24 <- r(-2401,-2402,R*),
+	world24 <- r(-2401,-2402,-2403,R*),
+	--
+	world31 <- r(R*),
+	world31 <- r(-3101,R*),
+	world31 <- r(-3101,-3102,R*),
+	world31 <- r(-3101,-3102,-3103,R*),
+	--
+	world32 <- r(R*),
+	world32 <- r(-3201,R*),
+	world32 <- r(-3201,-3202,R*),
+	world32 <- r(-3201,-3202,-3203,R*),
+	--
+	world33 <- r(R*),
+	world33 <- r(-3301,R*),
+	world33 <- r(-3301,-3302,R*),
+	world33 <- r(-3301,-3302,-3303,R*),
+	--
+	world34 <- r(R*),
+	world34 <- r(-3401,R*),
+	world34 <- r(-3401,-3402,R*),
+	world34 <- r(-3401,-3402,-3403,R*),
+	--
+	world35 <- r(R*),
+	world35 <- r(-3501,R*),
+	world35 <- r(-3501,-3502,R*),
+	world35 <- r(-3501,-3502,-3503,R*),
+	--
+	world36 <- r(R*),
+	world36 <- r(-3601,R*),
+	world36 <- r(-3601,-3602,R*),
+	world36 <- r(-3601,-3602,-3603,R*),!,
+	--
+	loop_D2(R*).
+loop_D2(_*):-!.
+--
+M(N*):-!,
+	con ? writeln("Test2 (1): M=",M,", N=",N*).
+--
+M(K,N*):-
+	con ? writeln("Test2 (2): M=",M,", K=",K,", N=",N).
+]
+-----------------------------------------------------------------------
+class 'Test3' (specialized 'Testbed'):
+--
+internal:
+--
+	world1	: 'Testbed';
+--
+variable:
+--
+	world21	: D3;
+	world22	: D3;
+	world23	: D3;
+	world24	: D3;
+--
+	world31	: D4;
+	world32	: D4;
+	world33	: D4;
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+internal:
+--
+	second_test;
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 3"),
+	fail.
+--
+loop_D1(H,R*):-!,
+	--
+	con ? writeln("loop_D1: ",H),
+	--
+	self <- p(R*),
+	self <- p(-0101,R*),
+	self <- p(-0101,-0102,R*),
+	self <- p(-0101,-0102,-0103,R*),
+	--
+	world1 <- p(R*),
+	world1 <- p(-1001,R*),
+	world1 <- p(-1001,-1002,R*),
+	world1 <- p(-1001,-1002,-1003,R*),
+	--
+	loop_D1(R*).
+loop_D1(_*):-!.
+--
+loop_D2(H,R*):-
+	--
+	con ? writeln("loop_D2: ",H),
+	--
+	self <- q(R*),
+	self <- q(-0201,R*),
+	self <- q(-0201,-0202,R*),
+	self <- q(-0201,-0202,-0203,R*),
+	--
+	world1 <- q(-1101,R*),
+	world1 <- q(-1101,-1102,R*),
+	world1 <- q(-1101,-1102,-1103,R*),
+	--
+	world21 <- r(R*),
+	world21 <- r(-2101,R*),
+	world21 <- r(-2101,-2102,R*),
+	world21 <- r(-2101,-2102,-2103,R*),
+	--
+	world22 <- r(R*),
+	world22 <- r(-2201,R*),
+	world22 <- r(-2201,-2202,R*),
+	world22 <- r(-2201,-2202,-2203,R*),
+	--
+	world23 <- r(R*),
+	world23 <- r(-2301,R*),
+	world23 <- r(-2301,-2302,R*),
+	world23 <- r(-2301,-2302,-2303,R*),
+	--
+	world24 <- r(R*),
+	world24 <- r(-2401,R*),
+	world24 <- r(-2401,-2402,R*),
+	world24 <- r(-2401,-2402,-2403,R*),
+	--
+	world31 <- r(R*),
+	world31 <- r(-3101,R*),
+	world31 <- r(-3101,-3102,R*),
+	world31 <- r(-3101,-3102,-3103,R*),
+	--
+	world32 <- r(R*),
+	world32 <- r(-3201,R*),
+	world32 <- r(-3201,-3202,R*),
+	world32 <- r(-3201,-3202,-3203,R*),
+	--
+	world33 <- r(R*),
+	world33 <- r(-3301,R*),
+	world33 <- r(-3301,-3302,R*),
+	world33 <- r(-3301,-3302,-3303,R*),
+	--
+	world34 <- r(R*),
+	world34 <- r(-3401,R*),
+	world34 <- r(-3401,-3402,R*),
+	world34 <- r(-3401,-3402,-3403,R*),
+	--
+	world35 <- r(R*),
+	world35 <- r(-3501,R*),
+	world35 <- r(-3501,-3502,R*),
+	world35 <- r(-3501,-3502,-3503,R*),
+	--
+	world36 <- r(R*),
+	world36 <- r(-3601,R*),
+	world36 <- r(-3601,-3602,R*),
+	world36 <- r(-3601,-3602,-3603,R*),!,
+	--
+	loop_D2(R*).
+loop_D2(_*):-!.
+--
+M(R*):-
+	con ? writeln("Test3 (1): M=",M,", R=",R),
+	second_test <- M(R*),
+	con ? writeln("Test3 (2): M=",M,", R=",R).
+]
+-----------------------------------------------------------------------
+class 'Testbed':
+--
+internal:
+--
+	world1	: 'Testbed'	= self;
+--
+variable:
+--
+	world21	: D3		= self;
+	world22	: D3		= #;
+	world23	: D3		= _;
+	world24	: D3		= _;
+--
+	world31	: D4		= self;
+	world32	: D4		= #;
+	world33	: D4		= -100;
+	world34	: D4		= _;
+	world35	: D4		= _;
+	world36	: D4		= _;
+--
+internal:
+--
+	auxiliary_tools		= ('AuxiliaryTools',
+					world23,
+					world24,
+					world34,
+					world35,
+					world36);
+--
+	con			= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+loop_D1(D1*)		- (i);
+loop_D2(D2*)		- (i);
+--
+p(D1*)			- (i);
+q(D2*)			- (i);
+--
+r(D2*)			- (i);
+r(D4,D2*)		- (i,i);
+--
+CLAUSES:
+--
+goal:-
+	--
+	loop_D1(1001,0101,0102,0103),
+	loop_D2(1002,0201,0202,0203),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	--
+	con ? writeln("O.K.").
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'AuxiliaryTools' (specialized 'Alpha'):
+--
+variable:
+--
+	world23	: D3;
+	world24	: D3;
+--
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_world23(D3)		- (i);
+set_world24(D3)		- (i);
+--
+set_world34(D4)		- (i);
+set_world35(D4)		- (i);
+set_world36(D4)		- (i);
+--
+CLAUSES:
+--
+set_world23(world23):-!.
+set_world23(_).
+--
+set_world24(world24):-!.
+set_world24(_).
+--
+set_world34(world34):-!.
+set_world34(_).
+--
+set_world35(world35):-!.
+set_world35(_).
+--
+set_world36(world36):-!.
+set_world36(_).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,164 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import 'ColoredReport' from "report_toolbox";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+w	= ('MyDialog');
+--
+[
+goal:-
+	w ? test2,
+	w ? show.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	report1		= ('ColoredReport',
+				title= "Tests",
+				x= 0,
+				y= 0,
+				height= 17,
+				width= 40);
+	report2		= ('EditIntegerWatch',
+				target_slot= output_slot_1,
+				title= "EditInteger Watch",
+				x= 40,
+				y= 0,
+				height= 17,
+				width= 80);
+	report3		= ('ColoredReport',
+				title= "Creation & Update Events",
+				y= 17);
+	con		= ('Console');
+--
+variable:
+--
+	output_slot_1;
+--
+[
+DOMAINS:
+--
+reference:
+--
+EditIntegerValue	= INTEGER; REAL; STRING; SYMBOL.
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1(EditIntegerValue)		- (i);
+test2;
+create_term(EditIntegerValue)	- (o);
+--
+CLAUSES:
+--
+action("action11"):-!,
+	test1(1000).
+action("action12"):-!,
+	test1(?pi()).
+action("action21"):-!,
+	test1("1000").
+action("action22"):-!,
+	test1("2.5").
+action("action31"):-!,
+	test1("001000").
+action("action32"):-!,
+	test1("2.500").
+action("action41"):-!,
+	test1(	"First line\n"
+		"Second line\n"
+		"Third line\n"
+		"Fourth line").
+action("action42"):-!,
+	test1(	"<<< =========="
+		" Very long line "
+		"========== >>>").
+action("action51"):-
+	X== con ? input_integer("Please input integer",1),!,
+	test1(X).
+action("action52"):-
+	X== con ? input_string("Please input string",""),!,
+	test1(X).
+action("action61"):-!,
+	test1('unknown').
+action("action62"):-!,
+	test1("X").
+action("action71"):-!,
+	test1(#).
+action("action72"):-!,
+	create_term(FreeVariable),
+	test1(FreeVariable).
+action("action8"):-!,
+	test2.
+action(_):-!,
+	report1 ? writeln("Warning: operation is cancelled!").
+--
+created_control(Address):-!,
+	Value== ?get(Address),
+	report3 ? write("The "),
+	report3 ? write_colored_term(Address),
+	report3 ? write(
+		" control is created ",
+		"with initial value: "),
+	report3 ? write_colored_term(Value),
+	report3 ? nl.
+--
+modified_control(Address):-!,
+	Value== ?get(Address),
+	report3 ? write("The "),
+	report3 ? write_colored_term(Address),
+	report3 ? write(" control has a new value: "),
+	report3 ? write_colored_term(Value),
+	report3 ? nl.
+--
+goal:-!,
+	test0.
+--
+test0:-
+	report1 ? writeln("Test 0:"),
+	report1 ? writeln("\tI will get value."),
+	?get('output_slot_1'),!,
+	report1 ? writeln("\tDone.").
+test0:-
+	report1 ? write_error_message("\tFailure!").
+--
+test1(Value):-
+	report1 ? writeln("Test 1:"),
+	report1 ? writeln("\tI will put value:"),
+	report1 ? write_value("\t",Value),
+	put('output_slot_1',Value),!,
+	report1 ? writeln("\tDone.").
+test1(_):-
+	report1 ? write_error_message("\tFailure!").
+--
+test2:-
+	report1 ? writeln("Test 2:"),
+	report1 ? writeln("\tI will get values:"),
+	Value1== ?cast("EditIntegerValue",
+		?get('output_slot_1')),!,
+	report1 ? write_value("\tValue: ",Value1).
+test2:-
+	report1 ? write_error_message("\tFailure!").
+--
+create_term(_).
+]
+-----------------------------------------------------------------------
+class 'EditIntegerWatch' (specialized 'ColoredReport'):
+--
+variable:
+--
+target_slot;
+--
+[
+goal:-!,
+	write_value("Slot value: ",target_slot).
+]
+-----------------------------------------------------------------------

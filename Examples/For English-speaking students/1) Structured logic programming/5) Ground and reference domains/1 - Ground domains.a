@@ -1,0 +1,46 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Ground, reference, --
+-- and mixed domains.                    --
+--                                       --
+-- Questions: What are ground terms?     --
+-- What are ground domains? What data    --
+-- structures can never be created       --
+-- during the processing of data items   --
+-- of the ground domains? Why is the     --
+-- unification of terms of the ground    --
+-- domains faster than the unification   --
+-- of terms of other kinds? Is the trail --
+-- used for the unification of the terms --
+-- of the ground domains? Why are ground --
+-- domains important for professional    --
+-- logic programming?                    --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+ground:
+
+D1	= f(N,N,N).
+N	= INTEGER.
+
+PREDICATES:
+
+nondeterm:
+
+p(D1)		- (o);
+
+CLAUSES:
+
+goal:-
+	p(X),
+	writeln(X).
+
+-- p(_).
+-- p(f(3,_,5)).
+p(f(1,2,3)).

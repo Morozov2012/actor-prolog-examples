@@ -1,0 +1,663 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2013-2017 IRE RAS Alexei A. Morozov                        --
+--------------------------------------------------------------------
+
+package "Morozov/Vision":
+
+import 'BufferedImage' from "Morozov/Java2D";
+import 'WritableImageProducer' from "Morozov/Java2D";
+
+DOMAINS:
+
+FrameNumber	= INTEGER.
+--
+BlobList	= Blob*.
+--
+Blob		= {	identifier: INTEGER,
+			type: BlobType,
+			x: INTEGER,
+			y: INTEGER,
+			width: INTEGER,
+			height: INTEGER,
+			centroid_x: INTEGER,
+			centroid_y: INTEGER,
+			foreground_area: INTEGER,
+			contour_length: INTEGER,
+			histograms: BlobHistogramList
+			}.
+--
+BlobType	= INTEGER; SYMBOL.
+--
+TrackList	= Track*.
+--
+Track		= {	identifier: INTEGER,
+			type: BlobType,
+			is_mature: YesNo,
+			frame1: FrameNumber,
+			time1: INTEGER,	-- Time in milliseconds
+			x1: INTEGER,	-- Center X1
+			y1: INTEGER,	-- Center Y1
+			centroid_x1: INTEGER,
+			centroid_y1: INTEGER,
+			frame2: FrameNumber,
+			time2: INTEGER,	-- Time in milliseconds
+			x2: INTEGER,	-- Center X2
+			y2: INTEGER,	-- Center Y2
+			centroid_x2: INTEGER,
+			centroid_y2: INTEGER,
+			segments: TrackSegmentList,
+			number_of_frames: INTEGER,
+			mean_blob_area: REAL,
+			mean_foreground_area: REAL,
+			mean_contour_length: REAL,
+			total_distance: REAL,
+			total_shift: REAL,
+			mean_velocity: REAL
+			}.
+--
+TrackSegmentList = TrackSegment*.
+--
+TrackSegment	= {	frame1: FrameNumber,
+			time1: INTEGER,	-- Time in milliseconds
+			x1: INTEGER,	-- Center X1
+			y1: INTEGER,	-- Center Y1
+			centroid_x1: INTEGER,
+			centroid_y1: INTEGER,
+			frame2: FrameNumber,
+			time2: INTEGER,	-- Time in milliseconds
+			x2: INTEGER,	-- Center X2
+			y2: INTEGER,	-- Center Y2
+			centroid_x2: INTEGER,
+			centroid_y2: INTEGER,
+			coordinates: TrackOfBlob,
+			mean_blob_area: REAL,
+			mean_foreground_area: REAL,
+			mean_characteristic_length: REAL,
+			mean_squared_characteristic_length: REAL,
+			mean_standardized_area: REAL,
+			mean_contour_length: REAL,
+			wr2_mean: REAL,
+			wr2_standard_deviation: REAL,
+			wr2_skewness: REAL,
+			wr2_kurtosis: REAL,
+			wr2_cardinality: INTEGER,
+			mean_velocity: REAL,
+			histograms: BlobHistogramList
+			}.
+--
+TrackOfBlob	= BlobCoordinates*.
+--
+BlobCoordinates	= {	frame: FrameNumber,
+			time: INTEGER,	-- Time in milliseconds
+			x: INTEGER,
+			y: INTEGER,
+			width: INTEGER,
+			height: INTEGER,
+			centroid_x: INTEGER,
+			centroid_y: INTEGER,
+			foreground_area: INTEGER,
+			characteristic_length: REAL,
+			contour_length: INTEGER,
+			r2: REAL,
+			velocity: REAL
+			}.
+--
+BlobHistogramList = BlobHistogram*.
+--
+BlobHistogram	= {	channel: ImageChannelName,
+			number_of_bins: INTEGER,
+			histogram_mean: HistogramBins,
+			histogram_sigma: HistogramBins,
+			cardinality: INTEGER
+			}.
+--
+HistogramBins	= REAL*.
+--
+GraphList	= ConnectedGraph*.
+--
+ConnectedGraph	= ConnectedGraphEdge*.
+--
+ConnectedGraphEdge = {	inputs: EdgeNumbers,
+			outputs: EdgeNumbers,
+			identifier: INTEGER,
+			type: BlobType
+			};
+		 	TrackSegment.
+--
+EdgeNumbers	= EdgeNumber*.
+EdgeNumber	= INTEGER.
+--
+BlobChronicle	= BlobFrame*.
+--
+BlobFrame	= {	frame: FrameNumber,
+			time: INTEGER,
+			blobs: BlobList
+			}.
+--
+TransformationMatrix	= TransformationMatrixRow*.
+TransformationMatrixRow	= REAL*.
+--
+DilationAlgorithm =	'PLAIN_DILATION';
+			'HIERARCHICAL_DILATION'.
+--
+ErodingAlgorithm =	'PLAIN_ERODING';
+			'HIERARCHICAL_ERODING'.
+--
+BlobExtractionAlgorithm	=
+			'TWO_PASS_BLOB_EXTRACTION';
+			'MULTIPASS_BLOB_EXTRACTION'.
+--
+PushOperationMode =	'SELECT_ALL';
+			'SELECT_NOTHING';
+			'DUPLICATE_FOREGROUND';
+			'FLIP_FOREGROUND'.
+--
+PopOperationMode =	'AND';
+			'OR';
+			'XOR';
+			'ASSIGN_FOREGROUND';
+			'FORGET_FOREGROUND'.
+--
+ImageChannelName =	'GRAYSCALE';
+			'HUE';
+			'SATURATION';
+			'BRIGHTNESS';
+			'RED';
+			'GREEN';
+			'BLUE';
+			'ALL'.
+--
+GradientComputationMode	=
+			'MODULUS';
+			'DIRECTION'.
+--
+BlobSortingCriterion =	'SIZE';
+			'FOREGROUND_AREA';
+			'CONTOUR_LENGTH';
+			'CENTROID_X';
+			'CENTROID_Y';
+			'LEFT_X';
+			'RIGHT_X';
+			'TOP_Y';
+			'BOTTOM_Y'.
+--
+TrackSortingCriterion =	'NUMBER_OF_FRAMES';
+			'MEAN_BLOB_AREA';
+			'MEAN_FOREGROUND_AREA';
+			'MEAN_CONTOUR_LENGTH';
+			'TOTAL_DISTANCE';
+			'TOTAL_SHIFT';
+			'MEAN_VELOCITY'.
+--
+SortingMode =		'DESCENDING_ORDER';
+			'ASCENDING_ORDER';
+			'default'.
+
+--------------------------------------------------------------------
+-- The 'BlobProcessingAttributes' interface.                      --
+--------------------------------------------------------------------
+
+interface 'BlobProcessingAttributes':
+
+minimal_training_interval			: FrameNumber;
+maximal_training_interval			: FrameNumber;
+horizontal_blob_border				: INTEGER;
+vertical_blob_border				: INTEGER;
+horizontal_extra_border_coefficient		: REAL;
+vertical_extra_border_coefficient		: REAL;
+minimal_blob_intersection_area			: INTEGER;
+minimal_blob_size				: INTEGER;
+minimal_track_duration				: FrameNumber;
+maximal_track_duration				: FrameNumber;
+maximal_chronicle_length			: Numerical;
+maximal_blob_invisibility_interval		: FrameNumber;
+maximal_track_retention_interval		: FrameNumber;
+--
+inverse_transformation_matrix		: TransformationMatrix;
+sampling_rate				: REAL;
+--
+r2_window_halfwidth				: INTEGER;
+apply_median_filtering_to_characteristic_length	: YesNo;
+characteristic_length_median_filter_halfwidth	: INTEGER;
+apply_median_filtering_to_velocity		: YesNo;
+velocity_median_filter_halfwidth		: INTEGER;
+synthesized_image_transparency			: INTEGER;
+make_rectangular_blobs_in_synthesized_image	: YesNo;
+
+[
+PREDICATES:
+--
+imperative:
+--
+set_minimal_training_interval(FrameNumber)		- (i);
+get_minimal_training_interval() = FrameNumber;
+--
+set_maximal_training_interval(FrameNumber)		- (i);
+get_maximal_training_interval() = FrameNumber;
+--
+set_horizontal_blob_border(INTEGER)			- (i);
+get_horizontal_blob_border() = INTEGER;
+--
+set_vertical_blob_border(INTEGER)			- (i);
+get_vertical_blob_border() = INTEGER;
+--
+set_horizontal_extra_border_coefficient(REAL)		- (i);
+get_horizontal_extra_border_coefficient() = REAL;
+--
+set_vertical_extra_border_coefficient(REAL)		- (i);
+get_vertical_extra_border_coefficient() = REAL;
+--
+set_minimal_blob_intersection_area(INTEGER)		- (i);
+get_minimal_blob_intersection_area() = INTEGER;
+--
+set_minimal_blob_size(INTEGER)				- (i);
+get_minimal_blob_size() = INTEGER;
+--
+set_minimal_track_duration(FrameNumber)			- (i);
+get_minimal_track_duration() = FrameNumber;
+--
+set_maximal_track_duration(FrameNumber)			- (i);
+get_maximal_track_duration() = FrameNumber;
+--
+set_maximal_chronicle_length(Numerical)			- (i);
+get_maximal_chronicle_length() = Numerical;
+--
+set_maximal_blob_invisibility_interval(FrameNumber)	- (i);
+get_maximal_blob_invisibility_interval() = FrameNumber;
+--
+set_maximal_track_retention_interval(FrameNumber)	- (i);
+get_maximal_track_retention_interval() = FrameNumber;
+--
+set_inverse_transformation_matrix(TransformationMatrix)	- (i);
+get_inverse_transformation_matrix() = TransformationMatrix;
+--
+set_sampling_rate(REAL)					- (i);
+get_sampling_rate() = REAL;
+--
+set_r2_window_halfwidth(INTEGER)			- (i);
+get_r2_window_halfwidth = INTEGER;
+--
+set_characteristic_length_median_filtering_mode(YesNo)	- (i);
+get_characteristic_length_median_filtering_mode() = YesNo;
+--
+set_characteristic_length_median_filter_halfwidth(INTEGER)
+							- (i);
+get_characteristic_length_median_filter_halfwidth() = INTEGER;
+--
+set_velocity_median_filtering_mode(YesNo)		- (i);
+get_velocity_median_filtering_mode() = YesNo;
+--
+set_velocity_median_filter_halfwidth(INTEGER)		- (i);
+get_velocity_median_filter_halfwidth() = INTEGER;
+--
+set_synthesized_image_transparency(INTEGER)		- (i);
+get_synthesized_image_transparency() = INTEGER;
+--
+set_synthesized_image_rectangular_blobs_mode(YesNo)	- (i);
+get_synthesized_image_rectangular_blobs_mode() = YesNo;
+]
+
+--------------------------------------------------------------------
+-- The 'VideoProcessingMachineOperations' interface.              --
+--------------------------------------------------------------------
+
+interface 'VideoProcessingMachineOperations':
+
+[
+PREDICATES:
+--
+imperative:
+--
+process_numbered_frame('BufferedImage')			- (i);
+process_numbered_frame(FileName)			- (i);
+process_numbered_frame(STRING)				- (i);
+process_numbered_frame('BufferedImage',INTEGER)		- (i,i);
+process_numbered_frame(FileName,INTEGER)		- (i,i);
+process_numbered_frame(STRING,INTEGER)			- (i,i);
+process_numbered_frame('BufferedImage',INTEGER,YesNo)	- (i,i,i);
+process_numbered_frame(FileName,INTEGER,YesNo)		- (i,i,i);
+process_numbered_frame(STRING,INTEGER,YesNo)		- (i,i,i);
+--
+process_realtime_frame('BufferedImage')			- (i);
+process_realtime_frame(FileName)			- (i);
+process_realtime_frame(STRING)				- (i);
+process_realtime_frame('BufferedImage',INTEGER)		- (i,i);
+process_realtime_frame(FileName,INTEGER)		- (i,i);
+process_realtime_frame(STRING,INTEGER)			- (i,i);
+process_realtime_frame('BufferedImage',INTEGER,YesNo)	- (i,i,i);
+process_realtime_frame(FileName,INTEGER,YesNo)		- (i,i,i);
+process_realtime_frame(STRING,INTEGER,YesNo)		- (i,i,i);
+--
+commit;
+--
+reset_settings;
+reset_statistics;
+reset_results;
+reset_all;
+--
+get_recent_frame_number(FrameNumber)			- (o);
+get_recent_frame_time(INTEGER)				- (o);
+--
+get_recent_image('BufferedImage')			- (i);
+get_preprocessed_image('BufferedImage')			- (i);
+get_foreground_image('BufferedImage')			- (i);
+get_synthesized_image('BufferedImage')			- (i);
+--
+get_background_image('BufferedImage')			- (i);
+get_background_image('BufferedImage',INTEGER)		- (i,i);
+--
+get_sigma_image('BufferedImage')			- (i);
+get_sigma_image('BufferedImage',INTEGER)		- (i,i);
+--
+get_blobs(BlobList)					- (o);
+get_tracks(TrackList)					- (o);
+get_connected_graphs(GraphList)				- (o);
+get_chronicle(BlobChronicle)				- (o);
+--
+physical_coordinates(INTEGER,INTEGER,REAL,REAL)		- (i,i,o,o);
+characteristic_length(INTEGER,INTEGER) = REAL		- (i,i);
+]
+
+--------------------------------------------------------------------
+-- The 'VideoProcessingMachine' class is                          --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+interface 'VideoProcessingMachine'
+
+(specialized
+	'DataAbstraction',
+	'VideoProcessingMachineOperations',
+	'BlobProcessingAttributes',
+	'DataResourceConsumer',
+	'WritableImageProducer'):
+
+brightness_histogram_tail_coefficient		: REAL;
+color_histogram_tail_coefficient		: REAL;
+
+[
+PREDICATES:
+--
+imperative:
+--
+img_get_subimage(INTEGER,INTEGER,INTEGER,INTEGER)	- (i,i,i,i);
+img_resize_image(INTEGER,INTEGER)			- (i,i);
+img_apply_gaussian_filter(INTEGER)			- (i);
+img_withdraw_image_preprocessing;
+--
+-- The pxl_adjust_contrast command adjusts image contrast. Because
+-- the command does not adjust channels individually, it does not
+-- introduce or remove color casts. It clips the shadow and
+-- highlight values in the image and then maps the remaining
+-- lightest and darkest pixels in the image to pure white (level
+-- 255) and pure black (level 0). This makes the highlights appear
+-- lighter and shadows appear darker.
+--
+pxl_adjust_contrast;
+pxl_adjust_contrast(REAL)				- (i);
+pxl_adjust_contrast(INTEGER,INTEGER)			- (i,i);
+--
+-- The pxl_adjust_levels command clips a portion of the shadows
+-- and highlights in each RGB channel and maps the lightest and
+-- darkest pixels in each color channel to pure white (level 255)
+-- and pure black (level 0). The intermediate pixel values are
+-- redistributed proportionately. As a result, using the
+-- pxl_adjust_levels command increases the contrast in the image
+-- because the pixel values are expanded. Because the
+-- pxl_adjust_levels command adjusts each RGB color channel
+-- individually, it may remove color or introduce color casts.
+--
+pxl_adjust_levels;
+pxl_adjust_levels(REAL)					- (i);
+--
+pxl_invert_colors;
+--
+pxl_select_image_channel(ImageChannelName)		- (i);
+--
+pxl_compute_gradient(GradientComputationMode)		- (i);
+pxl_smooth_image(INTEGER)				- (i);
+pxl_normalize_pixels(INTEGER,INTEGER)			- (i,i);
+pxl_withdraw_pixel_preprocessing;
+--
+msk_push_foreground;
+msk_push_foreground(PushOperationMode)			- (i);
+--
+msk_pop_foreground;
+msk_pop_foreground(PopOperationMode)			- (i);
+--
+msk_select_foreground(INTEGER,INTEGER)			- (i,i);
+msk_select_foreground(ImageChannelName,INTEGER,INTEGER)	- (i,i,i);
+--
+msk_add_foreground(INTEGER,INTEGER)			- (i,i);
+msk_add_foreground(ImageChannelName,INTEGER,INTEGER)	- (i,i,i);
+--
+msk_exclude_foreground(INTEGER,INTEGER)			- (i,i);
+msk_exclude_foreground
+	(ImageChannelName,INTEGER,INTEGER)		- (i,i,i);
+--
+msk_flip_foreground(INTEGER,INTEGER)			- (i,i);
+msk_flip_foreground(ImageChannelName,INTEGER,INTEGER)	- (i,i,i);
+--
+msk_select_polygon(PointList)				- (i);
+msk_add_polygon(PointList)				- (i);
+msk_exclude_polygon(PointList)				- (i);
+msk_flip_polygon(PointList)				- (i);
+--
+msk_select_all;
+msk_deselect_all;
+--
+msk_subtract_gaussian_background(REAL)			- (i);
+msk_subtract_gaussian_background(REAL,INTEGER)		- (i,i);
+msk_subtract_gaussian_background(REAL,INTEGER,INTEGER)	- (i,i,i);
+--
+msk_subtract_nonparametric_background
+	(INTEGER,REAL)					- (i,i);
+msk_subtract_nonparametric_background
+	(INTEGER,REAL,INTEGER)				- (i,i,i);
+msk_subtract_nonparametric_background
+	(INTEGER,REAL,INTEGER,INTEGER)			- (i,i,i,i);
+--
+msk_apply_rank_filter(INTEGER)				- (i);
+--
+msk_dilate_foreground;
+msk_dilate_foreground(INTEGER)				- (i);
+msk_dilate_foreground(INTEGER,DilationAlgorithm)	- (i,i);
+--
+msk_erode_foreground;
+msk_erode_foreground(INTEGER)				- (i);
+msk_erode_foreground(INTEGER,ErodingAlgorithm)		- (i,i);
+--
+msk_contour_foreground;
+--
+blb_extract_blobs(BlobType,BlobExtractionAlgorithm)	- (i,i);
+--
+blb_sort_blobs_by(BlobSortingCriterion)			- (i);
+blb_sort_blobs_by(BlobSortingCriterion,SortingMode)	- (i,i);
+--
+blb_select_front_blobs(INTEGER)				- (i);
+blb_select_front_blobs(INTEGER,BlobSortingCriterion)	- (i,i);
+blb_select_front_blobs
+	(INTEGER,BlobSortingCriterion,SortingMode)	- (i,i,i);
+--
+blb_select_superior_blob(BlobSortingCriterion)		- (i);
+blb_select_superior_blob
+	(BlobSortingCriterion,SortingMode)		- (i,i);
+--
+blb_fill_blobs;
+--
+blb_compute_color_histograms;
+blb_compute_color_histograms(INTEGER)			- (i);
+--
+blb_track_blobs;
+--
+blb_set_blob_borders(INTEGER,INTEGER)			- (i,i);
+blb_set_extra_border_coefficients(REAL,REAL)		- (i,i);
+blb_set_minimal_blob_intersection_area(INTEGER)		- (i);
+blb_set_minimal_blob_size(INTEGER)			- (i);
+--
+trk_select_front_tracks(INTEGER,TrackSortingCriterion)	- (i,i);
+trk_select_front_tracks
+	(INTEGER,TrackSortingCriterion,SortingMode)	- (i,i,i);
+--
+trk_select_superior_track(TrackSortingCriterion)	- (i);
+trk_select_superior_track
+	(TrackSortingCriterion,SortingMode)		- (i,i);
+--
+trk_refuse_slow_tracks(REAL,REAL,REAL)			- (i,i,i);
+--
+retract_all_instructions;
+suspend_processing;
+process_now;
+--
+set_brightness_histogram_tail_coefficient(REAL)		- (i);
+get_brightness_histogram_tail_coefficient = REAL;
+--
+set_color_histogram_tail_coefficient(REAL)		- (i);
+get_color_histogram_tail_coefficient = REAL;
+]
+
+--------------------------------------------------------------------
+-- The 'SynchronizedVideoProcessingMachine' class is              --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+interface 'SynchronizedVideoProcessingMachine'
+
+(specialized
+	'DataAbstraction',
+	'VideoProcessingMachineOperations',
+	'WritableImageProducer'):
+
+variable:
+
+video_processing_machine	: 'VideoProcessingMachine';
+
+[
+PREDICATES:
+--
+imperative:
+--
+set_video_processing_machine('VideoProcessingMachine')	- (i);
+get_video_processing_machine() = 'VideoProcessingMachine';
+]
+
+--------------------------------------------------------------------
+-- The 'ImageSubtractorOperations' interface.                     --
+--------------------------------------------------------------------
+
+interface 'ImageSubtractorOperations'
+
+(specialized 'VideoProcessingMachineOperations'):
+
+[
+PREDICATES:
+--
+imperative:
+--
+subtract(FrameNumber,'BufferedImage')			- (i,i);
+subtract(FrameNumber,FileName)				- (i,i);
+subtract(FrameNumber,STRING)				- (i,i);
+--
+subtract(FrameNumber,'BufferedImage',YesNo)		- (i,i,i);
+subtract(FrameNumber,FileName,YesNo)			- (i,i,i);
+subtract(FrameNumber,STRING,YesNo)			- (i,i,i);
+]
+
+--------------------------------------------------------------------
+-- The 'ImageSubtractor' class is                                 --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+interface 'ImageSubtractor'
+
+(specialized
+	'DataAbstraction',
+	'ImageSubtractorOperations',
+	'BlobProcessingAttributes',
+	'DataResourceConsumer',
+	'WritableImageProducer'):
+
+extract_blobs					: YesNo;
+track_blobs					: YesNo;
+use_grayscale_colors				: YesNo;
+apply_gaussian_filtering_to_background		: YesNo;
+background_gaussian_filter_radius		: INTEGER;
+apply_rank_filtering_to_background		: YesNo;
+background_rank_filter_threshold		: INTEGER;
+background_standard_deviation_factor		: REAL;
+contour_foreground				: YesNo;
+refuse_slow_tracks				: YesNo;
+fuzzy_velocity_threshold			: REAL;
+fuzzy_distance_threshold			: REAL;
+fuzzy_threshold_border				: REAL;
+
+[
+PREDICATES:
+--
+imperative:
+--
+set_blob_extraction_mode(YesNo)				- (i);
+get_blob_extraction_mode() = YesNo;
+--
+set_blob_tracing_mode(YesNo)				- (i);
+get_blob_tracing_mode() = YesNo;
+--
+set_grayscale_mode(YesNo)				- (i);
+get_grayscale_mode() = YesNo;
+--
+set_background_gaussian_filtering_mode(YesNo)		- (i);
+get_background_gaussian_filtering_mode() = YesNo;
+--
+set_background_gaussian_filter_radius(INTEGER)		- (i);
+get_background_gaussian_filter_radius() = INTEGER;
+--
+set_background_rank_filtering_mode(YesNo)		- (i);
+get_background_rank_filtering_mode() = YesNo;
+--
+set_background_rank_filter_threshold(INTEGER)		- (i);
+get_background_rank_filter_threshold() = INTEGER;
+--
+set_background_standard_deviation_factor(REAL)		- (i);
+get_background_standard_deviation_factor() = REAL;
+--
+set_foreground_contouring_mode(YesNo)			- (i);
+get_foreground_contouring_mode() = YesNo;
+--
+set_slow_tracks_deletion_mode(YesNo)			- (i);
+get_slow_tracks_deletion_mode() = YesNo;
+--
+set_fuzzy_velocity_threshold(REAL)			- (i);
+get_fuzzy_velocity_threshold() = REAL;
+--
+set_fuzzy_distance_threshold(REAL)			- (i);
+get_fuzzy_distance_threshold() = REAL;
+--
+set_fuzzy_threshold_border(REAL)			- (i);
+get_fuzzy_threshold_border() = REAL;
+]
+
+--------------------------------------------------------------------
+-- The 'SynchronizedImageSubtractor' class is                     --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+interface 'SynchronizedImageSubtractor'
+
+(specialized
+	'DataAbstraction',
+	'ImageSubtractorOperations',
+	'WritableImageProducer'):
+
+variable:
+
+image_subtractor		: 'ImageSubtractor';
+
+[
+PREDICATES:
+--
+imperative:
+--
+set_image_subtractor('ImageSubtractor')			- (i);
+get_image_subtractor() = 'ImageSubtractor';
+]

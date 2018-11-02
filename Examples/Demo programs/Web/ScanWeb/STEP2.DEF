@@ -1,0 +1,236 @@
+-------------------------------------------------------------------
+--              An example of Actor Prolog program.              --
+--          (c) 2002-2011, IRE RAS, Alexei A. Morozov.           --
+-------------------------------------------------------------------
+-- This is an auxiliary utility that processes data collected    --
+-- by the ScanWeb program. Execute it after the ScanWeb program. --
+-------------------------------------------------------------------
+import 'ColorDatabase'	from "Morozov/VRML/Colors";
+import 'AddressTable'	from "Morozov/Web/Scanning/Tables";
+import 'ShortName'	from "Morozov/VRML/Names";
+import "Morozov/VRML/Items";
+-------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+report_strange_date(
+	WebResourceName,
+	WebAddressList,
+	WebResourceDate);
+report_strange_number_of_pages(
+	WebResourceName,
+	WebAddressList,
+	N,N,N);
+report_strange_size(
+	WebResourceName,
+	WebAddressList,Size);
+--
+report_missing_item(WebResourceName,WebAddressList);
+--
+create_keyword_files(N,KeywordList);
+create_keyword_file(N,Keyword);
+copy_data(SceneAttributes,Hue);
+--
+determ:
+--
+element(N,KeywordList,Keyword)		- (i,i,o);
+--
+determ:
+--
+check_dictionary_if_need(
+		SceneAttributes,
+		InternalData,
+		N_List,
+		N)			- (i,i,i,o);
+--
+check_dictionary(N,N_List,N)		- (i,i,o);
+--
+imperative:
+--
+write_list(N_List);
+write_list(KeywordList);
+--
+write_item(N);
+write_item(Keyword);
+--
+write_date(WebResourceName,WebResourceDate);
+write_date(WebResourceDate);
+--
+determine_hue_of_keyword(N,Hue)			- (i,o);
+find_or_update_hue_of_keyword(Keyword,Hue)	- (i,o);
+--
+determine_hue_of_site(
+	SceneAttributes,
+	WebResourceName,
+	InternalData,
+	Hue,
+	Hue)				- (i,i,i,i,o);
+random_color= Hue;
+--
+update_keyword_color(Keyword,Hue);
+--
+update_personal_color(WebResourceName,Hue);
+--
+-------------------------------------------------------------------
+interface 'Step2' (specialized 'Console'):
+--
+size_file	: FileName;
+--
+pages_file	: FileName;
+links_file	: FileName;
+pictures_file	: FileName;
+binaries_file	: FileName;
+errors_file	: FileName;
+--
+keywords_file	: FileName;
+--
+colors		: 'ColorDatabase';
+--
+input		: 'WebSitesDatabase';
+--
+attributes	: 'AddressTable';
+output		: 'File';
+--
+store		: 'KeywordStore';
+names		: 'ShortName';
+--
+[
+PREDICATES:
+--
+determ:
+--
+'>'(N,N)					- (i,i);
+'<='(N,N)					- (i,i);
+'<'(N,N)					- (i,i);
+'<'(Size,Size)					- (i,i);
+--
+imperative:
+--
+'+'(N,N) = N					- (i,i);
+/* 2010.12.17
+'+'(WebResourceDate,INTEGER) = WebResourceDate	- (i,i);
+*/
+'-'(N,N) = N					- (i,i);
+--
+]
+-------------------------------------------------------------------
+--
+DOMAINS:
+--
+mixed:
+--
+SceneAttributes	= compare(SceneCriterion,SceneUnit);
+		  'all_keywords'; number(N).
+--
+InternalData	= {scene_attributes:SceneAttributes};
+		  TemporaryAttributesTable.
+--
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+use_declared_date_if_need(
+	WebResourceName,
+	WebResourceDate,
+	WebResourceDate)		- (i,i,o);
+--
+refine_date(
+	SceneAttributes,
+	WebResourceDate)		- (i,i);
+refine_date(
+	SceneAttributes,
+	WebResourceDate,
+	WebResourceDate)		- (i,i,i);
+--
+determ:
+--
+greater_date(WebResourceDate,WebResourceDate);
+--
+imperative:
+--
+increase_sum(SceneAttributes,SceneUnit,N);
+--
+update_list(Keyword,SceneAttributes,N_List);
+check_length(Keyword,N_List,N_List);
+--
+length(N_List)= INTEGER;
+--
+-----------------------------------------------------------------------
+interface 'KeywordStore' (specialized 'Database'):
+--
+internal:
+--
+	attributes	: 'AddressTable';
+	names		: 'Text';
+	con		: 'Console';
+	file_operations	: 'File';
+--
+[
+DOMAINS:
+--
+mixed:
+--
+Target	= number_of_items(N/*Index*/,N);
+	  recent_update(SceneAttributes,WebResourceDate);
+	  total_sum(SceneAttributes,SceneUnit,N);
+	  keyword_list(SceneAttributes,N_List);
+	  file_name(N,Keyword,FN,FN);
+	  hue(N,Hue).
+--
+reference:
+--
+FN	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+increase_counter(
+	SceneAttributes,
+	InternalData)			- (i,i);
+--
+increase_counter(N)			- (i);
+--
+analyse_item(N,InternalData)		- (i,i);
+--
+nondeterm:
+--
+get_virtual_item(InternalData)		- (o);
+--
+imperative:
+--
+remember_hue(N,Hue)			- (i,i);
+get_hue(N,Hue)				- (i,o);
+--
+imperative:
+--
+'+'(N,N) = N				- (i,i);
+'+'(N_List,N_List) = N_List		- (i,i);
+--
+determ:
+--
+'>='(WebResourceDate,WebResourceDate)	- (i,i);
+--
+]
+-------------------------------------------------------------------
+interface 'WebSitesDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+mixed:
+--
+Target	= InternalData.
+--
+PREDICATES:
+--
+imperative:
+--
+sort_by(SceneUnit)		- (i);
+--
+]
+-------------------------------------------------------------------
+

@@ -1,0 +1,78 @@
+package "Morozov/Web/Browsing/_List"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--             The "LIST" Actor Prolog package.              --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package implements a dialog box for examination of   --
+-- a list of Web resources. One can call an external Web     --
+-- browser to examine the content of given resources.        --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import 'List' from "Morozov/Web/Browsing/List";
+import 'Selector' from "Morozov/Web/Browsing/List";
+import 'Edit' from "Morozov/Web/Browsing/List";
+import '_AnalyserControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+import '_EngineControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+import '_EngineInput'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+---------------------------------------------------------------
+interface '_Browse_List'
+(specialized '_Block', '_AnalyserControl', '_EngineInput'):
+--
+internal:
+--
+	entry_c1	: '_AnalyserControl';
+--
+variable:
+--
+	value_i1	: WebAddressList;
+--
+internal:
+--
+	world		: 'List';
+--
+[
+]
+---------------------------------------------------------------
+-- This package implements a dialog box for selecting        --
+-- the Web resource from the list.                           --
+---------------------------------------------------------------
+interface '_Selector' (specialized '_Block'):
+--
+variable:
+--
+	value_i1		: WebAddressList;
+	value_o1		: WebAddressList;
+--
+internal:
+--
+	entry_o1		: WebAddressList;
+--
+	world			: 'Selector';
+--
+[
+]
+---------------------------------------------------------------
+-- This package implements a dialog box for editing address  --
+-- of the Web resource. User can select the address from     --
+-- the list.                                                 --
+---------------------------------------------------------------
+interface '_Edit' (specialized '_Block', '_AnalyserControl'):
+--
+variable:
+--
+	value_i1		: WebAddressList;
+	value_o1		: WebAddressList;
+--
+internal:
+--
+	entry_o1		: '_AnalyserControl';
+--
+	world			: 'Edit';
+--
+[
+]
+---------------------------------------------------------------

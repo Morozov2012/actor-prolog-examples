@@ -1,0 +1,100 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'FFmpeg'):
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	List== ?list_input_formats(),
+	write_format_list(List).
+--
+write_format_list([Head|Rest]):-!,
+	write_format(Head),
+	con ? writeln("--"),
+	write_format_list(Rest).
+write_format_list(_).
+--
+write_format(Format):-
+	write_format_name(Format),
+	write_format_long_name(Format),
+	write_format_mime_type(Format),
+	write_format_extensions(Format),
+	write_format_flags(Format),
+	write_format_tags(Format).
+--
+write_format_name(Format):-
+	Format == {name:Text|_},!,
+	con ? writeln("name: ",Text).
+write_format_name(_):-
+	con ? set_color('Red'),
+	con ? writeln("No name"),
+	con ? set_color('default').
+--
+write_format_long_name(Format):-
+	Format == {long_name:Text|_},!,
+	con ? writeln("long name: ",Text).
+write_format_long_name(_):-
+	con ? set_color('Red'),
+	con ? writeln("No long name"),
+	con ? set_color('default').
+--
+write_format_mime_type(Format):-
+	Format == {mime_type:Text|_},!,
+	con ? writeln("mime type: ",Text).
+write_format_mime_type(_):-
+	con ? set_color('Red'),
+	con ? writeln("No mime type"),
+	con ? set_color('default').
+--
+write_format_extensions(Format):-
+	Format == {extensions:Text|_},!,
+	con ? writeln("extensions: ",Text).
+write_format_extensions(_):-
+	con ? set_color('Red'),
+	con ? writeln("No extensions"),
+	con ? set_color('default').
+--
+write_format_flags(Format):-
+	Format == {flags:Flags|_},!,
+	write_format_flag_list(Flags).
+write_format_flags(_):-
+	con ? set_color('Red'),
+	con ? writeln("No flags"),
+	con ? set_color('default').
+--
+write_format_flag_list(Number):-
+	integer(Number),!,
+	con ? writeln("flags: ",Number).
+write_format_flag_list([Head|Rest]):-!,
+	con ? writeln("\tflag: ",Head),
+	write_format_flag_list(Rest).
+write_format_flag_list(_).
+--
+write_format_tags(Format):-
+	Format == {tags:Table|_},!,
+	write_format_tag_list(Table).
+write_format_tags(_):-
+	con ? set_color('Red'),
+	con ? writeln("No tags"),
+	con ? set_color('default').
+--
+write_format_tag_list([Head|Rest]):-!,
+	write_format_tag(Head),
+	write_format_tag_list(Rest).
+write_format_tag_list(_).
+--
+write_format_tag(tag(Identifier,Tag,Type)):-
+	con ? writeln(
+		"\tid: ",Identifier,
+		" -> tag: ",Tag,
+		" (",Type,")").
+]
+-----------------------------------------------------------------------

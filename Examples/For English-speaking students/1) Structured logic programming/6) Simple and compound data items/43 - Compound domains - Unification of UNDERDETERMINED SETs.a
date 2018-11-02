@@ -1,0 +1,127 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Underdetermined sets.                 --
+--                                       --
+-- Questions: What are underdetermined   --
+-- sets? What is the idea of the         --
+-- unification of the underdetermined    --
+-- sets? Is the order of pairs of the    --
+-- underdetermined sets essential during --
+-- the unification? Can one unify        --
+-- underdetermined sets that contain     --
+-- different numbers of pairs? Can a     --
+-- variable be a rest (tail) of an       --
+-- underdetermined set? Can this         --
+-- variable be substituted during the    --
+-- unification? Can one unify            --
+-- underdetermined sets that contain     --
+-- pairs with equal names and            --
+-- incompatible values?                  --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+Fruit	= {	name:STRING,
+		taste:Taste,
+		size:Size,
+		color:SYMBOL}.
+
+Taste	= 'good'; 'bad'.
+Size	= 'big'; 'medium'; 'small'.
+
+PREDICATES:
+
+match(Fruit,Fruit)	- (i,i);
+
+CLAUSES:
+
+goal:-
+	match(	{
+		name:"pear",
+		color:'yellow',
+		taste:'good',
+		size:'big'},
+		{
+		name:"pear",
+		color:'yellow',
+		taste:'good',
+		size:'big'}),
+	--
+	match(	{
+		name:"pear",
+		color:'yellow',
+		taste:'good',
+		size:'big'},
+		{
+		size:'big',
+		name:"pear",
+		taste:'good',
+		color:'yellow'}),
+	--
+	match(	{
+		color:'red',
+		taste:'good',
+		size:'big'},
+		{
+		size:'big',
+		taste:'good',
+		color:'red'}),
+	--
+	match(	{
+		color:'red',
+		taste:'good',
+		size:'big'},
+		{
+		size:'small',
+		taste:'good',
+		color:'red'}),
+	--
+	match(	{
+		name:"pear",
+		color:'yellow',
+		taste:'good',
+		size:'big'},
+		{
+		taste:'good',
+		color:'yellow',
+		size:'big'}).
+
+match(X,Y):-
+	X == {name:_|Y},
+	set_color('Blue'),
+	writeln("The second term is a "
+		"tail of the first one:"),
+	set_color('default'),
+	writeln("\t",X),
+	writeln("\t",Y),
+	fail.
+match(X,Y):-
+	Y == {name:_|X},
+	set_color('Blue'),
+	writeln("The first term is a "
+		"tail of the second one:"),
+	set_color('default'),
+	writeln("\t",X),
+	writeln("\t",Y),
+	fail.
+match(X,Y):-
+	X == Y,!,
+	set_color('DkGreen'),
+	writeln("These terms were ",
+		"unified successfully:"),
+	set_color('default'),
+	writeln("\t",X),
+	writeln("\t",Y).
+match(X,Y):-
+	set_color('Red'),
+	writeln("I cannot unify ",
+		"these terms:"),
+	set_color('default'),
+	writeln("\t",X),
+	writeln("\t",Y).

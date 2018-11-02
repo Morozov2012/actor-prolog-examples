@@ -1,0 +1,51 @@
+package "MOROZOV/WEB/DATA/MY_DATA":
+---------------------------------------------------------------
+--            The "MY_DATA" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package is dummy one. It contains some addresses of  --
+-- the HTML files on my local disk.                          --
+---------------------------------------------------------------
+class '_My_Data':
+--
+variable:
+--
+	value_o1;
+--
+	list_of_resources	= self ?? get_address;
+--
+internal:
+--
+	con;
+--
+[
+goal:-!,
+	value_o1 == list_of_resources.
+--
+show(_*):-
+	con ? show,
+	con ? clear,
+	{name:Name|_},
+	con ? writeln(Name),
+	fail.
+show(_*):-!.
+--
+get_address= URL :-
+	{address:URL|_}.
+--
+{name:"HTML2",address:"file:///d:\\Morozov\\- Doc -\\HTML-2\\index.html"}.
+{name:"HTML2",address:"file:///d:\\Morozov\\- Doc -\\HTML-2\\auto.html"}.
+{name:"HTML2",address:"file:///d:\\Morozov\\- Doc -\\HTML-2\\report1.html"}.
+{name:"HTML2",address:"file:///d:\\Morozov\\- Doc -\\HTML-2\\english.html"}.
+{name:"HTML2",address:"file:///d:\\Morozov\\- Doc -\\HTML-2\\selected.html"}.
+{name:"HTML2",address:"file:///d:\\Morozov\\- Doc -\\HTML-2\\internet.html"}.
+{name:"Actor Prolog",address:"file:///d:\\Morozov\\- Doc -\\Actor Prolog\\r_index.htm"}.
+{name:"Actor Prolog",address:"file:///d:\\Morozov\\- Doc -\\Actor Prolog\\index.htm"}.
+{name:"Actor Prolog",address:"file:///d:\\Morozov\\- Doc -\\Actor Prolog\\r_hello.htm"}.
+{name:"Actor Prolog",address:"file:///d:\\Morozov\\- Doc -\\Actor Prolog\\e_hello.htm"}.
+{name:"Actor Prolog",address:"file:///d:\\Morozov\\- Doc -\\Actor Prolog\\r_actors.htm"}.
+{name:"Actor Prolog",address:"file:///d:\\Morozov\\- Doc -\\Actor Prolog\\e_actors.htm"}.
+{name:"Actor Prolog",address:"file:///d:\\Morozov\\- Doc -\\Actor Prolog\\r_sets.htm"}.
+{name:"Actor Prolog",address:"file:///d:\\Morozov\\- Doc -\\Actor Prolog\\e_sets.htm"}.
+]
+---------------------------------------------------------------

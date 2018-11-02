@@ -1,0 +1,101 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Astrohn":
+
+import 'ThermalVideoBuffer' from "Morozov/ThermalVideoBuffer";
+import "Morozov/ColorMap";
+import 'BufferedImage' from "Morozov/Java2D";
+import 'WritableImageProducer' from "Morozov/Java2D";
+import "Morozov/Vision";
+
+--------------------------------------------------------------------
+-- The 'Astrohn' class is specialized class 'ThermalVideoBuffer'. --
+--------------------------------------------------------------------
+
+interface 'Astrohn' (specialized 'ThermalVideoBuffer'):
+
+terahertz_camera_address		: STRING;
+terahertz_camera_port			: INTEGER;
+color_camera_url			: STRING;
+synchronize_terahertz_and_color_streams	: YesNo;
+
+[
+PREDICATES:
+--
+imperative:
+--
+get_recent_terahertz_frame_number(FrameNumber)		- (o);
+get_recent_terahertz_frame_number(
+	FrameNumber,	-- Number of recent committed frame
+	FrameNumber)	-- Number of recent accepted frame
+			- (o,o);
+get_recent_color_frame_number(FrameNumber)		- (o);
+get_recent_color_frame_number(
+	FrameNumber,	-- Number of recent committed frame
+	FrameNumber)	-- Number of recent accepted frame
+			- (o,o);
+--
+get_recent_terahertz_frame_time(INTEGER)		- (o);
+get_recent_terahertz_frame_time(
+	INTEGER,	-- Recent committed frame time in milliseconds
+	INTEGER)	-- Recent accepted frame time in milliseconds
+			- (o,o);
+get_recent_color_frame_time(INTEGER)			- (o);
+get_recent_color_frame_time(
+	INTEGER,	-- Recent committed frame time in milliseconds
+	INTEGER)	-- Recent accepted frame time in milliseconds
+			- (o,o);
+--
+get_recent_terahertz_frame_relative_time(INTEGER)	- (o);
+get_recent_terahertz_frame_relative_time(
+	INTEGER,	-- Recent committed frame time in milliseconds
+	INTEGER)	-- Recent accepted frame time in milliseconds
+			- (o,o);
+get_recent_color_frame_relative_time(INTEGER)		- (o);
+get_recent_color_frame_relative_time(
+	INTEGER,	-- Recent committed frame time in milliseconds
+	INTEGER)	-- Recent accepted frame time in milliseconds
+			- (o,o);
+--
+get_recent_terahertz_frame_rate(REAL)			- (o);
+get_recent_terahertz_frame_rate(
+	REAL,		-- Frame rate of committed frames
+	REAL)		-- Frame rate of accepted frames
+			- (o,o);
+get_recent_color_frame_rate(REAL)			- (o);
+get_recent_color_frame_rate(
+	REAL,		-- Frame rate of committed frames
+	REAL)		-- Frame rate of accepted frames
+			- (o,o);
+--
+determ:
+--
+get_recent_terahertz_image('BufferedImage')		- (i);
+get_recent_color_image('BufferedImage')			- (i);
+get_recent_combined_image('BufferedImage')		- (i);
+get_recent_color_map(ColorMap)				- (o);
+--
+get_temperature(PointX,PointY) = REAL			- (i,i);
+get_minimal_temperature() = REAL;
+get_maximal_temperature() = REAL;
+--
+imperative:
+--
+get_terahertz_image_size_in_pixels(INTEGER,INTEGER)	- (o,o);
+get_color_image_size_in_pixels(INTEGER,INTEGER)		- (o,o);
+--
+set_terahertz_camera_address(STRING)			- (i);
+get_terahertz_camera_address() = STRING;
+--
+set_terahertz_camera_port(INTEGER)			- (i);
+get_terahertz_camera_port() = INTEGER;
+--
+set_color_camera_url(STRING)				- (i);
+get_color_camera_url() = STRING;
+--
+set_synchronize_terahertz_and_color_streams(YesNo)	- (i);
+get_synchronize_terahertz_and_color_streams() = YesNo;
+]

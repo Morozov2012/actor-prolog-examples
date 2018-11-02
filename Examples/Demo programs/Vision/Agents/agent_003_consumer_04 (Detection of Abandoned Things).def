@@ -1,0 +1,182 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+FrameRate	= REAL.
+--
+-----------------------------------------------------------------------
+interface 'VideoProcessing'
+(specialized 'Timer', 'CommunicationOperations'):
+--
+constant:
+--
+	inverse_transformation_matrix	: TransformationMatrix;
+	sampling_rate			: REAL;
+--
+internal:
+--
+	datastore		: 'DataStore';
+	database		: 'VideoDataSources';
+	subtractor		: 'ImageSubtractor';
+	image			: 'BufferedImage';
+	con			: 'Console';
+--
+constant:
+--
+	analyzer		: 'ImageAnalyzer';
+	trap			: 'CommunicationOperations';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+read_table;
+--
+new_frame(FrameNumber,BINARY,FrameRate)			- (i,i,i);
+reset;
+--
+determ:
+--
+alarm(	ExceptionName,
+	SYMBOL,
+	'ImageProducer')	- (i,i,i);
+alarm(	ExceptionName,
+	SYMBOL,
+	FrameNumber,
+	'BufferedImage',
+	FrameRate)		- (i,i,i,i,i);
+alarm(	ExceptionName,
+	SYMBOL)			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ImageAnalyzer' (specialized 'Alpha'):
+--
+constant:
+--
+	low_level_analyzer	: 'ImageSubtractor';
+--
+internal:
+--
+	subtractor		: 'SynchronizedImageSubtractor';
+	graphic_window		: 'Canvas2D';
+	image			: 'BufferedImage';
+	timer			: 'Timer';
+	text			: 'Text';
+--
+constant:
+--
+	circle_radius		: REAL;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+draw_scene(FrameNumber,FrameRate)			- (i,i);
+--
+draw_tracks(
+	PointX,
+	PointY,
+	TrackList,
+	FrameNumber,
+	FrameRate)		- (i,i,i,i,i);
+draw_track(
+	PointX,
+	PointY,
+	TrackSegmentList,
+	FrameNumber,
+	FrameRate)		- (i,i,i,i,i);
+draw_track_segment(
+	PointX,
+	PointY,
+	TrackSegment,
+	FrameNumber,
+	FrameRate)		- (i,i,i,i,i);
+--
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	TrackOfBlob)		- (i,i,i);
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	TrackOfBlob)		- (i,i,i,i,i);
+--
+determ:
+--
+is_abandoned_thing(TrackSegment,FrameRate)		- (i,i);
+--
+imperative:
+--
+fuzzy_metrics(REAL,REAL,REAL) = REAL			- (i,i,i);
+--
+draw_rectangle(
+	PointX,
+	PointY,
+	TrackOfBlob,
+	FrameNumber)		- (i,i,i,i);
+--
+draw_circle(PointX,PointY)				- (i,i);
+--
+draw_blob_identifier(PointX,PointY,REAL)		- (i,i,i);
+--
+report_time(FrameNumber,FrameRate)			- (i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX				- (i,i);
+'+'(PointY,PointY) = PointY				- (i,i);
+'-'(PointX,PointX) = PointX				- (i,i);
+'-'(PointY,PointY) = PointY				- (i,i);
+'/'(PointX,PointX) = PointX				- (i,i);
+'/'(PointY,PointY) = PointY				- (i,i);
+--
+power(PointX,INTEGER) = REAL				- (i,i);
+power(PointY,INTEGER) = REAL				- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'VideoDataSources' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= ('ImageProducer').
+--
+]
+-----------------------------------------------------------------------
+interface 'ImageProducer':
+[
+PREDICATES:
+--
+imperative:
+--
+register_consumer('VideoProcessing');
+]
+-----------------------------------------------------------------------
+interface 'CommunicationOperations':
+[
+PREDICATES:
+--
+determ:
+--
+register_oneself('ImageProducer')			- (i);
+process_frame
+	(FrameNumber,'BufferedImage',FrameRate)		- (i,i,i);
+reset_subtractor;
+]
+-----------------------------------------------------------------------

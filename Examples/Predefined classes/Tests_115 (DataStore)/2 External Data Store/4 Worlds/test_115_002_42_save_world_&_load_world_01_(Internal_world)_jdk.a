@@ -1,0 +1,207 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Warning: the interpreter does not support a domain check
+-- during the DataStore open operation.
+-- Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+MyDomainA		= ('TargetClassA').
+--
+MyMessageA		= text(STRING).
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+store1		= ('DataStore',
+			name="MyDataStore.dat",
+			access_mode='modifying');
+base1		= ('MyDatabaseA',
+			place=shared(store1,"MyTable"));
+--
+store2		= ('DataStore',
+			name="MyDataStore.dat",
+			access_mode='reading');
+base2		= ('MyDatabaseA',
+			place=shared(store2,"MyTable"));
+--
+target_world	= ('TargetClassA');
+--
+con		= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test01;
+test02;
+test03;
+--
+CLAUSES:
+--
+goal:-!,
+	test01,
+	test02,
+	test03.
+--
+test01:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store deletion."),
+	con ? set_color('default'),
+	store1 ? delete,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+test02:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test datastore creation."),
+	con ? set_color('Orange'),
+	con ? write("OPENING DATA STORE... "),
+	store1 ? open,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	base1 ? test_database_insert(target_world),
+	base1 ? test_database_find,
+	con ? set_color('Orange'),
+	con ? write("CLOSING DATA STORE... "),
+	store1 ? close,
+	con ? writeln("DONE."),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+test03:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test datastore inspection."),
+	con ? set_color('Orange'),
+	con ? write("OPENING DATA STORE... "),
+	store2 ? open,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	base2 ? test_database_find,
+	con ? set_color('Orange'),
+	con ? write("CLOSING DATA STORE... "),
+	store2 ? close,
+	con ? writeln("DONE."),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyDatabaseA' (specialized 'MyDatabase'):
+[
+DOMAINS:
+--
+Target		= MyDomainA.
+--
+]
+-----------------------------------------------------------------------
+class 'MyDatabaseB' (specialized 'MyDatabase'):
+[
+DOMAINS:
+--
+Target		= MyDomainB.
+--
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test_database_insert(Target)		- (i);
+test_database_find;
+inspect_database;
+communicate_with_the_world(Target)	- (i);
+--
+CLAUSES:
+--
+test_database_insert(MyWorld):-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest insertion to the database."),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	insert(MyWorld),
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test_database_insert(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+test_database_find:-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest database inspection."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	inspect_database,
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test_database_find:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+inspect_database:-
+	con ? writeln("\tDatabase content:"),
+	con ? set_color('Blue'),
+	find(Item),
+		con ? writeln("\t\t",Item),
+		communicate_with_the_world(Item),
+		fail.
+inspect_database:-
+	con ? set_color('default'),
+	con ? writeln("\tNo more items.").
+--
+communicate_with_the_world(W):-
+	W ? message(text("Hi!")),!.
+communicate_with_the_world(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tPredicate call failed."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'TargetClassA' (specialized 'Console'):
+[
+PREDICATES:
+--
+imperative:
+--
+message(MyMessageA)		- (i);
+--
+MODEL:
+--
+?message(Message).
+--
+CLAUSES:
+--
+message(Text):-
+	set_color('DkGreen'),
+	write("\t\tTargetClassA: I have got a message: "),
+	set_color('Violet'),
+	writeln(Text),
+	set_color('default').
+--
+goal:-!,
+	writeln("Hello from TargetClassA!").
+]
+-----------------------------------------------------------------------

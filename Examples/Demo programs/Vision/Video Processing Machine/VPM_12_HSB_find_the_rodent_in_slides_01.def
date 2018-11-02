@@ -1,0 +1,134 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+VideoFrameNumber	= INTEGER; STRING.
+--
+Hue			= INTEGER; STRING.
+Saturation		= INTEGER; STRING.
+Brightness		= INTEGER; STRING.
+--
+-----------------------------------------------------------------------
+interface 'DialogHSB' (specialized 'Dialog'):
+--
+constant:
+--
+	data_directory		: STRING;
+	file_name_format	: STRING;
+	frame_rate		: REAL;
+	subsampling		: INTEGER;
+--
+internal:
+--
+	vpm			: 'VideoProcessingMachine';
+	timer			: 'SpecialTimer';
+	graphic_window		: 'Canvas2D';
+	text			: 'Text';
+	image1			: 'BufferedImage';
+	image2			: 'BufferedImage';
+	state			: 'ProgramState';
+	con			: 'Console';
+--
+variable:
+--
+	first_frame		: VideoFrameNumber;
+	last_frame		: VideoFrameNumber;
+--
+	minimal_hue		: Hue;
+	maximal_hue		: Hue;
+--
+	minimal_saturation	: Saturation;
+	maximal_saturation	: Saturation;
+--
+	minimal_brightness	: Brightness;
+	maximal_brightness	: Brightness;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+detect_minimal_file_number(INTEGER,INTEGER)	- (i,o);
+detect_maximal_file_number
+	(INTEGER,INTEGER,INTEGER)		- (i,o,i);
+show_frame_range_if_necessary(INTEGER,INTEGER)	- (i,i);
+--
+divide_list(INTEGER,PointList,PointList)	- (i,i,o);
+--
+tick;
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+--
+draw_scene;
+draw_legend;
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'SpecialTimer' (specialized 'Timer'):
+--
+internal:
+--
+target_world	: 'DialogHSB';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		: 'Timer';
+--
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER);
+		  frame_counter(INTEGER);
+		  stop_watch_time(INTEGER);
+		  global_counter(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)			- (o);
+get_current_frame(INTEGER)			- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)			- (i);
+set_current_frame(INTEGER)			- (i);
+--
+reset_stopwatch;
+get_stopwatch_time(INTEGER)			- (o);
+--
+reset_frame_counter;
+increase_frame_counter;
+get_frame_counter(INTEGER)			- (o);
+--
+increase_global_counter;
+get_global_counter(INTEGER)			- (o);
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,32 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	panel		: 'Canvas2D';
+	text		: 'Text';
+	con		: 'Console';
+	store		: 'DataStore';
+	database	: 'MyDatabase';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= ('BufferedImage').
+--
+PREDICATES:
+--
+determ:
+--
+get_buffered_image('BufferedImage')	- (o);
+]
+-----------------------------------------------------------------------

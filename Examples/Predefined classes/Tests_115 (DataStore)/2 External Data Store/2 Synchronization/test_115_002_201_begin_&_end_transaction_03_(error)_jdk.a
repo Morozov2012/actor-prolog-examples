@@ -1,0 +1,165 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+IMPERATIVES:
+--
+test1;
+test2;
+test3;
+inspect_datastore;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+store		= ('DataStore',
+			name="MyDataStore",
+			access_mode='modifying');
+data_base	= ('MyDatabase',
+			place=shared(store,"MyTable"),
+			con=self);
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test data store deletion."),
+	set_color('default'),
+	store ? delete,
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("Test datastore creation."),
+	set_color('Orange'),
+	write("OPENING DATA STORE... "),
+	store ? open,
+	writeln("DONE."),
+	set_color('default'),
+	data_base ? test_database_inspection,
+	data_base ? test_database_updating,
+	data_base ? test_database_inspection,
+	data_base ? test_database_updating,
+	data_base ? test_database_inspection,
+	set_color('Orange'),
+	write("CLOSING DATA STORE... "),
+	store ? close,
+	writeln("DONE."),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("Test datastore inspection."),
+	set_color('Orange'),
+	write("OPENING DATA STORE... "),
+	store ? open,
+	writeln("DONE."),
+	set_color('default'),
+	store ? begin_transaction('reading'),
+	store ? begin_transaction('modifying'),!,
+	inspect_datastore,
+	store ? end_transaction,
+	store ? end_transaction,
+	set_color('Orange'),
+	write("CLOSING DATA STORE... "),
+	store ? close,
+	writeln("DONE."),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+test3:-
+	set_color('Red'),
+	writeln("\tTransaction failed."),
+	set_color('default').
+--
+inspect_datastore:-
+	store ? get_entry(Name,Type),
+	writeln("\t",Name," : ",Type),
+	fail.
+inspect_datastore.
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'LinkedHashMap'):
+--
+internal:
+--
+con;
+--
+[
+DOMAINS:
+--
+TargetValue	= {	name:Name,
+			age:INTEGER,
+			position:SYMBOL,
+			address:AddressList}.
+Name		= n(STRING,STRING,STRING).
+AddressList	= Address*.
+Address		= {	zip:INTEGER,
+			city:STRING,
+			street:STRING,
+			building:INTEGER}.
+--
+PREDICATES:
+--
+imperative:
+--
+test_database_updating;
+test_database_inspection;
+inspect_database;
+--
+CLAUSES:
+--
+test_database_updating:-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest database updating."),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	put(11112,{name:n("John","Richard","Doe")}),
+	put(11113,{address:[{city:"Berlin"}]}),
+	put(11111,{age:100,address:[{city:"Budapest"}]}),
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test_database_updating:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+test_database_inspection:-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest database inspection."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	inspect_database,
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test_database_inspection:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+inspect_database:-
+	con ? writeln("\tDatabase content:"),
+	con ? set_color('Blue'),
+	find(Item),
+		con ? writeln("\t\t",Item),
+		fail.
+inspect_database:-
+	con ? set_color('default'),
+	con ? writeln("\tNo more items.").
+]
+-----------------------------------------------------------------------

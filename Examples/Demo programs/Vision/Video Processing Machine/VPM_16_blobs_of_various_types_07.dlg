@@ -1,0 +1,48 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+
+dialog_font("Arial",8,[])
+padding(1,0)
+draft('off')
+
+modeless dialog 'ControlDialog' (
+	"Blob Extraction Demo",
+	default,default,default,
+	centered,centered,default)
+vbox(center)
+	hbox(center)
+		custom['KeepProportions'](graphic_window,64,48,"Control2D")
+	end_of_hbox
+	grid
+	row
+		column(right)
+			"First Frame:"
+		end_of_column
+		column(right)
+			hscroll(1002,first_frame,25,[1,1000],0)
+		end_of_column
+		column(right)
+			editinteger(first_frame,5,0)
+		end_of_column
+	end_of_row
+	row
+		column(right)
+			"Last Frame:"
+		end_of_column
+		column(right)
+			hscroll(1004,last_frame,25,[1,1000],0)
+		end_of_column
+		column(right)
+			editinteger(last_frame,5,1000)
+		end_of_column
+	end_of_row
+	end_of_grid
+	"The data are coming from "
+	"the Institute of Higher Nervous Activity "
+	"and Neurophysiology of RAS"
+end_of_vbox
+end_of_dialog

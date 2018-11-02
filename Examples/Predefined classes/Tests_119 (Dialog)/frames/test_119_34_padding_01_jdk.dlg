@@ -1,0 +1,11 @@
+mesh(80,25)
+-- padding(3.5,7.3)
+padding(1,1)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',24)
+
+dialog 'MyDialog'("The Padding Option Demo",default,default,default,5,1,default)
+	button("action11","&First, M")
+	button("action12","&Second, M")
+	button("action13","&Third, M")
+end_of_dialog

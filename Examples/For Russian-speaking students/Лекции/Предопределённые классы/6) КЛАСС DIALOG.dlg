@@ -1,0 +1,18 @@
+
+dialog 'Main' ("Demo Dialog",'Red','White',20,10,4,'Green')
+
+vbox('center')
+
+	statictext("Please enter text:")
+
+	hbox('center')
+
+		edittext("MyValue",12,2,"Text")
+
+		button(1,"&Action")
+
+	end_of_hbox
+
+end_of_vbox
+
+end_of_dialog

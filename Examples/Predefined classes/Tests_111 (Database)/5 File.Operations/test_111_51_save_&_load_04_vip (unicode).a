@@ -1,0 +1,185 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+	data1	= ('MyDatabase',
+			name="data_none.db",
+			character_set='none');
+	data2	= ('MyDatabase',
+			name="data_default.db");
+	data3	= ('MyDatabase',
+			name="data_ISO_8859_1.db",
+			character_set='ISO_8859_1');
+	data4	= ('MyDatabase',
+			name="data_US_ASCII.db",
+			character_set='US_ASCII');
+	data5	= ('MyDatabase',
+			name="data_UTF_16.db",
+			character_set='UTF_16');
+	data6	= ('MyDatabase',
+			name="data_UTF_16BE.db",
+			character_set='UTF_16BE');
+	data7	= ('MyDatabase',
+			name="data_UTF_16LE.db",
+			character_set='UTF_16LE');
+	data8	= ('MyDatabase',
+			name="data_UTF_8.db",
+			character_set='UTF_8');
+	data9	= ('MyDatabase',
+			name="data_1251.db",
+			character_set="windows-1251");
+--
+[
+goal:-!,
+	data1 ? create,
+	data1 ? retract_all,
+	data1 ? consult,
+	data1 ? list,
+	--
+	data2 ? create,
+	data2 ? retract_all,
+	data2 ? consult,
+	data2 ? list,
+	--
+	data3 ? create,
+	data3 ? retract_all,
+	data3 ? consult,
+	data3 ? list,
+	--
+	data4 ? create,
+	data4 ? retract_all,
+	data4 ? consult,
+	data4 ? list,
+	--
+	data5 ? create,
+	data5 ? retract_all,
+	data5 ? consult,
+	data5 ? list,
+	--
+	data6 ? create,
+	data6 ? retract_all,
+	data6 ? consult,
+	data6 ? list,
+	--
+	data7 ? create,
+	data7 ? retract_all,
+	data7 ? consult,
+	data7 ? list,
+	--
+	data8 ? create,
+	data8 ? retract_all,
+	data8 ? consult,
+	data8 ? list.
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+constant:
+--
+name;
+character_set;
+--
+internal:
+--
+trap	: 'SpecialStoreTrap'	= ('Trap',
+					world=self,
+					handler=self);
+con				= ('Console',
+					font_size=24);
+--
+[
+DOMAINS:
+--
+Target	= text(STRING,Color).
+--
+PREDICATES:
+--
+nondeterm:
+--
+initial_content(STRING,Color)	- (o,o);
+--
+imperative:
+--
+create;
+consult;
+list;
+--
+imperative:
+--
+alarm(_*)			- (i);
+--
+CLAUSES:
+--
+goal:-
+	initial_content(Text,Color),
+	append(text(Text,Color)),
+	fail.
+goal:-!.
+--
+initial_content(String,'Red'):-
+	String== ?codes_to_string([
+		16#767E#,16#95FB#,16#4E0D#,16#5982#,
+		16#4E00#,16#89C1#]).
+initial_content("Bai wen buru yi jian",'RoyalBlue').
+initial_content("Лучше один раз увидеть,",'RoyalBlue').
+initial_content("чем сто раз услышать",'RoyalBlue').
+--
+create:-
+	con ? set_color('DkGreen'),
+	con ? writeln("\tSaving the ",name," database..."),
+	con ? set_color('default'),
+	con ? writeln(
+		"\tCharacter set to be used: ",character_set),
+	save,
+	con ? writeln("\tDone.").
+--
+consult:-
+	con ? writeln("\tLoading the ",name," database..."),
+	con ? writeln(
+		"\tCharacter set to be used: ",character_set),
+	trap ? load,!,
+	con ? writeln("\tDone.").
+consult.
+--
+list:-
+	con ? writeln("\tThe ",name," database content:"),
+	Item== ?match(_),
+	Item == text(Text,Color),
+	con ? set_color(Color),
+	con ? writeln("\t",Text),
+	con ? set_color('default'),
+	fail.
+list:-
+	con ? writeln("\tEnd of database.").
+--
+alarm(_,_*):-
+	recent_loading_error(_,_,_,Message),!,
+	con ? set_color('Red'),
+	con ? writeln("\tI cannot load the ",name," database."),
+	con ? writeln("\tError: ",Message),
+	con ? set_color('default').
+alarm(Error,Arguments*):-!,
+	con ? set_color('Red'),
+	con ? writeln("\tI cannot load the ",name," database."),
+	con ? writeln("\tError: ",Error," ",Arguments),
+	con ? set_color('default').
+alarm(Arguments*):-!,
+	con ? writeln(Arguments).
+]
+-----------------------------------------------------------------------
+interface 'SpecialStoreTrap' (specialized 'Trap'):
+--
+[
+PREDICATES:
+--
+determ:
+--
+load;
+--
+]
+-----------------------------------------------------------------------

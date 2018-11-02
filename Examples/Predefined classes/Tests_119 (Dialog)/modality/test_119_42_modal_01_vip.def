@@ -1,0 +1,20 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+dialog1	: 'DemoPanel';
+dialog2	: 'DemoPanel';
+dialog3	: 'DemoPanel';
+[
+]
+-----------------------------------------------------------------------
+interface 'DemoPanel' (specialized 'Dialog'):
+--
+internal:
+--
+con		: 'Console';
+--
+[
+]
+-----------------------------------------------------------------------

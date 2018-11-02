@@ -1,0 +1,69 @@
+package "MOROZOV/TOOLS/B_SORT2"
+	(Item:=INTEGER,List:=ItemList):
+----------------------------------------------------------
+--                                                      --
+--      The "TOOLS/B_SORT2" Actor Prolog package.       --
+--     (c) 2005-2011, IRE RAS, Alexei A. Morozov.       --
+--                                                      --
+----------------------------------------------------------
+-- This package is intended for Binary Tree Sorting.    --
+----------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+create_BTree(BTree)			- (o);
+list_to_tree(List,BTree)		- (i,i);
+insert_item(Item,BTree)			- (i,i);
+tree_to_list(BTree,List,List)		- (i,i,o);
+--
+----------------------------------------------------------
+class 'B-Sorting':
+[
+----------------------------------------------------------
+goal.
+alarm(_).
+----------------------------------------------------------
+-- Sort List                                            --
+----------------------------------------------------------
+-- sort_list(#,#):-!.
+sort_list(List1,List2):-
+	create_BTree(Tree),
+	list_to_tree(List1,Tree),
+	tree_to_list(Tree,[],List2).
+--
+create_BTree(_).
+--
+----------------------------------------------------------
+-- List to Tree                                         --
+----------------------------------------------------------
+list_to_tree([Item|Rest],Tree):-!,
+	insert_item(Item,Tree),
+	list_to_tree(Rest,Tree).
+list_to_tree([],_):-!.
+list_to_tree(_,_):-
+	break('B-Sorting internal error').
+--
+-- insert_item(T,b(T,_,_)):-!.
+insert_item(T1,b(T2,_,_)):-
+	can_be_refined(T2),
+	T2 == T1,!.
+insert_item(T1,b(T2,L,_)):-
+	T1 < T2,!,
+	insert_item(T1,L).
+insert_item(Term,b(_,_,R)):-!,
+	insert_item(Term,R).
+insert_item(_,_):-
+	break('B-Sorting internal error').
+----------------------------------------------------------
+-- Tree to List                                         --
+----------------------------------------------------------
+tree_to_list('empty_BTree',List,List):-!.
+tree_to_list(b(Term,L,R),L1,L3):-!,
+	tree_to_list(R,L1,L2),
+	tree_to_list(L,[Term|L2],L3).
+tree_to_list(_,_,_):-
+	break('B-Sorting internal error').
+]
+----------------------------------------------------------

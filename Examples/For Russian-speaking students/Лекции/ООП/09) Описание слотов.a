@@ -1,0 +1,41 @@
+
+DOMAINS:
+
+N	= INTEGER.
+
+class 'MyClass' (specialized 'Console'):
+[
+PREDICATES:
+
+imperative:
+
+q(N,N,N)	- (i,i,o);
+
+CLAUSES:
+
+q(_,_,0).
+]
+
+class 'Main' (specialized 'Console'):
+
+-- constant:
+internal:
+
+slot	= ('MyClass');
+
+[
+PREDICATES:
+
+imperative:
+
+p(N,N,N)	- (i,i,o);
+
+CLAUSES:
+
+goal:-!,
+	p(1,2,_).
+
+p(A,B,C):-!,
+	slot ? q(A,B,C).
+
+]

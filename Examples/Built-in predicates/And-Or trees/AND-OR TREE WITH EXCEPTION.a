@@ -1,0 +1,15 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+project: (('Test'))
+
+class 'Test' (specialized 'Report'):
+[
+goal:-
+	writeln("Hello world!"),
+	break('stop_the_program').
+alarm(Name):-
+	writeln("Exception: ",Name).
+]

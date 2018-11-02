@@ -1,0 +1,79 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+write_command(OperatingSystemCommand)	- (i);
+test2(OperatingSystemCommand)		- (i);
+--
+class 'Main' (specialized 'Application'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2("winword.exe"),
+	test1,
+	test2(auto(".doc")),
+	test1,
+	test2('auto'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_command(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	Command== ?get_command(),!,
+	con ? write("Command: "),
+	con ? set_color('Violet'),
+	write_command(Command),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+write_command(Command):-
+	symbol(Command),!,
+	con ? writeln("'",Command,"'").
+write_command(Command):-
+	string(Command),!,
+	con ? writeln("\"",Command,"\"").
+write_command(Command):-
+	con ? writeln(Command).
+--
+test2(Command):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_command(Command),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

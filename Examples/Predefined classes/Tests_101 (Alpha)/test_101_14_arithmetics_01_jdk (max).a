@@ -1,0 +1,79 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2;
+test3;
+test4;
+test5(Numerical*)	- (i);
+test6(Numerical*)	- (i);
+test7(Numerical*)	- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5(5,10,3,2),
+	test6(5,10,3,2),
+	test7(5,10,3,2).
+--
+test0:-
+	con ? writeln("Test 0:"),
+	?max(10,3,2),
+	con ? writeln("   O.K.").
+--
+test1:-
+	con ? writeln("Test 1:"),
+	Value== ?max(7,10,3,2),
+	con ? writeln("   max(7,10,3,2)=",Value).
+--
+test2:-
+	con ? writeln("Test 2:"),
+	Value== ?max(7,10,3.0,2),
+	con ? writeln("   max(7,10,3.0,2)=",Value).
+--
+test3:-
+	con ? writeln("Test 3:"),
+	Value== ?max(7,[5,10,3,2]),
+	con ? writeln("   max(7,[5,10,3,2])=",Value).
+--
+test4:-
+	con ? writeln("Test 4:"),
+	Value== ?max(7,[5,10.0,3,2]),
+	con ? writeln("   max(7,[5,10.0,3,2])=",Value).
+--
+test5(List*):-
+	con ? writeln("Test 5:"),
+	Value== ?max(List*),
+	con ? writeln("   max(",List,")=",Value).
+--
+test6(List*):-
+	con ? writeln("Test 6:"),
+	Value== ?max([-7,-10,-1],List*),
+	con ? writeln(
+		"   max(",[-7,-10,-1],
+			",",List,")=",Value).
+--
+test7(List*):-
+	con ? writeln("Test 7:"),
+	Value== ?max([-10,[-3,-10],-11,-12],List*),
+	con ? writeln(
+		"   max(",[-10,[-3,-10],-11,-12],
+			",",List,")=",Value).
+]

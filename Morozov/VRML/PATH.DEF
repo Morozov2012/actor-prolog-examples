@@ -1,0 +1,133 @@
+package "Morozov/VRML/Path":
+-----------------------------------------------------------------------
+--                                                                   --
+--               The "VRML/PATH" Actor Prolog package.               --
+--            (c) 2002-2007, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package is intended for generating trajectory of flying      --
+-- viewpoint in VRML scenes.                                         --
+-----------------------------------------------------------------------
+import 'Vector' from "Morozov/VRML/Vectors";
+import "Morozov/Web/Scanning/Counter";
+import 'VRML_Toolbox' from "Morozov/VRML/Toolbox";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+mixed:
+--
+ViewpointPositions	= ViewpointPosition*.
+--
+reference:
+--
+ViewpointPosition	= vp(N,WebResourceName,RefX,RefY,RefZ).
+RefX, RefY, RefZ	= REAL.
+--
+ViewpointTree		= b(	ViewpointPosition,
+				ViewpointTree,
+				ViewpointTree);
+			  'empty'.
+--
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+increase_viewpoint_counter(N)			- (o);
+--
+save_viewpoint_positions(N,ViewpointPositions)	- (i,i);
+--
+sort_point_list(
+	ViewpointPositions,
+	ViewpointPositions)			- (i,o);
+create_tree(ViewpointTree)			- (o);
+list_to_tree(ViewpointPositions,ViewpointTree)	- (i,i);
+insert_item(ViewpointPosition,ViewpointTree)	- (i,i);
+tree_to_list(	ViewpointTree,
+		ViewpointPositions,
+		ViewpointPositions)		- (i,i,o);
+--
+determ:
+--
+is_greater(ViewpointPosition,ViewpointPosition);
+--
+imperative:
+--
+write_key_items(N)				- (i);
+write_key_items(N,N)				- (i,i);
+--
+write_viewpoint_positions(Indentation,N,N);
+write_viewpoint_position(Indentation,PX,PY,PZ,STRING);
+--
+write_viewpoint_orientations(Indentation,N,N);
+write_viewpoint_orientations(Indentation,N,PX,PY,PZ);
+write_viewpoint_orientation(Indentation,PX,PY,PZ,PX,PY,PZ,STRING);
+--
+-----------------------------------------------------------------------
+interface 'Trajectory' (specialized 'Alpha'):
+--
+output			: 'VRML_Toolbox';
+--
+store			: 'ViewpointDatabase';
+--
+bag			: 'ViewpointBag';
+--
+deboosting_factor	: INTEGER;
+--
+vector_operations	: 'Vector';
+text_operations		: 'Text';
+con			: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+reset;
+--
+add_viewpoint_position(WebResourceName,PX,PY,PZ)	- (i,i,i,i);
+--
+write_ViewpointPath(Indentation)			- (i);
+--
+write_MovingViewpoint(Indentation)			- (i);
+--
+nondeterm:
+--
+get_any_position_of_viewpoint= ViewpointPosition;
+--
+imperative:
+--
+'+'(N,N) = N;
+--
+'*'(N,INTEGER) = INTEGER;
+--
+'/'(N,N) = REAL;
+--
+determ:
+--
+'>'(RefY,RefY);
+--
+'<='(N,N);
+]
+-----------------------------------------------------------------------
+interface 'ViewpointDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+mixed:
+--
+Target	= ViewpointPosition;
+	  last_number_of_viewpoint_position(N).
+]
+-----------------------------------------------------------------------
+interface 'ViewpointBag' (specialized 'FindAll'):
+[
+PREDICATES:
+--
+imperative:
+--
+get_any_position_of_viewpoint= ViewpointPositions;
+]
+-----------------------------------------------------------------------

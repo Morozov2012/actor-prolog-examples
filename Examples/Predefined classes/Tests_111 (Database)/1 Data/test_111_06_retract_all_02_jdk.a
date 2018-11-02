@@ -1,0 +1,71 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+MyData		= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+Target	= MyData.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyDatabase');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test2.
+--
+test1:-
+	writeln("Test 1: append(i)"),
+	writeln("\tI will store data items."),
+	store?append(1000),
+	store?append(3000),
+	store?append(5000),
+	writeln("\tDone.").
+--
+test2:-
+	writeln("Test 2: find(o)"),
+	writeln("\tI will retrieve data items:"),
+	store ? find(Item),
+	writeln("\t",Item),
+	fail.
+test2:-
+	writeln("\tDone.").
+--
+test3:-
+	writeln("Test 3: retract_all()"),
+	writeln("\tI will delete all data item:"),
+	store ? retract_all,
+	writeln("\tDone.").
+--
+test4:-
+	writeln("Test 4: append(i)"),
+	writeln("\tI will store new data items."),
+	store?append(7000),
+	store?append(8000),
+	store?append(9000),
+	writeln("\tDone.").
+]
+-----------------------------------------------------------------------

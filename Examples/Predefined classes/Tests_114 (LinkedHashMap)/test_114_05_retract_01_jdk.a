@@ -1,0 +1,141 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+MyData		= {x:R_INTEGER,y:R_INTEGER,z:R_INTEGER}.
+R_INTEGER	= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+--
+-----------------------------------------------------------------------
+class 'MyHashMap' (specialized 'LinkedHashMap'):
+[
+DOMAINS:
+--
+reference:
+--
+TargetValue	= MyData.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyHashMap');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test2,
+	test5,
+	test2,
+	test1,
+	test2,
+	test6,
+	test2.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test 1: append(i)"),
+	writeln("\tI will store data items."),
+	set_color('default'),
+	store ? append(map(10000,{x:10,y:20})),
+	store ? append(map(20000,{x:30,y:50,z:5})),
+	store ? append(map(20000,{z:5,x:30,y:50})),
+	store ? append(map(30000,{x:100,y:21})),
+	store ? append(map(40000,{y:23,x:25,z:7})),
+	store ? append(map(20000,{x:30,z:5,y:50})),
+	store ? append(map(20000,{x:30,y:50,z:5})),
+	store ? append(map(50000,{x:30,y:25})),
+	set_color('DkGreen'),
+	writeln("\tDone."),
+	set_color('default').
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("Test 2: find(o)"),
+	writeln("\tI will retrieve data items:"),
+	set_color('Blue'),
+	store ? find(Item),
+		writeln("\t",Item),
+		fail.
+test2:-
+	set_color('DkGreen'),
+	writeln("\tDone."),
+	set_color('default').
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("Test 3: retract(o)"),
+	writeln("\tI will delete one data item:"),
+	set_color('default'),
+	store ? retract(Item),!,
+	set_color('DkGreen'),
+	write("\tDone: "),
+	set_color('Magenta'),
+	writeln(Item),
+	set_color('default').
+test3:-
+	set_color('Red'),
+	writeln("\tFailure."),
+	set_color('default').
+--
+test4:-
+	set_color('RoyalBlue'),
+	writeln("Test 4: retract(i)"),
+	writeln("\tI will delete one data item:"),
+	set_color('default'),
+	Item== store?match(map(_,{z:_|_})),
+	Item == map(K,{z:Z|Rest}),
+	store ? retract(Item),!,
+	set_color('DkGreen'),
+	write("\tDone: "),
+	set_color('Magenta'),
+	writeln("K=",K,", Z=",Z,", Rest=",Rest),
+	set_color('default').
+test4:-
+	set_color('Red'),
+	writeln("\tFailure."),
+	set_color('default').
+--
+test5:-
+	set_color('RoyalBlue'),
+	writeln("Test 5: append(i)"),
+	writeln("\tI will store one data item."),
+	set_color('default'),
+	store ? append(map(40000,{y:23,z:7,x:25})),
+	set_color('DkGreen'),
+	writeln("\tDone."),
+	set_color('default').
+--
+test6:-
+	set_color('RoyalBlue'),
+	writeln("Test 6: retract(o)"),
+	writeln("\tI will delete all data items:"),
+	set_color('Magenta'),
+	store ? retract(Item),
+		writeln("\t",Item),
+		fail.
+test6:-
+	set_color('DkGreen'),
+	writeln("\tDone."),
+	set_color('default').
+]
+-----------------------------------------------------------------------

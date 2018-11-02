@@ -1,0 +1,410 @@
+-------------------------------------------------------------
+--           An example of Actor Prolog program.           --
+--          (c) 2005, IRE RAS, Alexei A. Morozov.          --
+-------------------------------------------------------------
+--   An example of logical formula transformation.         --
+--   Clocksin W.F., Mellish C.F. Programming in PROLOG.    --
+--   Berlin, Springer Verlag, 1981.                        --
+-------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	store	= ('MyDatabase');
+--
+[
+CLAUSES:
+--
+goal:-
+	--
+	-- Program input:
+	-- (For all x:
+	--      (For all y:
+	--           man(y) -> respect(y,x) )
+	--      ->
+	--      king(x)
+	-- )
+	--
+	F== all('x',
+		'->'(	all('y',
+				'->'(
+					man('y'),
+					respect('y','x')
+					)
+				),
+			king('x')
+			)
+		),
+	--
+	-- Program output:
+	-- man(f1(X));king(X).
+	-- king(X):-respect(f1(X),X).
+	--
+	/*
+	--
+	-- Program input:
+	-- ( Not ( Exists y: p(y) ) )
+	-- &
+	-- ( For all x: s(x) )
+	-- &
+	-- ( For all y: p(y) or Not (For all f: f=y) )
+	--
+	F == '&'(
+	     '~'( exists('y', p('y')) ),
+	     '&'(
+	          all('x', s('x') ),
+	          '&'(
+	               all('y',
+	                    '#'( p('y'),
+	                         '~'(
+	                              all('f',
+	                                   eq('f','y')
+	                                   )
+	                              )
+	                         )
+	                    ),
+	               eq('z','z')
+	               )
+	          )
+	     ),
+	--
+	-- Program output:
+	-- :-p(Y).
+	-- s(X).
+	-- p(Y):-eq(f1(Y),Y).
+	-- eq(Z,Z).
+	--
+	*/
+	/*
+	--
+	-- Program input:
+	-- (For all y: Not (For all f: f=y) )
+	--
+	F == 	'&'(
+			all('y',
+				'~'(
+					all('f',
+						eq('f','y')
+						)
+					)
+				),
+			all('z',
+				eq('z','z')
+				)
+			),
+	--
+	-- Program output:
+	-- :-eq(f1(Y),Y).
+	-- eq(Z,Z).
+	--
+	*/
+	/*
+	--
+	-- Program input:
+	-- Not (Exists y: (For all f: f=y) )
+	--
+	F == 	'&'(
+			'~'(exists('y',
+				all('f',
+					eq('f','y')
+					)
+				)),
+			all('z',
+				eq('z','z')
+				)
+			),
+	--
+	-- Program output:
+	-- :-eq(f1(Y),Y).
+	-- eq(Z,Z).
+	--
+	*/
+	translate(F).
+--
+translate(X1):-
+	-- writeln(X1),
+	implout(X1,X2),		/* Stage 1 */
+	-- writeln(X2),
+	negin(X2,X3),		/* Stage 2 */
+	-- writeln(X3),
+	skolem(X3,X4,[]),	/* Stage 3 */
+	-- writeln(X4),
+	univout(X4,X5),		/* Stage 4 */
+	-- writeln(X5),
+	conjn(X5,X6),		/* Stage 5 */
+	-- writeln(X6),
+	clausify(X6,[],List1),	/* Stage 6 */
+	reverse(List1,[],List2),
+	pclauses(List2).	/* Print clauses */
+--
+-- Stage 1.
+--
+implout('<->'(P1,Q1),
+	'#'(	'&'(P2,Q2),
+		'&'('~'(P2),'~'(Q2)) )):-!,
+	implout(P1,P2),
+	implout(Q1,Q2).
+implout('->'(P1,Q1),'#'('~'(P2),Q2)):-!,
+	implout(P1,P2),
+	implout(Q1,Q2).
+implout(all(X,P1),all(X,P2)):-!,
+	implout(P1,P2).
+implout(exists(X,P1),exists(X,P2)):-!,
+	implout(P1,P2).
+implout('&'(P1,Q1),'&'(P2,Q2)):-!,
+	implout(P1,P2),
+	implout(Q1,Q2).
+implout('#'(P1,Q1),'#'(P2,Q2)):-!,
+	implout(P1,P2),
+	implout(Q1,Q2).
+implout('~'(P1),'~'(P2)):-!,
+	implout(P1,P2).
+implout(P,P).
+--
+-- Stage 2.
+--
+negin('~'(P1),P2):-!,
+	neg(P1,P2).
+negin(all(X,P1),all(X,P2)):-!,
+	negin(P1,P2).
+negin(exists(X,P1),exists(X,P2)):-!,
+	negin(P1,P2).
+negin('&'(P1,Q1),'&'(P2,Q2)):-!,
+	negin(P1,P2),
+	negin(Q1,Q2).
+negin('#'(P1,Q1),'#'(P2,Q2)):-!,
+	negin(P1,P2),
+	negin(Q1,Q2).
+negin(P,P).
+--
+neg('~'(P1),P2):-!,
+	negin(P1,P2).
+neg(all(X,P1),exists(X,P2)):-!,
+	neg(P1,P2).
+neg(exists(X,P1),all(X,P2)):-!,
+	neg(P1,P2).
+neg('&'(P1,Q1),'#'(P2,Q2)):-!,
+	neg(P1,P2),
+	neg(Q1,Q2).
+neg('#'(P1,Q1),'&'(P2,Q2)):-!,
+	neg(P1,P2),
+	neg(Q1,Q2).
+neg(P,'~'(P)).
+--
+-- Stage 3.
+--
+skolem(all(X,P1),all(X,P2),Vars):-!,
+	skolem(P1,P2,[X|Vars]).
+skolem(exists(X,P1),P3,Vars):-!,
+	gensym("f",F),
+	Sk== structure(F,Vars),
+	subst(X,Sk,P1,P2),
+	skolem(P2,P3,Vars).
+skolem('#'(P1,Q1),'#'(P2,Q2),Vars):-!,
+	skolem(P1,P2,Vars),
+	skolem(Q1,Q2,Vars).
+skolem('&'(P1,Q1),'&'(P2,Q2),Vars):-!,
+	skolem(P1,P2,Vars),
+	skolem(Q1,Q2,Vars).
+skolem(P,P,_).
+--
+gensym(Prefix,Name):-
+	store ? retract(I),!,
+	store ? append(I+1),
+	Name== Prefix + ?convert_to_string(I+1).
+gensym(Prefix,Name):-
+	store ? append(1),
+	Name== Prefix + ?convert_to_string(1).
+--
+subst(V1,V2,'~'(P1),'~'(P2)):-!,
+	subst(V1,V2,P1,P2).
+subst(V1,V2,'#'(P1,Q1),'#'(P2,Q2)):-!,
+	subst(V1,V2,P1,P2),
+	subst(V1,V2,Q1,Q2).
+subst(V1,V2,'&'(P1,Q1),'&'(P2,Q2)):-!,
+	subst(V1,V2,P1,P2),
+	subst(V1,V2,Q1,Q2).
+subst(V1,V2,'->'(P1,Q1),'->'(P2,Q2)):-!,
+	subst(V1,V2,P1,P2),
+	subst(V1,V2,Q1,Q2).
+subst(V1,V2,'<->'(P1,Q1),'<->'(P2,Q2)):-!,
+	subst(V1,V2,P1,P2),
+	subst(V1,V2,Q1,Q2).
+subst(V1,_,all(V1,_),_):-!,
+	writeln("The ",V1," variable is used incorrectly."),
+	break.
+subst(V1,_,exists(V1,_),_):-!,
+	writeln("The ",V1," variable is used incorrectly."),
+	break.
+subst(V1,V2,all(X,P1),all(X,P2)):-!,
+	subst(V1,V2,P1,P2).
+subst(V1,V2,exists(X,P1),exists(X,P2)):-!,
+	subst(V1,V2,P1,P2).
+subst(V1,V2,eq(V1,V1),eq(V2,V2)):-!.
+subst(V1,V2,eq(V1,X),eq(V2,X)):-!.
+subst(V1,V2,eq(X,V1),eq(X,V2)):-!.
+subst(V1,V2,p(V1),p(V2)):-!.
+subst(V1,V2,s(V1),s(V2)):-!.
+subst(V1,V2,man(V1),man(V2)):-!.
+subst(V1,V2,respect(V1,V1),respect(V2,V2)):-!.
+subst(V1,V2,respect(V1,X),respect(V2,X)):-!.
+subst(V1,V2,respect(X,V1),respect(X,V2)):-!.
+subst(V1,V2,king(V1),king(V2)):-!.
+subst(_,_,P,P).
+--
+-- Stage 4.
+--
+univout(all(_,P1),P2):-!,
+	univout(P1,P2).
+univout('&'(P1,Q1),'&'(P2,Q2)):-!,
+	univout(P1,P2),
+	univout(Q1,Q2).
+univout('#'(P1,Q1),'#'(P2,Q2)):-!,
+	univout(P1,P2),
+	univout(Q1,Q2).
+univout(P,P).
+--
+-- Stage 5.
+--
+conjn('#'(P1,Q1),R):-!,
+	conjn(P1,P2),
+	conjn(Q1,Q2),
+	conj2('#'(P2,Q2),R).
+conjn('&'(P1,Q1),'&'(P2,Q2)):-!,
+	conjn(P1,P2),
+	conjn(Q1,Q2).
+conjn(P,P).
+--
+conj2('#'('&'(P1,Q1),R),'&'(P2,Q2)):-!,
+	conjn('#'(P1,R),P2),
+	conjn('#'(Q1,R),Q2).
+conj2('#'(R,'&'(P1,Q1)),'&'(P2,Q2)):-!,
+	conjn('#'(R,P1),P2),
+	conjn('#'(R,Q1),Q2).
+conj2(P,P).
+--
+-- Stage 6.
+--
+clausify('&'(P,Q),C1,C3):-!,
+	clausify(P,C1,C2),
+	clausify(Q,C2,C3).
+clausify(P,Cs,[cl(A,B)|Cs]):-
+	inclause(P,[],A,[],B),!.
+clausify(_,Cs,Cs).
+--
+inclause('#'(P,Q),A1,A3,B1,B3):-!,
+	inclause(P,A1,A2,B1,B2),
+	inclause(Q,A2,A3,B2,B3).
+inclause('~'(P),A,A,B1,B2):-!,
+	notin(P,A),
+	putin(P,B1,B2).
+inclause(P,A1,A2,B,B):-!,
+	notin(P,B),
+	putin(P,A1,A2).
+--
+notin(X,[X|_]):-!,
+	fail.
+notin(X,[_|L]):-!,
+	notin(X,L).
+notin(_,[]).
+--
+putin(X,[],[X]):-!.
+putin(X,[X|L],[X|L]):-!.
+putin(X,[Y|L1],[Y|L2]):-
+	putin(X,L1,L2).
+--
+-- Reverse clause list.
+--
+reverse([X|Rest],L2,L3):-!,
+	reverse(Rest,[X|L2],L3).
+reverse([],List,List).
+--
+-- Print clauses.
+--
+pclauses([]):-!,
+	nl,nl.
+pclauses([cl(A,B)|Cs]):-!,
+	pclause(A,B),nl,
+	pclauses(Cs).
+--
+pclause(L,[]):-!,
+	pdisj(L),
+	write(".").
+pclause([],L):-!,
+	write(":-"),
+	pconj(L),
+	write(".").
+pclause(L1,L2):-
+	pdisj(L1),
+	write(":-"),
+	pconj(L2),
+	write(".").
+--
+pdisj([L]):-!,
+	write_literal(L).
+pdisj([L|Ls]):-!,
+	write_literal(L),
+	write(";"),
+	pdisj(Ls).
+pdisj([]).
+--
+pconj([L]):-!,
+	write_literal(L).
+pconj([L|Ls]):-
+	write_literal(L),
+	write(","),
+	pconj(Ls).
+pconj([]).
+--
+write_literal(eq(V1,V2)):-!,
+	write("eq("),
+	write_variable(V1),
+	write(","),
+	write_variable(V2),
+	write(")").
+write_literal(p(Variable)):-!,
+	write("p("),
+	write_variable(Variable),
+	write(")").
+write_literal(s(Variable)):-!,
+	write("s("),
+	write_variable(Variable),
+	write(")").
+write_literal(man(Variable)):-!,
+	write("man("),
+	write_variable(Variable),
+	write(")").
+write_literal(respect(V1,V2)):-!,
+	write("respect("),
+	write_variable(V1),
+	write(","),
+	write_variable(V2),
+	write(")").
+write_literal(king(Variable)):-!,
+	write("king("),
+	write_variable(Variable),
+	write(")").
+write_literal(L):-
+	write(L).
+--
+write_variable(structure(Name,List)):-!,
+	write(Name),
+	write("("),
+	write_variables(List),
+	write(")").
+write_variable(Name):-
+	write(?upper(?convert_to_string(Name))).
+--
+write_variables([V]):-!,
+	write_variable(V).
+write_variables([V|Rest]):-
+	write_variable(V),
+	write(","),
+	write_variables(Rest).
+write_variables([]).
+]
+-------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+]
+-------------------------------------------------------------

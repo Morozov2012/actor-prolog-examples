@@ -1,0 +1,96 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+Message		= STRING.
+--
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	test1	= (('Test1',
+			input=output));
+	test2	= (('Test2',
+			input=output));
+	test3	= (('Test3',
+			input=output));
+--
+protecting:
+--
+	output	: Message;
+--
+[
+goal:-!,
+	delay(1).
+--
+tick:-
+	output== "Run!",!,
+	suspend.
+]
+-----------------------------------------------------------------------
+class 'Test1' (specialized 'Test'):
+--
+y	= 0;
+height	= 8;
+--
+[
+alarm(Exception):-!,
+	set_color('Orange'),
+	writeln("Test1: ",Exception).
+]
+-----------------------------------------------------------------------
+class 'Test2' (specialized 'Test'):
+--
+y	= 8;
+height	= 8;
+--
+[
+alarm(Exception):-!,
+	set_color('Red'),
+	writeln("Test2: ",Exception),
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Test3' (specialized 'Test'):
+--
+y	= 16;
+height	= 8;
+--
+[
+alarm(Exception):-!,
+	set_color('Purple'),
+	writeln("Test3: ",Exception),
+	break('failure3').
+]
+-----------------------------------------------------------------------
+class 'Test' (specialized 'Report'):
+--
+variable:
+--
+	input	: Message;
+--
+[
+PREDICATES:
+--
+p(Message)	- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	set_color('RoyalBlue'),
+	writeln("goal"),
+	p(input).
+--
+p(#):-!.
+p(Message):-
+	-- p(Message),
+	set_color('DkGreen'),
+	writeln("I have received: ",Message),
+	break('user_defined_error').
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,35 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/ScreenCapture";
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	sampling_rate	: INTEGER;
+--
+internal:
+--
+	canvas		: 'ScreenCapture';
+	image		: 'BufferedImage';
+	writer		: 'FFmpeg';
+	counter		: 'Counter';
+	con		: 'Console';
+--
+[
+IMPERATIVES:
+correct_size(INTEGER,INTEGER)		- (i,o);
+]
+-----------------------------------------------------------------------
+interface 'Counter' (specialized 'Database'):
+[
+DOMAINS:
+Target	= INTEGER.
+IMPERATIVES:
+read_and_increase = INTEGER;
+]
+-----------------------------------------------------------------------

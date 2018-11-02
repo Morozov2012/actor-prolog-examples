@@ -1,0 +1,84 @@
+<html>
+<head>
+<title>Actor Prolog. Example &quot;D:\MOROZOV\Z\Z-DJ\DEMO\EXE\EXAMPLES\DEMO PROGRAMS\JAVA3D\TEST_CANVAS3D_13_JAVA (TEXTURE).A&quot;</title>
+</head>
+<body bgcolor="#F0F0F0">
+<table align="center" bgcolor="#FFFFFF" cellpadding=30>
+<tr>
+<td>
+<pre>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+<font color="0000FF"><i>-- An example of Actor Prolog program.                               --</i></font>
+<font color="0000FF"><i>-- (c) 2012 IRE RAS Alexei A. Morozov                                --</i></font>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+
+<font color="7F7F00"><u>import</u></font> .. <font color="7F7F00"><u>from</u></font> <font color="0000FF">&quot;morozov/Java3D&quot;</font>;
+
+<font color="7F7F00"><u>class</u></font> 'Main' <font color="#993300">(</font><font color="7F7F00"><u>specialized</u></font> 'Canvas3D'<font color="#993300">)</font>:
+<font color="0000FF"><i>--</i></font>
+enable_scene_antialiasing       = 'yes';
+<font color="0000FF"><i>--</i></font>
+<font color="#800080">[</font>
+goal:-!,
+        <font color="#008000">MaximumAngle</font>== <font color="#993300">?</font>pi<font color="#993300">()</font>*<font color="FF00FF">2.0</font>,
+        <font color="#008000">Bounds</font>== 'BoundingSphere'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        center: p<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font><font color="#993300">)</font>,
+                        radius: <font color="FF00FF">100.0</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+        show<font color="#993300">(</font><font color="#800080">[</font>
+                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        allowTransformWrite: 'yes',
+                        allowTransformRead: 'yes',
+                        branches: <font color="#800080">[</font>
+                                'Sphere'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        radius: <font color="FF00FF">0.25</font>,
+                                        generateNormals: 'yes',
+                                        divisions: <font color="0000FF">100</font>,
+                                        generateTextureCoords: 'yes',
+                                        appearance: 'Appearance'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                texture: 'Texture2D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        image: <font color="0000FF">&quot;jar:data/earth_2_512.gif&quot;</font>,
+                                                        format: 'RGBA',
+                                                        enableTextureMapping: 'yes',
+                                                        magnificationFilter: 'BASE_LEVEL_LINEAR',
+                                                        minificationFilter: 'BASE_LEVEL_LINEAR'
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                'RotationInterpolator'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        alpha: 'Alpha3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                loopCount: -<font color="0000FF">1</font>,
+                                                increasingEnable: 'yes',
+                                                increasingAlphaDuration: <font color="0000FF">4000</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                        transformAxis: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{}</font><font color="#993300">)</font>,
+                                        minimumAngle: <font color="FF00FF">0.0</font>,
+                                        maximumAngle: <font color="#008000">MaximumAngle</font>,
+                                        schedulingBounds: <font color="#008000">Bounds</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                <font color="#800080">]</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                'Background'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        color: 'Black',
+                        image: <font color="0000FF">&quot;jar:data/space4.gif&quot;</font>,
+                        scaleMode: 'SCALE_REPEAT',
+                        applicationBounds: <font color="#008000">Bounds</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                'AmbientLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        color: 'White',
+                        influencingBounds: <font color="#008000">Bounds</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                'OrbitBehavior'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        reverseAll: 'yes',
+                        stopZoom: 'yes',
+                        minRadius: <font color="FF00FF">1.5</font>,
+                        schedulingBounds: <font color="#008000">Bounds</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                <font color="#800080">]</font><font color="#993300">)</font>.
+<font color="#800080">]</font>
+</pre>
+</td>
+</tr>
+</table>
+</body>
+</html>

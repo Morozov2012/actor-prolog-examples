@@ -1,0 +1,13 @@
+
+class 'Main' (specialized 'DemoConsole'):
+
+a	= 100;
+b	= 300;
+c	= 500;
+
+[
+
+goal:-
+	writeln(b).
+
+]

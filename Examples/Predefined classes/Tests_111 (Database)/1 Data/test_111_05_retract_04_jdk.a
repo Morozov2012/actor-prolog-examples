@@ -1,0 +1,70 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+MyData		= s(N,N,N).
+N		= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+--
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+--
+DOMAINS:
+--
+Target	= MyData.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyDatabase');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test2.
+--
+test1:-
+	writeln("Test 1: append(i)"),
+	writeln("\tI will store data items."),
+	store ? append(s(1100,3100,5100)),
+	store ? append(s(1200,3200,5200)),
+	store ? append(s(1300,3300,5300)),
+	writeln("\tDone.").
+--
+test2:-
+	writeln("Test 2: find(o)"),
+	writeln("\tI have found data items:"),
+	store ? find(Item),
+	writeln("\t",Item),
+	fail.
+test2:-
+	writeln("\tDone.").
+--
+test3:-
+	writeln("Test 3: retract(o)"),
+	writeln("\tI will delete one data item."),
+	store ? retract(Item),!,
+	Item == s(X,Y,Z),
+	writeln("\tI have deleted one data item, ",
+		"X= ",X,", Y=",Y,", Z=",Z,".").
+test3:-
+	writeln("\t\tFailure.").
+]
+-----------------------------------------------------------------------

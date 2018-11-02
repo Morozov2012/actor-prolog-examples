@@ -1,0 +1,159 @@
+package "Morozov/Web/Scanning/Analyser":
+---------------------------------------------------------------------
+--              The "ANALYSER" Actor Prolog package.               --
+--           (c) 2002-2005, IRE RAS, Alexei A. Morozov.            --
+---------------------------------------------------------------------
+-- This package provides an engine for analyzing Web Sites and     --
+-- collecting information about them.                              --
+---------------------------------------------------------------------
+import "Morozov/Web/Data/Keywords";
+import 'ControlDialog'	    from "Morozov/Web/Scanning/Control";
+import 'AnalyserControl'    from "Morozov/Web/Scanning/Control";
+import 'Scanner'	    from "Morozov/Web/Scanning/Core";
+import 'WebFile'	    from "Morozov/Web/Scanning/Core";
+import 'Plain_Report'	    from "Morozov/Web/Scanning/Messages";
+import 'GenericReport'	    from "Morozov/Web/Scanning/Messages";
+import 'AnalyserMessages'   from "Morozov/Web/Scanning/Messages";
+import 'Statistics'	    from "Morozov/Web/Scanning/Counter";
+import 'StatisticsReporter' from "Morozov/Web/Scanning/Counter";
+import 'PageRegistry'	    from "Morozov/Web/Scanning/Counter";
+---------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+WebResourceRecords	= WebResourceRecord*; #.
+WebResourceRecord	= r(WebResourceAttributes,RecentAttributes).
+--
+reference:
+--
+RecentAttributes	= {	name:WebResourceName,
+				address:WebAddressList,
+				updated:WebResourceDate,
+				inspected:WebResourceDate,
+				items:N,
+				size:Size,
+				hyper_links:N,
+				pictures:N,
+				other_links:N,
+				error_links:N,
+				keywords:N_List
+				}.
+--
+---------------------------------------------------------------------
+interface 'ScanSite' (specialized 'AnalyserControl'):
+--
+variable:
+--
+	keywords		: KeywordList;
+	location		: WebAddressList;
+--
+internal:
+--
+	dialog			: 'ControlDialog';
+--
+variable:
+--
+	maximal_waiting_time	: MaximalWaitingTime;
+	domain			: WebAddressSegment;
+	use_max_depth		: UseMaxDepth;
+	max_depth		: Level;
+	virtual_resources	: WebAddressList;
+--
+	output_device		: OutputDeviceInstance;
+--
+internal:
+--
+	main_engine		: 'SpecialScanner';
+	site_statistics		: 'Statistics';
+	found_pages		: 'PageRegistry';
+	reporter		: 'StatisticsReporter';
+--
+variable:
+--
+	report_creater		: DummyList;
+--
+[
+]
+---------------------------------------------------------------------
+-- The 'SpecialScanner' class intended for analysis of given       --
+-- Web Site.                                                       --
+---------------------------------------------------------------------
+interface 'SpecialScanner' (specialized 'Scanner'):
+--
+variable:
+--
+	keywords		: KeywordList;
+	--
+	maximal_waiting_time	: MaximalWaitingTime;
+	--
+	use_max_depth		: UseMaxDepth;
+	max_depth		: Level;
+	--
+	virtual_resources	: WebAddressList;
+--
+internal:
+--
+	diary			: 'Report';
+	--
+	messages		: 'AnalyserMessages';
+	--
+	site_statistics		: 'Statistics';
+	file_operations		: 'WebFile';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+inspect(WebResourceAttributes)		- (i);
+--
+-- determ:
+nondeterm:
+--
+get_results = WebResourceRecord;
+--
+imperative:
+--
+get_parameters(
+	WebAddressList) = ContentParameters	- (i);
+get_text(WebAddressList) = PlainContent		- (i);
+get_references(WebAddressList) = ReferenceList	- (i);
+--
+length(PlainContent) = INTEGER			- (i);
+--
+'+'(Level,INTEGER) = INTEGER			- (i,i);
+'+'(Node,INTEGER) = INTEGER			- (i,i);
+'+'(STRING,WebAddressSegment) = STRING		- (i,i);
+--
+determ:
+--
+'<='(Level,Level)				- (i,i);
+-- '<'(Level,Level)				- (i,i);
+'<>'(WebAddressSegment,WebAddressSegment)	- (i,i);
+--
+nondeterm:
+--
+search(STRING,WebAddressSegment) = INTEGER	- (i,i);
+search(	WebAddressList,
+	WebAddressSegment) = INTEGER		- (i,i);
+--
+determ:
+--
+replace(WebAddress,
+	WebAddressList,
+	WebAddressList) = STRING		- (i,i,i);
+--
+imperative:
+--
+replace_all(
+	WebAddressSegment,
+	STRING,
+	STRING) = STRING			- (i,i,i);
+replace_all(
+	WebAddressList,
+	STRING,
+	STRING) = STRING			- (i,i,i);
+]
+---------------------------------------------------------------------

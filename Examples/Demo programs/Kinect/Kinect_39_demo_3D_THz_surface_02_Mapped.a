@@ -1,0 +1,153 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-----------------------------------------------------------------------
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Thanks to Andrew Davison                                          --
+-- Davison A. Kinect Open Source Programming Secrets (KOPS). -       --
+-- McGraw Hill, 2012.                                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	name	=	"J:/J4K (2018-06-29-THz)/Kinect2/"
+			"002.k2j";
+	first_frame	= 1;
+	end_frame	= 687;
+--
+	operating_mode	= 'PLAYING';
+	frame_type	= 'POINT_CLOUDS';
+	people_index	= 'EXTRACT_PEOPLE';
+	skeletons	= 'DETECT_SKELETONS';
+--
+	displaying_mode	= {
+		frame_type,
+		people_index,
+		skeletons};
+--
+	color_map	= 'OPTICAL';
+--
+internal:
+--
+	window	= ('Canvas2D');
+	dialog	= ('MainDialog',
+			kinect_buffer= self,
+			graphic_window= window);
+	buffer	= ('BufferedImage');
+	buffer3d	= ('BufferedScene');
+	image	= ('BufferedImage');
+	state	= ('ProgramState');
+	text	= ('Text');
+	con	= ('Console');
+--
+constant:
+--
+	main_label		= "Skeletons";
+	cylinder_radius		= 0.02;
+	joint_radius		= 0.03;
+	head_radius		= 0.05;
+	limb_transparency	= 0.1;
+	up_vector		= p(0,1,0);
+--
+	texture_file_format	= "%08d.jpeg";
+--
+	texture_directory	=
+		"J:/J4K (2018-06-29-THz)/THz/"
+		-- "2018-06-29-03-54-52_Gray";
+		"2018-06-29-03-54-52_Purple";
+	texture_frame_rate	= 5.995717344753747;
+	texture_time_shift	= -660;
+--
+	lookup_table_file_name	=
+		"J:/J4K (2018-06-29-THz)/Stereo20_1_11000/"
+		"LookUpTable.txt";
+--
+constant:
+--
+	-- slow_motion_coefficient	= 10.0;
+--
+[
+goal:-!,
+	dialog ? maximize,
+	set_lookup_table(lookup_table_file_name),
+	start.
+--
+frame_obtained:-
+	commit,!,
+	get_recent_frame_number(FrameNumber1),
+	get_recent_frame_time(Time1),
+	state ? set_first_frame_time(FrameNumber1,Time1),
+	process_frame(FrameNumber1,Time1).
+--
+process_frame(N1,Time1):-
+	N1 >= first_frame,
+	N1 <= end_frame,
+	state ? get_first_frame_time(N0,Time0),
+	compute_time(N1,Time1,N0,Time0,Time2),
+	FileNumber== texture_frame_rate * Time2 / 1000,
+	ShortFileName== text?format(
+		texture_file_format,?round(FileNumber)),
+	ImageToBeLoaded==
+		texture_directory + "/" +
+		ShortFileName,
+	image ? does_exist(ImageToBeLoaded),!,
+	image ? load(ImageToBeLoaded),
+	get_recent_scene(buffer3d,image),
+	get_recent_mapping(buffer,image),
+	window ? draw_image(buffer,0,0,1,1).
+process_frame(FrameNumber,_):-
+	FrameNumber > end_frame,!,
+	stop,
+	start.
+process_frame(_,_).
+--
+compute_time(N0,_,N0,_,Time):-!,
+	Time== 0.0 - texture_time_shift.
+compute_time(N1,Time1,N0,Time0,Time3):-
+	Time2== N1 * (Time1-Time0) / (N1-N0),
+	Time3== Time2 - texture_time_shift.
+--
+data_transfer_completion:-!,
+	stop,
+	start.
+-----------------------------------------------------------------------
+]
+-----------------------------------------------------------------------
+class 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	kinect_buffer;
+	graphic_window;
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+action("play"):-!,
+	kinect_buffer ? start.
+action("pause"):-!,
+	kinect_buffer ? pause.
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+[
+set_first_frame_time(_,_):-
+	find(_),!.
+set_first_frame_time(Number,Time):-
+	insert(f(Number,Time)).
+--
+get_first_frame_time(Number,Time):-
+	Item== ?match(_),!,
+	Item == f(Number,Time).
+get_first_frame_time(0,0).
+]
+-----------------------------------------------------------------------

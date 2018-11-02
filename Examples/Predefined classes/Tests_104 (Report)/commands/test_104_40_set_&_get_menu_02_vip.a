@@ -1,0 +1,91 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+write_menu(MenuDefinition,INTEGER)	- (i,i);
+write_menu_item(MenuItem,INTEGER)	- (i,i);
+write_tabulators(INTEGER)		- (i);
+
+class 'Main' (specialized 'Report'):
+--
+internal:
+--
+	dummy_timer		= ('Timer');
+--
+[
+goal:-!,
+	show,
+	set_menu([
+		submenu("&Flowers",[
+			item("&Bachelor's-button\tAlt-B","alt pressed B"),
+			item("&Ox-eye daisy\tCtrl-Alt-O","alt control pressed O"),
+			item("&Wild vetch\tAlt-Shift-W","alt shift pressed W"),
+			'separator',
+			item("&Sweet-william\tCtrl-Shift-S","shift control pressed S"),
+			item("Fo&rget-me-not\tCtrl-Alt-Shift-R","alt control shift pressed R")
+			]),
+		submenu("&Meal",[
+			item("Ju&icy apple\tShift-I","shift pressed I"),
+			item("Pl&um\tCtrl-U","control pressed U"),
+			'separator',
+			item("P&ear\tCtrl-Shift-E","control shift released E"),
+			item("&Grapes\tCtrl-Alt-G","control alt released G"),
+			item("B&lack-currant\tCtrl-Alt-Shift-L","control alt shift released L")
+			]),
+		'spacer',
+		submenu("&Help",[
+			item("E&xplanation\tF1","pressed F1"),
+			item("&Community\tC","released C"),
+			'separator',
+			item("Co&ntacts\tN","pressed N")
+			])
+		]),
+	Menu== ?get_menu(),
+	set_menu(Menu),
+	set_color('RoyalBlue'),
+	writeln("["),
+	write_menu(Menu,1),
+	writeln("]"),
+	set_color('default'),
+	writeln("Please test menu controls: "),
+	dummy_timer ? activate.
+--
+write_menu([H],T):-!,
+	write_tabulators(T),
+	write_menu_item(H,T+1),
+	nl.
+write_menu([H|R],T):-!,
+	write_tabulators(T),
+	write_menu_item(H,T),
+	writeln(","),
+	write_menu(R,T).
+write_menu(_,_).
+--
+write_menu_item(submenu(ActionName,List),T):-!,
+	writeln("submenu(\"",ActionName,"\",["),
+	write_menu(List,T+1),
+	write_tabulators(T),
+	write("])").
+write_menu_item('separator',_):-!,
+	write("'separator'").
+write_menu_item('spacer',_):-!,
+	write("'spacer'").
+write_menu_item(H,_):-
+	write(H).
+--
+write_tabulators(0):-!.
+write_tabulators(T):-!,
+	write("   "),
+	write_tabulators(T-1).
+--
+action(Action):-!,
+	write("Selected menu item: "),
+	set_color('Violet'),
+	writeln(Action),
+	set_color('default').
+]

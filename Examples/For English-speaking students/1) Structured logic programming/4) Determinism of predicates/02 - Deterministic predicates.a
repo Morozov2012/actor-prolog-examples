@@ -1,0 +1,35 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Deterministic,     --
+-- non-deterministic, and imperative     --
+-- predicates.                           --
+--                                       --
+-- Questions: What are deterministic     --
+-- predicates? Let us assume that the p  --
+-- predicate contains clauses p(1) and   --
+-- p(2). Is the predicate deterministic  --
+-- in this case?                         --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+determ:
+
+p(INTEGER)	- (o);
+
+CLAUSES:
+
+goal:-
+	p(X),
+	writeln("X= ",X),
+	fail.
+
+-- p(1).
+-- p(1).
+p(2).
+-- p(3).

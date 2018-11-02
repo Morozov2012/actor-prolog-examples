@@ -1,0 +1,655 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/TEV1";
+import .. from "morozov/ColorMap";
+-----------------------------------------------------------------------
+project: (('Viewer'))
+-----------------------------------------------------------------------
+class 'Viewer' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer		= ('CameraControl',
+				viewer=self,
+				main_window);
+	main_window	= ('Canvas2D',
+				background_color='SystemControl');
+	con		= ('Console');
+	color_maps	= ('ColorMap');
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+	exit_on_close		= 'yes';
+	--
+	dlg_ctrl_lower_bound			= 1010;
+	dlg_ctrl_lower_main_quantile		= 1020;
+	dlg_ctrl_lower_auxiliary_quantile	= 1030;
+	dlg_ctrl_lower_scrollbar_range		= 1041;
+	dlg_ctrl_lower_scrollbar_value		= 1042;
+	--
+	dlg_ctrl_upper_bound			= 2010;
+	dlg_ctrl_upper_main_quantile		= 2020;
+	dlg_ctrl_upper_auxiliary_quantile	= 2030;
+	dlg_ctrl_upper_scrollbar_range		= 2041;
+	dlg_ctrl_upper_scrollbar_value		= 2042;
+	--
+	dlg_ctrl_togglebutton_bounds		= 3010;
+	dlg_ctrl_togglebutton_q1		= 3020;
+	dlg_ctrl_togglebutton_q2		= 3030;
+	dlg_ctrl_togglebutton_autoranging	= 3040;
+	--
+	dlg_ctrl_togglebutton_double_color_map	= 4010;
+	dlg_ctrl_togglebutton_average		= 4020;
+	dlg_ctrl_togglebutton_color_map		= 4040;
+--
+[
+goal:-!,
+	initialize_temperature_ranges,
+	update_displaying_mode,
+	switch_controls,
+	show.
+--
+action("Open"):-!,
+	select_and_open_device.
+action("Start"):-!,
+	buffer ? start.
+action("Pause"):-!,
+	buffer ? pause.
+action("Stop"):-!,
+	buffer ? stop.
+action("Close"):-!,
+	buffer ? close.
+action("CalibrateCamera"):-!,
+	buffer ? calibrate.
+action("AdjustRange"):-!,
+	Min== buffer?get_minimal_temperature(),
+	Max== buffer?get_maximal_temperature(),
+	set_temperature_range(Min,Max).
+action("ResetRange"):-!,
+	set_temperature_range(-10.0,100.0).
+--
+complete_editing(dlg_ctrl_lower_bound):-
+	update_lower_temperature_bound,!,
+	refine_upper_bound,
+	refine_lower_quantile1,
+	refine_upper_quantile1,
+	refine_lower_quantile2,
+	refine_upper_quantile2.
+complete_editing(dlg_ctrl_upper_bound):-
+	update_upper_temperature_bound,!,
+	refine_lower_bound,
+	refine_lower_quantile1,
+	refine_upper_quantile1,
+	refine_lower_quantile2,
+	refine_upper_quantile2.
+complete_editing(dlg_ctrl_lower_main_quantile):-
+	check_lower_quantile1,
+	Value== ?update_lower_main_temperature_quantile(),!,
+	put(dlg_ctrl_lower_scrollbar_value,Value),
+	refine_upper_quantile1,
+	refine_lower_quantile2,
+	refine_upper_quantile2,
+	initialize_upper_scroller.
+complete_editing(dlg_ctrl_upper_main_quantile):-
+	check_upper_quantile1,
+	Value== ?update_upper_main_temperature_quantile(),!,
+	put(dlg_ctrl_upper_scrollbar_value,Value),
+	refine_lower_quantile1,
+	refine_lower_quantile2,
+	refine_upper_quantile2.
+complete_editing(dlg_ctrl_lower_auxiliary_quantile):-
+	check_lower_quantile2,
+	Value== ?update_lower_auxiliary_temperature_quantile(),!,
+	put(dlg_ctrl_lower_scrollbar_value,Value),
+	refine_upper_quantile2,
+	initialize_upper_scroller.
+complete_editing(dlg_ctrl_upper_auxiliary_quantile):-
+	check_upper_quantile2,
+	Value== ?update_upper_auxiliary_temperature_quantile(),!,
+	put(dlg_ctrl_upper_scrollbar_value,Value),
+	refine_lower_quantile2.
+--
+modified_control(dlg_ctrl_lower_scrollbar_value):-
+	Value== ?val("INTEGER",?get(dlg_ctrl_lower_scrollbar_value)),!,
+	set_lower_scroller(Value),
+	initialize_upper_scroller.
+modified_control(dlg_ctrl_upper_scrollbar_value):-
+	Value== ?val("INTEGER",?get(dlg_ctrl_upper_scrollbar_value)),!,
+	set_upper_scroller(Value).
+modified_control(dlg_ctrl_togglebutton_bounds):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_bounds)),!,
+	set_Bounds_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_q1):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_q1)),!,
+	set_Q1_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_q2):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_q2)),!,
+	set_Q2_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_autoranging):-
+	Mode== ?on_off(?val("YesNo",
+		?get(dlg_ctrl_togglebutton_autoranging))),!,
+	buffer ? set_autoranging_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_double_color_map):-
+	Mode== ?on_off(?val("YesNo",
+		?get(dlg_ctrl_togglebutton_double_color_map))),!,
+	buffer ? set_double_color_map_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_average):-
+	Mode== ?on_off(?val("YesNo",
+		?get(dlg_ctrl_togglebutton_average))),!,
+	buffer ? set_averaging_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_color_map):-!,
+	update_displaying_mode.
+-----------------------------------------------------------------------
+select_and_open_device:-
+	List== buffer?get_device_list(),
+	initialize_data_acquisition(List).
+--
+initialize_data_acquisition([]):-!,
+	con ? error(
+		"Error",
+		"Sorry, the TE V1 device is not found!").
+initialize_data_acquisition(List):-
+	con ? select_item(
+		"Device Selection",
+		"Select device, please",
+		?cast("S_List",List),
+		1,
+		SelectedIdentifier,
+		_),!,
+	initialize_selected_device(SelectedIdentifier).
+initialize_data_acquisition(_).
+--
+initialize_selected_device(Identifier):-
+	set_title(con?format("Thermal Image Viewer [%s]",Identifier)),
+	buffer ? open(Identifier),!.
+initialize_selected_device(Identifier):-
+	con ? error(
+		"Error",
+		con?format(
+			"Sorry, I cannot open the\n%s\ndevice!",
+			Identifier)).
+-----------------------------------------------------------------------
+update_displaying_mode:-
+	TextCM== ?val("STRING",
+		?get(dlg_ctrl_togglebutton_color_map)),!,
+	ColorMap== color_maps?string_to_color_map_name(TextCM),
+	buffer ? set_main_color_map(ColorMap).
+update_displaying_mode.
+--
+set_Bounds_mode('yes'):-!,
+	put(dlg_ctrl_togglebutton_q1,'no'),
+	put(dlg_ctrl_togglebutton_q2,'no'),
+	initialize_lower_scroller,
+	initialize_upper_scroller.
+set_Bounds_mode(_).
+--
+set_Q1_mode('yes'):-!,
+	put(dlg_ctrl_togglebutton_bounds,'no'),
+	put(dlg_ctrl_togglebutton_q2,'no'),
+	initialize_lower_scroller,
+	initialize_upper_scroller.
+set_Q1_mode(_).
+--
+set_Q2_mode('yes'):-!,
+	put(dlg_ctrl_togglebutton_bounds,'no'),
+	put(dlg_ctrl_togglebutton_q1,'no'),
+	initialize_lower_scroller,
+	initialize_upper_scroller.
+set_Q2_mode(_).
+--
+is_Bounds_mode:-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_bounds)),
+	Mode == 'yes'.
+--
+is_Q1_mode:-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_q1)),
+	Mode == 'yes'.
+--
+is_Q2_mode:-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_q2)),
+	Mode == 'yes'.
+--
+initialize_temperature_ranges:-
+	update_lower_temperature_bound,
+	fail.
+initialize_temperature_ranges:-
+	update_upper_temperature_bound,
+	fail.
+initialize_temperature_ranges:-
+	update_lower_main_temperature_quantile,
+	fail.
+initialize_temperature_ranges:-
+	update_upper_main_temperature_quantile,
+	fail.
+initialize_temperature_ranges:-
+	update_lower_auxiliary_temperature_quantile,
+	fail.
+initialize_temperature_ranges:-
+	update_upper_auxiliary_temperature_quantile,
+	fail.
+initialize_temperature_ranges.
+--
+update_lower_temperature_bound() = Value :-
+	Value== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	buffer ? set_lower_temperature_bound(Value).
+--
+update_upper_temperature_bound() = Value :-
+	Value== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	buffer ? set_upper_temperature_bound(Value).
+--
+update_lower_main_temperature_quantile() = Value :-
+	Value== ?val("REAL",?get(dlg_ctrl_lower_main_quantile)),
+	buffer ? set_lower_main_temperature_quantile(Value).
+--
+update_upper_main_temperature_quantile() = Value :-
+	Value== ?val("REAL",?get(dlg_ctrl_upper_main_quantile)),
+	buffer ? set_upper_main_temperature_quantile(Value).
+--
+update_lower_auxiliary_temperature_quantile() = Value :-
+	Value== ?val("REAL",?get(dlg_ctrl_lower_auxiliary_quantile)),
+	buffer ? set_lower_auxiliary_temperature_quantile(Value).
+--
+update_upper_auxiliary_temperature_quantile() = Value :-
+	Value== ?val("REAL",?get(dlg_ctrl_upper_auxiliary_quantile)),
+	buffer ? set_upper_auxiliary_temperature_quantile(Value).
+--
+check_lower_quantile1:-
+	Value== ?val("REAL",?get(dlg_ctrl_lower_main_quantile)),
+	LowerBound== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	Value < LowerBound,
+	put(dlg_ctrl_lower_bound,Value),
+	update_lower_temperature_bound,
+	fail.
+check_lower_quantile1:-
+	Value== ?val("REAL",?get(dlg_ctrl_lower_main_quantile)),
+	UpperBound== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	Value > UpperBound,
+	put(dlg_ctrl_upper_bound,Value),
+	update_upper_temperature_bound,
+	fail.
+check_lower_quantile1.
+--
+check_upper_quantile1:-
+	Value== ?val("REAL",?get(dlg_ctrl_upper_main_quantile)),
+	LowerBound== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	Value < LowerBound,
+	put(dlg_ctrl_lower_bound,Value),
+	update_lower_temperature_bound,
+	fail.
+check_upper_quantile1:-
+	Value== ?val("REAL",?get(dlg_ctrl_upper_main_quantile)),
+	UpperBound== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	Value > UpperBound,
+	put(dlg_ctrl_upper_bound,Value),
+	update_upper_temperature_bound,
+	fail.
+check_upper_quantile1.
+--
+check_lower_quantile2:-
+	Value== ?val("REAL",?get(dlg_ctrl_lower_auxiliary_quantile)),
+	LowerBound== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	Value < LowerBound,
+	put(dlg_ctrl_lower_bound,Value),
+	update_lower_temperature_bound,
+	fail.
+check_lower_quantile2:-
+	Value== ?val("REAL",?get(dlg_ctrl_lower_auxiliary_quantile)),
+	UpperBound== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	Value > UpperBound,
+	put(dlg_ctrl_upper_bound,Value),
+	update_upper_temperature_bound,
+	fail.
+check_lower_quantile2.
+--
+check_upper_quantile2:-
+	Value== ?val("REAL",?get(dlg_ctrl_upper_auxiliary_quantile)),
+	LowerBound== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	Value < LowerBound,
+	put(dlg_ctrl_lower_bound,Value),
+	update_lower_temperature_bound,
+	fail.
+check_upper_quantile2:-
+	Value== ?val("REAL",?get(dlg_ctrl_upper_auxiliary_quantile)),
+	UpperBound== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	Value > UpperBound,
+	put(dlg_ctrl_upper_bound,Value),
+	update_upper_temperature_bound,
+	fail.
+check_upper_quantile2.
+--
+refine_lower_bound:-
+	Value== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	Bound== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	put(dlg_ctrl_lower_bound,?min(Value,Bound)),
+	update_lower_temperature_bound,!.
+refine_lower_bound.
+--
+refine_upper_bound:-
+	Value== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	Bound== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	put(dlg_ctrl_upper_bound,?max(Value,Bound)),
+	update_upper_temperature_bound,!.
+refine_upper_bound.
+--
+refine_lower_quantile1:-
+	Value== ?val("REAL",?get(dlg_ctrl_lower_main_quantile)),
+	LowerBound== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	UpperBound== ?val("REAL",?get(dlg_ctrl_upper_main_quantile)),
+	put(dlg_ctrl_lower_main_quantile,
+		?max(?min(Value,UpperBound),LowerBound)),
+	update_lower_main_temperature_quantile,!.
+refine_lower_quantile1.
+--
+refine_upper_quantile1:-
+	Value== ?val("REAL",?get(dlg_ctrl_upper_main_quantile)),
+	UpperBound== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	LowerBound== ?val("REAL",?get(dlg_ctrl_lower_main_quantile)),
+	put(dlg_ctrl_upper_main_quantile,
+		?min(?max(Value,LowerBound),UpperBound)),
+	update_upper_main_temperature_quantile,!.
+refine_upper_quantile1.
+--
+refine_lower_quantile2:-
+	Value== ?val("REAL",
+		?get(dlg_ctrl_lower_auxiliary_quantile)),
+	LowerBound== ?val("REAL",
+		?get(dlg_ctrl_lower_bound)),
+	UpperBound== ?val("REAL",
+		?get(dlg_ctrl_upper_auxiliary_quantile)),
+	put(dlg_ctrl_lower_auxiliary_quantile,
+		?max(?min(Value,UpperBound),LowerBound)),
+	update_lower_auxiliary_temperature_quantile,!.
+refine_lower_quantile2.
+--
+refine_upper_quantile2:-
+	Value== ?val("REAL",
+		?get(dlg_ctrl_upper_auxiliary_quantile)),
+	UpperBound== ?val("REAL",
+		?get(dlg_ctrl_upper_bound)),
+	LowerBound== ?val("REAL",
+		?get(dlg_ctrl_lower_auxiliary_quantile)),
+	put(dlg_ctrl_upper_auxiliary_quantile,
+		?min(?max(Value,LowerBound),UpperBound)),
+	update_upper_auxiliary_temperature_quantile,!.
+refine_upper_quantile2.
+-----------------------------------------------------------------------
+initialize_lower_scroller:-
+	is_Q1_mode,
+	LB== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	UB== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	CV== ?val("REAL",?get(dlg_ctrl_lower_main_quantile)),!,
+	put(dlg_ctrl_lower_scrollbar_range,[LB,UB]),
+	put(dlg_ctrl_lower_scrollbar_value,CV).
+initialize_lower_scroller:-
+	is_Q2_mode,
+	LB== ?val("REAL",?get(dlg_ctrl_lower_bound)),
+	UB== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	CV== ?val("REAL",?get(dlg_ctrl_lower_auxiliary_quantile)),!,
+	put(dlg_ctrl_lower_scrollbar_range,[LB,UB]),
+	put(dlg_ctrl_lower_scrollbar_value,CV).
+initialize_lower_scroller:-
+	put(dlg_ctrl_lower_scrollbar_range,[0,1]),
+	put(dlg_ctrl_lower_scrollbar_value,0).
+--
+initialize_upper_scroller:-
+	is_Q1_mode,
+	LB== ?val("REAL",?get(dlg_ctrl_lower_main_quantile)),
+	UB== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	CV== ?val("REAL",?get(dlg_ctrl_upper_main_quantile)),!,
+	put(dlg_ctrl_upper_scrollbar_range,[LB,UB]),
+	put(dlg_ctrl_upper_scrollbar_value,CV).
+initialize_upper_scroller:-
+	is_Q2_mode,
+	LB== ?val("REAL",?get(dlg_ctrl_lower_auxiliary_quantile)),
+	UB== ?val("REAL",?get(dlg_ctrl_upper_bound)),
+	CV== ?val("REAL",?get(dlg_ctrl_upper_auxiliary_quantile)),!,
+	put(dlg_ctrl_upper_scrollbar_range,[LB,UB]),
+	put(dlg_ctrl_upper_scrollbar_value,CV).
+initialize_upper_scroller:-
+	put(dlg_ctrl_upper_scrollbar_range,[0,1]),
+	put(dlg_ctrl_upper_scrollbar_value,0).
+--
+set_lower_scroller(Value):-
+	is_Q1_mode,
+	put(dlg_ctrl_lower_main_quantile,Value),
+	update_lower_main_temperature_quantile,!.
+set_lower_scroller(Value):-
+	is_Q2_mode,
+	put(dlg_ctrl_lower_auxiliary_quantile,Value),
+	update_lower_auxiliary_temperature_quantile,!.
+set_lower_scroller(_).
+--
+set_upper_scroller(Value):-
+	is_Q1_mode,
+	put(dlg_ctrl_upper_main_quantile,Value),
+	update_upper_main_temperature_quantile,!.
+set_upper_scroller(Value):-
+	is_Q2_mode,
+	put(dlg_ctrl_upper_auxiliary_quantile,Value),
+	update_upper_auxiliary_temperature_quantile,!.
+set_upper_scroller(_).
+-----------------------------------------------------------------------
+set_temperature_range(Min,Max):-
+	is_Bounds_mode,!,
+	put(dlg_ctrl_lower_bound,Min),
+	put(dlg_ctrl_upper_bound,Max),
+	complete_editing(dlg_ctrl_lower_bound),
+	complete_editing(dlg_ctrl_upper_bound).
+set_temperature_range(Min,Max):-
+	is_Q1_mode,!,
+	put(dlg_ctrl_lower_main_quantile,Min),
+	put(dlg_ctrl_upper_main_quantile,Max),
+	complete_editing(dlg_ctrl_lower_main_quantile),
+	complete_editing(dlg_ctrl_upper_main_quantile).
+set_temperature_range(Min,Max):-
+	is_Q2_mode,!,
+	put(dlg_ctrl_lower_auxiliary_quantile,Min),
+	put(dlg_ctrl_upper_auxiliary_quantile,Max),
+	complete_editing(dlg_ctrl_lower_auxiliary_quantile),
+	complete_editing(dlg_ctrl_upper_auxiliary_quantile).
+set_temperature_range(_,_).
+-----------------------------------------------------------------------
+switch_controls:-
+	switch_lower_bound_editor,
+	switch_upper_bound_editor,
+	switch_lower_quantile1_editor,
+	switch_upper_quantile1_editor,
+	switch_lower_quantile2_editor,
+	switch_upper_quantile2_editor,
+	switch_lower_scale_scroller,
+	switch_upper_scale_scroller,
+	switch_scale_control_buttons,
+	initialize_lower_scroller,
+	initialize_upper_scroller.
+--
+switch_lower_bound_editor:-
+	is_Bounds_mode,!,
+	enable(dlg_ctrl_lower_bound).
+switch_lower_bound_editor:-
+	disable(dlg_ctrl_lower_bound).
+--
+switch_upper_bound_editor:-
+	is_Bounds_mode,!,
+	enable(dlg_ctrl_upper_bound).
+switch_upper_bound_editor:-
+	disable(dlg_ctrl_upper_bound).
+--
+switch_lower_quantile1_editor:-
+	Mode== buffer?get_autoranging_mode(),
+	Mode == 'on',!,
+	disable(dlg_ctrl_lower_main_quantile).
+switch_lower_quantile1_editor:-
+	is_Q1_mode,!,
+	enable(dlg_ctrl_lower_main_quantile).
+switch_lower_quantile1_editor:-
+	disable(dlg_ctrl_lower_main_quantile).
+--
+switch_upper_quantile1_editor:-
+	Mode== buffer?get_autoranging_mode(),
+	Mode == 'on',!,
+	disable(dlg_ctrl_upper_main_quantile).
+switch_upper_quantile1_editor:-
+	is_Q1_mode,!,
+	enable(dlg_ctrl_upper_main_quantile).
+switch_upper_quantile1_editor:-
+	disable(dlg_ctrl_upper_main_quantile).
+--
+switch_lower_quantile2_editor:-
+	M1== buffer?get_autoranging_mode(),
+	M1 == 'on',!,
+	disable(dlg_ctrl_lower_auxiliary_quantile).
+switch_lower_quantile2_editor:-
+	is_Q2_mode,
+	M2== buffer?get_double_color_map_mode(),
+	M2== 'on',!,
+	enable(dlg_ctrl_lower_auxiliary_quantile).
+switch_lower_quantile2_editor:-
+	disable(dlg_ctrl_lower_auxiliary_quantile).
+--
+switch_upper_quantile2_editor:-
+	Mode== buffer?get_autoranging_mode(),
+	Mode == 'on',!,
+	disable(dlg_ctrl_upper_auxiliary_quantile).
+switch_upper_quantile2_editor:-
+	is_Q2_mode,
+	M2== buffer?get_double_color_map_mode(),
+	M2== 'on',!,
+	enable(dlg_ctrl_upper_auxiliary_quantile).
+switch_upper_quantile2_editor:-
+	disable(dlg_ctrl_upper_auxiliary_quantile).
+--
+switch_lower_scale_scroller:-
+	Mode== buffer?get_autoranging_mode(),
+	Mode == 'on',!,
+	disable(dlg_ctrl_lower_scrollbar_range).
+switch_lower_scale_scroller:-
+	is_Q1_mode,!,
+	enable(dlg_ctrl_lower_scrollbar_range).
+switch_lower_scale_scroller:-
+	is_Q2_mode,!,
+	enable(dlg_ctrl_lower_scrollbar_range).
+switch_lower_scale_scroller:-
+	disable(dlg_ctrl_lower_scrollbar_range).
+--
+switch_upper_scale_scroller:-
+	Mode== buffer?get_autoranging_mode(),
+	Mode == 'on',!,
+	disable(dlg_ctrl_upper_scrollbar_range).
+switch_upper_scale_scroller:-
+	is_Q1_mode,!,
+	enable(dlg_ctrl_upper_scrollbar_range).
+switch_upper_scale_scroller:-
+	is_Q2_mode,!,
+	enable(dlg_ctrl_upper_scrollbar_range).
+switch_upper_scale_scroller:-
+	disable(dlg_ctrl_upper_scrollbar_range).
+--
+switch_scale_control_buttons:-
+	switch_quantile1_button,
+	switch_quantile2_button,
+	switch_double_color_map_button.
+--
+switch_quantile1_button:-
+	Mode== buffer?get_autoranging_mode(),
+	Mode == 'on',!,
+	disable(dlg_ctrl_togglebutton_q1).
+switch_quantile1_button:-
+	enable(dlg_ctrl_togglebutton_q1).
+--
+switch_quantile2_button:-
+	Mode== buffer?get_autoranging_mode(),
+	Mode == 'on',!,
+	disable(dlg_ctrl_togglebutton_q2).
+switch_quantile2_button:-
+	M2== buffer?get_double_color_map_mode(),
+	M2== 'on',!,
+	enable(dlg_ctrl_togglebutton_q2).
+switch_quantile2_button:-
+	disable(dlg_ctrl_togglebutton_q2).
+--
+switch_double_color_map_button:-
+	Mode== buffer?get_autoranging_mode(),
+	Mode == 'on',!,
+	disable(dlg_ctrl_togglebutton_double_color_map).
+switch_double_color_map_button:-
+	enable(dlg_ctrl_togglebutton_double_color_map).
+-----------------------------------------------------------------------
+on_off('yes') = 'on' :-!.
+on_off(_) = 'off'.
+]
+-----------------------------------------------------------------------
+class 'CameraControl' (specialized 'TEV1'):
+--
+constant:
+--
+	operating_mode			= 'LISTENING';
+--
+internal:
+--
+	viewer;
+	main_window;
+--
+	image				= ('BufferedImage');
+	con				= ('Console');
+	text				= ('Text');
+	timer				= ('Timer');
+--
+[
+frame_obtained:-
+	commit,!,
+	get_recent_image(image),
+	get_image_size_in_pixels(IW,IH),
+	get_recent_frame_number(FrameNumber),
+	get_recent_frame_time(FrameTime),
+	get_recent_frame_rate(FrameRate),
+	main_window ? suspend_redrawing,
+	resize_main_window(IW,IH),
+	main_window ? clear,
+	main_window ? draw_image(image,0,0,1,1),
+	report_time(FrameNumber,FrameTime,FrameRate),
+	main_window ? draw_now.
+--
+resize_main_window(IW,IH):-
+	IW > 0,
+	IH > 0,!,
+	main_window ? refine_width(IW/IH).
+resize_main_window(_,_).
+--
+complete_calibration():-!.
+--
+data_transfer_error(ErrorName):-!,
+	con ? error("Data Transfer Error",ErrorName).
+--
+report_time(_,_,_):-
+	main_window ? set_brush('Green'),
+	main_window ? set_font({size:18}),
+	fail.
+report_time(FrameNumber,FrameTime,FrameRate):-
+	FrameNumber >= 0,
+	Time== timer?convert_to_time(FrameTime),
+	Time == time(Hours,Minutes,Seconds,Milliseconds),!,
+	main_window ? set_text_alignment('LEFT','TOP'),
+	main_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %02d:%02d:%02d.%03d; Frame: %d",
+			Hours,Minutes,Seconds,Milliseconds,
+			FrameNumber)),
+	main_window ? set_text_alignment('RIGHT','TOP'),
+	main_window ? draw_text(
+		0.91, 0.02,
+		text?format(
+			"Frame Rate: %2.1f",FrameRate)).
+report_time(_,_,_).
+]
+-----------------------------------------------------------------------

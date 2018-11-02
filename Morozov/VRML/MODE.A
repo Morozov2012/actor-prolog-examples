@@ -1,0 +1,45 @@
+package "Morozov/VRML/Mode":
+-----------------------------------------------------------------------
+--                                                                   --
+--               The "VRML/MODE" Actor Prolog package.               --
+--             (c) 2002-2007, IRE RAS, Alexei A. Morozov.            --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This is an auxiliary package for storing control information      --
+-- during generaton of VRML text.                                    --
+-----------------------------------------------------------------------
+class 'Report_Mode' (specialized 'Database'):
+[
+goal:-!.
+--
+set_parameters(Mode):-
+	retract_all(),
+	insert(Mode).
+--
+use_Fog:-
+	fail.
+	-- find('dynamic').
+--
+use_Background:-
+	find('dynamic'),!.
+--
+draw_front_planes:-
+	fail.
+	-- find('dynamic').
+--
+use_flying_camera:-
+	find('dynamic'),!.
+--
+enable_navigation:-
+	find('static'),!.
+--
+accomodate_height_of_graph:-
+	find('dynamic'),!.
+--
+minimize_width_of_items:-
+	find('dynamic'),!.
+--
+use_LightPanel:-
+	fail.
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,141 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+p1	= (('Observer',
+		data= (('Target',
+			iw= ('AuxiliaryWorld',
+				input= A))) ?? f(0,1,2,3)
+		));
+--
+p2	= (('Sender',
+		output= A));
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Timer'):
+--
+protecting:
+--
+	output;
+--
+internal:
+--
+	con	= ('Report',
+			title= "Sender",
+			x= 0,
+			width= 40,
+			y= 0,
+			height= 12);
+--
+[
+goal:-!,
+	con ? set_color('DkGreen'),
+	con ? writeln("Sender: I will start."),
+	con ? set_color('default'),
+	set_period(1,1.5),
+	activate.
+--
+tick:-
+	time(_,_,Second,_),
+	form_output(Second),!,
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Sender: I will send:"),
+	con ? set_color('SkyBlue'),
+	con ? writeln(output),
+	con ? set_color('default').
+tick:-!.
+--
+form_output(S):-
+	?mod(S,10) < 5,!,
+	output== #.
+form_output(Second):-
+	S== ?val("T_Item",Second),
+	output == S.
+]
+-----------------------------------------------------------------------
+class 'Target' (specialized 'Alpha'):
+--
+internal:
+--
+	iw;
+--
+	con	= ('Report',
+			title= "Target",
+			x= 0,
+			width= 40,
+			y= 12,
+			height= 13);
+--
+[
+goal:-!,
+	con ? set_color('DkGreen'),
+	con ? writeln("Target: I will start."),
+	con ? set_color('default').
+--
+f(A,B,C,D)= _:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Target: I will compute function:"),
+	con ? set_color('Violet'),
+	con ? writeln("f(",A,",",B,",",C,",",D,")"),
+	con ? set_color('default'),
+	fail.
+f(A,B,C,D)= A + B + C + D:-
+	numerical(A,B,C,D).
+f(A,B,_,_)= A + B:-
+	numerical(A,B).
+f(_,_,C,D)= C + D:-
+	numerical(C,D).
+]
+-----------------------------------------------------------------------
+class 'AuxiliaryWorld' (specialized 'Report'):
+--
+suspending:
+--
+	input;
+--
+constant:
+--
+	title	= "Auxiliary World";
+	x	= 40;
+	y	= 0;
+	width	= 40;
+	height	= 12;
+--
+[
+goal:-!,
+	[input],
+	set_color('RoyalBlue'),
+	writeln("AuxiliaryWorld: I have received:"),
+	set_color('SkyBlue'),
+	writeln(input),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Observer' (specialized 'Report'):
+--
+variable:
+--
+	data;
+--
+constant:
+--
+	title	= "Observer";
+	x	= 40;
+	y	= 12;
+	width	= 40;
+	height	= 13;
+--
+[
+goal:-!,
+	[data],
+	set_color('RoyalBlue'),
+	writeln("Observer: I have received data:"),
+	set_color('Violet'),
+	writeln(data),
+	set_color('default').
+]
+-----------------------------------------------------------------------

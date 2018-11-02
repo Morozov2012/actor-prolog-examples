@@ -1,0 +1,40 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+
+PREDICATES:
+imperative:
+-- determ:
+p;
+
+class 'MyArray' (specialized 'DynamicWorlds'):
+[
+PREDICATES:
+imperative:
+element(ArrayIndex*) = 'Report'	- (i);
+]
+
+class 'MyWorld' (specialized 'Console'):
+--
+internal:
+--
+w	: 'MyArray' of 'Report';
+--
+[
+goal:-!,
+	p.
+--
+p:-
+	w[1000] ? writeln("Hi!").
+]
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+w	= 'MyArray'[..] of ('Report');
+s	= ('MyWorld',w);
+--
+[
+]

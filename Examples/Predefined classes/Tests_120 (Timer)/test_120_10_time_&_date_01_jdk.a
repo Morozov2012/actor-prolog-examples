@@ -1,0 +1,79 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test10;
+test11;
+test12;
+test13;
+test20;
+test21;
+test22;
+test23;
+--
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	delay(1).
+--
+tick:-!,
+	test10,
+	test11,
+	test12,
+	test13,
+	test20,
+	test21,
+	test22,
+	test23.
+--
+test10:-
+	con ? writeln("Test 1.0:"),
+	time(),
+	con ? writeln("\tDone.").
+--
+test11:-
+	con ? writeln("Test 1.1:"),
+	Time== ?time(),
+	con ? writeln("\tCurrent time: ",Time).
+--
+test12:-
+	con ? writeln("Test 1.2:"),
+	time(Hour,Minute,Second),
+	con ? writeln("\t",Hour,":",Minute,":",Second).
+--
+test13:-
+	con ? writeln("Test 1.3:"),
+	time(Hour,Minute,Second,Millisecond),
+	con ? writeln("\t",Hour,":",Minute,":",Second,":",Millisecond).
+--
+test20:-
+	con ? writeln("Test 2.0:"),
+	date(),
+	con ? writeln("\tDone.").
+--
+test21:-
+	con ? writeln("Test 2.1:"),
+	Date== ?date(),
+	con ? writeln("\tCurrent date: ",Date).
+--
+test22:-
+	con ? writeln("Test 2.2:"),
+	date(Year,Month,Day),
+	con ? writeln("\t",Year,"-",Month,"-",Day).
+--
+test23:-
+	con ? writeln("Test 2.3:"),
+	date(Year,Month,Day,DayOfWeek),
+	con ? writeln("\t",Year,"-",Month,"-",Day,".",DayOfWeek).
+]
+-----------------------------------------------------------------------

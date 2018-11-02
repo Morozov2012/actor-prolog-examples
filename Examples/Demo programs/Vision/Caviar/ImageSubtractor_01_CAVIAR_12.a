@@ -1,0 +1,1034 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014-2017 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+-- Warning: This matrix corresponds to the CAVIAR data set,
+-- clips from INRIA (1st Set) only!
+--
+inverse_transformation_matrix	= [
+		[0.3945,0.0468,0.0168],
+		[0.0996,-0.1625,0.0056],
+		[-34.0116,28.5636,1.0000]];
+--
+sampling_rate	= 25.0;
+--
+stage_one		= (('ImagePreprocessor',
+				sampling_rate,
+				low_level_analyzer,
+				stage_two));
+stage_two		= (('ImageAnalyzer',
+				low_level_analyzer,
+				preprocessor= stage_one,
+				sampling_rate));
+--
+internal:
+--
+low_level_analyzer	= ('ImageSubtractor',
+				extract_blobs= 'yes',
+				track_blobs= 'yes',
+				minimal_training_interval= 100,
+				maximal_training_interval= -1,
+				use_grayscale_colors= 'yes',
+				apply_gaussian_filtering_to_background= 'yes',
+				background_gaussian_filter_radius= 1,
+				apply_rank_filtering_to_background= 'yes',
+				background_rank_filter_threshold= 4,
+				background_standard_deviation_factor= 1.2,
+				horizontal_blob_border= 3,
+				vertical_blob_border= 3,
+				horizontal_extra_border_coefficient= -1.0,
+				vertical_extra_border_coefficient= -1.0,
+				minimal_blob_intersection_area= 1,
+				minimal_blob_size= 100,
+				minimal_track_duration= 5,
+				maximal_blob_invisibility_interval= 3,
+				maximal_track_retention_interval= 4500,
+				inverse_transformation_matrix,
+				sampling_rate,
+				apply_median_filtering_to_velocity= 'yes',
+				velocity_median_filter_halfwidth= 3,
+				refuse_slow_tracks= 'yes',
+				fuzzy_velocity_threshold= 0.001,
+				fuzzy_distance_threshold= 50.0,
+				fuzzy_threshold_border= 0.50,
+				synthesized_image_transparency= 64,
+				make_rectangular_blobs_in_synthesized_image= 'no');
+--
+[
+]
+-----------------------------------------------------------------------
+class 'ImagePreprocessor' (specialized 'Timer'):
+--
+constant:
+--
+	sampling_rate;
+--
+	low_level_analyzer;
+	stage_two;
+--
+internal:
+--
+	subtractor	= ('SynchronizedImageSubtractor',
+				image_subtractor= low_level_analyzer);
+--
+	text		= ('Text');
+	image		= ('BufferedImage');
+	state		= ('ProgramState');
+--
+[
+goal:-!,
+	Time0== ?milliseconds(),
+	state ? set_beginning_time(Time0),
+	set_period(1/sampling_rate,0),
+	activate.
+--
+set_target_data_directry(DirectoryName,Prefix):-
+	state ? set_target_directory(DirectoryName,Prefix),
+	T2== ?milliseconds(),
+	state ? set_beginning_time(T2),
+	subtractor ? reset_results,
+	subtractor ? reset_statistics.
+--
+tick:-
+	T2== ?milliseconds(),
+	state ? get_beginning_time(T1),
+	Delta== (T2 - T1) / 1000.0 * sampling_rate,
+	N== ?convert_to_integer(?round(Delta)),!,
+	load_figure(N,T2).
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	state ? set_current_frame(N),
+	ShortFileName== text?format("%03d",N) + ".jpg",
+	state ? get_target_directory(DirectoryName,Prefix),
+	ImageToBeLoaded==
+		DirectoryName + "/" +
+		Prefix +
+		ShortFileName,
+	image ? does_exist(ImageToBeLoaded),!,
+	image ? load(ImageToBeLoaded),
+	subtractor ? subtract(N,image),
+	stage_two [<<] draw_scene().
+load_figure(_,T2):-
+	state ? set_beginning_time(T2),
+	subtractor ? reset_results.
+]
+-----------------------------------------------------------------------
+class 'ImageAnalyzer' (specialized 'Dialog'):
+--
+constant:
+--
+	sampling_rate;
+--
+	low_level_analyzer;
+	preprocessor;
+--
+internal:
+--
+	subtractor	= ('SynchronizedImageSubtractor',
+				image_subtractor= low_level_analyzer);
+--
+constant:
+--
+	walking_speed_threshold_value		= 0.5;
+	walking_speed_threshold_halfwidth	= 0.5;
+	running_speed_threshold_value		= 1.5; -- 1.0;
+	running_speed_threshold_halfwidth	= 0.5;
+	movement_duration_threshold_value	= 0.75; -- 0.5;
+	movement_duration_threshold_halfwidth	= 0.5;
+--
+	velocity_bound_1			= 0.5;
+	velocity_bound_2			= 0.75;
+	velocity_bound_3			= 1.0;
+	velocity_bound_4			= 1.25;
+	velocity_bound_5			= 1.5;
+	velocity_bound_6			= 2.0;
+	velocity_bound_7			= 2.5;
+	velocity_bound_8			= 3.0;
+--
+	velocity_color_1			= 'Violet';
+	velocity_color_2			= 'Magenta';
+	velocity_color_3			= 'Cyan';
+	velocity_color_4			= 'Emerald';
+	velocity_color_5			= 'Lime';
+	velocity_color_6			= 'Yellow';
+	velocity_color_7			= 'Orange';
+	velocity_color_8			= 'Pink';
+	velocity_color_9			= 'Red';
+--
+	maximal_depth_of_search			= 15;
+--
+	is_top_level_window			= 'yes';
+	circle_radius				= 0.005;
+--
+internal:
+--
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	prompt_window	= ('Report',
+				y= 22,
+				height= 3);
+	text		= ('Text');
+	image		= ('BufferedImage');
+	timer		= ('Timer');
+	con		= ('Console');
+	env		= ('DesktopWindow');
+	files		= ('File');
+--
+variable:
+--
+	target_image;
+	target_objects;
+--
+[
+goal:-!,
+	env ? set_exit_on_close('no'),
+	maximize,
+	timer ? set_priority('minimal'),
+	restore_settings,
+	graphic_window ? show.
+--
+draw_scene():-
+	subtractor ? commit,
+	subtractor ? get_recent_frame_number(FrameN),
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	draw_target_image(target_image),
+	draw_target_objects(target_objects,FrameN),
+	report_time(FrameN),
+	graphic_window ? draw_now.
+--
+draw_target_image("Recent Image"):-!,
+	subtractor ? get_recent_image(image),
+	graphic_window ? draw_image(image,0,0,1,1).
+draw_target_image("Background Image"):-!,
+	subtractor ? get_background_image(image),
+	graphic_window ? draw_image(image,0,0,1,1).
+draw_target_image("Sigma Image"):-!,
+	subtractor ? get_sigma_image(image),
+	graphic_window ? draw_image(image,0,0,1,1).
+draw_target_image("Foreground Image"):-!,
+	subtractor ? get_foreground_image(image),
+	graphic_window ? draw_image(image,0,0,1,1).
+draw_target_image("Synthesized Image"):-!,
+	subtractor ? get_synthesized_image(image),
+	graphic_window ? draw_image(image,0,0,1,1).
+draw_target_image("Background+Synthesized"):-!,
+	subtractor ? get_background_image(image),
+	graphic_window ? draw_image(image,0,0,1,1),
+	subtractor ? get_synthesized_image(image),
+	graphic_window ? draw_image(image,0,0,1,1).
+draw_target_image(_).
+--
+draw_target_objects("Nothing",_):-!.
+draw_target_objects("Extract Blobs",_):-!,
+	subtractor ? get_blobs(Blobs),
+	image ? get_size_in_pixels(IW,IH),
+	draw_blobs(IW,IH,Blobs).
+draw_target_objects("Extract Tracks",FrameN):-!,
+	subtractor ? get_tracks(Tracks),
+	image ? get_size_in_pixels(IW,IH),
+	-- draw_legend,
+	draw_tracks(IW,IH,Tracks,FrameN).
+draw_target_objects("Extract Graphs",FrameN):-!,
+	subtractor ? get_connected_graphs(Graphs),
+	image ? get_size_in_pixels(IW,IH),
+	draw_legend,
+	draw_graphs(IW,IH,Graphs,1,'off',FrameN).
+draw_target_objects("Scene Analysis 1",FrameN):-!,
+	subtractor ? get_connected_graphs(Graphs),
+	image ? get_size_in_pixels(IW,IH),
+	draw_legend,
+	draw_graphs(IW,IH,Graphs,1,'method_one',FrameN).
+draw_target_objects("Scene Analysis 2",FrameN):-!,
+	subtractor ? get_connected_graphs(Graphs),
+	image ? get_size_in_pixels(IW,IH),
+	draw_legend,
+	draw_graphs(IW,IH,Graphs,1,'method_two',FrameN).
+draw_target_objects("Scene Analysis 3",FrameN):-!,
+	subtractor ? get_connected_graphs(Graphs),
+	image ? get_size_in_pixels(IW,IH),
+	draw_legend,
+	draw_graphs(IW,IH,Graphs,1,'method_three',FrameN).
+draw_target_objects(_,_).
+--
+draw_blobs(IW,IH,[Blob|Rest]):-!,
+	draw_blob(IW,IH,Blob),
+	draw_blobs(IW,IH,Rest).
+draw_blobs(_,_,_).
+--
+draw_blob(IW,IH,Blob):-
+	Blob == {identifier:Id,x:X0,y:Y0,width:W1,height:H1|_},
+	graphic_window ? set_pen({color:'Yellow',lineWidth:3}),
+	graphic_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	X2== (X0 - W1 / 2) / IW,
+	Y2== (Y0 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	draw_blob_identifier(X0,Y0,IW,IH,Id),
+	fail.
+draw_blob(_,_,_).
+--
+draw_blob_identifier(X0,Y0,IW,IH,Id):-!,
+	Text== text?format("%d",Id),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? draw_text(X0/IW,Y0/IH,Text).
+--
+draw_tracks(IW,IH,[Track|Rest],FrameN):-!,
+	draw_track(IW,IH,Track,FrameN),
+	draw_tracks(IW,IH,Rest,FrameN).
+draw_tracks(_,_,_,_).
+--
+draw_track(IW,IH,{identifier:Id,segments:Segments|_},FrameN):-
+	graphic_window ? set_brush('Green'),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	draw_track_segments(IW,IH,Id,Segments,FrameN),
+	fail.
+draw_track(_,_,_,_).
+--
+draw_track_segments(IW,IH,Id,[Segment|Rest],FrameN):-!,
+	draw_track_segment(IW,IH,Id,Segment,FrameN),
+	draw_track_segments(IW,IH,Id,Rest,FrameN).
+draw_track_segments(_,_,_,_,_).
+--
+draw_track_segment(
+		IW,IH,_/*Id*/,{
+			coordinates:TrackOfBlobs,
+			mean_velocity:Velocity|_},
+		FrameN):-
+	draw_track_of_blobs(IW,IH,TrackOfBlobs,'no','no',Velocity),
+	draw_rectangle('no',[],TrackOfBlobs,IW,IH,FrameN),
+	fail.
+draw_track_segment(_,_,_,_,_).
+--
+draw_circle(X0,Y0):-
+	X1== X0 - circle_radius,
+	Y1== Y0 - circle_radius,
+	Width== circle_radius * 2,
+	Height== circle_radius * 2,
+	graphic_window ? draw_ellipse(X1,Y1,Width,Height).
+--
+draw_track_identifier(X1,Y1,X2,Y2,Id):-!,
+	Text== text?format("%d",Id),
+	graphic_window ? set_font({size:14}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? draw_text((X1+X2)/2,(Y1+Y2)/2,Text).
+--
+draw_graphs(IW,IH,[Graph|Rest],N,AnalysisMethod,FrameN):-
+	do_analyse_graph(AnalysisMethod),
+	is_a_kind_of_a_running_away(
+		AnalysisMethod,Graph,1,Graph,_,_,_,_,_,_),!,
+	draw_graph(IW,IH,Graph,Graph,'yes',AnalysisMethod,N,FrameN),
+	graphic_window ? set_font({size:48,weight:'WEIGHT_BOLD'}),
+	graphic_window ? set_pen({color:'Red'}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? draw_text(0.5,0.5,"Attention!"),
+	draw_graphs(IW,IH,Rest,N+1,AnalysisMethod,FrameN).
+draw_graphs(IW,IH,[Graph|Rest],N,AnalysisMethod,FrameN):-!,
+	draw_graph(IW,IH,Graph,Graph,'no',AnalysisMethod,N,FrameN),
+	draw_graphs(IW,IH,Rest,N+1,AnalysisMethod,FrameN).
+draw_graphs(_,_,_,_,_,_).
+--
+do_analyse_graph('off'):-!,
+	fail.
+do_analyse_graph(_).
+--
+is_a_kind_of_a_running_away(
+		'method_one',
+		[Edge|_],EN,Graph,
+		WalkingPerson,N1,Edge,EN,RunningPerson,N3):-
+	Edge == {inputs:Origins,outputs:Branches|_},
+	Branches == [_,_|_],
+	contains_a_walking_person(
+		Origins,Graph,[],WalkingPerson,_,_,0,N1,0),
+	contains_a_running_person(
+		Branches,Graph,[],RunningPerson,_,_,0,N3,0),!.
+is_a_kind_of_a_running_away(
+		'method_two',
+		[ForkEdge|_],EN,Graph,
+		JoiningEdge,N1,ForkEdge,EN,RunningPerson,N3):-
+	ForkEdge == {inputs:Origins,outputs:Branches|_},
+	Branches == [_,_|_],
+	contains_a_running_person(
+		Branches,Graph,[],RunningPerson,_,_,0,N3,0),
+	is_a_meeting(
+		Origins,Graph,[],
+		{},ForkEdge,
+		EN,JoiningEdge,N1,0),!.
+is_a_kind_of_a_running_away(
+		'method_three',
+		[ForkEdge|_],EN,Graph,
+		JoiningEdge,N1,ForkEdge,EN,RunningPerson,N3):-
+	ForkEdge == {inputs:Origins,outputs:Branches|_},
+	Branches == [_,_|_],
+	contains_a_running_person(
+		Branches,Graph,[],RunningPerson,_,_,0,N3,0),
+	is_a_meeting(
+		Origins,Graph,[],
+		ForkEdge,ForkEdge,
+		EN,JoiningEdge,N1,0),!.
+is_a_kind_of_a_running_away(
+		AnalysisMethod,
+		[_|Rest],EN,Graph,
+		Person1,N1,CommonEdge,N2,Person2,N3):-
+	is_a_kind_of_a_running_away(
+		AnalysisMethod,
+		Rest,EN+1,Graph,
+		Person1,N1,CommonEdge,N2,Person2,N3).
+--
+contains_a_running_person([N1|_],Graph,Stack,Person,M1,M2,_,N2,D):-
+	is_not_element(N1,Stack),
+	get_edge(N1,Graph,Edge),
+	is_a_running_person(
+		Edge,Graph,[N1|Stack],Person,M1,M2,N1,N2,D),!.
+contains_a_running_person([_|Rest],Graph,Stack,Person,M1,M2,N1,N2,D):-
+	D <= maximal_depth_of_search,
+	contains_a_running_person(
+		Rest,Graph,Stack,Person,M1,M2,N1,N2,D+1).
+--
+is_a_running_person(Edge,_,_,Edge,M1,M2,N,N,_):-
+	Edge == {
+		mean_velocity:Velocity,
+		frame1:Beginning,
+		frame2:End|_},
+	M1== ?fuzzy_metrics(
+		Velocity,
+		running_speed_threshold_value,
+		running_speed_threshold_halfwidth),
+	Duration== (End - Beginning) / sampling_rate,
+	M2== ?fuzzy_metrics(
+		Duration,
+		movement_duration_threshold_value,
+		movement_duration_threshold_halfwidth),
+	M1 * M2 >= 0.5,!.
+is_a_running_person(Edge,Graph,Stack,Person,M1,M2,N1,N2,D):-
+	Edge == {outputs:Branches|_},
+	D <= maximal_depth_of_search,
+	contains_a_running_person(
+		Branches,Graph,Stack,Person,M1,M2,N1,N2,D+1).
+--
+contains_a_walking_person([N1|_],Graph,Stack,Person,M1,M2,_,N2,D):-
+	is_not_element(N1,Stack),
+	get_edge(N1,Graph,Edge),
+	is_a_walking_person(
+		Edge,Graph,[N1|Stack],Person,M1,M2,N1,N2,D),!.
+contains_a_walking_person([_|Rest],Graph,Stack,Person,M1,M2,N1,N2,D):-
+	D <= maximal_depth_of_search,
+	contains_a_walking_person(
+		Rest,Graph,Stack,Person,M1,M2,N1,N2,D+1).
+--
+is_a_walking_person(Edge,_,_,Edge,M1,M2,N,N,_):-
+	Edge == {
+		mean_velocity:Velocity,
+		frame1:Beginning,
+		frame2:End|_},
+	M1== 1 - ?fuzzy_metrics(
+		Velocity,
+		walking_speed_threshold_value,
+		walking_speed_threshold_halfwidth),
+	Duration== (End - Beginning) / sampling_rate,
+	M2== ?fuzzy_metrics(
+		Duration,
+		movement_duration_threshold_value,
+		movement_duration_threshold_halfwidth),
+	M1 * M2 >= 0.5,!.
+is_a_walking_person(Edge,Graph,Stack,Person,M1,M2,N1,N2,D):-
+	Edge == {inputs:Origins|_},
+	D <= maximal_depth_of_search,
+	contains_a_walking_person(
+		Origins,Graph,Stack,Person,M1,M2,N1,N2,D+1).
+--
+is_a_meeting(Origins,_,_,ForkEdge,JoiningEdge,N0,JoiningEdge,N0,_):-
+	Origins == [_,_|_],
+	is_a_delay(JoiningEdge,ForkEdge),!.
+is_a_meeting([N1|_],Graph,Stack,ForkEdge,_,_,JoiningEdge,N2,D):-
+	D <= maximal_depth_of_search,
+	is_not_element(N1,Stack),
+	get_edge(N1,Graph,PreviousEdge),
+	PreviousEdge == {inputs:Origins|_},
+	is_a_meeting(
+		Origins,Graph,[N1|Stack],
+		ForkEdge,PreviousEdge,
+		N1,JoiningEdge,N2,D+1).
+--
+is_a_delay({},_):-!.
+is_a_delay(_,{}):-!.
+is_a_delay(JoiningEdge,ForkEdge):-
+	ForkEdge == {frame2:FrameE|_},
+	JoiningEdge == {frame1:FrameB|_},!,
+	TimeDelay== (FrameE - FrameB) / sampling_rate,
+	TimeDelay >= 1.0.
+--
+is_not_element(N1,[N2|Rest]):-
+	N1 <> N2,
+	is_not_element(N1,Rest).
+is_not_element(_,[]).
+--
+fuzzy_metrics(X,Threshold,Halfwidth) = 1.0 :-
+	X >= Threshold + Halfwidth,!.
+fuzzy_metrics(X,Threshold,Halfwidth) = 0.0 :-
+	X <= Threshold - Halfwidth,!.
+fuzzy_metrics(X,Threshold,Halfwidth) = Value :-
+	Value== (X-Threshold+Halfwidth) * (1 / (2*Halfwidth)).
+--
+draw_graph(IW,IH,[Edge|Rest],Graph,IsARA,AnalyseGraph,N,FrameN):-!,
+	draw_edge(IW,IH,Edge,Graph,IsARA,AnalyseGraph,N,FrameN),
+	draw_graph(IW,IH,Rest,Graph,IsARA,AnalyseGraph,N,FrameN).
+draw_graph(_,_,_,_,_,_,_,_).
+--
+draw_edge(	IW,IH,
+		{	x1:X1a,y1:Y1a,x2:X2a,y2:Y2a,
+			-- identifier:Id,
+			inputs:Origins,
+			outputs:Branches,
+			coordinates:TrackOfBlobs,
+			mean_velocity:Velocity|_},
+		Graph,IsARA,_,_,FrameN):-
+	X1r== X1a / IW,
+	Y1r== Y1a / IH,
+	X2r== X2a / IW,
+	Y2r== Y2a / IH,
+	graphic_window ? set_pen({color:'Blue',lineWidth:1}),
+	draw_origins(X1a,Y1a,IW,IH,Origins,Graph),
+	draw_track_of_blobs(IW,IH,TrackOfBlobs,'yes',IsARA,Velocity),
+	draw_rectangle(IsARA,Branches,TrackOfBlobs,IW,IH,FrameN),
+	graphic_window ? set_brush('on'),
+	graphic_window ? set_pen({color:'Green',lineWidth:1}),
+	graphic_window ? draw_line(X1r,Y1r,X2r,Y2r),
+	draw_circle(X1r,Y1r),
+	draw_circle(X2r,Y2r),
+	-- draw_graph_identifier('off',X1r,Y1r,X2r,Y2r,Id),
+	fail.
+draw_edge(_,_,_,_,_,_,_,_).
+--
+draw_graph_identifier('off',X1,Y1,X2,Y2,Id):-!,
+	Text== text?format("%d",Id),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? draw_text((X1+X2)/2,(Y1+Y2)/2,Text).
+draw_graph_identifier(_,_,_,_,_,_).
+--
+draw_origins(Sx,Sy,IW,IH,[Origin|Rest],Graph):-!,
+	draw_origin(Sx,Sy,IW,IH,Origin,Graph),
+	draw_origins(Sx,Sy,IW,IH,Rest,Graph).
+draw_origins(_,_,_,_,_,_).
+--
+draw_origin(SxA,SyA,IW,IH,N,Graph):-
+	get_edge(N,Graph,Edge),
+	Edge == {x2:Nx2a,y2:Ny2a|_},!,
+	draw_origin_arrow(SxA,SyA,Nx2a,Ny2a,IW,IH).
+draw_origin(_,_,_,_,_,_).
+--
+draw_origin_arrow(X,Y,X,Y,_,_):-!.
+draw_origin_arrow(SxA,SyA,Nx2a,Ny2a,IW,IH):-
+	SxR== SxA / IW,
+	SyR== SyA / IH,
+	Nx2r== Nx2a / IW,
+	Ny2r== Ny2a / IH,
+	graphic_window ? draw_line(SxR,SyR,Nx2r,Ny2r).
+--
+get_edge(1,[Edge|_],Edge):-!.
+get_edge(N,[_|Rest],Edge):-
+	N > 0,
+	get_edge(N-1,Rest,Edge).
+--
+draw_track_of_blobs(
+		IW,IH,[Blob|Rest],DisplayVelocity,IsARA,Velocity):-
+	Blob== {x:Xa,y:Ya|_},!,
+	Xr== Xa / IW,
+	Yr== Ya / IH,
+	draw_track_of_blobs(
+		IW,IH,Xr,Yr,Rest,DisplayVelocity,IsARA,Velocity).
+draw_track_of_blobs(_,_,_,_,_,_).
+--
+draw_track_of_blobs(
+		IW,IH,X1,Y1,[Blob|Rest],DisplayVelocity,IsARA,_):-
+	Blob== {x:Xa,y:Ya,velocity:Velocity|_},!,
+	X2== Xa / IW,
+	Y2== Ya / IH,
+	select_line_color(DisplayVelocity,IsARA,Velocity,Color,LW),
+	graphic_window ? set_pen({color:Color,lineWidth:LW}),
+	graphic_window ? draw_line(X1,Y1,X2,Y2),
+	draw_track_of_blobs(
+		IW,IH,X2,Y2,Rest,DisplayVelocity,IsARA,Velocity).
+draw_track_of_blobs(_,_,_,_,_,_,_,_).
+--
+select_line_color('no',_,_,'Magenta',2):-!.
+select_line_color(_,'yes',_,'Red',2):-!.
+select_line_color(_,_,Velocity,Color,2):-
+	select_line_color(Velocity,Color).
+--
+select_line_color(Velocity,velocity_color_1):-
+	Velocity <= velocity_bound_1,!.
+select_line_color(Velocity,velocity_color_2):-
+	Velocity > velocity_bound_1,
+	Velocity <= velocity_bound_2,!.
+select_line_color(Velocity,velocity_color_3):-
+	Velocity > velocity_bound_2,
+	Velocity <= velocity_bound_3,!.
+select_line_color(Velocity,velocity_color_4):-
+	Velocity > velocity_bound_3,
+	Velocity <= velocity_bound_4,!.
+select_line_color(Velocity,velocity_color_5):-
+	Velocity > velocity_bound_4,
+	Velocity <= velocity_bound_5,!.
+select_line_color(Velocity,velocity_color_6):-
+	Velocity > velocity_bound_5,
+	Velocity <= velocity_bound_6,!.
+select_line_color(Velocity,velocity_color_7):-
+	Velocity > velocity_bound_6,
+	Velocity <= velocity_bound_7,!.
+select_line_color(Velocity,velocity_color_8):-
+	Velocity > velocity_bound_7,
+	Velocity <= velocity_bound_8,!.
+select_line_color(_,velocity_color_9).
+--
+draw_rectangle('yes',[],Track,IW,IH,FrameN):-!,
+	draw_colored_rectangle(Track,IW,IH,FrameN,'Yellow',3).
+draw_rectangle('no',[],Track,IW,IH,FrameN):-!,
+	draw_colored_rectangle(Track,IW,IH,FrameN,'Cyan',3).
+draw_rectangle(_,_,_,_,_,_).
+--
+draw_colored_rectangle([Blob],IW,IH,FrameN,Color,LW):-
+	Blob == {frame:FrameN,x:X0,y:Y0,width:W1,height:H1|_},!,
+	graphic_window ? set_brush('off'),
+	graphic_window ? set_pen({color:Color,lineWidth:LW}),
+	X2== (X0 - W1 / 2) / IW,
+	Y2== (Y0 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2).
+draw_colored_rectangle([_|Rest],IW,IH,FrameN,Color,LW):-!,
+	draw_colored_rectangle(Rest,IW,IH,FrameN,Color,LW).
+draw_colored_rectangle(_,_,_,_,_,_).
+--
+action("SelectDirectory"):-
+	FileName== con?input_file_name(
+		"Please enter data directory",
+		"*.jpg",
+		["*.jpg","JPEG Files"]),
+	files ? extract_path(
+		FileName,
+		Path,
+		ShortNameWithExtension),
+	files ? extract_extension(
+		ShortNameWithExtension,
+		ShortFileName,
+		_),
+	L1== con?length(ShortFileName),
+	L2== L1 - 3,
+	con ? split(L2,ShortFileName,Prefix,_),!,
+	preprocessor <- set_target_data_directry(Path,Prefix),
+	put('title',
+		"Image Subtractor Demo ["+Path+"]").
+action("ResetSettings"):-!,
+	subtractor ? reset_settings(),
+	restore_settings.
+action("ResetStatistics"):-!,
+	subtractor ? reset_statistics().
+action("ResetResults"):-!,
+	subtractor ? reset_results().
+action("ResetAll"):-!,
+	subtractor ? reset_all(),
+	restore_settings.
+action("DumpGraph"):-!,
+	subtractor ? get_connected_graphs(Graphs),
+	con ? clear,
+	dump_graphs(target_objects,Graphs).
+action("QuitProgram"):-!,
+	break(0).
+action(_):-!.
+--
+restore_settings:-
+	F1== 'yes',
+	put("UseGrayscaleColors",F1),
+	low_level_analyzer <- set_grayscale_mode(F1),
+	F2== 'yes',
+	put("ApplyGaussianFilteringToBackground",F2),
+	low_level_analyzer <- set_background_gaussian_filtering_mode(F2),
+	switch_background_gaussian_filter_radius(F2),
+	F3== 1,
+	put("BackgroundGaussianFilterRadius",F3),
+	low_level_analyzer <- set_background_gaussian_filter_radius(F3),
+	F4== 'yes',
+	put("ApplyRankFilteringToBackground",F4),
+	low_level_analyzer <- set_background_rank_filtering_mode(F4),
+	switch_background_rank_filter_threshold(F4),
+	F5== 4,
+	put("BackgroundRankFilterThreshold",F5),
+	low_level_analyzer <- set_background_rank_filter_threshold(F5),
+	F6== 1.3,
+	put("BackgroundStandardDeviationFactor",F6),
+	low_level_analyzer <- set_background_standard_deviation_factor(F6),
+	F7== 'yes',
+	put("ApplyMedianFilteringToVelocity",F7),
+	low_level_analyzer <- set_velocity_median_filtering_mode(F7),
+	switch_velocity_median_filter_halfwidth(F7),
+	F8== 3,
+	put("VelocityMedianFilterHalfwidth",F8),
+	low_level_analyzer <- set_velocity_median_filter_halfwidth(F8),
+	F9== 'yes',
+	put("RefuseSlowTracks",F9),
+	low_level_analyzer <- set_slow_tracks_deletion_mode(F9),
+	switch_fuzzy_thresholds(F9),
+	F10== 0.001,
+	put("FuzzyVelocityThreshold",F10),
+	low_level_analyzer <- set_fuzzy_velocity_threshold(F10),
+	F11== 50.0,
+	put("FuzzyDistanceThreshold",F11),
+	low_level_analyzer <- set_fuzzy_distance_threshold(F11),
+	F12== 0.5,
+	put("FuzzyThresholdBorder",F12),
+	low_level_analyzer <- set_fuzzy_threshold_border(F12).
+--
+modified_control("UseGrayscaleColors"):-
+	F1== ?val("YesNoUnknown",?get("UseGrayscaleColors")),!,
+	ynu2yn(F1,F2),
+	low_level_analyzer <- set_grayscale_mode(F2).
+modified_control("ApplyGaussianFilteringToBackground"):-
+	F1== ?val("YesNoUnknown",?get("ApplyGaussianFilteringToBackground")),!,
+	ynu2yn(F1,F2),
+	low_level_analyzer <- set_background_gaussian_filtering_mode(F2),
+	switch_background_gaussian_filter_radius(F2).
+modified_control("BackgroundGaussianFilterRadius"):-
+	V== ?val("INTEGER",?get("BackgroundGaussianFilterRadius")),!,
+	low_level_analyzer <- set_background_gaussian_filter_radius(V).
+modified_control("ApplyRankFilteringToBackground"):-
+	F1== ?val("YesNoUnknown",?get("ApplyRankFilteringToBackground")),!,
+	ynu2yn(F1,F2),
+	low_level_analyzer <- set_background_rank_filtering_mode(F2),
+	switch_background_rank_filter_threshold(F2).
+modified_control("BackgroundRankFilterThreshold"):-
+	V== ?val("INTEGER",?get("BackgroundRankFilterThreshold")),!,
+	low_level_analyzer <- set_background_rank_filter_threshold(V).
+modified_control("BackgroundStandardDeviationFactor"):-
+	V== ?val("REAL",?get("BackgroundStandardDeviationFactor")),!,
+	low_level_analyzer <- set_background_standard_deviation_factor(V).
+modified_control("ApplyRankFilteringToBackgroundingToVelocity"):-
+	F1== ?val("YesNoUnknown",?get("ApplyRankFilteringToBackgroundingToVelocity")),!,
+	ynu2yn(F1,F2),
+	low_level_analyzer <- set_velocity_median_filtering_mode(F2),
+	switch_velocity_median_filter_halfwidth(F2).
+modified_control("VelocityRankFilteringToBackgroundHalfwidth"):-
+	V== ?val("INTEGER",?get("VelocityRankFilteringToBackgroundHalfwidth")),!,
+	low_level_analyzer <- set_velocity_median_filter_halfwidth(V).
+modified_control("RefuseSlowTracks"):-
+	F1== ?val("YesNoUnknown",?get("RefuseSlowTracks")),!,
+	ynu2yn(F1,F2),
+	low_level_analyzer <- set_slow_tracks_deletion_mode(F2),
+	switch_fuzzy_thresholds(F2).
+modified_control("FuzzyVelocityThreshold"):-
+	V== ?val("REAL",?get("FuzzyVelocityThreshold")),!,
+	low_level_analyzer <- set_fuzzy_velocity_threshold(V).
+modified_control("FuzzyDistanceThreshold"):-
+	V== ?val("REAL",?get("FuzzyDistanceThreshold")),!,
+	low_level_analyzer <- set_fuzzy_distance_threshold(V).
+modified_control("FuzzyThresholdBorder"):-
+	V== ?val("REAL",?get("FuzzyThresholdBorder")),!,
+	low_level_analyzer <- set_fuzzy_threshold_border(V).
+modified_control(_):-!.
+--
+ynu2yn('yes','yes'):-!.
+ynu2yn(_,'no').
+--
+switch_background_gaussian_filter_radius('yes'):-!,
+	enable("Prompting:BackgroundGaussianFilterRadius"),
+	enable("BackgroundGaussianFilterRadius").
+switch_background_gaussian_filter_radius(_):-
+	disable("Prompting:BackgroundGaussianFilterRadius"),
+	disable("BackgroundGaussianFilterRadius").
+--
+switch_background_rank_filter_threshold('yes'):-!,
+	enable("Prompting:BackgroundRankFilterThreshold"),
+	enable("BackgroundRankFilterThreshold").
+switch_background_rank_filter_threshold(_):-
+	disable("Prompting:BackgroundRankFilterThreshold"),
+	disable("BackgroundRankFilterThreshold").
+--
+switch_velocity_median_filter_halfwidth('yes'):-!,
+	enable("Prompting:VelocityMedianFilterHalfwidth"),
+	enable("VelocityMedianFilterHalfwidth").
+switch_velocity_median_filter_halfwidth(_):-
+	disable("Prompting:VelocityMedianFilterHalfwidth"),
+	disable("VelocityMedianFilterHalfwidth").
+--
+switch_fuzzy_thresholds('yes'):-!,
+	enable("Prompting:FuzzyVelocityThreshold"),
+	enable("Prompting:FuzzyDistanceThreshold"),
+	enable("Prompting:FuzzyThresholdBorder"),
+	enable("FuzzyVelocityThreshold"),
+	enable("FuzzyDistanceThreshold"),
+	enable("FuzzyThresholdBorder").
+switch_fuzzy_thresholds(_):-
+	disable("Prompting:FuzzyVelocityThreshold"),
+	disable("Prompting:FuzzyDistanceThreshold"),
+	disable("Prompting:FuzzyThresholdBorder"),
+	disable("FuzzyVelocityThreshold"),
+	disable("FuzzyDistanceThreshold"),
+	disable("FuzzyThresholdBorder").
+--
+dump_graphs(AnalysisMethod,_):-
+	con ? writeln("Scene analysis method: ",AnalysisMethod),
+	fail.
+dump_graphs("Scene Analysis 1",GraphList):-!,
+	dump_graphs('method_one',GraphList,1).
+dump_graphs("Scene Analysis 2",GraphList):-!,
+	dump_graphs('method_two',GraphList,1).
+dump_graphs("Scene Analysis 3",GraphList):-!,
+	dump_graphs('method_three',GraphList,1).
+dump_graphs(_,GraphList):-
+	dump_graphs('off',GraphList,1).
+--
+dump_graphs(AnalysisMethod,[Graph|Rest],GN):-
+	is_a_kind_of_a_running_away(
+		AnalysisMethod,Graph,1,Graph,J,Nj,F,Nf,_,Nr),!,
+	con ? writeln("GRAPH_IDENTIFIER: ",GN),
+	con ? set_color('Red'),
+	con ? writeln("\tAttention!"),
+	con ? set_color('default'),
+	report_obtained_edges(AnalysisMethod,J,Nj,F,Nf,Nr),
+	dump_graph(Graph,Graph,1),
+	dump_graphs(AnalysisMethod,Rest,GN+1).
+dump_graphs(AnalysisMethod,[Graph|Rest],GN):-!,
+	con ? writeln("GRAPH_IDENTIFIER: ",GN),
+	dump_graph(Graph,Graph,1),
+	dump_graphs(AnalysisMethod,Rest,GN+1).
+dump_graphs(_,_,_).
+--
+report_obtained_edges('method_one',_,Nw,_,Nf,Nr):-!,
+	con ? writeln("\tWalking person edge: ",Nw),
+	con ? writeln("\tFork edge: ",Nf),
+	con ? writeln("\tRunning person edge: ",Nr).
+report_obtained_edges('method_two',_,Nj,_,Nf,Nr):-!,
+	con ? writeln("\tJoining edge: ",Nj),
+	con ? writeln("\tFork edge: ",Nf),
+	con ? writeln("\tRunning person edge: ",Nr).
+report_obtained_edges('method_three',J,Nj,F,Nf,Nr):-!,
+	con ? writeln("\tJoining edge: ",Nj),
+	con ? writeln("\tFork edge: ",Nf),
+	report_delay_attributes(F,J),
+	con ? writeln("\tRunning person edge: ",Nr).
+report_obtained_edges(_,_,N1,_,N2,N3):-
+	con ? writeln("\tEdge 1: ",N1),
+	con ? writeln("\tEdge 2: ",N2),
+	con ? writeln("\tEdge 3: ",N3).
+--
+report_delay_attributes(F,J):-
+	F== {frame2:FrameE,x2:Xe,y2:Ye|_},
+	J== {frame1:FrameB,x1:Xb,y1:Yb|_},!,
+	TimeDelay== (FrameE - FrameB) / sampling_rate,
+	con ? writeln("\tTime delay: ",TimeDelay),
+	PathLength== ?sqrt(?power(Xb-Xe,2)+?power(Yb-Ye,2)),
+	con ? writeln("\tPath length: ",PathLength).
+report_delay_attributes(_,_).
+--
+dump_graph([Edge|Rest],Graph,N):-!,
+	con ? writeln("\tEDGE_NUMBER: ",N),
+	check_edge(Edge,Graph),
+	dump_edge(Edge),
+	dump_graph(Rest,Graph,N+1).
+dump_graph(_,_,_).
+--
+check_edge(Edge,_):-
+	Edge == {	frame1:Beginning,
+			frame2:End,
+			mean_velocity:Velocity|_},
+	M1== ?fuzzy_metrics(
+		Velocity,
+		running_speed_threshold_value,
+		running_speed_threshold_halfwidth),
+	Duration== (End - Beginning) / sampling_rate,
+	M2== ?fuzzy_metrics(
+		Duration,
+		movement_duration_threshold_value,
+		movement_duration_threshold_halfwidth),
+	con ? writeln("\t\tIs this edge a running?"),
+	con ? writeln("\t\t\tM1: ",M1),
+	con ? writeln("\t\t\tM2: ",M2),
+	report_metrics_value(M1*M2,'Black','Red'),
+	fail.
+check_edge(Edge,Graph):-
+	is_a_running_person(Edge,Graph,[],_,M1,M2,0,N,0),
+	con ? set_color('Red'),
+	con ? writeln("\t\tThis is a running person: ",N),
+	con ? set_color('default'),
+	con ? writeln("\t\t\tM1: ",M1),
+	con ? writeln("\t\t\tM2: ",M2),
+	con ? writeln("\t\t\tM1*M2: ",M1*M2),
+	fail.
+check_edge(Edge,_):-
+	Edge == {	frame1:Beginning,
+			frame2:End,
+			mean_velocity:Velocity|_},
+	M1== 1 - ?fuzzy_metrics(
+		Velocity,
+		walking_speed_threshold_value,
+		walking_speed_threshold_halfwidth),
+	Duration== (End - Beginning) / sampling_rate,
+	M2== ?fuzzy_metrics(
+		Duration,
+		movement_duration_threshold_value,
+		movement_duration_threshold_halfwidth),
+	con ? writeln("\t\tIs this edge a walking?"),
+	con ? writeln("\t\t\tM1: ",M1),
+	con ? writeln("\t\t\tM2: ",M2),
+	report_metrics_value(M1*M2,'White','Blue'),
+	fail.
+check_edge(Edge,Graph):-
+	is_a_walking_person(Edge,Graph,[],_,M1,M2,0,N,0),
+	con ? set_color('Blue'),
+	con ? writeln("\t\tThis is a walking person: ",N),
+	con ? set_color('default'),
+	con ? writeln("\t\t\tM1: ",M1),
+	con ? writeln("\t\t\tM2: ",M2),
+	con ? writeln("\t\t\tM1*M2: ",M1*M2),
+	fail.
+check_edge(_,_).
+--
+report_metrics_value(M,Color1,Color2):-
+	M >= 0.5,!,
+	con ? write("\t\t\t"),
+	con ? set_color(Color1,Color2),
+	con ? writeln("M1*M2: ",M),
+	con ? set_color('default','default').
+report_metrics_value(M,_,_):-
+	con ? writeln("\t\t\tM1*M2: ",M).
+--
+dump_edge(	{	frame1:Beginning,
+			frame2:End,
+			identifier:Id,
+			x1:X1a,y1:Y1a,x2:X2a,y2:Y2a,
+			inputs:Origins,
+			outputs:Branches,
+			-- coordinates:TrackOfBlobs,
+			mean_velocity:Velocity|_}):-
+	con ? set_color('default'),
+	con ? writeln("\t\tidentifier: ",Id),
+	con ? writeln(
+		"\t\tx1:",X1a," y1:",Y1a," x2:",X2a," y2:",Y2a),
+	con ? writeln("\t\tframe1: ",Beginning),
+	con ? writeln("\t\tframe2: ",End),
+	con ? writeln("\t\tframe2-frame1: ",End-Beginning),
+	con ? writeln(
+		"\t\t(frame2-frame1)/rate: ",
+		(End - Beginning) / sampling_rate),
+	select_line_color(Velocity,Color),
+	con ? set_color(Color),
+	con ? writeln("\t\tmean_velocity: ",Velocity),
+	con ? set_color('default'),
+	con ? writeln("\t\tinputs: ",Origins),
+	con ? writeln("\t\toutputs: ",Branches),
+	-- con ? writeln("\t\tcoordinates: ",TrackOfBlobs),
+	fail.
+dump_edge(_).
+--
+draw_legend:-
+	graphic_window ? set_brush('off'),
+	graphic_window ? set_font({size:12,weight:'WEIGHT_BOLD'}),
+	graphic_window ? set_text_alignment('LEFT','CENTER'),
+	X0r== 0.82,
+	Y0r== 0.05,
+	X1r== X0r + 0.02,
+	Y1r== Y0r + 0.03,
+	Y2r== Y1r + 0.03,
+	Y3r== Y2r + 0.03,
+	Y4r== Y3r + 0.03,
+	Y5r== Y4r + 0.03,
+	Y6r== Y5r + 0.03,
+	Y7r== Y6r + 0.03,
+	Y8r== Y7r + 0.03,
+	Y9r== Y8r + 0.03,
+	T1== text?format("Velocity <= %1.2f",velocity_bound_1),
+	T2== text?format("Velocity > %1.2f",velocity_bound_1),
+	T3== text?format("Velocity > %1.2f",velocity_bound_2),
+	T4== text?format("Velocity > %1.2f",velocity_bound_3),
+	T5== text?format("Velocity > %1.2f",velocity_bound_4),
+	T6== text?format("Velocity > %1.2f",velocity_bound_5),
+	T7== text?format("Velocity > %1.2f",velocity_bound_6),
+	T8== text?format("Velocity > %1.2f",velocity_bound_7),
+	T9== text?format("Velocity > %1.2f",velocity_bound_8),
+	graphic_window ? set_pen({color:velocity_color_1}),
+	graphic_window ? draw_text(X1r,Y1r,T1),
+	graphic_window ? set_pen({color:velocity_color_2}),
+	graphic_window ? draw_text(X1r,Y2r,T2),
+	graphic_window ? set_pen({color:velocity_color_3}),
+	graphic_window ? draw_text(X1r,Y3r,T3),
+	graphic_window ? set_pen({color:velocity_color_4}),
+	graphic_window ? draw_text(X1r,Y4r,T4),
+	graphic_window ? set_pen({color:velocity_color_5}),
+	graphic_window ? draw_text(X1r,Y5r,T5),
+	graphic_window ? set_pen({color:velocity_color_6}),
+	graphic_window ? draw_text(X1r,Y6r,T6),
+	graphic_window ? set_pen({color:velocity_color_7}),
+	graphic_window ? draw_text(X1r,Y7r,T7),
+	graphic_window ? set_pen({color:velocity_color_8}),
+	graphic_window ? draw_text(X1r,Y8r,T8),
+	graphic_window ? set_pen({color:velocity_color_9}),
+	graphic_window ? draw_text(X1r,Y9r,T9),
+	graphic_window ? set_pen({color:'Green',lineWidth:1}),
+	Wr== 0.17,
+	Hr== Y9r - Y0r + 0.025,
+	graphic_window ? draw_rectangle(X0r,Y0r,Wr,Hr).
+--
+report_time(_):-
+	graphic_window ? set_brush('Green'),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('LEFT','TOP'),
+	fail.
+report_time(FrameN):-
+	FrameN >= 0,!,
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %3.2f [sec]; Frame: %s",
+			FrameN/sampling_rate,FrameN)).
+report_time(_):-
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		"Training... Please wait a minute...").
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+[
+CLAUSES:
+--
+get_target_directory(DirectoryName,Prefix):-
+	Item== ?match(current_directory(_,_)),
+	Item == current_directory(DirectoryName,Prefix),!.
+--
+get_beginning_time(T):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(T),!.
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_target_directory(DirectoryName,Prefix):-
+	retract_all(current_directory(_,_)),
+	append(current_directory(DirectoryName,Prefix)).
+--
+set_beginning_time(T):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(T)).
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)).
+]
+-----------------------------------------------------------------------

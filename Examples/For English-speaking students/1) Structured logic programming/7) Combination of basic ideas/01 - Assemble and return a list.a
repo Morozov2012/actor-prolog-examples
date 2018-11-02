@@ -1,0 +1,40 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: assemble and return a list. --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Recursion with the input argument  --
+--    (input assembling of a list).      --
+-- 2) An output argument.                --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+p(List,List)		- (i,o);
+
+CLAUSES:
+
+goal:-
+	p([],Y),
+	writeln(Y).
+
+p(Rest,Result):-
+	Head== ?input_integer(
+		"Please enter an integer",
+		0),!,
+	p([Head|Rest],Result).
+p(AssembledList,AssembledList).

@@ -1,0 +1,137 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support these operations.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+w	= ('MyDialog');
+--
+[
+goal:-
+	w ? show.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+constant:
+--
+	main_slot	= slot1;
+	slot1		= ('FirstTest');
+	slot2		= ('SecondTest');
+	slot3		= ('ThirdTest');
+--
+	is_top_level_window	= 'yes';
+--
+[
+DOMAINS:
+--
+reference:
+--
+CustomValue	= ('Report'); #.
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1(CustomValue)		- (i);
+--
+CLAUSES:
+--
+action("action11"):-!,
+	test1(slot2).
+action("action12"):-!,
+	test1(slot3).
+action(_):-!.
+--
+created_control(_):-!.
+--
+modified_control(_):-!.
+--
+goal:-!,
+	test0.
+--
+test0:-
+	?get('main_slot'),!.
+test0.
+--
+test1(Value):-
+	put('main_slot',Value),!.
+test1(_).
+]
+-----------------------------------------------------------------------
+class 'FirstTest' (specialized 'Report'):
+--
+constant:
+--
+background_color		= 'White';
+--
+[
+goal:-!.
+--
+initialize:-!,
+	set_font_size(14),
+	set_color('RoyalBlue'),
+	writeln("This text font is of size 14."),
+	set_color('default').
+--
+start:-!,
+	set_color('Magenta'),
+	writeln("start"),
+	set_color('default').
+--
+stop:-!,
+	set_color('SkyBlue'),
+	writeln("stop"),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'SecondTest' (specialized 'Report'):
+--
+constant:
+--
+text_style			= 'bold';
+background_color		= 'RoyalBlue';
+--
+[
+goal:-!.
+--
+initialize:-!,
+	set_font_size('default'),
+	set_color('Orange'),
+	writeln("This text font is of default size."),
+	set_color('default').
+--
+start:-!,
+	set_color('Magenta'),
+	writeln("start"),
+	set_color('default').
+--
+stop:-!,
+	set_color('SkyBlue'),
+	writeln("stop"),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'ThirdTest' (specialized 'Report'):
+--
+constant:
+--
+background_color		= 'White';
+--
+[
+goal:-!.
+--
+initialize:-!,
+	set_font('times',72,'underlined'),
+	set_color('Red'),
+	write("This text font is of size 72."),
+	set_color('default').
+]
+-----------------------------------------------------------------------

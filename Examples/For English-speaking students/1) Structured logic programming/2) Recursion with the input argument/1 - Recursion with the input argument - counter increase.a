@@ -1,0 +1,32 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Recursion.         --
+--                                       --
+-- Questions: What is a recursion with   --
+-- the input argument? How can one       --
+-- implement an increase of a counter    --
+-- with the help of the recursion with   --
+-- the input argument? Why does not this --
+-- program write the number 10?          --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+nondeterm:
+
+p(INTEGER)	- (i);
+
+CLAUSES:
+
+goal:-
+	p(1).
+
+p(10).
+p(I):-
+	writeln(I),
+	p(I+1).

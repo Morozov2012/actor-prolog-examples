@@ -1,0 +1,58 @@
+package "Morozov/VRML/Colors":
+-----------------------------------------------------------------------
+--                                                                   --
+--              The "VRML/COLORS" Actor Prolog package.              --
+--             (c) 2002-2007, IRE RAS, Alexei A. Morozov.            --
+--                                                                   --
+-----------------------------------------------------------------------
+import "Morozov/Web/Data/Keywords";
+import "Morozov/Web/Data/Address";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+Hue, Saturation, Brightness	= REAL.
+RGB_Color			= c(Color_R,Color_G,Color_B).
+Color_R, Color_G, Color_B	= REAL.
+--
+RGB_Sector			= INTEGER.
+--
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+make_color(	Hue,Saturation,
+		Brightness,Brightness,
+		RGB_Color)				- (i,i,i,i,o);
+--
+select_RGB(RGB_Sector,REAL,Color_R,Color_G,Color_B)	- (i,i,o,o,o);
+--
+-----------------------------------------------------------------------
+interface 'Color_Table' (specialized 'Alpha'):
+--
+con	: 'Console';
+--
+[
+--
+PREDICATES:
+--
+imperative:
+--
+make_gray_color(Brightness,Color_R,Color_G,Color_B)	- (i,o,o,o);
+make_special_color
+	(Hue,Brightness,Color_R,Color_G,Color_B)	- (i,i,o,o,o);
+make_color(Hue,Saturation,Brightness,RGB_Color)		- (i,i,i,o);
+]
+-----------------------------------------------------------------------
+interface 'ColorDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+mixed:
+--
+Target	=	keyword_color(Keyword,Hue);
+		personal_color(WebResourceName,Hue).
+]
+-------------------------------------------------------------------

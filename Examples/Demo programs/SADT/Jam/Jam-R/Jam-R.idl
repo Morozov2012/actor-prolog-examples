@@ -1,0 +1,1757 @@
+KIT ;
+  IDL VERSION 1.2.8 ;
+  TITLE 'ПРИГОТОВЛЕНИЕ ВАРЕНЬЯ' ;
+  AUTHOR 'Alexei A. Morozov' ;
+  CREATION DATE 19/3/1999 ;
+  PROJECT NAME 'Actor Prolog' ;
+
+  MODEL 'ПРИГОТОВЛЕНИЕ ВАРЕНЬЯ'
+    {LWI
+    F 0 -13 0 0 0 400
+      0 0 0 204 3 2 1 18
+      100 'Times New Roman'
+    F 1 -24 0 0 0 400
+      0 0 0 204 3 2 1 18
+      180 'Times New Roman'
+    F 2 -16 0 0 0 400
+      0 0 0 204 3 2 1 18
+      120 'Times New Roman'
+    F 3 -13 0 900 900 400
+      0 0 0 204 3 2 1 18
+      100 'Times New Roman'
+    F 4 -11 0 0 0 400
+      0 0 0 0 3 2 1 49
+      80 'Courier New'
+    D 0 0 0 0 0 1 0 0 4
+    G 0 1
+    T 'PUBLICATION'
+    R 60
+    M 0  }
+ ;
+    AUTHOR 'Alexei A. Morozov' ;
+    PROJECT NAME 'Actor Prolog' ;
+
+    DIAGRAM GRAPHIC A-0 ;
+      CREATION DATE 19/3/1999 ;
+      REVISION DATE 10/6/1999 ;
+      TITLE 'ПРИГОТОВЛЕНИЕ ВАРЕНЬЯ' ;
+      STATUS PUBLICATION ;
+
+      BOX 0 ;
+        NAME '{LWI I 0 255 255 255}ПРИГОТОВЛЕНИЕ ВАРЕНЬЯ' ;
+        BOX COORDINATES (0,33173;0,65831) (0,66346;0,32915) ;
+        DETAIL REFERENCE N A0 ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER ;
+        PATH (0,01923;0,37618) (0,33173;0,37618) ;
+        LABEL '{LWI I 0 255 255 }Ягоды и фрукты' ;
+        LABEL COORDINATES (0,01923;0,37304) ;
+        SINK BOX 0I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER ;
+        PATH (0,01923;0,45455) (0,33173;0,45455) ;
+        LABEL '{LWI I 0 255 255 }Сахар' ;
+        LABEL COORDINATES (0,01923;0,45141) ;
+        SINK BOX 0I2 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER ;
+        PATH (0,01923;0,53292) (0,33173;0,53292) ;
+        LABEL '{LWI I 0 255 255 }Питьевая вода' ;
+        LABEL COORDINATES (0,01923;0,52978) ;
+        SINK BOX 0I3 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BORDER ;
+        PATH (0,01923;0,61129) (0,33173;0,61129) ;
+        LABEL '{LWI I 0 255 255 }Банки и крышки' ;
+        LABEL COORDINATES (0,01923;0,60815) ;
+        SINK BOX 0I4 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BORDER ;
+        PATH (0,11058;0,96395) (0,11058;0,76803) (0,36538;0,76803) (0,36538;0,
+65831) ;
+        LABEL '{LWI I 0 255 255 }Источник проточной воды<CR>(желательно)' ;
+        LABEL COORDINATES (0,04808;0,72727) ;
+        SINK BOX 0M1 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BORDER ;
+        PATH (0,22115;0,96395) (0,22115;0,83856) (0,43269;0,83856) (0,43269;0,
+65831) ;
+        LABEL '{LWI I 0 255 255 }Посуда' ;
+        LABEL COORDINATES (0,26538;0,81818) ;
+        SINK TUNNEL  {LWI Q}BOX 0M2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BORDER ;
+        PATH (0,41346;0,03135) (0,41346;0,32915) ;
+        LABEL '{LWI I 0 255 255 }Правила приготовления<CR>варенья' ;
+        LABEL COORDINATES (0,23365;0,14263) ;
+        SINK TUNNEL  {LWI Q}BOX 0C1 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BORDER ;
+        PATH (0,50000;0,96395) (0,50000;0,65831) ;
+        LABEL '{LWI I 0 255 255 }Газовая или электрическая<CR>плитка' ;
+        LABEL COORDINATES (0,30865;0,94514) ;
+        SINK BOX 0M3 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BORDER ;
+        PATH (0,56731;0,96395) (0,56731;0,65831) ;
+        LABEL '{LWI I 0 255 255 }Пищевая сода' ;
+        LABEL COORDINATES (0,61635;0,93574) ;
+        SINK BOX 0M4 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BORDER ;
+        PATH (0,57692;0,03135) (0,57692;0,32915) ;
+        LABEL '{LWI I 0 255 255 }Техника безопасности' ;
+        LABEL COORDINATES (0,62981;0,16928) ;
+        SINK TUNNEL  {LWI Q}BOX 0C2 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BORDER ;
+        PATH (0,84135;0,96395) (0,84135;0,81505) (0,63462;0,81505) (0,63462;0,
+65831) ;
+        LABEL '{LWI I 0 255 255 }Машинка для закатки (если<CR>нужно)' ;
+        LABEL COORDINATES (0,69712;0,75392) ;
+        SINK BOX 0M5 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 0O1 ;
+        PATH (0,66346;0,49373) (0,97596;0,49373) ;
+        LABEL '{LWI I 0 255 255 }Варенье в банках' ;
+        LABEL COORDINATES (0,72308;0,47806) ;
+        SINK BORDER ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A0 ;
+      CREATION DATE 19/3/1999 ;
+      REVISION DATE 27/1/2003 ;
+      TITLE 'ПРИГОТОВЛЕНИЕ ВАРЕНЬЯ' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Выбрать<CR>ягоды и<CR>фрукты' ;
+        BOX COORDINATES (0,11538;0,16458) (0,20192;0,07053)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Стерилизовать<CR>банки и<CR>крышки' ;
+        BOX COORDINATES (0,18269;0,56426) (0,26923;0,47022) ;
+        DETAIL REFERENCE N A2 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Подготовить<CR>ягоды и<CR>фрукты' ;
+        BOX COORDINATES (0,30288;0,32132) (0,38942;0,22727) ;
+        DETAIL REFERENCE N A3 ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Варка<CR><CR>#XOR BLOCK#' ;
+        BOX COORDINATES (0,44712;0,50157) (0,57212;0,34483) ;
+        DETAIL REFERENCE N A4 ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 0 255 255 255}Охладить варенье' ;
+        BOX COORDINATES (0,62019;0,66614) (0,72596;0,54075)  ;
+      ENDBOX ;
+
+      BOX 6 ;
+        NAME '{LWI I 2 255 255 255}Анализ модели:<CR><CR>Какие необходимы<CR>п
+осуда и<CR>инструменты?<CR>' ;
+        BOX COORDINATES (0,72115;0,22727) (0,88462;0,03918)  ;
+      ENDBOX ;
+
+      BOX 7 ;
+        NAME '{LWI I 0 255 255 255}Разлить<CR>варенье<CR>в банки' ;
+        BOX COORDINATES (0,81250;0,84639) (0,90865;0,70533)  ;
+      ENDBOX ;
+
+      ARROWSEG 16 ;
+        SOURCE BORDER I1 (0,00481;0,12539) ;
+        PATH (0,01923;0,11755) (0,11538;0,11755) ;
+        LABEL '{LWI I 0 255 255 }Ягоды и<CR>фрукты' ;
+        LABEL COORDINATES (0,01731;0,07837) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 20 ;
+        SOURCE BORDER I2 (0,00481;0,28213) ;
+        PATH (0,01923;0,27429) (0,30288;0,27429) ;
+        LABEL '{LWI I 0 255 255 }Сахар' ;
+        LABEL COORDINATES (0,01635;0,26489) ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BORDER I3 (0,00481;0,40752) ;
+        PATH (0,01923;0,39969) (0,12981;0,39969) ;
+        LABEL '{LWI I 0 255 255 }Питьевая<CR>вода' ;
+        LABEL COORDINATES (0,01923;0,36207) ;
+        SINK BRANCH 18 19 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BORDER I4 (0,00481;0,54075) ;
+        PATH (0,01923;0,53292) (0,18269;0,53292) ;
+        LABEL '{LWI I 0 255 255 }Банки и<CR>крышки' ;
+        LABEL COORDINATES (0,01731;0,49530) ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BORDER M4 (0,18750;0,98433) ;
+        PATH (0,19712;0,96395) (0,19712;0,56426) ;
+        LABEL '{LWI I 0 255 255 }Пищевая<CR>сода' ;
+        LABEL COORDINATES (0,11538;0,93103) ;
+        SQUIGGLE COORDINATES (0,16538;0,93260) (0,19712;0,90125) ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BORDER M3 (0,31731;0,98433) ;
+        PATH (0,32692;0,96395) (0,32692;0,71317) ;
+        LABEL '{LWI I 0 255 255 }Газовая или электрическая<CR>плитка' ;
+        LABEL COORDINATES (0,21346;0,93103) ;
+        SQUIGGLE COORDINATES (0,29135;0,94044) (0,32692;0,92476) ;
+        SINK BRANCH 9 8 13 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M1 (0,35577;0,98433) ;
+        PATH (0,36538;0,96395) (0,36538;0,82288) ;
+        LABEL '{LWI I 0 255 255 }Источник проточной воды<CR>(желательно)' ;
+        LABEL COORDINATES (0,40192;0,93103) ;
+        SQUIGGLE COORDINATES (0,40192;0,94201) (0,36538;0,90125) ;
+        SINK BRANCH 2 3 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BORDER M5 (0,85096;0,98433) ;
+        PATH (0,86058;0,96395) (0,86058;0,84639) ;
+        LABEL '{LWI I 0 255 255 }Машинка для закатки (если<CR>нужно)' ;
+        LABEL COORDINATES (0,70288;0,93103) ;
+        SQUIGGLE COORDINATES (0,81827;0,92006) (0,86058;0,90909) ;
+        SINK BOX 7M1 ;
+      ENDSEG ;
+
+      ARROWSEG 17 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,20192;0,11755) (0,25962;0,11755) (0,25962;0,24295) (0,30288;0,
+24295) ;
+        LABEL '{LWI I 0 255 255 }Выбранные ягоды и<CR>фрукты' ;
+        LABEL COORDINATES (0,27500;0,07994) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 15 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,38942;0,27429) (0,43269;0,27429) (0,43269;0,42320) (0,44712;0,
+42320) ;
+        LABEL '{LWI I 0 255 255 }Сахарная смесь' ;
+        LABEL COORDINATES (0,46154;0,26332) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 14 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,57212;0,42320) (0,59615;0,42320) (0,59615;0,60345) ;
+        LABEL '{LWI I 0 255 255 }Готовое (горячее)<CR>варенье' ;
+        LABEL COORDINATES (0,61058;0,39498) ;
+        SINK BRANCH 21 22 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,26923;0,51724) (0,40385;0,51724) (0,40385;0,80721) (0,81250;0,
+80721) ;
+        LABEL '{LWI I 0 255 255 }Стерилизованные банки и крышки' ;
+        LABEL COORDINATES (0,43462;0,79310) ;
+        SINK BOX 7I2 ;
+      ENDSEG ;
+
+      ARROWSEG 24 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,72596;0,60345) (0,75000;0,60345) (0,75000;0,75235) ;
+        LABEL '{LWI I 0 255 255 }Охлаждённое<CR>варенье' ;
+        LABEL COORDINATES (0,75288;0,55643) ;
+        SINK JOIN 23 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BOX 7O1 ;
+        PATH (0,90865;0,77586) (0,97596;0,77586) ;
+        LABEL '{LWI I 0 255 255 }Варенье в<CR>банках' ;
+        LABEL COORDINATES (0,93269;0,73041) ;
+        SINK BORDER O1 (0,97885;0,78370) ;
+      ENDSEG ;
+
+      ARROWSEG 22 ;
+        SOURCE BRANCH 14 ;
+        PATH (0,59615;0,60345) (0,62019;0,60345) ;
+        LABEL 'Охлаждённое варенье' ;
+        SINK BOX 5I1 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,32692;0,71317) (0,50962;0,71317) (0,50962;0,50157) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 4M1 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,32692;0,71317) (0,25481;0,71317) (0,25481;0,56426) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 2M3 ;
+      ENDSEG ;
+
+      ARROWSEG 23 ;
+        SOURCE JOIN 21 24 ;
+        PATH (0,75000;0,75235) (0,81250;0,75235) ;
+        LABEL '{LWI I 0 255 255 }Готовое варенье' ;
+        LABEL COORDINATES (0,78558;0,67712) ;
+        SQUIGGLE COORDINATES (0,79712;0,68025) (0,77885;0,75235) ;
+        SINK BOX 7I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,36538;0,82288) (0,22596;0,82288) (0,22596;0,56426) ;
+        LABEL 'Источник проточной воды (желательно)' ;
+        SINK BOX 2M2 ;
+      ENDSEG ;
+
+      ARROWSEG 18 ;
+        SOURCE BRANCH 11 ;
+        PATH (0,12981;0,39969) (0,12981;0,49373) (0,18269;0,49373) ;
+        LABEL 'Питьевая вода' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 19 ;
+        SOURCE BRANCH 11 ;
+        PATH (0,12981;0,39969) (0,12981;0,30564) (0,30288;0,30564) ;
+        LABEL 'Питьевая вода' ;
+        SINK BOX 3I3 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,32692;0,71317) (0,32692;0,32132) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 3M1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,36538;0,82288) (0,36538;0,32132) ;
+        LABEL 'Источник проточной воды (желательно)' ;
+        SINK BOX 3M2 ;
+      ENDSEG ;
+
+      ARROWSEG 21 ;
+        SOURCE BRANCH 14 ;
+        PATH (0,59615;0,60345) (0,59615;0,75235) (0,75000;0,75235) ;
+        LABEL 'Охлаждённое варенье' ;
+        SINK JOIN 23 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A2 ;
+      CREATION DATE 19/3/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Стерилизовать банки и крышки' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Вымыть банки<CR>и крышки' ;
+        BOX COORDINATES (0,12019;0,27429) (0,25000;0,13323)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Вскипятить<CR>воду в чайнике' ;
+        BOX COORDINATES (0,28846;0,75235) (0,42308;0,61129)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Обработать крышки<CR>кипятком' ;
+        BOX COORDINATES (0,43269;0,43887) (0,56250;0,29781)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Обработать банки<CR>кипятком' ;
+        BOX COORDINATES (0,54327;0,64263) (0,67308;0,50157)  ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 0 255 255 255}Просушить<CR>банки и крышки' ;
+        BOX COORDINATES (0,76923;0,83072) (0,89904;0,68966)  ;
+      ENDBOX ;
+
+      ARROWSEG 6 ;
+        SOURCE BORDER I2 (0,00481;0,21160) ;
+        PATH (0,01923;0,20376) (0,12019;0,20376) ;
+        LABEL '{LWI I 0 255 255 }Банки и крышки' ;
+        LABEL COORDINATES (0,01923;0,19749) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BORDER I1 (0,00481;0,40752) ;
+        PATH (0,01923;0,39969) (0,25000;0,39969) ;
+        LABEL '{LWI I 0 255 255 }Питьевая вода' ;
+        LABEL COORDINATES (0,01923;0,39342) ;
+        SINK BRANCH 4 16 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER M1 (0,14423;0,98433) ;
+        PATH (0,15385;0,96395) (0,15385;0,27429) ;
+        LABEL '{LWI I 0 255 255 }Пищевая сода' ;
+        LABEL COORDINATES (0,05769;0,93260) ;
+        SQUIGGLE COORDINATES (0,13462;0,92320) (0,15385;0,92476) ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 17 ;
+        SOURCE BORDER M2 (0,20673;0,98433) ;
+        PATH (0,21635;0,96395) (0,21635;0,27429) ;
+        LABEL '{LWI I 0 255 255 }Источник проточной воды (желательно)' ;
+        LABEL COORDINATES (0,24038;0,93260) ;
+        SQUIGGLE COORDINATES (0,24038;0,92163) (0,21635;0,92476) ;
+        SINK BOX 1M2 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BORDER M3 (0,48558;0,98433) ;
+        PATH (0,49519;0,96395) (0,49519;0,83072) ;
+        LABEL '{LWI I 0 255 255 }Газовая или электрическая плитка' ;
+        LABEL COORDINATES (0,52019;0,93260) ;
+        SQUIGGLE COORDINATES (0,52019;0,92163) (0,49519;0,92476) ;
+        SINK BRANCH 1 7 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,25000;0,23511) (0,29327;0,23511) (0,29327;0,33699) ;
+        LABEL 'Вымытые крышки' ;
+        SINK BRANCH 15 14 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,56250;0,36834) (0,73558;0,36834) (0,73558;0,72884) (0,76923;0,
+72884) ;
+        LABEL '{LWI I 0 255 255 }Стерилизованные крышки' ;
+        LABEL COORDINATES (0,65962;0,33386) ;
+        SINK BOX 5I1 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,67308;0,57210) (0,69712;0,57210) (0,69712;0,79154) (0,76923;0,
+79154) ;
+        LABEL '{LWI I 0 255 255 }Стерилизованные банки' ;
+        LABEL COORDINATES (0,60288;0,86520) ;
+        SQUIGGLE COORDINATES (0,69712;0,84169) (0,71635;0,79154) ;
+        SINK BOX 5I2 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,42308;0,68182) (0,60577;0,68182) (0,60577;0,64263) ;
+        LABEL '{LWI I 0 255 255 }Кипяток в чайнике' ;
+        LABEL COORDINATES (0,52308;0,75078) ;
+        SQUIGGLE COORDINATES (0,56635;0,72727) (0,58654;0,68182) ;
+        SINK BOX 4M1 ;
+      ENDSEG ;
+
+      ARROWSEG 18 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,89904;0,76019) (0,97596;0,76019) ;
+        LABEL '{LWI I 0 255 255 }Стерилизованные банки<CR>и крышки' ;
+        LABEL COORDINATES (0,85673;0,63950) ;
+        SQUIGGLE COORDINATES (0,92404;0,67085) (0,92788;0,76019) ;
+        SINK BORDER O1 (0,97885;0,76803) ;
+      ENDSEG ;
+
+      ARROWSEG 14 ;
+        SOURCE BRANCH 9 ;
+        PATH (0,29327;0,33699) (0,43269;0,33699) ;
+        LABEL '{LWI I 0 255 255 }Вымытые крышки' ;
+        LABEL COORDINATES (0,31154;0,22100) ;
+        SQUIGGLE COORDINATES (0,36058;0,22414) (0,35096;0,33699) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 13 ;
+        PATH (0,25000;0,39969) (0,43269;0,39969) ;
+        LABEL 'Питьевая вода' ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BRANCH 12 ;
+        PATH (0,49519;0,83072) (0,35577;0,83072) (0,35577;0,75235) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+      ARROWSEG 16 ;
+        SOURCE BRANCH 13 ;
+        PATH (0,25000;0,39969) (0,25000;0,68182) (0,28846;0,68182) ;
+        LABEL 'Питьевая вода' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 15 ;
+        SOURCE BRANCH 9 ;
+        PATH (0,29327;0,33699) (0,29327;0,57210) (0,54327;0,57210) ;
+        LABEL '{LWI I 0 255 255 }Вымытые банки' ;
+        LABEL COORDINATES (0,31827;0,52508) ;
+        SQUIGGLE COORDINATES (0,36250;0,52821) (0,35577;0,57210) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BRANCH 12 ;
+        PATH (0,49519;0,83072) (0,49519;0,43887) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 3M1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A4 ;
+      CREATION DATE 19/3/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Варка  #XOR BLOCK#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Цикл варки твёрдых<CR>ягод и фруктов' ;
+        BOX COORDINATES (0,27885;0,43103) (0,43269;0,24295) ;
+        DETAIL REFERENCE N A41 ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Цикл варки мягких<CR>ягод и фруктов' ;
+        BOX COORDINATES (0,58654;0,69749) (0,74038;0,50940) ;
+        DETAIL REFERENCE N A42 ;
+      ENDBOX ;
+
+      ARROWSEG 9 ;
+        SOURCE BORDER I1 (0,00481;0,34483) ;
+        PATH (0,01923;0,33699) (0,16346;0,33699) ;
+        LABEL '{LWI I 0 255 255 }Сахарная смесь' ;
+        LABEL COORDINATES (0,02212;0,31191) ;
+        SINK BRANCH 3 4 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M1 (0,50000;0,98433) ;
+        PATH (0,50962;0,96395) (0,50962;0,83856) ;
+        LABEL '{LWI I 0 255 255 }Газовая или электрическая<CR>плитка' ;
+        LABEL COORDINATES (0,53077;0,92947) ;
+        SINK BRANCH 7 8 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,43269;0,33699) (0,83654;0,33699) (0,83654;0,59561) ;
+        LABEL 'Готовое (горячее) варенье' ;
+        SINK JOIN 5 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,74038;0,59561) (0,83654;0,59561) ;
+        LABEL 'Готовое (горячее) варенье' ;
+        SINK JOIN 5 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 9 ;
+        PATH (0,16346;0,33699) (0,27885;0,33699) ;
+        LABEL 'Сахарная смесь' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE JOIN 2 6 ;
+        PATH (0,83654;0,59561) (0,97596;0,59561) ;
+        LABEL '{LWI I 0 255 255 }Готовое (горячее)<CR>варенье' ;
+        LABEL COORDINATES (0,85096;0,53918) ;
+        SINK BORDER O1 (0,97885;0,60345) ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,50962;0,83856) (0,66346;0,83856) (0,66346;0,69749) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,50962;0,83856) (0,35577;0,83856) (0,35577;0,43103) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 9 ;
+        PATH (0,16346;0,33699) (0,16346;0,60345) (0,58654;0,60345) ;
+        LABEL 'Сахарная смесь' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A41 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Цикл варки твёрдых ягод и фруктов' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Нагреть смесь' ;
+        BOX COORDINATES (0,16346;0,34483) (0,33654;0,18025)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Выстаивание' ;
+        BOX COORDINATES (0,50000;0,59561) (0,67308;0,43103)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Проверить готовность<CR>варенья<CR>[твёрдые
+ ягоды и фрукты]' ;
+        BOX COORDINATES (0,60577;0,83856) (0,77885;0,67398)  ;
+      ENDBOX ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I1 (0,00481;0,30564) ;
+        PATH (0,01923;0,29781) (0,16346;0,29781) ;
+        LABEL '{LWI I 0 255 255 }Сахарная смесь' ;
+        LABEL COORDINATES (0,02115;0,36364) ;
+        SINK BOX 1I2 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M1 (0,24038;0,98433) ;
+        PATH (0,25000;0,96395) (0,25000;0,34483) ;
+        LABEL '{LWI I 0 255 255 }Газовая или электрическая плитка' ;
+        LABEL COORDINATES (0,26923;0,91536) ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,33654;0,23511) (0,43750;0,23511) (0,43750;0,50940) (0,50000;0,
+50940) ;
+        LABEL '{LWI I 0 255 255 }Нагретая смесь (после 1-го или<CR>2-го нагрев
+а)' ;
+        LABEL COORDINATES (0,47308;0,30094) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 1O2 ;
+        PATH (0,33654;0,29781) (0,37500;0,29781) (0,37500;0,75235) (0,60577;0,
+75235) ;
+        LABEL '{LWI I 0 255 255 }Нагретая смесь (после 3-го нагрева)' ;
+        LABEL COORDINATES (0,31442;0,81661) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,67308;0,50940) (0,87981;0,50940) ;
+        LABEL 'Охлаждённые ягоды и фрукты в сиропе' ;
+        SINK JOIN 8 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,77885;0,72884) (0,87981;0,72884) (0,87981;0,50940) ;
+        LABEL 'Охлаждённые ягоды и фрукты в сиропе' ;
+        SINK JOIN 8 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 3O2 ;
+        PATH (0,77885;0,79154) (0,97596;0,79154) ;
+        LABEL '{LWI I 0 255 255 }Готовое (горячее)<CR>варенье' ;
+        LABEL COORDINATES (0,82308;0,90125) ;
+        SQUIGGLE COORDINATES (0,86923;0,87774) (0,86538;0,79154) ;
+        SINK BORDER O1 (0,97885;0,79937) ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE JOIN 9 6 ;
+        PATH (0,87981;0,50940) (0,87981;0,10972) (0,11538;0,10972) (0,11538;0,
+23511) (0,16346;0,23511) ;
+        LABEL '{LWI I 0 255 255 }Охлаждённые ягоды и фрукты в сиропе' ;
+        LABEL COORDINATES (0,55481;0,07367) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A3 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Подготовить ягоды и фрукты' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Вымыть ягоды и фрукты' ;
+        BOX COORDINATES (0,23077;0,42320) (0,46154;0,21160)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Подготовить сахарную смесь<CR>#XOR BLOCK#' 
+;
+        BOX COORDINATES (0,53846;0,72884) (0,76923;0,51724) ;
+        DETAIL REFERENCE N A32 ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER I1 (0,00481;0,32132) ;
+        PATH (0,01923;0,31348) (0,23077;0,31348) ;
+        LABEL '{LWI I 0 255 255 }Выбранные ягоды<CR>и фрукты' ;
+        LABEL COORDINATES (0,01827;0,28213) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BORDER I2 (0,00481;0,63480) ;
+        PATH (0,01923;0,62696) (0,53846;0,62696) ;
+        LABEL '{LWI I 0 255 255 }Сахар' ;
+        LABEL COORDINATES (0,01923;0,62069) ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BORDER I3 (0,00481;0,69749) ;
+        PATH (0,01923;0,68966) (0,53846;0,68966) ;
+        LABEL '{LWI I 0 255 255 }Питьевая вода' ;
+        LABEL COORDINATES (0,01923;0,68339) ;
+        SINK BOX 2I3 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M2 (0,33654;0,98433) ;
+        PATH (0,34615;0,96395) (0,34615;0,42320) ;
+        LABEL '{LWI I 0 255 255 }Источник проточной воды<CR>(желательно)' ;
+        LABEL COORDINATES (0,36635;0,90752) ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BORDER M1 (0,64423;0,98433) ;
+        PATH (0,65385;0,96395) (0,65385;0,72884) ;
+        LABEL '{LWI I 0 255 255 }Газовая или электрическая плитка' ;
+        LABEL COORDINATES (0,67115;0,90752) ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,46154;0,31348) (0,50000;0,31348) (0,50000;0,56426) (0,53846;0,
+56426) ;
+        LABEL '{LWI I 0 255 255 }Чистые ягоды и фрукты' ;
+        LABEL COORDINATES (0,51635;0,30251) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,76923;0,61912) (0,97596;0,61912) ;
+        LABEL '{LWI I 0 255 255 }Сахарная смесь' ;
+        LABEL COORDINATES (0,81923;0,60502) ;
+        SINK BORDER O1 (0,97885;0,62696) ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A32 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Подготовить сахарную смесь #XOR BLOCK#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Подготовить смесь из<CR>твёрдых ягод и саха
+ра' ;
+        BOX COORDINATES (0,25481;0,32915) (0,42788;0,16458) ;
+        DETAIL REFERENCE N A321 ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Подготовить смесь из<CR>крупных фруктов и с
+ахара' ;
+        BOX COORDINATES (0,42788;0,57210) (0,60096;0,40752) ;
+        DETAIL REFERENCE N A322 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Подготовить смесь из<CR>мягких ягод и сахар
+а' ;
+        BOX COORDINATES (0,54327;0,79937) (0,71635;0,63480) ;
+        DETAIL REFERENCE N A323 ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER I1 (0,00481;0,20376) ;
+        PATH (0,01923;0,19592) (0,19712;0,19592) ;
+        LABEL '{LWI I 0 255 255 }Чистые ягоды и фрукты' ;
+        LABEL COORDINATES (0,01635;0,18966) ;
+        SINK BRANCH 3 4 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BORDER I2 (0,00481;0,25862) ;
+        PATH (0,01923;0,25078) (0,14423;0,25078) ;
+        LABEL '{LWI I 0 255 255 }Сахар' ;
+        LABEL COORDINATES (0,01538;0,24451) ;
+        SINK BRANCH 15 14 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BORDER I3 (0,00481;0,31348) ;
+        PATH (0,01923;0,30564) (0,09615;0,30564) ;
+        LABEL '{LWI I 0 255 255 }Питьевая вода' ;
+        LABEL COORDINATES (0,01538;0,29937) ;
+        SINK BRANCH 18 19 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BORDER M1 (0,33173;0,98433) ;
+        PATH (0,34135;0,96395) (0,34135;0,32915) ;
+        LABEL '{LWI I 0 255 255 }Газовая или электрическая плитка' ;
+        LABEL COORDINATES (0,11635;0,92476) ;
+        SQUIGGLE COORDINATES (0,30000;0,91850) (0,34135;0,93260) ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,42788;0,24295) (0,75962;0,24295) (0,75962;0,48589) ;
+        LABEL 'Сахарная смесь' ;
+        SINK JOIN 9 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,60096;0,48589) (0,75962;0,48589) ;
+        LABEL 'Сахарная смесь' ;
+        SINK JOIN 9 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,71635;0,71317) (0,75962;0,71317) ;
+        LABEL 'Сахарная смесь' ;
+        SINK JOIN 7 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,19712;0,19592) (0,25481;0,19592) ;
+        LABEL 'Чистые ягоды и фрукты' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 15 ;
+        SOURCE BRANCH 12 ;
+        PATH (0,14423;0,25078) (0,25481;0,25078) ;
+        LABEL 'Сахар' ;
+        SINK BOX 1I2 ;
+      ENDSEG ;
+
+      ARROWSEG 18 ;
+        SOURCE BRANCH 13 ;
+        PATH (0,09615;0,30564) (0,25481;0,30564) ;
+        LABEL 'Питьевая вода' ;
+        SINK BOX 1I3 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,19712;0,43887) (0,42788;0,43887) ;
+        LABEL 'Чистые ягоды и фрукты' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 16 ;
+        SOURCE BRANCH 14 ;
+        PATH (0,14423;0,49373) (0,42788;0,49373) ;
+        LABEL 'Сахар' ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE JOIN 1 9 ;
+        PATH (0,75962;0,71317) (0,97596;0,71317) ;
+        LABEL '{LWI I 0 255 255 }Сахарная смесь' ;
+        LABEL COORDINATES (0,85192;0,68652) ;
+        SINK BORDER O1 (0,97885;0,72100) ;
+      ENDSEG ;
+
+      ARROWSEG 19 ;
+        SOURCE BRANCH 13 ;
+        PATH (0,09615;0,30564) (0,09615;0,54859) (0,42788;0,54859) ;
+        LABEL 'Питьевая вода' ;
+        SINK BOX 2I3 ;
+      ENDSEG ;
+
+      ARROWSEG 14 ;
+        SOURCE BRANCH 12 ;
+        PATH (0,14423;0,25078) (0,14423;0,49373) ;
+        LABEL 'Сахар' ;
+        SINK BRANCH 17 16 ;
+      ENDSEG ;
+
+      ARROWSEG 17 ;
+        SOURCE BRANCH 14 ;
+        PATH (0,14423;0,49373) (0,14423;0,75235) (0,54327;0,75235) ;
+        LABEL 'Сахар' ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,19712;0,43887) (0,19712;0,68182) (0,54327;0,68182) ;
+        LABEL 'Чистые ягоды и фрукты' ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,19712;0,19592) (0,19712;0,43887) ;
+        LABEL 'Чистые ягоды и фрукты' ;
+        SINK BRANCH 6 5 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE JOIN 10 8 ;
+        PATH (0,75962;0,48589) (0,75962;0,71317) ;
+        LABEL 'Сахарная смесь' ;
+        SINK JOIN 7 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A321 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Подготовить смесь из твёрдых ягод и сахара' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Вскипятить воду<CR>в кастрюле' ;
+        BOX COORDINATES (0,12981;0,28213) (0,25962;0,14107)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Приготовить сироп' ;
+        BOX COORDINATES (0,25000;0,72100) (0,37981;0,57994)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Бланшировать<CR>ягоды' ;
+        BOX COORDINATES (0,40865;0,47022) (0,53846;0,32915)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Положить ягоды<CR>в сироп' ;
+        BOX COORDINATES (0,70673;0,79937) (0,83654;0,65831)  ;
+      ENDBOX ;
+
+      ARROWSEG 4 ;
+        SOURCE BORDER I3 (0,00481;0,21944) ;
+        PATH (0,01923;0,21160) (0,10096;0,21160) ;
+        LABEL '{LWI I 0 255 255 }Питьевая вода' ;
+        LABEL COORDINATES (0,01442;0,20533) ;
+        SINK BRANCH 9 10 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,43887) ;
+        PATH (0,01923;0,43103) (0,40865;0,43103) ;
+        LABEL '{LWI I 0 255 255 }Чистые ягоды и<CR>фрукты' ;
+        LABEL COORDINATES (0,01442;0,39498) ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I2 (0,00481;0,68966) ;
+        PATH (0,01923;0,68182) (0,25000;0,68182) ;
+        LABEL '{LWI I 0 255 255 }Сахар' ;
+        LABEL COORDINATES (0,01346;0,67555) ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BORDER M1 (0,30288;0,98433) ;
+        PATH (0,31250;0,96395) (0,31250;0,83072) ;
+        LABEL '{LWI I 0 255 255 }Газовая или электрическая плитка' ;
+        LABEL COORDINATES (0,32500;0,92947) ;
+        SINK BRANCH 11 12 13 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,25962;0,21160) (0,32692;0,21160) (0,32692;0,36834) (0,40865;0,
+36834) ;
+        LABEL '{LWI I 0 255 255 }Кипяток' ;
+        LABEL COORDINATES (0,34423;0,19749) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,53846;0,39969) (0,62019;0,39969) (0,62019;0,69749) (0,70673;0,
+69749) ;
+        LABEL '{LWI I 0 255 255 }Прогретые ягоды' ;
+        LABEL COORDINATES (0,64135;0,38871) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,37981;0,65831) (0,53365;0,65831) (0,53365;0,76019) (0,70673;0,
+76019) ;
+        LABEL '{LWI I 0 255 255 }Сироп' ;
+        LABEL COORDINATES (0,51442;0,62853) ;
+        SINK BOX 4I2 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,83654;0,72884) (0,97596;0,72884) ;
+        LABEL '{LWI I 0 255 255 }Сахарная смесь' ;
+        LABEL COORDINATES (0,86442;0,71787) ;
+        SINK BORDER O1 (0,97885;0,73668) ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,10096;0,21160) (0,12981;0,21160) ;
+        LABEL 'Питьевая вода' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,31250;0,83072) (0,19231;0,83072) (0,19231;0,28213) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,31250;0,83072) (0,47115;0,83072) (0,47115;0,47022) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 3M1 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,10096;0,21160) (0,10096;0,61912) (0,25000;0,61912) ;
+        LABEL 'Питьевая вода' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,31250;0,83072) (0,31250;0,72100) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A322 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Подготовить смесь из крупных фруктов и сахара' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Порезать на дольки' ;
+        BOX COORDINATES (0,12981;0,28213) (0,25962;0,14107)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Пересыпать сахаром<CR>[измельчённые фрукты]
+' ;
+        BOX COORDINATES (0,30288;0,46238) (0,43269;0,32132)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Выстаивать 6-8 часов<CR>[измельчённые фрукт
+ы]' ;
+        BOX COORDINATES (0,48558;0,67398) (0,64423;0,50157)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Добавить в<CR>смесь воду' ;
+        BOX COORDINATES (0,69231;0,84639) (0,82212;0,70533)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,21944) ;
+        PATH (0,01923;0,21160) (0,12981;0,21160) ;
+        LABEL '{LWI I 0 255 255 }Чистые ягоды и<CR>фрукты' ;
+        LABEL COORDINATES (0,01923;0,16928) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I2 (0,00481;0,43103) ;
+        PATH (0,01923;0,42320) (0,30288;0,42320) ;
+        LABEL '{LWI I 0 255 255 }Сахар' ;
+        LABEL COORDINATES (0,01827;0,41379) ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BORDER I3 (0,00481;0,81505) ;
+        PATH (0,01923;0,80721) (0,69231;0,80721) ;
+        LABEL '{LWI I 0 255 255 }Питьевая вода' ;
+        LABEL COORDINATES (0,01827;0,79781) ;
+        SINK BOX 4I2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,25962;0,21160) (0,28365;0,21160) (0,28365;0,36050) (0,30288;0,
+36050) ;
+        LABEL '{LWI I 0 255 255 }Измельчённые фрукты' ;
+        LABEL COORDINATES (0,29519;0,19749) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,43269;0,39185) (0,45673;0,39185) (0,45673;0,58777) (0,48558;0,
+58777) ;
+        LABEL '{LWI I 0 255 255 }Измельчённые фрукты с сахаром' ;
+        LABEL COORDINATES (0,47404;0,38558) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,64423;0,58777) (0,66346;0,58777) (0,66346;0,74451) (0,69231;0,
+74451) ;
+        LABEL '{LWI I 0 255 255 }Фрукты, давшие сок' ;
+        LABEL COORDINATES (0,67596;0,57524) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,82212;0,77586) (0,97596;0,77586) ;
+        LABEL '{LWI I 0 255 255 }Сахарная смесь' ;
+        LABEL COORDINATES (0,86154;0,76019) ;
+        SINK BORDER O1 (0,97885;0,78370) ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A323 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Подготовить смесь из мягких ягод и сахара' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Пересыпать сахаром<CR>[мягкие ягоды]' ;
+        BOX COORDINATES (0,19712;0,42320) (0,42788;0,21160)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Выстаивать 6-8 часов<CR>[мягкие ягоды]' ;
+        BOX COORDINATES (0,53846;0,72884) (0,76923;0,51724)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,27429) ;
+        PATH (0,01923;0,26646) (0,19712;0,26646) ;
+        LABEL '{LWI I 0 255 255 }Чистые ягоды и<CR>фрукты' ;
+        LABEL COORDINATES (0,01923;0,20533) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I2 (0,00481;0,37618) ;
+        PATH (0,01923;0,36834) (0,19712;0,36834) ;
+        LABEL '{LWI I 0 255 255 }Сахар' ;
+        LABEL COORDINATES (0,02115;0,34639) ;
+        SINK BOX 1I2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,42788;0,31348) (0,48558;0,31348) (0,48558;0,61912) (0,53846;0,
+61912) ;
+        LABEL '{LWI I 0 255 255 }Ягоды с сахаром' ;
+        LABEL COORDINATES (0,51635;0,29624) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,76923;0,61912) (0,97596;0,61912) ;
+        LABEL '{LWI I 0 255 255 }Сахарная смесь' ;
+        LABEL COORDINATES (0,80481;0,59875) ;
+        SINK BORDER O1 (0,97885;0,62696) ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A42 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Цикл варки мягких ягод и фруктов' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Основной этап варки' ;
+        BOX COORDINATES (0,15385;0,32915) (0,32692;0,16458)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Проверить готовность<CR>варенья<CR>[мягкие 
+ягоды]' ;
+        BOX COORDINATES (0,39423;0,53292) (0,56731;0,36834)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Дополнительный<CR>этап варки' ;
+        BOX COORDINATES (0,64423;0,77586) (0,81731;0,61129)  ;
+      ENDBOX ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I1 (0,00481;0,25078) ;
+        PATH (0,01923;0,24295) (0,15385;0,24295) ;
+        LABEL '{LWI I 0 255 255 }Сахарная смесь' ;
+        LABEL COORDINATES (0,01923;0,21944) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M1 (0,46154;0,98433) ;
+        PATH (0,47115;0,96395) (0,47115;0,86207) ;
+        LABEL '{LWI I 0 255 255 }Газовая или электрическая плитка' ;
+        LABEL COORDINATES (0,48654;0,93260) ;
+        SINK BRANCH 8 9 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,32692;0,24295) (0,35577;0,24295) (0,35577;0,44671) (0,39423;0,
+44671) ;
+        LABEL '{LWI I 0 255 255 }Нагретые ягоды и фрукты с сахаром' ;
+        LABEL COORDINATES (0,38365;0,24138) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,56731;0,43103) (0,85577;0,43103) (0,85577;0,68966) ;
+        LABEL 'Готовое (горячее) варенье' ;
+        SINK JOIN 6 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 2O2 ;
+        PATH (0,56731;0,48589) (0,61058;0,48589) (0,61058;0,68966) (0,64423;0,
+68966) ;
+        LABEL '{LWI I 0 255 255 }Нагретые ягоды<CR>и фрукты с<CR>сахаром' ;
+        LABEL COORDINATES (0,47885;0,69906) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,81731;0,68966) (0,85577;0,68966) ;
+        LABEL 'Готовое (горячее) варенье' ;
+        SINK JOIN 6 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE JOIN 2 7 ;
+        PATH (0,85577;0,68966) (0,97596;0,68966) ;
+        LABEL '{LWI I 0 255 255 }Готовое (горячее)<CR>варенье' ;
+        LABEL COORDINATES (0,84519;0,78527) ;
+        SQUIGGLE COORDINATES (0,89327;0,76176) (0,89904;0,68966) ;
+        SINK BORDER O1 (0,97885;0,69749) ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,47115;0,86207) (0,24038;0,86207) (0,24038;0,32915) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,47115;0,86207) (0,73077;0,86207) (0,73077;0,77586) ;
+        LABEL 'Газовая или электрическая плитка' ;
+        SINK BOX 3M1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GLOSSARY A0G {LWI A 
+      TERM 'ПРИГОТОВЛЕНИЕ ВАРЕНЬЯ'
+      ''
+      N 'Это моя самая любимая программа. Она помогает варить варенье из чёрно
+й рябины, яблок и земляники. На самом деле, когда я писал эту программу, мне х
+отелось потренироваться в проведении интервью по правилам SADT методологии. Дл
+я этого я не придумал ничего лучше, как попросить мою собственную матушку расс
+казать мне, как надо варить варенье. Поскольку я старался нарисовать модель ка
+к можно более подробно, интервью затянулось на два дня. Результат оказался нео
+жиданным для нас обоих. Матушка была очень удивлена, когда я показал ей полный
+ перечень посуды и инструментов, которые ей приходится использовать во время п
+риготовления обычного варенья. Заодно я немного научился готовить. Матушка, сп
+асибо за помощь!'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Стерилизовать банки и крышки'
+      ''
+      N 'Стерилизовать банки и крышки.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Подготовить ягоды и фрукты'
+      ''
+      N 'Вымыть ягоды и фрукты, если нужно - нарезать и бланшировать (прогреть
+). Подготовить смесь ягод и фруктов с сахаром.'
+      S 'PUBLICATION'
+      C 255 1 255
+      F 1.000000
+      TERM 'Варка  #XOR BLOCK#'
+      ''
+      N 'Сварить ягоды и фрукты в сахаре.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Разлить варенье в банки'
+      ''
+      N 'Готовое варенье наливаем в банки и закрываем крышкой (варенье можно ч
+ерпать ложкой).'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Вымыть банки и крышки'
+      ''
+      N 'Протираем содой всю поверхность банок и крышек, а потом смываем соду 
+водой.'
+      S 'PUBLICATION'
+      C 255 10 255
+      F 1.000000
+      TERM 'Обработать банки кипятком'
+      ''
+      N 'Обливаем кипятком всю поверхность банки.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Обработать крышки кипятком'
+      ''
+      N 'Кипятить крышки в течение 2-х минут.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Просушить банки и крышки'
+      ''
+      N 'Перевернуть банки. Держать банки и крышки при комнатной температуре д
+о полного высыхания (просушка может занять примерно 1 час).'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Выстаивание'
+      ''
+      N 'Охлаждать при комнатной температуре 6-8 часов.'
+      S 'PUBLICATION'
+      C 255 12 255
+      F 1.000000
+      TERM 'Анализ модели:  Какие необходимы посуда и инструменты? '
+      ''
+      S 'PUBLICATION'
+      C 255 3 255
+      F 1.000000
+      TERM 'Вскипятить воду в чайнике'
+      ''
+      N 'Нагревать воду в чайнике, пока не закипит.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Выбрать ягоды и фрукты'
+      ''
+      N 'Выбрать ягоды и фрукты для приготовления варенья. Оценка качества про
+дуктов - визуальная.'
+      S 'PUBLICATION'
+      C 255 3 255
+      F 1.000000
+      TERM 'Вымыть ягоды и фрукты'
+      ''
+      N 'Вымыть ягоды и фрукты в дуршлаге (желательно - под проточной водой). 
+Оценка чистоты - визуальная.'
+      S 'PUBLICATION'
+      C 255 10 255
+      F 1.000000
+      TERM 'Подготовить сахарную смесь #XOR BLOCK#'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Подготовить смесь из твёрдых ягод и сахара'
+      ''
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Подготовить смесь из крупных фруктов и сахара'
+      ''
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Подготовить смесь из мягких ягод и сахара'
+      ''
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Вскипятить воду в кастрюле'
+      ''
+      N 'Нагревать воду в кастрюле, пока не закипит.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Бланшировать ягоды'
+      ''
+      N '2-3 раза опустить ягоды в кипящую воду в дуршлаге. Общее время прогре
+ва примерно 2 минуты.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Приготовить сироп'
+      ''
+      N 'Смешать 1-2 стакана воды и 1 кг сахара. Варить смесь пока сахар не ра
+зойдётся (пока не превратится в однородную жидкую массу). Мешать ложкой, чтобы
+ сахар не пригорел.'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Положить ягоды в сироп'
+      ''
+      N 'Положить ягоды в сироп.'
+      S 'PUBLICATION'
+      C 255 1 255
+      F 1.000000
+      TERM 'Порезать на дольки'
+      ''
+      N 'Мелкие фрукты разрезать на 4 дольки, крупные - на большее число.'
+      S 'PUBLICATION'
+      C 255 1 255
+      F 1.000000
+      TERM 'Пересыпать сахаром [измельчённые фрукты]'
+      ''
+      N 'Пересыпать измельчённые фрукты сахаром. Соотношение: на 1 кг фруктов 
+ 1-1.2 кг сахара.'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Выстаивать 6-8 часов [измельчённые фрукты]'
+      ''
+      N 'Выстаивать смесь 6-8 часов.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Добавить в смесь воду'
+      ''
+      N 'Добавить в смесь воду в соотношении 1 стакан воды на 1 кг фруктов.'
+      S 'PUBLICATION'
+      C 255 10 255
+      F 1.000000
+      TERM 'Пересыпать сахаром [мягкие ягоды]'
+      ''
+      N 'Пересыпать ягоды сахаром.'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Выстаивать 6-8 часов [мягкие ягоды]'
+      ''
+      N 'Выстаивать ягоды 6-8 часов.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Цикл варки твёрдых ягод и фруктов'
+      ''
+      N 'Цикл варки твёрдых ягод и фруктов.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Цикл варки мягких ягод и фруктов'
+      ''
+      N 'Цикл варки мягких ягод и фруктов.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Нагреть смесь'
+      ''
+      N 'Довести смесь до кипения и варить в течение 3-5 минут, точнее: a) 5 м
+инут - для яблок, b) 3 минуты - для чёрной рябины. На последнем этапе - варить
+ до готовности. Мешать варенье ложкой, чтобы обеспечить однородность массы.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Охладить варенье'
+      ''
+      N 'Охлаждать варенье, пока оно не остынет (около 3-х часов).'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Проверить готовность варенья [твёрдые ягоды и фрукты]'
+      ''
+      N 'Проверить готовность варенья с помощью следующего правила: капля (гот
+ового) варенья не должна растекаться на блюдце. Дополнительное правило для ябл
+ок: желательно, чтобы яблоки стали прозрачными.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Основной этап варки'
+      ''
+      N 'Сначала нагреть смесь на слабом огне, осторожно помешивая ложкой, до 
+полного растворения сахара в выделившемся соке (время нагрева определяется виз
+уально). Затем усилить огонь и варить 10 минут.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Проверить готовность варенья [мягкие ягоды]'
+      ''
+      N 'Проверить готовность варенья с помощью следующего правила: капля (гот
+ового) варенья не должна растекаться на блюдце.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Дополнительный этап варки'
+      ''
+      N 'Варить ещё 5 минут.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+     ENDGLOSS } ;
+     GLOSSARY ;
+      TERM 'Нагретые ягоды и фрукты с сахаром'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Сахар'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Питьевая вода'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Банки и крышки'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Правила приготовления варенья'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Техника безопасности'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Варенье в банках'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Источник проточной воды (желательно)'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Стерилизованные банки и крышки'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Посуда'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Газовая или электрическая плитка'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Пищевая сода'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Машинка для закатки (если нужно)'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Кипяток'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Прогретые ягоды'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Сироп'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Вымытые банки'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Вымытые крышки'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Стерилизованные банки'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Стерилизованные крышки'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Кипяток в чайнике'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Ягоды и фрукты'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Выбранные ягоды и фрукты'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Нагретая смесь (после 1-го или 2-го нагрева)'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Сахарная смесь'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Чистые ягоды и фрукты'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Измельчённые фрукты'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Измельчённые фрукты с сахаром'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Фрукты, давшие сок'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Ягоды с сахаром'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Нагретая смесь (после 3-го нагрева)'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Охлаждённые ягоды и фрукты в сиропе'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Готовое варенье'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Охлаждённое варенье'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Готовое (горячее) варенье'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+     ENDGLOSS ;
+    ENDDIAGRAM ;
+  ENDMODEL ;
+
+ENDKIT ;

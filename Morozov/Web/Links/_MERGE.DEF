@@ -1,0 +1,48 @@
+package "Morozov/Web/Links/_Merge"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--        The "WEB/LINKS/MERGE" Actor Prolog package.        --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains a set of connectors for             --
+-- linking various program components.                       --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import '_AnalyserControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+import '_EngineInput'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+---------------------------------------------------------------
+interface '_Merge_Two_Lists'
+(specialized '_Block', '_AnalyserControl', '_EngineInput'):
+--
+variable:
+--
+	value_i1	: WebAddressList;
+	value_i2	: WebAddressList;
+	value_o1	: WebAddressList;
+--
+internal:
+--
+	con		: 'Report';
+--
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+show(_*)				- (i);
+--
+merge_lists(
+	WebAddressList,
+	WebAddressList,
+	WebAddressList)			- (i,i,_);
+--
+determ:
+--
+member(WebAddressList,WebAddressList)	- (i,i);
+--
+]
+---------------------------------------------------------------

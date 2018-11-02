@@ -1,0 +1,100 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+class 'Main' (specialized 'Canvas3D'):
+--
+internal:
+--
+	text_tools			= ('Text');
+--
+constant:
+--
+	background_color		= color3(0.05,0.05,0.5);
+	enable_scene_antialiasing	= 'yes';
+--
+[
+goal:-!,
+	Text== "Actor Prolog",
+	SL== text_tools?length(Text),
+	Scale== 1.2 / SL,
+	X== - (SL) / 2.0,
+	MaximumAngle== ?pi()*2.0,
+	Bounds== 'BoundingSphere'({
+			center: p(0.0,0.0,0.0),
+			radius: 100.0
+			}),
+	show([
+		'TransformGroup'({
+			transform3D: 'Transform3D'({
+				scale: Scale
+				}),
+			branches: [
+				'TransformGroup'({
+					allowTransformWrite: 'yes',
+					allowTransformRead: 'yes',
+					branches: [
+						'Shape3D'({
+							geometry: 'Text3D'({
+								font3D: 'Font3D'({
+									fontName: 'helvetica',
+									fontSize: 2,
+									fontStyle: [],
+									extrudePath: 'FontExtrusion'({})
+									}),
+								string: Text,
+								position: p(X,-1,-1),
+								horizontalAlignment: 'ALIGN_FIRST',
+								path: 'PATH_RIGHT',
+								characterSpacing: 0.0
+								}),
+							appearance: 'Appearance'({
+								material: 'Material'({
+									lightingEnable: 'yes'
+									})
+								})
+							}),
+						'RotationInterpolator'({
+							alpha: 'Alpha3D'({
+								loopCount: -1,
+								increasingEnable: 'yes',
+								increasingAlphaDuration: 4000
+								}),
+							transformAxis: 'Transform3D'({}),
+							minimumAngle: 0.0,
+							maximumAngle: MaximumAngle,
+							schedulingBounds: Bounds
+							})
+						]
+					})
+				]
+			}),
+		'Background'({
+			color: background_color,
+			applicationBounds: Bounds
+			}),
+		'AmbientLight'({
+			color: color3(0.3,0.3,0.3),
+			influencingBounds: Bounds
+			}),
+		'DirectionalLight'({
+			color: color3(1.0,1.0,0.9),
+			direction: [1.0,1.0,1.0],
+			influencingBounds: Bounds
+			}),
+		'DirectionalLight'({
+			color: color3(1.0,1.0,0.9),
+			direction: [-1.0,-1.0,-1.0],
+			influencingBounds: Bounds
+			}),
+		'OrbitBehavior'({
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			})
+		]).
+]

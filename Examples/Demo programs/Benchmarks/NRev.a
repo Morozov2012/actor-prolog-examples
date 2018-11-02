@@ -1,0 +1,134 @@
+------------------------------------------------------------------
+--                                                              --
+--      An example of Actor Prolog program.                     --
+--      (c) 2007, IRE RAS, Alexei A. Morozov.                   --
+--                                                              --
+--      Naive reverse benchmark used to compute "LIPS".         --
+--      Nominal value to test is length 20.                     --
+--                                                              --
+------------------------------------------------------------------
+-- pragma: DEBUG_INFORMATION_GENERATION= OFF;
+------------------------------------------------------------------
+project: (('NREV'))
+------------------------------------------------------------------
+class 'NREV' (specialized 'Alpha'):
+--
+internal:
+--
+con		= ('Console');
+window		= ('Report',x=15,width=50,y=15,height=7);
+timer		= ('Timer');
+--
+[
+goal:-
+	window ? clear,
+	--
+	Length== con ? input_integer("Length of List:",50),
+	Iterations==
+		con ? input_integer("Number of Iterations:",40),
+	--
+	window ? writeln("Length of List:       ",Length),
+	window ? writeln("Number of Iterations: ",Iterations),
+	--
+	Length > 0,
+	Iterations > 0,
+	--
+	window ? writeln("Wait a moment, please..."),
+	--
+	genlst(Length, List),
+	test(Iterations,List,EA,MA,SA),
+	computeavgtime(EA, MA, SA, Iterations, Avgtime),
+	LI== ((Length+1) * (Length+2)) / 2 + 1,
+	Avgtime > 0,!,
+	LIPS== LI / Avgtime,
+	spy_point('beep'),
+	window ? writef("LIPS = %f",LIPS).
+goal:-!,
+	window ? write("Illegal parameters!").
+------------------------------------------------------------------
+--                                                              --
+--  2015.06.28 02:32                                            --
+--  Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB    --
+--  Windows7 - PM.64 (RUS)                                      --
+--  ========================================================    --
+--  AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                      --
+--                                                              --
+--  g:\temp1\jv>java -version                                   --
+--  java version "1.7.0_80"                                     --
+--  Java(TM) SE Runtime Environment (build 1.7.0_80-b15)        --
+--  Java HotSpot(TM) 64-Bit Server VM                           --
+--  (build 24.80-b11, mixed mode)                               --
+--                                                              --
+--  java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation       --
+--  -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch  --
+--                                                              --
+--  Length of List:       1000                                  --
+--  Number of Iterations: 1000                                  --
+--  Wait a moment, please...                                    --
+--  LIPS = 103_274_711.696855                                   --
+--                                                              --
+--  EXE file:                                                   --
+--                                                              --
+--  Length of List:       1000                                  --
+--  Number of Iterations: 1000                                  --
+--  Wait a moment, please...                                    --
+--  LIPS = 67_954_200.5420127958                                --
+--                                                              --
+------------------------------------------------------------------
+--
+test(Iters,List,EA,MA,SA):-
+	timer ? time(Hr1,Min1,Sec1,MSEC1),
+	runtest(Iters,List),
+	timer ? time(Hr2,Min2,Sec2,MSEC2),
+	runcontrol(Iters,List),
+	timer ? time(Hr3,Min3,Sec3,MSEC3),
+	abstime(Hr3,Min3,Sec3,MSEC3,EA),
+	abstime(Hr2,Min2,Sec2,MSEC2,MA),
+	abstime(Hr1,Min1,Sec1,MSEC1,SA).
+--
+runtest(N,List):-
+	for(1,N,_),
+	runtestonce(List),
+	fail.
+runtest(_,_).
+--
+runcontrol(N,List):-
+	for(1,N,_),
+	runcontrolonce(List),
+	fail.
+runcontrol(_,_).
+--
+runtestonce(List):-
+	nrev(List,_),!.
+--
+runcontrolonce(List):-
+	control(List,_),!.
+--
+nrev([],[]).
+nrev([H|T],L):-
+	nrev(T,L1),
+	append(L1,[H],L).
+--
+append([],X,X).
+append([H|T],X,[H|T1]):-
+	append(T,X,T1).
+--
+control(_,[]).
+--
+computeavgtime(EA,MA,SA,Iters,AvgTime):-
+	AvgTime== ((MA-SA) - (EA-MA)) / Iters.
+--
+abstime(Hr,Min,Sec,MSEC,Abs):-
+	Abs== Hr*3600.0 + Min*60 + Sec + MSEC/1000.0.
+	-- (20.08.2009)
+--
+for(I,I,I):-!.
+for(I,_,I).
+for(I,J,K):-
+	for(?inc(I),J,K).
+--
+genlst(0,[]):-!.
+genlst(N,[N|X]):-
+	genlst(?dec(N),X).
+]
+-----------------------------------------------------------------------

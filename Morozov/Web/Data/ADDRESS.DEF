@@ -1,0 +1,65 @@
+package "Morozov/Web/Data/Address":
+---------------------------------------------------------------
+--            The "ADDRESS" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+WebAddressList		= WebAddress;
+			  ('WebAddressFilter');
+			  WebAddressList*.
+WebAddress		= STRING.
+--
+WebResourceAttributes	= {
+			name: WebResourceName,
+			address: WebAddressList,
+			domain: WebAddressSegment,
+			prefix: WebAddressSegment,
+			disabled_prefix: WebAddressSegments,
+			declared_date: WebResourceDate
+			}.
+--
+WebResourceName		= STRING.
+--
+WebAddressSegment	= STRING.
+WebAddressSegments	= WebAddressSegment*.
+--
+Level			= INTEGER; STRING.
+Node			= INTEGER.
+--
+WebResourceDate		= date(
+				WebResourceYear,
+				WebResourceMonth,
+				WebResourceDay).
+--
+WebResourceYear		= INTEGER.
+WebResourceMonth	= INTEGER; STRING.
+WebResourceDay		= INTEGER.
+--
+DOMAINS:
+--
+reference:
+--
+DoFilterList		= 'yes'; 'no'; 'unknown'.
+--
+UseMaxDepth		= 'yes'; 'no'; 'unknown'.
+--
+MaximalWaitingTime	= REAL; STRING.
+--
+---------------------------------------------------------------
+interface 'WebAddressFilter':
+--
+[
+PREDICATES:
+--
+visible:
+--
+nondeterm:
+--
+filter(DoFilterList,WebAddressList) = WebAddressList;
+--
+]
+---------------------------------------------------------------

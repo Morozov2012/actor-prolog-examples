@@ -1,0 +1,43 @@
+package "Morozov/Web/Data/_Kwrds"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--           The "KEYWORDS" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains a collection of some useful         --
+-- keywords related to the logic programming and Prolog.     --
+---------------------------------------------------------------
+import 'LogicProgrammingKeywords'
+	from "Morozov/Web/Data/Keywords";
+---------------------------------------------------------------
+class '_Logic_Programming_Keywords' (specialized '_Block'):
+--
+variable:
+--
+	value_o1;
+--
+internal:
+--
+	world	= ('LogicProgrammingKeywords');
+--
+	con;
+--
+[
+goal:-!,
+	world ? keywords(List),
+	value_o1 == List,!.
+--
+show(_*):-
+	con ? show,
+	con ? clear,
+	world ? keywords(List),
+	write_list(List),
+	fail.
+show(_*):-!.
+--
+write_list([Item|Rest]):-!,
+	con ? writeln(Item),
+	write_list(Rest).
+write_list(_):-!.
+]
+---------------------------------------------------------------

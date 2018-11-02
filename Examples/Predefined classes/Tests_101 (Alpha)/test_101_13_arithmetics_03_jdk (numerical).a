@@ -1,0 +1,150 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+Value	= INTEGER; REAL.
+
+PREDICATES:
+
+imperative:
+
+create_value(Value)		- (o);
+testF1(Value)			- (i);
+testF2(Value)			- (i);
+--
+test0;
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+PREDICATES:
+
+determ:
+
+numerical(Value*)	- (i);
+
+CLAUSES:
+
+goal:-!,
+	create_value(V),
+	testF1(V),
+	test0,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6,
+	test7,
+	test8.
+--
+create_value(_).
+--
+testF1(V):-
+	con ? writeln("Test F1:"),
+	con ? writeln("   v=",V),
+	?numerical(V),!,
+	con ? writeln("Failure: x is numerical.").
+testF1(_):-
+	con ? writeln("   O.K.: x is not numerical.").
+--
+test0:-
+	con ? writeln("Test 0:"),
+	?numerical(),!,
+	con ? writeln("   O.K.").
+test0:-
+	con ? writeln("Failure").
+--
+test1:-
+	con ? writeln("Test 1:"),
+	X== 100,
+	con ? writeln("   x=",X),
+	?numerical(X),!,
+	con ? writeln("   O.K.: x is numerical.").
+test1:-
+	con ? writeln("Failure").
+--
+test2:-
+	con ? writeln("Test 2:"),
+	X== 'name',
+	con ? writeln("   x=",X),
+	?numerical(X),!,
+	con ? writeln("Failure").
+test2:-
+	con ? writeln("   O.K.: x is not numerical.").
+--
+test3:-
+	con ? writeln("Test 3:"),
+	X== "text",
+	con ? writeln("   x=",X),
+	?numerical(X),!,
+	con ? writeln("Failure").
+test3:-
+	con ? writeln("   O.K.: x is not numerical.").
+--
+test4:-
+	con ? writeln("Test 3:"),
+	X== 100.0,
+	con ? writeln("   x=",X),
+	?numerical(X),!,
+	con ? writeln("   O.K.: x is numerical.").
+test4:-
+	con ? writeln("Failure").
+--
+test5:-
+	con ? writeln("Test 5:"),
+	X== 100,
+	Y== 100.0,
+	con ? writeln("   x=",X," y=",Y),
+	?numerical(X,Y),!,
+	con ? writeln("   O.K.: x and y are numerical.").
+test5:-
+	con ? writeln("Failure").
+--
+test6:-
+	con ? writeln("Test 6:"),
+	X== 100,
+	Y== "text",
+	con ? writeln("   x=",X," y=",Y),
+	?numerical(X,Y),!,
+	con ? writeln("Failure").
+test6:-
+	con ? writeln("   O.K.: x or y is not numerical.").
+--
+test7:-
+	con ? writeln("Test 7:"),
+	X== 'name',
+	Y== 100.0,
+	con ? writeln("   x=",X," y=",Y),
+	?numerical(X,Y),!,
+	con ? writeln("Failure").
+test7:-
+	con ? writeln("   O.K.: x or y is not numerical.").
+--
+test8:-
+	con ? writeln("Test 8:"),
+	X== 100.0,
+	Y== 300,
+	con ? writeln("   x=",X," y=",Y),
+	?numerical(X,Y),!,
+	con ? writeln("   O.K.: x and y are numerical.").
+test8:-
+	con ? writeln("Failure").
+]

@@ -1,0 +1,30 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+[
+goal:-!,
+	test1,
+	test2.
+--
+test1:-
+	writeln("Test 1:"),
+	?note("Hello world!"),!,
+	writeln("\tDone.").
+--
+test2:-
+	writeln("Test 2:"),
+	?note("Note","Hello world!"),!,
+	writeln("\tDone.").
+]
+-----------------------------------------------------------------------

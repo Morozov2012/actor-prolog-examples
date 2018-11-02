@@ -1,0 +1,110 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+
+class 'Main' (specialized 'Text'):
+--
+case_sensitivity	= 'on';
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6,
+	test7,
+	test8.
+--
+test0:-
+	con ? writeln("Test 0"),
+	?search("Text","Pattern"),
+	?search("Pattern"),
+	fail.
+test0.
+--
+test1:-
+	con ? writeln("Test 1"),
+	Text== "ABCD{efGHi}JK{efGHi}lmnO{EFghI}PQRST",
+	X1== ?search(Text,"efGHi"),
+	con ? writeln("\t",X1),
+	fail.
+test1.
+--
+test2:-
+	con ? writeln("Test 2"),
+	Text== "ABCD{efGHi}JK{efGHi}lmnO{EFghI}PQRST",
+	?search(Text,"efGHi"),
+	con ? writeln("\t","O.K."),
+	fail.
+test2.
+--
+test3:-
+	con ? writeln("Test 3"),
+	X1== ?search("ABC",""),
+	con ? writeln("\t",X1),
+	fail.
+test3.
+--
+test4:-
+	con ? writeln("Test 4"),
+	X1== ?search("",""),
+	con ? writeln("\t",X1),
+	fail.
+test4.
+--
+test5:-
+	con ? writeln("Test 5"),
+	Text== "ABCD{efGHi}JK{efGHi}lmnO{EFghI}PQRST",
+	set_string(Text),
+	X1== ?search("efGHi"),
+	con ? writeln("\t",X1),
+	fail.
+test5.
+--
+test6:-
+	con ? writeln("Test 6"),
+	Text== "ABCD{efGHi}JK{efGHi}lmnO{EFghI}PQRST",
+	set_string(Text),
+	?search("efGHi"),
+	con ? writeln("\t","O.K."),
+	fail.
+test6.
+--
+test7:-
+	con ? writeln("Test 7"),
+	set_string("ABC"),
+	X1== ?search(""),
+	con ? writeln("\t",X1),
+	fail.
+test7.
+--
+test8:-
+	con ? writeln("Test 8"),
+	set_string(""),
+	X1== ?search(""),
+	con ? writeln("\t",X1),
+	fail.
+test8.
+]

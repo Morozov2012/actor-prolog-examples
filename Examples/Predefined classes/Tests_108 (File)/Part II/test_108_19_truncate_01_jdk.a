@@ -1,0 +1,91 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+
+class 'Main':
+--
+internal:
+--
+	test1	= ('Test',
+			name= "test.asc");
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'File'):
+--
+constant:
+--
+	name	: FileName;
+--
+	random_access	= 'on';
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("=== File: ",name," ==="),
+	test1,
+	test2,
+	test3,
+	test4,	-- Try to switch off this line.
+	test5,
+	test6.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tI will try to create the file."),
+	?set_string("012345678901234567890123456789"),
+	con ? writeln("\tDone.").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln(
+		"\tI will try to open the file for the modifying."),
+	?open(name,'modifying'),
+	con ? writeln("\tDone!").
+--
+test3:-
+	con ? writeln("Test 3"),
+	con ? writeln("\tI will try to write a line."),
+	?write("Hello world!"),
+	con ? writeln("\tDone!").
+--
+test4:-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to truncate the file."),
+	?truncate(),
+	con ? writeln("\tDone!").
+--
+test5:-
+	con ? writeln("Test 5"),
+	con ? writeln("\tI will try to close the file."),
+	?close(),
+	con ? writeln("\tThe file was closed successfully.").
+--
+test6:-
+	con ? writeln("Test 6"),
+	con ? writeln("\tI will try to read the file."),
+	Text== ?get_string(),
+	con ? writeln("\t>>>",Text,"<<<").
+]

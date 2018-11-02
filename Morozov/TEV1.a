@@ -1,0 +1,199 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/TEV1":
+
+import 'ThermalVideoBuffer' from "Morozov/ThermalVideoBuffer";
+import 'BufferedImage' from "Morozov/Java2D";
+import "Morozov/Vision";
+
+--------------------------------------------------------------------
+-- The 'TEV1' class is specialized class 'ThermalVideoBuffer'.    --
+--------------------------------------------------------------------
+
+class 'TEV1' (specialized 'ThermalVideoBuffer'):
+
+default_identifier				= 'default';
+--
+temperature_scale				= 'CELSIUS';
+--
+use_recorded_calibration_commands		= 'yes';
+--
+eliminate_anomalous_pixels			= 'yes';
+apply_anomalous_voltage_pixel_detector		= 'yes';
+anomalous_voltage_threshold			= 10.0;
+apply_anomalous_temperature_pixel_detector	= 'yes';
+anomalous_temperature_threshold			= 0.10;
+--
+do_not_suspend_USB_data_transfer		= 'yes';
+read_time_out					= 70;
+write_time_out					= 70;
+--
+output_debug_information			= 1;
+--
+[
+SOURCE:
+	"morozov.built_in.TEV1";
+
+MODEL:
+
+?complete_calibration().
+?missed_frame(TimeInMilliseconds).
+
+CLAUSES:
+--
+open():
+	[external "open"].
+open(DeviceIdentifier):
+	[external "open"].
+--
+calibrate:
+	[external "calibrate"].
+annul_calibration:
+	[external "annulCalibration"].
+--
+save_sensor_attributes(FileName):
+	[external "saveSensorAttributes"].
+load_sensor_attributes(FileName):
+	[external "loadSensorAttributes"].
+--
+close:
+	[external "close"].
+--
+is_open:
+	[external "isOpen"].
+--
+get_recent_frame_number(
+		NumberOfRecentCommittedFrame):
+	[external "getRecentFrameNumber"].
+get_recent_frame_number(
+		NumberOfRecentCommittedFrame,
+		NumberOfRecentValidFrame,
+		NumberOfRecentCorruptedFrame):
+	[external "getRecentFrameNumber"].
+--
+get_recent_frame_time(
+		RecentCommittedFrameTimeInMilliseconds):
+	[external "getRecentFrameTime"].
+get_recent_frame_time(
+		RecentCommittedFrameTimeInMilliseconds,
+		RecentValidFrameTimeInMilliseconds,
+		RecentCorruptedFrameTimeInMilliseconds):
+	[external "getRecentFrameTime"].
+--
+get_recent_frame_relative_time(
+		RecentCommittedFrameRelativeTimeInMilliseconds):
+	[external "getRecentFrameRelativeTime"].
+get_recent_frame_relative_time(
+		RecentCommittedFrameRelativeTimeInMilliseconds,
+		RecentValidFrameRelativeTimeInMilliseconds,
+		RecentCorruptedFrameRelativeTimeInMilliseconds):
+	[external "getRecentFrameRelativeTime"].
+--
+get_recent_frame_rate(
+		FrameRateOfCommittedFrames):
+	[external "getRecentFrameRate"].
+get_recent_frame_rate(
+		FrameRateOfCommittedFrames,
+		FrameRateOfValidFrames,
+		FrameRateOfCorruptedFrames):
+	[external "getRecentFrameRate"].
+--
+reset_frame_rate:
+	[external "resetFrameRate"].
+--
+get_recent_image(BufferedImage):
+	[external "getRecentImage"].
+--
+get_temperature(X,Y) = Temperature:
+	[external "getTemperature"].
+get_minimal_temperature() = Temperature:
+	[external "getMinimalTemperature"].
+get_maximal_temperature() = Temperature:
+	[external "getMaximalTemperature"].
+--
+get_image_size_in_pixels(Width,Height):
+	[external "getImageSizeInPixels"].
+--
+get_actual_identifier() = DeviceIdentifier:
+	[external "getActualIdentifier"].
+--
+get_number_of_dead_pixels() = Number:
+	[external "getNumberOfDeadPixels"].
+get_number_of_anomalous_voltage_pixels() = Number:
+	[external "getNumberOfAnomalousVoltagePixels"].
+get_number_of_anomalous_temperature_pixels() = Number:
+	[external "getNumberOfAnomalousTemperaturePixels"].
+--
+get_device_list = DeviceIdentifierList:
+	[external "getDeviceList"].
+--
+set_default_identifier(DeviceIdentifier):
+	[external "setDefaultIdentifier"].
+get_default_identifier() = DeviceIdentifier:
+	[external "getDefaultIdentifier"].
+--
+set_temperature_scale(TemperatureScale):
+	[external "setTemperatureScale"].
+get_temperature_scale() = TemperatureScale:
+	[external "getTemperatureScale"].
+--
+set_use_recorded_calibration_commands(YesNo):
+	[external "setUseRecordedCalibrationCommands"].
+get_use_recorded_calibration_commands(YesNo):
+	[external "getUseRecordedCalibrationCommands"].
+--
+set_eliminate_anomalous_pixels(YesNo):
+	[external "setEliminateAnomalousPixels"].
+get_eliminate_anomalous_pixels() = YesNo:
+	[external "getEliminateAnomalousPixels"].
+--
+set_apply_anomalous_voltage_pixel_detector(YesNo):
+	[external "setApplyAnomalousVoltagePixelDetector"].
+get_apply_anomalous_voltage_pixel_detector() = YesNo:
+	[external "getApplyAnomalousVoltagePixelDetector"].
+--
+set_anomalous_voltage_threshold(Numerical):
+	[external "setAnomalousVoltageThreshold"].
+get_anomalous_voltage_threshold() = Numerical:
+	[external "getAnomalousVoltageThreshold"].
+--
+set_apply_anomalous_temperature_pixel_detector(YesNo):
+	[external "setApplyAnomalousTemperaturePixelDetector"].
+get_apply_anomalous_temperature_pixel_detector() = YesNo:
+	[external "getApplyAnomalousTemperaturePixelDetector"].
+--
+set_anomalous_temperature_threshold(Numerical):
+	[external "setAnomalousTemperatureThreshold"].
+get_anomalous_temperature_threshold() = Numerical:
+	[external "getAnomalousTemperatureThreshold"].
+--
+set_do_not_suspend_USB_data_transfer(YesNo):
+	[external "setDoNotSuspendUSBDataTransfer"].
+get_do_not_suspend_USB_data_transfer() = YesNo:
+	[external "getDoNotSuspendUSBDataTransfer"].
+--
+set_read_time_out(Milliseconds):
+	[external "setReadTimeOut"].
+get_read_time_out() = Milliseconds:
+	[external "getReadTimeOut"].
+--
+set_write_time_out(Milliseconds):
+	[external "setWriteTimeOut"].
+get_write_time_out() = Milliseconds:
+	[external "getWriteTimeOut"].
+--
+set_output_debug_information(VerbosityLevel):
+	[external "setOutputDebugInformation"].
+get_output_debug_information() = VerbosityLevel:
+	[external "getOutputDebugInformation"].
+--
+-- These methods are to be implemented by the programmer:
+--
+complete_calibration:
+	[external "completeCalibration"].
+missed_frame(TimeInMilliseconds):
+	[external "missedFrame"].
+]

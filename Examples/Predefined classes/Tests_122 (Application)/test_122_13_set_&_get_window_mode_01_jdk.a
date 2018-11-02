@@ -1,0 +1,71 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(WindowMode)	- (i);
+--
+class 'Main' (specialized 'Application'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2('restored'),
+	test1,
+	test2('invisible'),
+	test1,
+	test2('minimized'),
+	test1,
+	test2('maximized'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_window_mode(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	Mode== ?get_window_mode(),!,
+	con ? write("Window mode: "),
+	con ? set_color('Violet'),
+	con ? writeln("\'",Mode,"\'"),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test2(Mode):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_window_mode(Mode),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

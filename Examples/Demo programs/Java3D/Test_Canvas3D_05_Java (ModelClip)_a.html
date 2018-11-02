@@ -1,0 +1,115 @@
+<html>
+<head>
+<title>Actor Prolog. Example &quot;D:\MOROZOV\Z\Z-DJ\DEMO\EXE\EXAMPLES\DEMO PROGRAMS\JAVA3D\TEST_CANVAS3D_05_JAVA (MODELCLIP).A&quot;</title>
+</head>
+<body bgcolor="#F0F0F0">
+<table align="center" bgcolor="#FFFFFF" cellpadding=30>
+<tr>
+<td>
+<pre>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+<font color="0000FF"><i>-- An example of Actor Prolog program.                               --</i></font>
+<font color="0000FF"><i>-- (c) 2012 IRE RAS Alexei A. Morozov                                --</i></font>
+<font color="0000FF"><i>--                                                                   --</i></font>
+<font color="0000FF"><i>-- This program draws an object and creates a clip plane to see      --</i></font>
+<font color="0000FF"><i>-- the interior of the object. It also has a behavior to move        --</i></font>
+<font color="0000FF"><i>-- the clip plane.                                                   --</i></font>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+
+<font color="7F7F00"><u>import</u></font> .. <font color="7F7F00"><u>from</u></font> <font color="0000FF">&quot;morozov/Java3D&quot;</font>;
+
+<font color="7F7F00"><u>class</u></font> 'Main' <font color="#993300">(</font><font color="7F7F00"><u>specialized</u></font> 'Canvas3D'<font color="#993300">)</font>:
+<font color="#800080">[</font>
+goal:-!,
+        <font color="#008000">Bounds</font>== 'BoundingSphere'<font color="#993300">(</font><font color="FF00FF">{</font>
+                center: p<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font><font color="#993300">)</font>,
+                radius: <font color="FF00FF">100.0</font>
+                <font color="FF00FF">}</font><font color="#993300">)</font>,
+        <font color="#008000">Appearance</font>== 'Appearance'<font color="#993300">(</font><font color="FF00FF">{</font>
+                material: 'Material'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        lightingEnable: 'yes'
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                polygonAttributes: 'PolygonAttributes'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        cullFace: 'CULL_NONE'
+                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                <font color="FF00FF">}</font><font color="#993300">)</font>,
+        show<font color="#993300">(</font><font color="#800080">[</font>
+                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                scale: <font color="FF00FF">0.4</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                        branches: <font color="#800080">[</font>
+                                'AmbientLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        lightOn: 'yes',
+                                        color: c3<font color="#993300">(</font><font color="FF00FF">1.0</font>,<font color="FF00FF">1.0</font>,<font color="FF00FF">1.0</font><font color="#993300">)</font>,
+                                        influencingBounds: <font color="#008000">Bounds</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                'DirectionalLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        color: c3<font color="#993300">(</font><font color="FF00FF">0.5</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.5</font><font color="#993300">)</font>,
+                                        direction: <font color="#800080">[</font>-<font color="FF00FF">1.0</font>,-<font color="FF00FF">1.0</font>,<font color="FF00FF">1.0</font><font color="#800080">]</font>,
+                                        influencingBounds: <font color="#008000">Bounds</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                'DirectionalLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        color: c3<font color="#993300">(</font><font color="FF00FF">0.7</font>,<font color="FF00FF">0.7</font>,<font color="FF00FF">0.0</font><font color="#993300">)</font>,
+                                        direction: <font color="#800080">[</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,-<font color="FF00FF">1.0</font><font color="#800080">]</font>,
+                                        influencingBounds: <font color="#008000">Bounds</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                rotation: <font color="#800080">[</font><font color="FF00FF">0.0</font>,<font color="FF00FF">1.0</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">45.0</font><font color="#800080">]</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                        branches: <font color="#800080">[</font>
+                                                'Cylinder'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        radius: <font color="FF00FF">0.5</font>,
+                                                        height: <font color="FF00FF">2.2</font>,
+                                                        generateNormals: 'yes',
+                                                        xdivisions: <font color="0000FF">100</font>,
+                                                        ydivisions: <font color="0000FF">1</font>,
+                                                        appearance: <font color="#008000">Appearance</font>
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                'Cylinder'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        radius: <font color="FF00FF">0.3</font>,
+                                                        height: <font color="FF00FF">2.5</font>,
+                                                        generateNormals: 'yes',
+                                                        xdivisions: <font color="0000FF">100</font>,
+                                                        ydivisions: <font color="0000FF">1</font>,
+                                                        appearance: <font color="#008000">Appearance</font>
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                'Box'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        xdim: <font color="FF00FF">0.8</font>,
+                                                        ydim: <font color="FF00FF">0.8</font>,
+                                                        zdim: <font color="FF00FF">0.8</font>,
+                                                        generateNormals: 'yes',
+                                                        appearance: <font color="#008000">Appearance</font>
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        allowTransformWrite: 'yes',
+                                                        allowTransformRead: 'yes',
+                                                        branches: <font color="#800080">[</font>
+                                                                'MouseRotate'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                                        schedulingBounds: <font color="#008000">Bounds</font>
+                                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                                'MouseZoom'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                                        schedulingBounds: <font color="#008000">Bounds</font>
+                                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                                'MouseWheelZoom'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                                        schedulingBounds: <font color="#008000">Bounds</font>
+                                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                                'ModelClip'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                                        <font color="0000FF">1</font>: <font color="#800080">[</font><font color="FF00FF">0.0</font>,<font color="FF00FF">1.0</font>,<font color="FF00FF">1.0</font>,<font color="FF00FF">0.0</font><font color="#800080">]</font>,
+                                                                        influencingBounds: <font color="#008000">Bounds</font>
+                                                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                                <font color="#800080">]</font>
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                <font color="#800080">]</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                <font color="#800080">]</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                <font color="#800080">]</font><font color="#993300">)</font>.
+<font color="#800080">]</font>
+</pre>
+</td>
+</tr>
+</table>
+</body>
+</html>

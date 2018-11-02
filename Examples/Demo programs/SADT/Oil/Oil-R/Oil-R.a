@@ -1,0 +1,1895 @@
+------------------------------------------------------------------------
+-- Пример программы на Акторном Прологе.                              --
+-- Небольшая визуальная экспертная система.                           --
+-- Алексей А. Морозов, ИРЭ РАН.                                       --
+-- 11 декабря 1998 г.                                                 --
+------------------------------------------------------------------------
+--                                                                    --
+-- Описание способов воздействия на месторождение                     --
+--                                                                    --
+------------------------------------------------------------------------
+-- Гидродинамический способ (заводнение)                              --
+------------------------------------------------------------------------
+class '_Гидродинамический_способ_(заводнение)'
+(specialized 'Способы_воздействия'):
+[
+check_collected_water(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,5.0):-!.
+porosity(0.1,0.5):-!.
+saturation(0.7,1.0):-!.
+moist(0,90):-!.
+--
+check_water_thickness(_):-!.
+check_pressure(_):-!.
+check_depth(_):-!.
+--
+check_rock_thickness(RT):-!,
+	min_rock_thickness(MinRockThickness),!,
+	MinRockThickness < RT.
+--
+thickness(3,100):-!.
+min_rock_thickness(3.0):-!.
+temperature(20,100):-!.
+angle(0,5):-!.
+--
+check_acid(_):-!.
+--
+density(650,1000):-!.
+viscosity(0.01,25.0):-!.
+--
+check_water(_):-!.
+--
+check_gas(_):-!.
+--
+check_asphalt(_):-!.
+check_resin(_):-!.
+--
+check_T_paraph(TO,TS):-!,
+	TO < TS.
+--
+paraph(0.0,0.055):-!.
+sulphur(0.0,0.02):-!.
+--
+check_cement(_):-!.
+check_carbon(_):-!.
+--
+clay(0.0,0.05):-!.
+]
+------------------------------------------------------------------------
+-- Термические методы                                                 --
+------------------------------------------------------------------------
+class 'Термические_методы' (specialized 'Способы_воздействия'):
+[
+check_acid(_):-!.
+check_water(_):-!.
+check_gas(_):-!.
+check_T_paraph(_,_):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_горячей_воды' (specialized 'Термические_методы'):
+[
+check_moist(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+type_of_collector("трещинный"):-!.
+penetrability(0.1,3.0):-!.
+porosity(0.1,0.3):-!.
+saturation(0.7,1.0):-!.
+collected_water(0.0,0.3):-!.
+--
+check_water_thickness(_):-!.
+check_rock_thickness(RT):-!,
+	min_rock_thickness(MinRockThickness),!,
+	MinRockThickness < RT.
+--
+thickness(10,25):-!.
+min_rock_thickness(3.0):-!.
+pressure(1.0,40.0):-!.
+temperature(0,50):-!.
+angle(0,5):-!.
+depth(30,2000):-!.
+--
+density(850,1000):-!.
+viscosity(15.0,100.0):-!.
+--
+paraph(0.0,0.3):-!.
+asphalt(0.0,0.15):-!.
+resin(0.0,0.4):-!.
+sulphur(0.0,0.08):-!.
+--
+check_carbon(_):-!.
+--
+cement(0.1,0.3):-!.
+clay(0.0,0.25):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_пара' (specialized 'Термические_методы'):
+[
+check_moist(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.01,3.0):-!.
+porosity(0.04,0.3):-!.
+saturation(0.4,1.0):-!.
+collected_water(0.0,0.3):-!.
+--
+thickness(6,25):-!.
+water_thickness(0.0,3.0):-!.
+rock_thickness(3.0,100.0):-!.
+pressure(1.0,15.0):-!.
+temperature(0,50):-!.
+angle(0,5):-!.
+depth(30,1000):-!.
+--
+density(800,1100):-!.
+viscosity(50.0,8000.0):-!.
+--
+paraph(0.0,0.3):-!.
+asphalt(0.0,0.15):-!.
+resin(0.0,0.4):-!.
+sulphur(0.0,0.08):-!.
+--
+cement(0.1,0.3):-!.
+clay(0.0,0.05):-!.
+carbon(0.0,0.05):-!.
+]
+------------------------------------------------------------------------
+class '_Внутрипластовое_горение' (specialized 'Термические_методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,5.0):-!.
+porosity(0.18,0.4):-!.
+saturation(0.4,1.0):-!.
+collected_water(0.0,0.3):-!.
+moist(0,180):-!.
+--
+check_pressure(_):-!.
+check_temperature(_):-!.
+--
+thickness(3,20):-!.
+water_thickness(0.0,3.0):-!.
+rock_thickness(3.0,100.0):-!.
+angle(0,3):-!.
+depth(150,2000):-!.
+--
+density(825,1100):-!.
+viscosity(1.0,1500.0):-!.
+--
+paraph(0.0,0.3):-!.
+asphalt(0.0,0.15):-!.
+resin(0.0,0.4):-!.
+sulphur(0.0,0.02):-!.
+--
+check_carbon(_):-!.	-- НБ
+--
+cement(0.1,0.3):-!.
+clay(0.0,0.1):-!.
+]
+------------------------------------------------------------------------
+-- Физико-химические методы                                           --
+------------------------------------------------------------------------
+class 'Физико-химические методы' (specialized 'Способы_воздействия'):
+[
+check_water_thickness(_):-!.
+check_rock_thickness(_):-!.
+check_gas(_):-!.
+check_sulphur(_):-!.
+check_T_paraph(_,_):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_водного_раствора_ПАВ'
+(specialized 'Физико-химические методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,2.0):-!.
+porosity(0.1,0.35):-!.
+saturation(0.7,1.0):-!.
+collected_water(0.0,0.15):-!.
+moist(0,180):-!.
+--
+check_pressure(_):-!.
+--
+thickness(7,15):-!.
+temperature(10,50):-!.
+angle(0,5):-!.
+depth(30,1500):-!.
+--
+density(800,950):-!.
+viscosity(0.01,60.0):-!.
+acid(0.01,10.0):-!.
+--
+mineralization(0.0,25.0):-!.
+pH(6.0,10.0):-!.
+hardness(0.0,5.0):-!.
+--
+paraph(0.0,0.02):-!.
+asphalt(0.0,0.1):-!.
+resin(0.15,0.4):-!.
+--
+check_cement(_):-!.
+check_carbon(_):-!.
+--
+clay(0.0,0.1):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_водного_раствора_полимера'
+(specialized 'Физико-химические методы'):
+[
+check_collected_water(_):-!.
+check_moist(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,2.0):-!.
+porosity(0.1,0.35):-!.
+saturation(0.5,1.0):-!.
+--
+check_thickness(_):-!.
+check_angle(_):-!.
+check_depth(_):-!.
+--
+pressure(5.0,60.0):-!.
+temperature(0,5):-!.
+--
+check_acid(_):-!.
+--
+density(820,950):-!.
+viscosity(0.1,100.0):-!.
+--
+mineralization(0.0,20.0):-!.
+pH(4.0,10.0):-!.
+hardness(0.0,5.0):-!.
+--
+check_substances(_,_):-!.
+--
+check_cement(_):-!.
+check_carbon(_):-!.
+--
+clay(0.0,0.1):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_водного_раствора_щёлочи'
+(specialized 'Физико-химические методы'):
+[
+check_penetrability(PN):-!,
+	min_penetrability(MinPenetrability),!,
+	MinPenetrability < PN.
+check_porosity(_):-!.
+check_collected_water(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+min_penetrability(0.1):-!.
+saturation(0.6,1.0):-!.
+moist(0,180):-!.
+--
+check_stratum(_):-!.
+--
+check_density(_):-!.
+--
+viscosity(0.01,40.0):-!.
+acid(0.01,10.0):-!.
+--
+check_pH(_):-!.
+--
+mineralization(0.0,50.0):-!.
+hardness(0.0,0.03):-!.
+--
+check_substances(_,_):-!.
+--
+check_cement(_):-!.
+check_carbon(_):-!.
+--
+clay(0.0,0.1):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_водного_раствора_серной_кислоты'
+(specialized 'Физико-химические методы'):
+[
+check_porosity(_):-!.
+check_collected_water(_):-!.
+check_moist(_):-!.
+--
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.5,1.0):-!.
+saturation(0.7,1.0):-!.
+--
+check_stratum(_):-!.
+--
+check_density(_):-!.
+check_acid(_):-!.
+--
+viscosity(0.01,30.0):-!.
+--
+check_pH(_):-!.
+--
+mineralization(0.0,150.0):-!.
+hardness(0.0,5.0):-!.
+--
+check_paraph(_):-!.
+--
+asphalt(0.0,0.1):-!.
+resin(0.0,0.2):-!.
+--
+check_clay(_):-!.
+--
+cement(0.1,0.3):-!.
+carbon(0.01,0.25):-!.
+]
+------------------------------------------------------------------------
+class '_Мицеллярно-полимерное_заводнение'
+(specialized 'Физико-химические методы'):
+[
+check_collected_water(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,2.0):-!.
+porosity(0.1,0.35):-!.
+saturation(0.25,1.0):-!.
+moist(0,180):-!.
+--
+check_thickness(_):-!.
+check_temperature(_):-!.
+check_angle(_):-!.
+check_depth(_):-!.
+--
+pressure(10.0,60.0):-!.
+--
+check_acid(_):-!.
+--
+density(850,940):-!.
+viscosity(0.01,20.0):-!.
+--
+mineralization(0.0,50.0):-!.
+pH(4.0,10.0):-!.
+hardness(0.0,0.025):-!.
+--
+check_substances(_,_):-!.
+--
+check_cement(_):-!.
+check_carbon(_):-!.
+--
+clay(0.0,0.05):-!.
+]
+------------------------------------------------------------------------
+class '_Карбонизированное_заводнение'
+(specialized 'Физико-химические методы'):
+[
+check_collected_water(_):-!.
+check_moist(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,5.0):-!.
+porosity(0.1,0.5):-!.
+saturation(0.4,1.0):-!.
+--
+check_temperature(_):-!.
+check_angle(_):-!.
+--
+thickness(2,100):-!.
+pressure(10.0,60.0):-!.
+depth(30,3000):-!.
+--
+check_oil(_):-!.
+--
+check_water(_):-!.
+--
+check_paraph(_):-!.
+--
+asphalt(0.0,0.05):-!.
+resin(0.0,0.1):-!.
+--
+check_composition(_):-!.
+]
+------------------------------------------------------------------------
+class '_Мицеллярное_заводнение'
+(specialized 'Физико-химические методы'):
+[
+verify_parameters(_):-!,
+	method_is_unknown.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_водного_раствора_спирта'
+(specialized 'Физико-химические методы'):
+[
+verify_parameters(_):-!,
+	method_is_unknown.
+]
+------------------------------------------------------------------------
+-- Газовые методы                                                     --
+------------------------------------------------------------------------
+class 'Газовые_методы' (specialized 'Способы_воздействия'):
+[
+check_moist(_):-!.
+--
+water_thickness(0.0,3.0):-!.
+rock_thickness(3.0,100.0):-!.
+--
+check_acid(_):-!.
+--
+check_water(_):-!.
+--
+check_free_gas(_):-!.
+--
+nitrogen(0.0,0.02):-!.
+--
+check_sulphur(_):-!.
+check_T_paraph(_,_):-!.
+--
+check_cement(_):-!.
+check_carbon(_):-!.
+--
+clay(0.0,0.05):-!.
+]
+------------------------------------------------------------------------
+class '_Азот_смешивающийся' (specialized 'Газовые_методы'):
+[
+check_collected_water(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.0001,3.0):-!.
+porosity(0.04,0.35):-!.
+saturation(0.25,1.0):-!.
+--
+thickness(6,30):-!.
+pressure(35.0,55.0):-!.
+temperature(20,200):-!.
+angle(0,90):-!.
+depth(2200,6000):-!.
+--
+density(650,880):-!.
+viscosity(0.01,25.0):-!.
+--
+check_substances(_,_):-!.
+]
+------------------------------------------------------------------------
+class '_Азот_несмешивающийся' (specialized 'Газовые_методы'):
+[
+check_collected_water(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.005,3.0):-!.
+porosity(0.04,0.35):-!.
+saturation(0.5,1.0):-!.
+--
+thickness(6,30):-!.
+pressure(5.0,55.0):-!.
+temperature(20,200):-!.
+angle(0,5):-!.
+depth(360,6000):-!.
+--
+density(650,920):-!.
+viscosity(0.4,10.0):-!.
+--
+check_substances(_,_):-!.
+]
+------------------------------------------------------------------------
+class '_CO2_смешивающийся' (specialized 'Газовые_методы'):
+[
+check_collected_water(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.0001,3.0):-!.
+porosity(0.04,0.35):-!.
+saturation(0.25,1.0):-!.
+--
+thickness(6,30):-!.
+pressure(8.0,55.0):-!.
+temperature(20,200):-!.
+angle(0,90):-!.
+depth(900,6000):-!.
+--
+density(650,880):-!.
+viscosity(0.01,12.0):-!.
+--
+paraph(0.0,0.3):-!.
+asphalt(0.0,0.1):-!.
+resin(0.0,0.15):-!.
+]
+------------------------------------------------------------------------
+class '_CO2_несмешивающийся' (specialized 'Газовые_методы'):
+[
+check_collected_water(_):-!.
+--
+type_of_rock("терригенный"):-!.
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.005,3.0):-!.
+porosity(0.04,0.35):-!.
+saturation(0.5,1.0):-!.
+--
+thickness(6,30):-!.
+pressure(5.0,55.0):-!.
+temperature(20,200):-!.
+angle(0,5):-!.
+depth(700,6000):-!.
+--
+density(650,1000):-!.
+viscosity(10.0,1000.0):-!.
+--
+paraph(0.0,0.3):-!.
+asphalt(0.0,0.1):-!.
+resin(0.0,0.15):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_углеводородных_растворителей'
+(specialized 'Газовые_методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.005,3.0):-!.
+porosity(0.04,0.35):-!.
+saturation(0.4,1.0):-!.
+collected_water(0.0,0.3):-!.
+--
+thickness(6,40):-!.
+pressure(5.0,55.0):-!.
+temperature(20,200):-!.
+angle(0,5):-!.
+depth(400,6000):-!.
+--
+density(650,880):-!.
+viscosity(0.1,50.0):-!.
+--
+check_substances(_,_):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_газа_высокого_давления'
+(specialized 'Газовые_методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.	--  В книге - не пропечатано!
+penetrability(0.0001,3.0):-!.
+porosity(0.04,0.35):-!.
+saturation(0.4,1.0):-!.
+collected_water(0.0,0.2):-!.
+--
+thickness(6,15):-!.
+pressure(25.0,55.0):-!.
+temperature(20,200):-!.
+angle(0,90):-!.
+depth(800,7000):-!.
+--
+density(650,880):-!.
+viscosity(0.4,10.0):-!.
+--
+check_substances(_,_):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_обогащённого_газа' (specialized 'Газовые_методы'):
+[
+verify_parameters(_):-!,
+	method_is_unknown.
+]
+------------------------------------------------------------------------
+-- Микробиологические методы                                          --
+------------------------------------------------------------------------
+class 'Микробиологические_методы' (specialized 'Способы_воздействия'):
+[
+check_collected_water(_):-!.
+check_moist(_):-!.
+--
+check_rock_thickness(RT):-!,
+	min_rock_thickness(MinRockThickness),!,
+	MinRockThickness < RT.
+--
+min_rock_thickness(3.0):-!.
+--
+check_acid(_):-!.
+--
+check_nitrogen(_):-!.
+--
+check_sulphur(_):-!.
+check_T_paraph(_,_):-!.
+--
+check_cement(_):-!.
+check_clay(_):-!.
+]
+------------------------------------------------------------------------
+class '_Био-ПАВ' (specialized 'Микробиологические_методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,5.0):-!.
+porosity(0.25,0.4):-!.
+saturation(0.7,1.0):-!.
+--
+check_thickness(_):-!.
+check_water_thickness(_):-!.
+check_pressure(_):-!.
+check_angle(_):-!.
+--
+temperature(10,90):-!.
+depth(30,1500):-!.
+--
+density(650,859):-!.	-- В книге дано значение 859.
+viscosity(0.4,60.0):-!.
+--
+mineralization(0.0,300.0):-!.
+pH(6.0,7.5):-!.
+hardness(0.0,10.0):-!.
+--
+check_free_gas(_):-!.
+--
+check_substances(_,_):-!.
+--
+check_carbon(_):-!.
+]
+------------------------------------------------------------------------
+class '_Ксантан' (specialized 'Микробиологические_методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+type_of_collector("трещинный"):-!.
+penetrability(0.05,5.0):-!.
+porosity(0.25,0.4):-!.
+saturation(0.7,1.0):-!.
+--
+check_thickness(_):-!.
+check_water_thickness(_):-!.
+check_pressure(_):-!.
+check_angle(_):-!.
+--
+temperature(10,150):-!.
+depth(30,1500):-!.
+--
+density(650,850):-!.
+viscosity(0.4,25.0):-!.
+--
+mineralization(0.0,150.0):-!.
+pH(6.0,7.5):-!.
+hardness(0.0,10.0):-!.
+--
+check_free_gas(_):-!.
+--
+check_substances(_,_):-!.
+--
+check_carbon(_):-!.
+]
+------------------------------------------------------------------------
+class '_Склеро-глюкан' (specialized 'Микробиологические_методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,5.0):-!.
+porosity(0.25,0.4):-!.
+saturation(0.7,1.0):-!.
+--
+check_rock_thickness(_):-!.
+--
+thickness(3,20):-!.
+water_thickness(0.0,0.05):-!.
+pressure(1.0,20.0):-!.
+temperature(0,150):-!.
+angle(0,5):-!.
+depth(30,1500):-!.
+--
+density(650,850):-!.
+viscosity(0.4,25.0):-!.
+--
+mineralization(0.0,350.0):-!.
+pH(6.0,7.5):-!.
+hardness(0.0,150.0):-!.
+--
+free_gas('no'):-!.
+--
+paraph(0.0,0.3):-!.
+asphalt(0.0,0.15):-!.
+resin(0.0,0.4):-!.
+--
+check_carbon(_):-!.
+]
+------------------------------------------------------------------------
+class '_Поли-сахарид' (specialized 'Микробиологические_методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,5.0):-!.
+porosity(0.25,0.4):-!.
+saturation(0.7,1.0):-!.
+--
+check_rock_thickness(_):-!.
+--
+thickness(3,20):-!.
+water_thickness(0.0,0.05):-!.
+pressure(1.0,20.0):-!.
+temperature(0,150):-!.
+angle(0,5):-!.
+depth(30,1500):-!.
+--
+density(650,850):-!.
+viscosity(0.4,25.0):-!.
+--
+mineralization(0.0,350.0):-!.
+pH(6.0,7.5):-!.
+hardness(0.0,300.0):-!.
+--
+free_gas('no'):-!.
+--
+paraph(0.0,0.3):-!.
+asphalt(0.0,0.15):-!.
+resin(0.0,0.4):-!.
+--
+check_carbon(_):-!.
+]
+------------------------------------------------------------------------
+class '_Активация_естественной_микрофлоры'
+(specialized 'Микробиологические_методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_collector("поровый"):-!.
+penetrability(0.1,5.0):-!.
+porosity(0.25,0.4):-!.
+saturation(0.7,1.0):-!.
+--
+check_thickness(_):-!.
+check_water_thickness(_):-!.
+check_pressure(_):-!.
+check_angle(_):-!.
+--
+temperature(10,40):-!.
+depth(30,2000):-!.
+--
+check_density(_):-!.
+--
+viscosity(0.01,20.0):-!.
+--
+mineralization(0.0,20.0):-!.
+pH(6.0,7.5):-!.
+hardness(0.0,5.0):-!.
+--
+free_gas('no'):-!.
+--
+check_substances(_,_):-!.
+--
+carbon(0.0,0.05):-!.
+]
+------------------------------------------------------------------------
+class '_Микробное_(меласское)_заводнение'
+(specialized 'Микробиологические_методы'):
+[
+type_of_rock("терригенный"):-!.
+type_of_rock("карбонатный"):-!.
+type_of_collector("поровый"):-!.
+type_of_collector("трещинный"):-!.
+penetrability(0.1,5.0):-!.
+porosity(0.1,0.4):-!.
+saturation(0.5,1.0):-!.
+--
+check_rock_thickness(_):-!.
+--
+thickness(3,100):-!.
+water_thickness(0.0,0.05):-!.
+pressure(0.0,15.0):-!.
+temperature(20,60):-!.
+angle(0,10):-!.
+depth(0,1500):-!.
+--
+density(650,900):-!.
+viscosity(0.1,60.0):-!.
+--
+mineralization(0.0,100.0):-!.
+pH(6.0,8.0):-!.
+hardness(0.0,20.0):-!.
+--
+free_gas('no'):-!.
+--
+paraph(0.0,0.3):-!.
+asphalt(0.0,0.15):-!.
+resin(0.0,0.4):-!.
+--
+carbon(0.0,1.0):-!.
+]
+------------------------------------------------------------------------
+class '_Нагнетание_микроорганизмов'
+(specialized 'Микробиологические_методы'):
+[
+verify_parameters(_):-!,
+	method_is_unknown.
+]
+------------------------------------------------------------------------
+-- Базовый класс 'Способы_воздействия'                                --
+------------------------------------------------------------------------
+class 'Способы_воздействия' (specialized 'Объяснение_решений'):
+[
+check_parameters({	rock: R,
+			stratum: ST,
+			oil: O,
+			water: W,
+			gas: G,
+			substances: SS,
+			composition: C
+			|_}):-
+	check_rock(R),
+	check_stratum(ST),
+	check_oil(O),
+	check_water(W),
+	check_gas(G),
+	check_substances(SS,ST),
+	check_composition(C).
+------------------------------------------------------------------------
+check_rock({	type_of_rock: RT,
+		type_of_collector: CT,
+		penetrability: PN,
+		porosity: PR,
+		saturation: S,
+		water: W,
+		moist: M
+		|_}):-
+	check_type_of_rock(RT),
+	check_type_of_collector(CT),
+	check_penetrability(PN),
+	check_porosity(PR),
+	check_saturation(S),
+	check_collected_water(W),
+	check_moist(M).
+--
+check_type_of_rock(RT):-!,
+	type_of_rock(RT),!.
+check_type_of_collector(CT):-!,
+	type_of_collector(CT),!.
+check_penetrability(PN):-
+	penetrability(MinPenetrability,MaxPenetrability),!,
+	--
+	MinPenetrability <= PN,
+	PN <= MaxPenetrability.
+check_porosity(PR):-
+	porosity(MinPorosity,MaxPorosity),!,
+	--
+	MinPorosity <= PR,
+	PR <= MaxPorosity.
+check_saturation(S):-
+	saturation(MinSaturation,MaxSaturation),!,
+	--
+	MinSaturation <= S,
+	S <= MaxSaturation.
+check_collected_water(W):-
+	collected_water(MinWater,MaxWater),!,
+	--
+	MinWater <= W,
+	W <= MaxWater.
+check_moist(M):-
+	moist(MinMoist,MaxMoist),!,
+	--
+	MinMoist <= M,
+	M <= MaxMoist.
+------------------------------------------------------------------------
+check_stratum({	thickness: TH,
+		water_thickness: WT,
+		rock_thickness: RT,
+		pressure: P,
+		temperature: T,
+		angle: A,
+		depth: D
+		|_}):-
+	check_thickness(TH),
+	check_water_thickness(WT),
+	check_rock_thickness(RT),
+	check_pressure(P),
+	check_temperature(T),
+	check_angle(A),
+	check_depth(D).
+--
+check_thickness(TH):-
+	thickness(MinThickness,MaxThickness),!,
+	--
+	MinThickness <= TH,
+	TH <= MaxThickness.
+check_water_thickness(WT):-
+	water_thickness(MinWaterThickness,MaxWaterThickness),!,
+	--
+	MinWaterThickness <= WT,
+	WT <= MaxWaterThickness.
+check_rock_thickness(RT):-
+	rock_thickness(MinRockThickness,MaxRockThickness),!,
+	--
+	MinRockThickness <= RT,
+	RT <= MaxRockThickness.
+check_pressure(P):-
+	pressure(MinPressure,MaxPressure),!,
+	--
+	MinPressure <= P,
+	P <= MaxPressure.
+check_temperature(T):-
+	temperature(MinTemperature,MaxTemperature),!,
+	--
+	MinTemperature <= T,
+	T <= MaxTemperature.
+check_angle(A):-
+	angle(MinAngle,MaxAngle),!,
+	--
+	MinAngle <= A,
+	A <= MaxAngle.
+check_depth(D):-
+	depth(MinDepth,MaxDepth),!,
+	--
+	MinDepth <= D,
+	D <= MaxDepth.
+------------------------------------------------------------------------
+check_oil({	density: D,
+		viscosity: V,
+		acid: A
+		|_}):-
+	check_density(D),
+	check_viscosity(V),
+	check_acid(A).
+--
+check_density(D):-
+	density(MinDensity,MaxDensity),!,
+	--
+	MinDensity <= D,
+	D <= MaxDensity.
+check_viscosity(V):-
+	viscosity(MinViscosity,MaxViscosity),!,
+	--
+	MinViscosity <= V,
+	V <= MaxViscosity.
+check_acid(A):-
+	acid(MinAcid,MaxAcid),!,
+	--
+	MinAcid <= A,
+	A <= MaxAcid.
+------------------------------------------------------------------------
+check_water({	mineralization: M,
+		pH: PH,
+		hardness: H
+		|_}):-
+	check_mineralization(M),
+	check_pH(PH),
+	check_hardness(H).
+--
+check_mineralization(M):-
+	mineralization(MinMineralization,MaxMineralization),!,
+	--
+	MinMineralization <= M,
+	M <= MaxMineralization.
+check_pH(PH):-
+	pH(Min_pH,Max_pH),!,
+	--
+	Min_pH <= PH,
+	PH <= Max_pH.
+check_hardness(H):-
+	hardness(MinHardness,MaxHardness),!,
+	--
+	MinHardness <= H,
+	H <= MaxHardness.
+------------------------------------------------------------------------
+check_gas({nitrogen:N,free_gas:FG|_}):-!,
+	check_nitrogen(N),
+	check_free_gas(FG).
+--
+check_nitrogen(N):-
+	nitrogen(MinNitrogen,MaxNitrogen),!,
+	--
+	MinNitrogen <= N,
+	N <= MaxNitrogen.
+--
+check_free_gas(FG):-
+	free_gas(FG),!.
+------------------------------------------------------------------------
+check_substances({
+		paraph: P,
+		asphalt: A,
+		resin: R,
+		sulphur: S,
+		t_paraph: TO
+		|_},
+		{
+		temperature: TS
+		|_}):-
+	check_paraph(P),
+	check_asphalt(A),
+	check_resin(R),
+	check_sulphur(S),
+	check_T_paraph(TO,TS).
+--
+check_paraph(P):-
+	paraph(MinParaph,MaxParaph),!,
+	--
+	MinParaph <= P,
+	P <= MaxParaph.
+check_asphalt(A):-
+	asphalt(MinAsphalt,MaxAsphalt),!,
+	--
+	MinAsphalt <= A,
+	A <= MaxAsphalt.
+check_resin(R):-
+	resin(MinResin,MaxResin),!,
+	--
+	MinResin <= R,
+	R <= MaxResin.
+check_sulphur(S):-
+	sulphur(MinSulphur,MaxSulphur),
+	--
+	MinSulphur <= S,
+	S <= MaxSulphur.
+------------------------------------------------------------------------
+check_composition({cement:C1,clay:C2,carbon:C3|_}):-!,
+	check_cement(C1),
+	check_clay(C2),
+	check_carbon(C3),!.
+--
+check_cement(C1):-
+	cement(MinCement,MaxCement),!,
+	--
+	MinCement <= C1,
+	C1 <= MaxCement.
+check_clay(C2):-
+	clay(MinClay,MaxClay),!,
+	--
+	MinClay <= C2,
+	C2 <= MaxClay.
+check_carbon(C3):-
+	carbon(MinCarbon,MaxCarbon),!,
+	--
+	MinCarbon <= C3,
+	C3 <= MaxCarbon.
+------------------------------------------------------------------------
+type_of_rock(_):-
+	fail.
+type_of_collector(_):-
+	fail.
+penetrability(#,#).
+porosity(#,#).
+saturation(#,#).
+collected_water(#,#).
+moist(#,#).
+--
+thickness(#,#).
+water_thickness(#,#).
+rock_thickness(#,#).
+pressure(#,#).
+temperature(#,#).
+angle(#,#).
+depth(#,#).
+--
+density(#,#).
+viscosity(#,#).
+acid(#,#).
+--
+mineralization(#,#).
+pH(#,#).
+hardness(#,#).
+--
+nitrogen(#,#).
+free_gas(_):-
+	fail.
+--
+paraph(#,#).
+asphalt(#,#).
+resin(#,#).
+sulphur(#,#).
+--
+cement(#,#).
+clay(#,#).
+carbon(#,#).
+]
+------------------------------------------------------------------------
+-- Базовый класс 'Объяснение_решений'                                 --
+------------------------------------------------------------------------
+class 'Объяснение_решений' (specialized 'Проверка_параметров'):
+name;
+con;
+tools;
+[
+verify_parameters({	rock: R,
+			stratum: ST,
+			oil: O,
+			water: W,
+			gas: G,
+			substances: SS,
+			composition: C
+			|_}):-!,
+	con ? clear,
+	con ? show,
+	con ? set_color('Blue'),
+	con ? writeln("Метод воздействия: ",name),
+	con ? nl,
+	con ? set_color('default'),
+	con ? writeln("Проверка параметров:"),
+	verify_rock(R,"Горная порода"),
+	verify_stratum(ST,"Пласт"),
+	verify_oil(O,"Пластовая нефть"),
+	verify_water(W,"Пластовая вода"),
+	verify_gas(G,"Пластовый газ"),
+	verify_substances(SS,ST,"Пластовые вещества"),
+	verify_composition(C,"Минеральный состав"),
+	con ? writeln("Проверка закончена.").
+verify_parameters(P):-
+	con ? clear,
+	con ? show,
+	con ? set_color('Red'),
+	con ? writeln("Метод воздействия: ",name),
+	con ? nl,
+	con ? writeln("Параметры не заданы!"),
+	con ? set_color('default'),
+	con ? writeln(P).
+------------------------------------------------------------------------
+verify_rock(_,Title):-
+	check_rock(#),!,
+	is_unused(Title).
+verify_rock({	type_of_rock: RT,
+		type_of_collector: CT,
+		penetrability: PN,
+		porosity: PR,
+		saturation: S,
+		water: W,
+		moist: M
+		|_},Title):-!,
+	con ? writeln(Title,":"),
+	verify_type_of_rock(RT,"Тип породы"),
+	verify_type_of_collector(CT,"Тип коллектора"),
+	verify_penetrability(PN,"Проницаемость"),
+	verify_porosity(PR,"Пористость"),
+	verify_saturation(S,"Нефтенасыщенность"),
+	verify_collected_water(W,"Связанная вода"),
+	verify_moist(M,"Средний угол смачивания").
+verify_rock(_,Title):-
+	is_not_valid(Title).
+--
+verify_type_of_rock(_,Title):-
+	check_type_of_rock(#),!,
+	is_unused(1,Title).
+verify_type_of_rock(RT,Title):-
+	check_type_of_rock(RT),!,
+	is_valid(1,Title).
+verify_type_of_rock(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_type_of_collector(_,Title):-
+	check_type_of_collector(#),!,
+	is_unused(1,Title).
+verify_type_of_collector(CT,Title):-
+	check_type_of_collector(CT),!,
+	is_valid(1,Title).
+verify_type_of_collector(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_penetrability(_,Title):-
+	check_penetrability(#),!,
+	is_unused(1,Title).
+verify_penetrability(PN,Title):-
+	check_penetrability(PN),!,
+	is_valid(1,Title).
+verify_penetrability(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_porosity(_,Title):-
+	check_porosity(#),!,
+	is_unused(1,Title).
+verify_porosity(PR,Title):-
+	check_porosity(PR),!,
+	is_valid(1,Title).
+verify_porosity(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_saturation(_,Title):-
+	check_saturation(#),!,
+	is_unused(1,Title).
+verify_saturation(S,Title):-
+	check_saturation(S),!,
+	is_valid(1,Title).
+verify_saturation(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_collected_water(_,Title):-
+	check_collected_water(#),!,
+	is_unused(1,Title).
+verify_collected_water(W,Title):-
+	check_collected_water(W),!,
+	is_valid(1,Title).
+verify_collected_water(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_moist(_,Title):-
+	check_moist(#),!,
+	is_unused(1,Title).
+verify_moist(M,Title):-
+	check_moist(M),!,
+	is_valid(1,Title).
+verify_moist(_,Title):-
+	is_not_valid(1,Title).
+------------------------------------------------------------------------
+verify_stratum(_,Title):-
+	check_stratum(#),!,
+	is_unused(Title).
+verify_stratum({
+		thickness: TH,
+		water_thickness: WT,
+		rock_thickness: RT,
+		pressure: P,
+		temperature: T,
+		angle: A,
+		depth: D
+		|_},Title):-!,
+	con ? writeln(Title,":"),
+	verify_thickness(TH,"Толщина пласта"),
+	verify_water_thickness(WT,"Толщина водонасыщенной зоны"),
+	verify_rock_thickness(RT,"Толщина покрывающих пород"),
+	verify_pressure(P,"Давление"),
+	verify_temperature(T,"Температура"),
+	verify_angle(A,"Угол падения"),
+	verify_depth(D,"Глубина залегания").
+verify_stratum(_,Title):-
+	is_not_valid(Title).
+--
+verify_thickness(_,Title):-
+	check_thickness(#),!,
+	is_unused(1,Title).
+verify_thickness(TH,Title):-
+	check_thickness(TH),!,
+	is_valid(1,Title).
+verify_thickness(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_water_thickness(_,Title):-
+	check_water_thickness(#),!,
+	is_unused(1,Title).
+verify_water_thickness(WT,Title):-
+	check_water_thickness(WT),!,
+	is_valid(1,Title).
+verify_water_thickness(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_rock_thickness(_,Title):-
+	check_rock_thickness(#),!,
+	is_unused(1,Title).
+verify_rock_thickness(RT,Title):-
+	check_rock_thickness(RT),!,
+	is_valid(1,Title).
+verify_rock_thickness(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_pressure(_,Title):-
+	check_pressure(#),!,
+	is_unused(1,Title).
+verify_pressure(P,Title):-
+	check_pressure(P),!,
+	is_valid(1,Title).
+verify_pressure(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_temperature(_,Title):-
+	check_temperature(#),!,
+	is_unused(1,Title).
+verify_temperature(T,Title):-
+	check_temperature(T),!,
+	is_valid(1,Title).
+verify_temperature(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_angle(_,Title):-
+	check_angle(#),!,
+	is_unused(1,Title).
+verify_angle(A,Title):-
+	check_angle(A),!,
+	is_valid(1,Title).
+verify_angle(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_depth(_,Title):-
+	check_depth(#),!,
+	is_unused(1,Title).
+verify_depth(D,Title):-
+	check_depth(D),!,
+	is_valid(1,Title).
+verify_depth(_,Title):-
+	is_not_valid(1,Title).
+------------------------------------------------------------------------
+verify_oil(_,Title):-
+	check_oil(#),!,
+	is_unused(Title).
+verify_oil({	density: D,
+		viscosity: V,
+		acid: A
+		|_},Title):-!,
+	con ? writeln(Title,":"),
+	verify_density(D,"Плотность"),
+	verify_viscosity(V,"Вязкость"),
+	verify_acid(A,"Кислотное число").
+verify_oil(_,Title):-
+	is_not_valid(Title).
+--
+verify_density(_,Title):-
+	check_density(#),!,
+	is_unused(1,Title).
+verify_density(D,Title):-
+	check_density(D),!,
+	is_valid(1,Title).
+verify_density(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_viscosity(_,Title):-
+	check_viscosity(#),!,
+	is_unused(1,Title).
+verify_viscosity(V,Title):-
+	check_viscosity(V),!,
+	is_valid(1,Title).
+verify_viscosity(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_acid(_,Title):-
+	check_acid(#),!,
+	is_unused(1,Title).
+verify_acid(A,Title):-
+	check_acid(A),!,
+	is_valid(1,Title).
+verify_acid(_,Title):-
+	is_not_valid(1,Title).
+------------------------------------------------------------------------
+verify_water(_,Title):-
+	check_water(#),!,
+	is_unused(Title).
+verify_water({	mineralization: M,
+		pH: PH,
+		hardness: H
+		|_},Title):-!,
+	con ? writeln(Title,":"),
+	verify_mineralization(M,"Минерализация"),
+	verify_pH(PH,"pH"),
+	verify_hardness(H,"Жесткость").
+verify_water(_,Title):-
+	is_not_valid(Title).
+--
+verify_mineralization(_,Title):-
+	check_mineralization(#),!,
+	is_unused(1,Title).
+verify_mineralization(M,Title):-
+	check_mineralization(M),!,
+	is_valid(1,Title).
+verify_mineralization(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_pH(_,Title):-
+	check_pH(#),!,
+	is_unused(1,Title).
+verify_pH(PH,Title):-
+	check_pH(PH),!,
+	is_valid(1,Title).
+verify_pH(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_hardness(_,Title):-
+	check_hardness(#),!,
+	is_unused(1,Title).
+verify_hardness(H,Title):-
+	check_hardness(H),!,
+	is_valid(1,Title).
+verify_hardness(_,Title):-
+	is_not_valid(1,Title).
+------------------------------------------------------------------------
+verify_gas(_,Title):-
+	check_gas(#),!,
+	is_unused(Title).
+verify_gas({nitrogen:N,free_gas:FG|_},Title):-!,
+	con ? writeln(Title,":"),
+	verify_nitrogen(N,"Азотистые соединения"),
+	verify_free_gas(FG,"Наличие свободного газа").
+verify_gas(_,Title):-
+	is_not_valid(Title).
+--
+verify_nitrogen(_,Title):-
+	check_nitrogen(#),!,
+	is_unused(1,Title).
+verify_nitrogen(N,Title):-
+	check_nitrogen(N),!,
+	is_valid(1,Title).
+verify_nitrogen(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_free_gas(_,Title):-
+	check_free_gas(#),!,
+	is_unused(1,Title).
+verify_free_gas('no',Title):-
+	check_free_gas('no'),!,
+	is_valid(1,Title,"газа нет").
+verify_free_gas(FG,Title):-
+	check_free_gas(FG),!,
+	is_valid(1,Title).
+verify_free_gas(_,Title):-
+	is_not_valid(1,Title).
+------------------------------------------------------------------------
+verify_substances(_,_,Title):-
+	check_substances(#,#),!,
+	is_unused(0,Title,"не учитываются").
+verify_substances({
+		paraph: P,
+		asphalt: A,
+		resin: R,
+		sulphur: S,
+		t_paraph: TO
+		|_},
+		{
+		temperature: TS
+		|_},
+		Title):-!,
+	con ? writeln(Title,":"),
+	verify_paraph(P,"Парафин"),
+	verify_asphalt(A,"Асфальтены"),
+	verify_resin(R,"Смолы"),
+	verify_sulphur(S,"Сера"),
+	verify_T_paraph(TO,TS,"Температура насыщения парафином").
+verify_substances(_,_,Title):-
+	is_not_valid(1,Title,"не подходят").
+--
+verify_paraph(_,Title):-
+	check_paraph(#),!,
+	is_unused(1,Title).
+verify_paraph(P,Title):-
+	check_paraph(P),!,
+	is_valid(1,Title).
+verify_paraph(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_asphalt(_,Title):-
+	check_asphalt(#),!,
+	is_unused(1,Title).
+verify_asphalt(A,Title):-
+	check_asphalt(A),!,
+	is_valid(1,Title).
+verify_asphalt(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_resin(_,Title):-
+	check_resin(#),!,
+	is_unused(1,Title).
+verify_resin(R,Title):-
+	check_resin(R),!,
+	is_valid(1,Title).
+verify_resin(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_sulphur(_,Title):-
+	check_sulphur(#),!,
+	is_unused(1,Title).
+verify_sulphur(S,Title):-
+	check_sulphur(S),!,
+	is_valid(1,Title).
+verify_sulphur(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_T_paraph(_,_,Title):-
+	check_T_paraph(#,#),!,
+	is_unused(1,Title).
+verify_T_paraph(TO,TS,Title):-
+	check_T_paraph(TO,TS),!,
+	is_valid(1,Title).
+verify_T_paraph(_,_,Title):-
+	is_not_valid(1,Title).
+------------------------------------------------------------------------
+verify_composition(_,Title):-
+	check_composition(#),!,
+	is_unused(Title).
+verify_composition({cement:C1,clay:C2,carbon:C3|_},Title):-!,
+	con ? writeln(Title,":"),
+	verify_cement(C1,"Цемент"),
+	verify_clay(C2,"Глины"),
+	verify_carbon(C3,"Карбонатность").
+verify_composition(_,Title):-
+	is_not_valid(Title).
+--
+verify_cement(_,Title):-
+	check_cement(#),!,
+	is_unused(1,Title).
+verify_cement(C1,Title):-
+	check_cement(C1),!,
+	is_valid(1,Title).
+verify_cement(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_clay(_,Title):-
+	check_clay(#),!,
+	is_unused(1,Title).
+verify_clay(C2,Title):-
+	check_clay(C2),!,
+	is_valid(1,Title).
+verify_clay(_,Title):-
+	is_not_valid(1,Title).
+--
+verify_carbon(_,Title):-
+	check_carbon(#),!,
+	is_unused(1,Title).
+verify_carbon(C3,Title):-
+	check_carbon(C3),!,
+	is_valid(1,Title).
+verify_carbon(_,Title):-
+	is_not_valid(1,Title).
+------------------------------------------------------------------------
+is_valid(Text1):-!,
+	is_valid(0,Text1).
+is_valid(N,Text1):-!,
+	is_valid(N,Text1,"подходит").
+is_valid(N,Text1,Text2):-!,
+	write_tab(N),
+	con ? write(Text1),
+	con ? write(" - "),
+	con ? set_color('Green'),
+	con ? write(Text2),
+	con ? set_color('default'),
+	con ? writeln(".").
+--
+is_not_valid(Text1):-!,
+	is_not_valid(0,Text1).
+is_not_valid(N,Text1):-!,
+	is_not_valid(N,Text1,"не подходит").
+is_not_valid(N,Text1,Text2):-!,
+	write_tab(N),
+	con ? write(Text1),
+	con ? write(" - "),
+	con ? set_color('Red'),
+	con ? write(Text2),
+	con ? set_color('default'),
+	con ? writeln(".").
+--
+is_unused(Text1):-!,
+	is_unused(0,Text1).
+--
+is_unused(N,Text1):-!,
+	is_unused(N,Text1,"не учитывается").
+is_unused(N,Text1,Text2):-
+	write_tab(N),
+	con ? write(Text1),
+	con ? write(" - "),
+	con ? set_color('Blue'),
+	con ? write(Text2),
+	con ? set_color('default'),
+	con ? writeln(".").
+--
+write_tab(N):-
+	tools?(N <= 0),!.
+write_tab(N):-
+	con ? write("   "),
+	N2 == tools?'-'(N,1),
+	write_tab(N2).
+------------------------------------------------------------------------
+method_is_unknown:-
+	con ? clear,
+	con ? show,
+	con ? set_color('Red'),
+	con ? writeln("Метод воздействия: ",name),
+	con ? nl,
+	con ? writeln(
+		"Извините, про этот метод мне\n",
+		"просто ничего не известно."),
+	con ? set_color('default').
+]
+------------------------------------------------------------------------
+-- Базовый класс 'Проверка_параметров'                                --
+------------------------------------------------------------------------
+class 'Проверка_параметров' (specialized '_Block'):
+--
+value_i1;
+--
+value_o1;
+--
+title;
+name;
+x;
+y;
+--
+dialog		= ('ДиалогПроверкиПараметров',
+			title,
+			x,
+			y,
+			owner=self);
+--
+tools		= ('ArithmeticOperations');
+--
+controller	= ('MethodNameSender',
+			target=self,
+			output=value_o1);
+--
+[
+goal:-!,
+	tools ? bound(value_i1),
+	check_parameters(value_i1).
+--
+get_result()= name :-
+	check_parameters(value_i1).
+--
+show(_,_):-
+	parameters_are_not_valid,
+	verify_parameters(value_i1),
+	fail.
+show(_,_):-
+	dialog ? show,
+	fail.
+--
+parameters_are_not_valid:-
+	check_parameters(value_i1),!,
+	fail.
+parameters_are_not_valid.
+--
+verify_parameters:-
+	verify_parameters(value_i1),
+	fail.
+verify_parameters.
+--
+X < Y :-!,
+	tools ? '<'(?val("GroundNumber",X),?val("GroundNumber",Y)).
+X <= Y :-!,
+	tools ? '<='(?val("GroundNumber",X),?val("GroundNumber",Y)).
+]
+------------------------------------------------------------------------
+class 'ДиалогПроверкиПараметров' (specialized 'Dialog'):
+--
+internal:
+--
+	owner;
+--
+[
+action(1000):-!,
+	owner ? verify_parameters.
+]
+------------------------------------------------------------------------
+--                                                                    --
+-- Описание параметров месторождения                                  --
+--                                                                    --
+------------------------------------------------------------------------
+class '_Горная_порода' (specialized 'Описание_параметров'):
+--
+type_of_rock;
+type_of_collector;
+penetrability;
+porosity;
+saturation;
+water;
+moist;
+--
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == {
+		type_of_rock,
+		type_of_collector,
+		penetrability,
+		porosity,
+		saturation,
+		water,
+		moist}.
+]
+------------------------------------------------------------------------
+class '_Пласт' (specialized 'Описание_параметров'):
+--
+thickness;
+water_thickness;
+rock_thickness;
+pressure;
+temperature;
+angle;
+depth;
+--
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == {
+		thickness,
+		water_thickness,
+		rock_thickness,
+		pressure,
+		temperature,
+		angle,
+		depth}.
+]
+------------------------------------------------------------------------
+class '_Пластовая_нефть' (specialized 'Описание_параметров'):
+--
+density;
+viscosity;
+acid;
+--
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == {density,viscosity,acid}.
+]
+------------------------------------------------------------------------
+class '_Пластовая_вода' (specialized 'Описание_параметров'):
+--
+mineralization;
+pH;
+hardness;
+--
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == {mineralization,pH,hardness}.
+]
+------------------------------------------------------------------------
+class '_Пластовый_газ' (specialized 'Описание_параметров'):
+--
+nitrogen;
+free_gas;
+--
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == {nitrogen,free_gas}.
+]
+------------------------------------------------------------------------
+class '_Пластовые_вещества' (specialized 'Описание_параметров'):
+--
+paraph;
+asphalt;
+resin;
+sulphur;
+t_paraph;
+--
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == {paraph,asphalt,resin,sulphur,t_paraph}.
+]
+------------------------------------------------------------------------
+class '_Минеральный_состав' (specialized 'Описание_параметров'):
+--
+cement;
+clay;
+carbon;
+--
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == {cement,clay,carbon}.
+]
+------------------------------------------------------------------------
+-- Базовый класс 'Описание_параметров'                                --
+------------------------------------------------------------------------
+class 'Описание_параметров' (specialized '_DialogBlock'):
+[
+]
+------------------------------------------------------------------------
+--                                                                    --
+-- Вспомогательные классы                                             --
+--                                                                    --
+------------------------------------------------------------------------
+class '_Вывод_результатов' (specialized '_DialogBlock'):
+[
+show(_,_):-!,
+	show.
+]
+------------------------------------------------------------------------
+class '_Составить_список' (specialized '_Block'):
+--
+value_i1;
+value_i2;
+value_i3;
+value_i4;
+value_i5;
+value_i6;
+value_i7;
+--
+value_o1;
+--
+controller	= ('MethodNameSender',
+			target=self,
+			output=value_o1);
+--
+[
+goal:-!,
+	List1== [	value_i1,value_i2,value_i3,
+			value_i4,value_i5,value_i6,value_i7],
+	clear_list(List1,List2),
+	-- send_value(List2).
+	list_is_not_empty(List2).
+--
+clear_list([],[]):-!.
+clear_list([#|Rest1],Rest2):-!,
+	clear_list(Rest1,Rest2).
+clear_list([Name|Rest1],[Name|Rest2]):-!,
+	clear_list(Rest1,Rest2).
+clear_list(_,[]).
+--
+list_is_not_empty([]):-!,
+	fail.
+list_is_not_empty(_).
+--
+get_result()= List2 :-
+	List1== [	value_i1,value_i2,value_i3,
+			value_i4,value_i5,value_i6,value_i7],
+	clear_list(List1,List2).
+--
+show(_,_):-!.
+]
+------------------------------------------------------------------------
+class '_Составить_список_параметров' (specialized '_Block'):
+--
+value_i1;
+value_i2;
+value_i3;
+value_i4;
+value_i5;
+value_i6;
+value_i7;
+--
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == {
+		rock: value_i1,
+		stratum: value_i2,
+		oil: value_i3,
+		water: value_i4,
+		gas: value_i5,
+		substances: value_i6,
+		composition: value_i7
+		}.
+--
+show(_,_):-!.
+]
+------------------------------------------------------------------------
+class '_DialogBlock' (specialized 'Dialog'):
+--
+total_model;
+--
+[
+component(_):-
+	fail.
+]
+------------------------------------------------------------------------
+class '_Block':
+--
+total_model;
+--
+[
+show(_,_).
+--
+component(_):-
+	fail.
+--
+goal.
+--
+alarm(_):-
+	fail.
+]
+------------------------------------------------------------------------
+class 'ArithmeticOperations' (specialized 'Alpha'):
+[
+]
+------------------------------------------------------------------------
+class 'MethodNameSender':
+--
+target;
+--
+result	= target??get_result();
+--
+output;
+--
+[
+goal:-
+	send_value(result,output).
+--
+send_value(Value,Value).
+--
+alarm(_):-
+	fail.
+]
+------------------------------------------------------------------------

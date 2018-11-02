@@ -1,0 +1,91 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	sampling_rate	= 15;
+--
+internal:
+--
+	canvas		= ('Canvas2D');
+	image		= ('BufferedImage');
+	writer		= ('FFmpeg',
+				operating_mode='WRITING',
+				name="Test01.avi");
+	counter		= ('Counter');
+	con		= ('Console');
+--
+[
+goal:-!,
+	canvas ? set_scaling_factor('MIN'),
+	canvas ? show,
+	canvas ? get_image(image),
+	image ? get_size_in_pixels(Width1,Height1),
+	correct_size(Width1,Width2),
+	correct_size(Height1,Height2),
+	con ? writeln("Width: ",Width2," Height: ",Height2),
+	writer ? open({
+		codec_type: 'AVMEDIA_TYPE_VIDEO',
+		destination_image_width: Width2,
+		destination_image_height: Height2,
+		time_base: q(1,sampling_rate),
+		bit_rate: 5_000_000
+		}),
+	set_period(1/sampling_rate),
+	activate.
+--
+correct_size(Size,Size):-
+	?mod(Size,2) == 0,!.
+correct_size(Size1,Size2):-
+	Size2== Size1 + 11.
+--
+tick:-
+	N== counter?read_and_increase,
+	N <= 100,!,
+	record_frame(N).
+tick:-!,
+	suspend,
+	canvas ? hide,
+	writer ? close,
+	con ? writeln("Done.").
+--
+record_frame(N):-
+	canvas ? suspend_redrawing,
+	canvas ? clear('no'),
+	draw_spirogram(3,5,10,150-N*5,1000),
+	canvas ? draw_now,
+	canvas ? get_image(image),
+	writer ? write_image(image).
+--
+draw_spirogram(R1,R2,P,S,NP):-
+	canvas ? translate(0.5,0.5),
+	X1== (R1+R2-P)/S,
+	Y1== 0.0,
+	drawing_loop(0,NP,X1,Y1,R1,R2,P,S),
+	canvas ? show.
+--
+drawing_loop(N,MaxN,X1,Y1,R1,R2,P,S):-
+	N < MaxN,!,
+	T== N*?pi()/90,
+	X2== ((R1+R2)*?cos(T)-P*?cos((R1+R2)*T/R2))/S,
+	Y2== ((R1+R2)*?sin(T)-P*?sin((R1+R2)*T/R2))/S,
+	canvas ? draw_line(X1,Y1,X2,Y2),
+	drawing_loop(N+1,MaxN,X2,Y2,R1,R2,P,S).
+drawing_loop(_,_,_,_,_,_,_,_).
+]
+-----------------------------------------------------------------------
+class 'Counter' (specialized 'Database'):
+[
+read_and_increase = N :-
+	retract(N),!,
+	insert(N+1).
+read_and_increase = 1 :-
+	insert(2).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,369 @@
+#VRML V2.0 utf8
+WorldInfo{
+  title "Actor Prolog. An Example of Web Agent Report."
+  info ["(c) 2016 IRE RAS Alexei A. Morozov"]
+}
+NavigationInfo{
+  type "NONE"
+  headlight TRUE
+}
+Background{
+  backUrl ["../space4.gif"]
+  bottomUrl ["../space4.gif"]
+  frontUrl ["../space4.gif"]
+  leftUrl ["../space4.gif"]
+  rightUrl ["../space4.gif"]
+  topUrl ["../space4.gif"]
+}
+DEF PS1 ProximitySensor{
+  size 100 100 100
+}
+DEF Dashboard Transform{
+  children[
+    Transform{
+      translation -0.10 -0.075 -0.20
+      children[
+        Transform{
+          translation 0.01 0.01 0.04
+          children[
+            DEF SELECT Switch{
+              whichChoice 0
+              choice[
+                Transform{
+                  translation 0.02 0.0085 0
+                  children[
+                    Shape{
+                      appearance Appearance{
+                        material Material{
+                          emissiveColor 1 0 0
+                          diffuseColor 1 0 0
+                          specularColor 1 0 0
+                          transparency 0.5
+                        }
+                      }
+                      geometry Box{
+                        size 0.032 0.0159 0.0001
+                      }
+                    }
+                  ]
+                }
+                Group{
+                  children[
+                    Shape{
+                      appearance Appearance{
+                        material Material{
+                          transparency 1
+                        }
+                      }
+                      geometry IndexedFaceSet{
+                        coord Coordinate{
+                          point[
+                            0 0 0,
+                            0.04 0 0,
+                            0.04 0.017 0,
+                            0 0.018 0,
+                            0.09 0.065 0.161
+                          ]
+                        }
+                        coordIndex[
+                          0 1 2 3 -1
+                          1 4 0 -1
+                          2 4 1 -1
+                          3 4 2 -1
+                          4 3 0 -1
+                        ]
+                      }
+                    }
+                    Transform{
+                      translation 0.02 0.0085 0
+                      children[
+                        Shape{
+                          appearance Appearance{
+                            material Material{
+                              emissiveColor 0 1 0
+                              diffuseColor 0 1 0
+                              specularColor 0 1 0
+                              transparency 0.5
+                            }
+                          }
+                          geometry Box{
+                            size 0.032 0.0159 0.0001
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        Shape{
+          geometry Text{
+            string ["Fly !"]
+            fontStyle FontStyle{
+              family "SERIF"
+              style "BOLD"
+              size 0.015
+            }
+          }
+        }
+        DEF TS1 TouchSensor{
+        }
+      ]
+    }
+  ]
+}
+DEF TOGGLE Script{
+  eventIn SFBool isOver
+  eventOut SFInt32 whichChoice
+  url "javascript:
+    function isOver(value,time){
+      if(value==true) whichChoice= 1;
+      else whichChoice= 0;
+    }"
+  }
+ROUTE TS1.isOver TO TOGGLE.isOver
+ROUTE TOGGLE.whichChoice TO SELECT.whichChoice
+ROUTE PS1.orientation_changed TO Dashboard.set_rotation
+ROUTE PS1.position_changed TO Dashboard.set_translation
+DEF SENSOR1 SphereSensor{
+}
+DEF TRAN1 Transform{
+  children [
+    Shape{
+      geometry IndexedLineSet{
+        coord Coordinate{
+          point [
+            -2.5 -1.7 -2.5,
+            2.5 -1.7 -2.5,
+            -2.5 1.7 -2.5,
+            -2.5 -1.7 2.5,
+            2.5 1.7 -2.5,
+            2.5 -1.7 2.5,
+            -2.5 1.7 2.5
+          ]
+        }
+        coordIndex [
+          0 1 -1 0 2 -1 0 3 -1
+          2 6 -1 3 6 -1 2 4 -1
+          1 4 -1 3 5 -1 1 5 -1
+        ]
+      }
+      appearance Appearance{
+        material Material{
+          emissiveColor 1 1 1
+        }
+      }
+    }
+    Transform{
+      translation -2.5 1.7 -2.5
+      children[
+        Shape{
+          geometry Text{
+            string ["Size"]
+            fontStyle FontStyle{
+              family "SANS"
+              size 0.5
+            }
+          }
+        }
+      ]
+    }
+    Transform{
+      translation 2.5 -1.7 -2.5
+      children[
+        Shape{
+          geometry Text{
+            string ["Date"]
+            fontStyle FontStyle{
+              family "SANS"
+              size 0.5
+            }
+          }
+        }
+      ]
+    }
+    Transform{
+      translation 0 0 -2.5
+      children[
+        Shape{
+          geometry Text{
+            string ["semantic foundation"]
+            fontStyle FontStyle{
+              family "SANS"
+              size 0.5
+              justify "MIDDLE"
+            }
+          }
+        }
+      ]
+    }
+    Shape{
+      geometry IndexedFaceSet{
+        coord Coordinate{
+          point [
+            -2.5 -1.7 -2.5,
+            2.5 -1.7 -2.5,
+            -2.5 1.7 -2.5,
+            -2.5 -1.7 2.5,
+            2.5 1.7 -2.5,
+            2.5 -1.7 2.5,
+            -2.5 1.7 2.5
+            2.5 1.7 2.5
+          ]
+        }
+        coordIndex [
+          0 1 4 2 -1
+          0 2 6 3 -1
+          0 3 5 1 -1
+        ]
+      }
+      appearance Appearance{
+        material Material{
+          diffuseColor 0 0 0
+          emissiveColor 0 0 0
+          transparency 1
+        }
+      }
+    }
+    DEF TR Transform{
+      children[
+        DEF MVP Viewpoint{
+          position 0 0 0
+          fieldOfView 0.78
+          description "Moving"
+        }
+      ]
+    }
+  ]
+}
+ROUTE SENSOR1.rotation_changed TO TRAN1.rotation
+DEF SVP Viewpoint{
+  position 5 2 7
+  orientation 20 -40 3 -0.7
+  fieldOfView 0.78
+}
+ROUTE SENSOR1.isActive TO SVP.set_bind
+DEF SVP Viewpoint{
+  position 5 2 7
+  orientation 20 -40 3 -0.7
+  fieldOfView 0.78
+}
+ROUTE TS1.isOver TO MVP.set_bind
+DEF TRAN_PL_1 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T1 TimeSensor{
+  cycleInterval 17
+  loop TRUE
+}
+DEF CI1 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25
+  ]
+}
+ROUTE T1.fraction_changed TO CI1.set_fraction
+ROUTE CI1.value_changed TO TRAN_PL_1.translation
+DEF TRAN_PL_2 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T2 TimeSensor{
+  cycleInterval 11
+  loop TRUE
+}
+DEF CI2 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25
+  ]
+}
+ROUTE T2.fraction_changed TO CI2.set_fraction
+ROUTE CI2.value_changed TO TRAN_PL_2.translation
+DEF TRAN_PL_3 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T3 TimeSensor{
+  cycleInterval 7
+  loop TRUE
+}
+DEF CI3 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25
+  ]
+}
+ROUTE T3.fraction_changed TO CI3.set_fraction
+ROUTE CI3.value_changed TO TRAN_PL_3.translation
+DEF TRAN_PL_3 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T3 TimeSensor{
+  cycleInterval 3
+  loop TRUE
+}
+DEF CI3 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25
+  ]
+}
+ROUTE T3.fraction_changed TO CI3.set_fraction
+ROUTE CI3.value_changed TO TRAN_PL_3.translation

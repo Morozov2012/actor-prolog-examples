@@ -1,0 +1,99 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= ('MyWindow',
+		x= 0,
+		y= 0,
+		maximal_line_number= 5,
+		last_line= "-- last line --\n");
+--
+w2	= ('MyWindow',
+		x= 1,
+		y= 0,
+		maximal_line_number= 'window_height',
+		last_line= "-- last line --\n");
+--
+w3	= ('MyWindow',
+		x= 2,
+		y= 0,
+		maximal_line_number= 'no_limit',
+		last_line= "-- last line --\n");
+--
+w4	= ('MyWindow',
+		x= 0,
+		y= 1,
+		maximal_line_number= 5,
+		last_line= "-- last line --");
+--
+w5	= ('MyWindow',
+		x= 1,
+		y= 1,
+		maximal_line_number= 'window_height',
+		last_line= "-- last line --");
+--
+w6	= ('MyWindow',
+		x= 2,
+		y= 1,
+		maximal_line_number= 'no_limit',
+		last_line= "-- last line --");
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	y			= 0;
+	width			= 1;
+	height			= 1;
+	maximal_line_number;
+	last_line;
+--
+	font_name		= 'helvetica';
+	font_size		= 288;
+--
+variable:
+--
+	title	: R_STRING	= _;
+--
+[
+DOMAINS:
+--
+reference:
+R_STRING	= STRING.
+--
+IMPERATIVES:
+--
+compute_title(MaximalLineNumber) = STRING	- (i);
+write_lines(INTEGER,INTEGER)			- (i,i);
+--
+CLAUSES:
+--
+goal:-!,
+	title== ?compute_title(maximal_line_number),
+	writeln("Hello world!"),
+	writeln("maximal_line_number= ",maximal_line_number),
+	write_lines(25,2).
+--
+compute_title(MaximalLineNumber) =
+		?format("maximal_line_number=%s",maximal_line_number)
+	:-
+	numerical(MaximalLineNumber),!.
+compute_title(MaximalLineNumber) = ?format("%s",MaximalLineNumber).
+--
+write_lines(N,Min):-
+	N >= Min,!,
+	writeln("-- line ",N," --"),
+	write_lines(N-1,Min).
+write_lines(_,_):-
+	write(last_line).
+]
+-----------------------------------------------------------------------

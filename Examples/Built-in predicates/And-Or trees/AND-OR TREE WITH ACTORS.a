@@ -1,0 +1,43 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+project: (('Test'))
+
+class 'Test':
+--
+w1	= ('Sender',
+		channel=X);
+w2	= ('Receiver',
+		channel=X);
+--
+[
+goal:-
+	w1 ? show.
+]
+
+class 'Sender' (specialized 'Dialog'):
+--
+constant:
+--
+	identifier	= "User Input";
+--
+variable:
+--
+	input;
+	channel;
+[
+goal:-
+	channel := input.
+]
+
+class 'Receiver' (specialized 'Report'):
+--
+variable:
+--
+	channel;
+[
+goal:-
+	writeln(channel).
+]

@@ -1,0 +1,49 @@
+mesh(80,25)
+window_font("Arial",17,[bold])
+dialog_font("Arial",10,[])
+dialog 'Control' (
+	"Control dialog",
+	default,default,default,
+	centered,centered,default)
+vbox(center)
+	grid
+		row
+			column(right)
+				"State of the port: "
+			end_of_column
+			column(left)
+				text(1001,10,1,"")
+			end_of_column
+			column
+				statictext("     ")
+			end_of_column
+		end_of_row
+		row
+			column(right)
+				"Shared text: "
+			end_of_column
+			column(left)
+				text(1002,10,1,"")
+			end_of_column
+			column
+				statictext("     ")
+			end_of_column
+		end_of_row
+		row
+			column(right)
+			end_of_column
+			column(left)
+				button("text","&Update text")
+			end_of_column
+			column
+				statictext("     ")
+			end_of_column
+		end_of_row
+	end_of_grid
+	hbox
+		button("plain","Declare p&lain port")
+		button("protecting","Declare p&rotecting port")
+	end_of_hbox
+	button("suspending","Declare &suspending port")
+end_of_vbox
+end_of_dialog

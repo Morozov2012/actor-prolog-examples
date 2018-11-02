@@ -1,0 +1,109 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',14)
+
+dialog 'MyDialog'("ListEdit Demo",default,default,default,centered,centered,default)
+vbox(center)
+	listedit['Sort'](1010,output_slot_2,10,4,
+		[
+		"One",
+		"Two",
+		"Three",
+		"Four",
+		"Five",
+		"Six",
+		"Seven"
+		],
+		"Three")
+	grid
+		row
+			column
+				button("action11","Put items list 1")
+			end_of_column
+			column
+				button("action12","Put position: 3")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action21","Put items list 2")
+			end_of_column
+			column
+				button("action22","Put position: \"Two\"")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action31","Put items list 3")
+			end_of_column
+			column
+				button("action32","Put position: [2,5,\"Red\"]")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action41","Put items list 4")
+			end_of_column
+			column
+				button("action42","Put position: [5,[2.1,'Red']]")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action51","Put items list: 'name1'")
+			end_of_column
+			column
+				button("action52","Put position: 'name1'")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action61","Put items: [1,2,3]")
+			end_of_column
+			column
+				button("action62","Put position: 0")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action71","Put items: [3,[2],1]")
+			end_of_column
+			column
+				button("action72","Put position: -1")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action81","Put items: [ ]")
+			end_of_column
+			column
+				button("action82","Put position: [ ]")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action91","Put items list: #")
+			end_of_column
+			column
+				button("action92","Put position: #")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action101","Put items list: _")
+			end_of_column
+			column
+				button("action102","Put position: _")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action111","Get items")
+			end_of_column
+			column
+				button("action112","Get position")
+			end_of_column
+		end_of_row
+	end_of_grid
+end_of_vbox
+end_of_dialog

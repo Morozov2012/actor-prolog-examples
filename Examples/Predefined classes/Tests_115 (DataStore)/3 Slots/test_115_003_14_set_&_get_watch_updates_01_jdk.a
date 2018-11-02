@@ -1,0 +1,68 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(YesNo)		- (i);
+--
+class 'Main' (specialized 'DataStore'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2('yes'),
+	test1,
+	test2('no'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_watch_updates(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	Mode== ?get_watch_updates(),!,
+	con ? set_color('Black'),
+	con ? write("Watch updates: "),
+	con ? set_color('Violet'),
+	con ? writeln("'",Mode,"'"),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test2(Mode):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_watch_updates(Mode),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

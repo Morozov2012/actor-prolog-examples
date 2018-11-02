@@ -1,0 +1,21 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/ColorMap":
+
+--------------------------------------------------------------------
+-- The 'ColorMap' class is specialized class 'DataAbstraction'.   --
+--------------------------------------------------------------------
+
+class 'ColorMap' (specialized 'DataAbstraction'):
+[
+SOURCE:
+	"morozov.built_in.ColorMap";
+
+CLAUSES:
+--
+string_to_color_map_name(Text) = Value:
+	[external "stringToColorMapName"].
+]

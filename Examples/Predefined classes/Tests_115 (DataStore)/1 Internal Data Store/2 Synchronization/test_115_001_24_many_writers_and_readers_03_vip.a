@@ -1,0 +1,212 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Warning: the VIP version does not support the activate and
+-- the update predicates of the Database and the DataStore classes.
+-- Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	number_of_writers	= 100;
+	number_of_readers	= 500;
+
+--
+	writers	= 'WriterArray'[number_of_writers] of
+			(('MyWriter',
+				data_store=store));
+--
+	readers	= 'ReaderArray'[number_of_readers] of
+			(('MyReader',
+				data_store=store));
+--
+internal:
+--
+	store	= ('DataStore',
+			name="MyDataStore.dat",
+			access_mode='modifying');
+--
+[
+goal:-
+	[writers[N]] << initiate(N,number_of_writers),
+		fail.
+goal:-
+	[readers[N]] << initiate(N,number_of_readers),
+		fail.
+]
+-----------------------------------------------------------------------
+class 'WriterArray' (specialized 'DynamicWorlds'):
+[
+]
+-----------------------------------------------------------------------
+class 'ReaderArray' (specialized 'DynamicWorlds'):
+[
+]
+-----------------------------------------------------------------------
+class 'MyWriter' (specialized 'Timer'):
+--
+constant:
+--
+	data_store;
+--
+internal:
+--
+	database	= ('MyDatabase',
+				place=shared(data_store,"MyTable"),
+				con);
+--
+	con		= ('Report',
+				width=target_width,
+				height=target_height);
+--
+constant:
+--
+	target_width	= 25;
+	target_height	= 7;
+--
+[
+goal:-!.
+--
+initiate(N,Max):-
+	X1== ?random(80-target_width+1),
+	Y1== ?random(12-target_height+1),
+	con ? set_x(X1),
+	con ? set_y(Y1),
+	R1== (128+?random(128))/255,
+	G1== (128+?random(128))/255,
+	B1== (128+?random(128))/255,
+	con ? set_background_color(color3(R1,G1,B1)),
+	con ? set_title(con?format("WRITER %d / %d",N,Max)),
+	con ? show,
+	set_period(0.0,0.0),
+	activate.
+--
+tick:-!,
+	database ? update_database.
+]
+-----------------------------------------------------------------------
+class 'MyReader' (specialized 'Alpha'):
+--
+constant:
+--
+	data_store;
+--
+internal:
+--
+	database	= ('MyDatabase',
+				place=shared(data_store,"MyTable"),
+				con);
+--
+	con		= ('Report',
+				width=target_width,
+				height=target_height);
+--
+constant:
+--
+	target_width	= 25;
+	target_height	= 7;
+--
+[
+goal:-!.
+--
+initiate(N,Max):-
+	X1== ?random(80-target_width+1),
+	Y1== 13 + ?random(12-target_height+1),
+	con ? set_x(X1),
+	con ? set_y(Y1),
+	R1== (?random(128))/255,
+	G1== (?random(128))/255,
+	B1== (?random(128))/255,
+	con ? set_background_color(color3(R1,G1,B1)),
+	con ? set_title(con?format("READER %d / %d",N,Max)),
+	con ? show,
+	database ? activate.
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	con;
+--
+[
+update:-!,
+	con ? set_color('Magenta'),
+	con ? writeln("AN UPDATE IS REPORTED!"),
+	con ? set_color('default'),
+	report_whether_database_is_updated,
+	inspect_database,
+	set_watch_updates('no').
+--
+report_whether_database_is_updated:-
+	is_updated,!,
+	con ? set_color('White','DkGreen'),
+	con ? writeln("The database is updated!"),
+	con ? set_color('default','default').
+report_whether_database_is_updated:-
+	con ? set_color('Navy','default'),
+	con ? writeln("The database is NOT updated!"),
+	con ? set_color('default','default').
+--
+update_database:-
+	con ? set_color('Black'),
+	con ? writeln("Test database update."),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	modify_database,
+	end_transaction.
+update_database:-
+	con ? set_color('White','Violet'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default','default').
+--
+inspect_database:-
+	con ? set_color('White'),
+	con ? writeln("Test database reading."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	check_database('White'),
+	end_transaction.
+inspect_database:-
+	con ? set_color('White','Violet'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default','default').
+--
+modify_database:-
+	check_database('Black'),
+	fail.
+modify_database:-
+	Delta== ?random(101) - 50.0,
+	modify_database(Delta),
+	modify_database(-(Delta)).
+--
+modify_database(Delta):-
+	T1== ?match(_),
+	T1 == my_data(V1),
+	retract(T1),!,
+	insert(my_data(V1 + Delta)).
+modify_database(Delta):-
+	insert(my_data(Delta)).
+--
+check_database(Color):-
+	T1== ?match(_),
+	T1 == my_data(V1),!,
+	report_checksum(V1,Color).
+check_database(_).
+--
+report_checksum(V1,_):-
+	V1 <> 0.0,
+	con ? set_color('White','Red'),
+	con ? writeln("Illegal check sum value!"),
+	con ? set_color('default','default'),
+	fail.
+report_checksum(V1,Color):-
+	con ? set_color(Color,'default'),
+	con ? writeln("Check sum: ",V1),
+	con ? set_color('default','default').
+]
+-----------------------------------------------------------------------

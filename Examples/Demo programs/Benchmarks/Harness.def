@@ -1,0 +1,47 @@
+package
+"examples/demo programs/benchmarks/harness"
+(TestData:=IntegerList,Result:=IntegerList):
+--------------------------------------------------------------------
+--                                                                --
+--      A generic benchmark harness                               --
+--      (c) 2007, IRE RAS, Alexei A. Morozov                      --
+--                                                                --
+--------------------------------------------------------------------
+--
+DOMAINS:
+--
+Count		= INTEGER.
+IntegerList	= INTEGER*.
+--
+PREDICATES:
+--
+imperative:
+--
+bench(Count)			- (i);
+dobench(Count)			- (i);
+--
+nondeterm:
+--
+repeat(Count)			- (i);
+--
+--------------------------------------------------------------------
+interface 'TestFacilities' (specialized 'Alpha'):
+--
+internal:
+--
+con		: 'Console';
+window		: 'Report';
+timer		: 'Timer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+data(TestData)			- (o);
+--
+nondeterm:
+--
+benchmark(TestData,Result)	- (i,o);
+]
+--------------------------------------------------------------------

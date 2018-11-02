@@ -1,0 +1,63 @@
+Input image: 20min00001.jpg
+Expected minimal X: -1 [m]
+Expected maximal X: 1 [m]
+Expected minimal Y: -1 [m]
+Expected maximal Y: 1 [m]
+X,Y co-ordinates of defining points in meters:
+0.0000 0.0000
+0.2750 0.0000
+0.2750 0.3080
+0.0000 0.3080
+X,Y co-ordinates of defining points in pixels:
+286.0000  63.0000
+598.0000  82.0000
+588.0000 437.0000
+270.0000 416.0000
+Projective transformation matrix:
+1117.2293   67.2939   -0.0163
+ -68.1543 1112.9467   -0.0613
+ 284.0902   62.5793    0.9933
+Inverse matrix of projective transformation:
+ 0.0009 -0.0001  0.0000
+ 0.0000  0.0009  0.0001
+-0.2568 -0.0407  1.0000
+This matrix is to be used in the demos.
+=======================================
+Self-check (1): Image -> Physical space
+=======================================
+Expected: u=286 v=63
+Obtained: u=286 v=63
+Expected: u=598 v=82
+Obtained: u=598 v=82
+Expected: u=588 v=437
+Obtained: u=588 v=437
+Expected: u=270 v=416
+Obtained: u=270 v=416
+=======================================
+Self-check (2): Physical space -> Image
+=======================================
+Expected: x=0 y=0
+Obtained: x=-1.1028e-16 y=-6.8926e-18
+Expected: x=0.275 y=0
+Obtained: x=0.275 y=-1.3723e-17
+Expected: x=0.275 y=0.308
+Obtained: x=0.275 y=0.308
+Expected: x=0 y=0.308
+Obtained: x=-5.4092e-17 y=0.308
+=======================================
+Read and display input image
+=======================================
+Warning: Image is too big to fit on screen;
+displaying at 67% 
+> In imuitools\private\initSize at 71
+  In imshow at 282
+  In reconstruct_02 at 110 
+=======================================
+Reconstruct and display source image
+=======================================
+Warning: Image is too big to fit on screen;
+displaying at 67% 
+> In imuitools\private\initSize at 71
+  In imshow at 282
+  In reconstruct_02 at 194 
+>> 

@@ -1,0 +1,190 @@
+package "Morozov/Web/Filters/Exam":
+---------------------------------------------------------------
+--         The "FILTERS/EXAM" Actor Prolog package.          --
+--        (c) 2002-2011, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package checks given list of Web resources.          --
+---------------------------------------------------------------
+-- import 'WebAddressFilter' from "Morozov/Web/Data/Address";
+import "Morozov/Web/Scanning/Counter";
+import "Morozov/Web/Engines/Control";
+---------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+initiate_limit_of_length(Size)			- (i);
+--
+check_resources(WebAddressList)			- (i);
+check_resource_if_necessary(WebAddressList)	- (i);
+--
+determ:
+--
+check_resource(WebAddressList)			- (i);
+--
+imperative:
+--
+process_resource
+	(WebAddressList,ContentParameters)	- (i,i);
+--
+write_size_of_file(ResourceSize)		- (i);
+--
+check_text_if_possible
+	(WebAddressList,ResourceSize)		- (i,i);
+check_text(WebAddressList,PlainContent)		- (i,i);
+--
+---------------------------------------------------------------
+class 'Check_Resources' (specialized 'Dialog'):
+--
+variable:
+--
+	search_pattern;
+--
+internal:
+--
+	receptor	= ('WebReceptor',
+				location= "",
+				maximal_waiting_time= 12.0,
+				revision_period= 'none',
+				attempt_period= 'none');
+--
+	report		= ('Report',
+				x=5,
+				y=5,
+				width=70,
+				height=20,
+				title=	"Preliminary "
+					"Check of Files");
+--
+protecting:
+--
+	limit_of_length;
+--
+internal:
+--
+	text		= ('Text');
+	store		= ('ExamStore');
+--
+[
+goal:-!,
+	initiate_limit_of_length(limit_of_length).
+--
+initiate_limit_of_length(50000):-!.
+initiate_limit_of_length(_).
+--
+filter('no',#)= _
+	:-!.
+filter('yes',List)= URL
+	:-
+	[search_pattern],
+	[limit_of_length],
+	-- report ? clear,
+	-- report ? show,
+	check_resources(List),
+	Item== store ? match(
+		es(_,search_pattern,limit_of_length,'yes')),
+	Item == es(URL,_,_,_).
+--
+check_resources([URL|Rest]):-!,
+	check_resource_if_necessary(URL),
+	check_resources(Rest).
+check_resources(_).
+--
+check_resource_if_necessary(URL):-
+	store ? match(
+		es(URL,search_pattern,limit_of_length,_)),!.
+check_resource_if_necessary(URL):-
+	store ? update_record(
+		URL,search_pattern,limit_of_length,'no'),
+	[self] << check_resource(URL).
+--
+check_resource(URL):-
+	Parameters== receptor?get_parameters(?cast("URL",URL)),
+	self <- process_resource(URL,Parameters).
+--
+process_resource(URL,entry(_,_,_,Size)):-!,
+	report ? writeln("I check this resource: ",URL),
+	report ? write("The size of the file: "),
+	write_size_of_file(Size),
+	check_text_if_possible(URL,Size).
+process_resource(URL,Answer):-
+	[search_pattern],
+	[limit_of_length],
+	report ? writeln(
+		"This resource is not available now:"),
+	report ? writeln(URL),
+	report ? writeln("The answer of the server: ",Answer),
+	report ? nl,
+	store ? update_record(
+		URL,search_pattern,limit_of_length,'no'),
+	fail.
+process_resource(_,_).
+--
+write_size_of_file(-1):-
+	report ? writeln("unknown."),!.
+write_size_of_file(Size):-
+	Size >= 0,
+	report ? writeln(Size),!.
+write_size_of_file(_).
+--
+check_text_if_possible(URL,Size):-
+	[limit_of_length],
+	-- Size >= 0,
+	Size <= limit_of_length,!,
+	report ? writeln(
+		"The size of the file is suitable "
+		"for preliminary check."),
+	Text== receptor ? get_text(?cast("URL",URL)),
+	check_text(URL,Text).
+check_text_if_possible(URL,_):-
+	[search_pattern],
+	[limit_of_length],!,
+	report ? writeln(
+		"The file is too big for preliminary check."),
+	report ? writeln(
+		"I have accepted this resource: ",URL),
+	report ? nl,
+	store ? update_record(
+		URL,search_pattern,limit_of_length,'yes').
+check_text_if_possible(_,_).
+--
+check_text(URL,Text):-
+	string(Text),
+	[search_pattern],
+	[limit_of_length],
+	text ? search(	?val("STRING",Text),
+			?val("STRING",search_pattern)),!,
+	report ? set_color('Black','Green'),
+	report ? writeln(
+		"This resource has passed "
+		"the check successfully: ",URL),
+	report ? set_color('Black'),
+	report ? writeln(
+		"I have accepted this resource: ",URL),
+	report ? nl,
+	store ? update_record(
+		URL,search_pattern,limit_of_length,'yes').
+check_text(URL,_):-
+	[search_pattern],
+	[limit_of_length],
+	report ? set_color('Red'),
+	report ? writeln(
+		"I have rejected this resource: ",URL),
+	report ? set_color('Black'),
+	report ? nl,
+	store ? update_record(
+		URL,search_pattern,limit_of_length,'no'),
+	fail.
+check_text(_,_).
+]
+---------------------------------------------------------------
+class 'ExamStore' (specialized 'Database'):
+[
+update_record(URL,SearchPattern,Size,IsOK):-
+	?match(es(URL,SearchPattern,Size,IsOK)),!.
+update_record(URL,SearchPattern,Size,IsOK):-
+	retract_all(es(URL,SearchPattern,Size,_)),
+	insert(es(URL,SearchPattern,Size,IsOK)).
+]
+---------------------------------------------------------------

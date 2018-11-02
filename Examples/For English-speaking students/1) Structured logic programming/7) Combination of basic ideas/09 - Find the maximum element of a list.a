@@ -1,0 +1,50 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: find the maximum element of --
+-- a list.                               --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Disassembling of a list.           --
+-- 2) An input argument.                 --
+-- 3) An output argument.                --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+maximum(List,INTEGER)	- (i,o);
+p(List,INTEGER,INTEGER)	- (i,i,o);
+
+CLAUSES:
+
+goal:-
+	L== [1,5,3,4,2],
+	maximum(L,N),
+	writeln(N).
+
+maximum([Head|Rest],Result):-
+	p(Rest,Head,Result).
+maximum([],_):-
+	error("The list is empty!"),
+	break.
+
+p([X|Rest],M,Result):-
+	X > M,!,
+	p(Rest,X,Result).
+p([X|Rest],M,Result):-
+	X <= M,!,
+	p(Rest,M,Result).
+p(_,Y,Y).

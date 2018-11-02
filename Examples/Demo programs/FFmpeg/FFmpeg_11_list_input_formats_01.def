@@ -1,0 +1,36 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'FFmpeg'):
+--
+internal:
+--
+	con	: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+write_format_list(FFmpegInputFormats)		- (i);
+write_format(FFmpegInputFormat)			- (i);
+--
+write_format_name(FFmpegInputFormat)		- (i);
+write_format_long_name(FFmpegInputFormat)	- (i);
+write_format_mime_type(FFmpegInputFormat)	- (i);
+write_format_extensions(FFmpegInputFormat)	- (i);
+--
+write_format_flags(FFmpegInputFormat)		- (i);
+write_format_flag_list(FFmpegFormatFlags)	- (i);
+--
+write_format_tags(FFmpegInputFormat)		- (i);
+write_format_tag_list(FFmpegFormatTags)		- (i);
+write_format_tag(FFmpegFormatTag)		- (i);
+]
+-----------------------------------------------------------------------

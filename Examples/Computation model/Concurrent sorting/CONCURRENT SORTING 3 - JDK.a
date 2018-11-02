@@ -1,0 +1,375 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--              (c) 2011, IRE RAS, Alexei A. Morozov.                --
+--     An implementation of the Concurrent Sorting Algorithm.        --
+-----------------------------------------------------------------------
+--                                                                   --
+-- Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB          --
+-- Windows7 - PM.64 (RUS)                                            --
+-- ================================================================= --
+-- AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                            --
+--                                                                   --
+-- EXE file produced by the Actor Prolog system:                     --
+--                                                                   --
+-- list_length = 50;                                                 --
+-- 100 iterations take 52510 msec                                    --
+-- 525.1 milliseconds per iteration                                  --
+-- list_length = 100;                                                --
+-- 100 iterations take 182020 msec                                   --
+-- 1820.2 milliseconds per iteration                                 --
+--                                                                   --
+-- java version "1.7.0"                                              --
+-- Java(TM) SE Runtime Environment (build 1.7.0-b147)                --
+-- Java HotSpot(TM) 64-Bit Server VM (build 21.0-b17, mixed mode)    --
+--                                                                   --
+-- === BigInteger ===                                                --
+-- java -Xrs -XX:+UseNUMA -server -Xbatch -jar main.jar              --
+--                                                                   --
+-- list_length = 50;                                                 --
+-- 100 iterations take 1170 msec                                     --
+-- 11,700000 milliseconds per iteration                              --
+-- 1000 iterations take 3260 msec                                    --
+-- 3,260000 milliseconds per iteration                               --
+-- list_length = 100;                                                --
+-- 100 iterations take 1575 msec                                     --
+-- 15,750000 milliseconds per iteration                              --
+-- list_length = 500;                                                --
+-- 100 iterations take 4134 msec                                     --
+-- 41,340000 milliseconds per iteration                              --
+-- list_length = 5000;                                               --
+-- java -Xss10000k -Xms1000000k -Xmx1000000k -Xrs -XX:+UseNUMA       --
+-- -server -Xbatch -jar main.jar                                     --
+-- 100 iterations take 82992 msec                                    --
+-- 829,920000 milliseconds per iteration                             --
+-- 100 iterations take 82759 msec                                    --
+-- 827,590000 milliseconds per iteration                             --
+-- list_length = 10000;                                              --
+-- 100 iterations take 704872 msec                                   --
+-- 7048,720000 milliseconds per iteration                            --
+--                                                                   --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'MyTimer'):
+--
+constant:
+--
+	controller	= (('Controller',
+				protecting:
+					output=L1,
+				variable:
+					input=L2,
+				constant:
+					scheduler=self));
+--
+	engine		= (('SortingEngine',
+				suspending:
+					input=L1,
+				protecting:
+					output=L2));
+--
+	total_number_of_iterations	= 100;
+--
+variable:
+--
+	time1;
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	time1== ?time(),
+	-- con ? writeln("Main::goal:time1= ",time1),
+	controller <- implement_one_iteration(1).
+--
+report_end_of_iteration(K):-
+	-- con ? writeln("Main::report_end_of_iteration:K= ",K),
+	K == total_number_of_iterations,
+	T2== ?time(),
+	[time1],
+	bound(time1),!,
+	Period== (T2 - time1),
+	con ? writef(
+		"%d iterations take %d msec\n",
+		total_number_of_iterations,
+		Period),
+	con ? writef(
+		"%f milliseconds per iteration\n",
+		Period/total_number_of_iterations).
+report_end_of_iteration(K):-
+	controller <- implement_one_iteration(K+1).
+]
+-----------------------------------------------------------------------
+class 'MyTimer' (specialized 'Timer'):
+[
+]
+-----------------------------------------------------------------------
+class 'Controller' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+variable:
+--
+	input;		-- Sorted list (term)
+--
+constant:
+--
+	scheduler;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output;		-- User input (term)
+--
+-- AUXILIARY SLOTS:
+--
+constant:
+--
+	list_length	= 100;
+--
+variable:
+--
+	sum;
+	product;
+--
+variable:
+--
+	number_of_iteration;
+--
+internal:
+--
+	accumulator	= ('Accumulator',
+				number_of_iteration,
+				output,
+				sum,
+				product);
+--
+	receiver	= ('Receiver',
+				list_length,
+				sum,
+				product,
+				input,
+				number_of_iteration,
+				scheduler);
+--
+--	con		= ('Console');
+--
+[
+goal:-!.
+--
+implement_one_iteration(K):-
+	number_of_iteration== K,!,
+	-- con ? writeln(
+	--	"Controller::number_of_iteration: ",
+	--	number_of_iteration),
+	form_output_list(output,sum,product).
+implement_one_iteration(_).
+--
+form_output_list(Output,Sum,Product):-
+	create_list(list_length,List,0.0,1.0,S,P),
+	-- con ? writeln("Controller::form_output_list: ",List),
+	Output== List,
+	Sum== S,
+	Product== P,!.
+	-- con ? writeln("Controller::S: ",S),
+	-- con ? writeln("Controller::P: ",P).
+-- form_output_list([1.0,0.5,0.0],1.5,0.5):-!.
+form_output_list(_,_,_).
+--
+create_list(N,[Value|Rest],S1,P1,S3,P3):-
+	N > 0,!,
+	Value== ?random(),
+	S2== S1 + Value,
+	P2== P1 * Value,
+	create_list(N-1,Rest,S2,P2,S3,P3).
+create_list(_,[],S,P,S,P).
+]
+-----------------------------------------------------------------------
+class 'Accumulator' (specialized 'Alpha'):
+--
+variable:
+--
+	number_of_iteration;
+	output;
+	sum;
+	product;
+--
+[
+goal:-!,
+	accept_value(number_of_iteration,output,sum,product).
+--
+accept_value(_,_,_,_).
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Alpha'):
+--
+list_length;
+--
+sum;
+product;
+--
+input;
+--
+number_of_iteration;
+--
+scheduler;
+--
+-- con		= ('Console');
+--
+[
+goal:-!,
+	[number_of_iteration,sum,product],
+	report_result(input,number_of_iteration,sum,product).
+--
+report_result(#,_,_,_):-!.
+report_result(_,#,_,_):-!.
+report_result(_,_,#,_):-!.
+report_result(_,_,_,#):-!.
+report_result(SortedList,K,Sum,Product):-
+	[number_of_iteration,Sum,Product],
+	-- con ? writeln("Receiver::sum: ",Sum),
+	-- con ? writeln("Receiver::product: ",Product),
+	list_is_sorted(SortedList,Sum,Product),!,
+	-- con ? writeln("Receiver:: List is Sorted: ",SortedList),
+	scheduler <- report_end_of_iteration(K).
+report_result(_,_,_,_).
+--
+list_is_sorted([H|Rest],Sum,Product):-!,
+	list_is_sorted(H,Rest,list_length-1,0.0+H,1.0*H,S,P),
+	-- con ? writeln("Receiver::S: ",S),
+	-- con ? writeln("Receiver::P: ",P),
+	?abs(Sum - S) <= 1.0e-10,
+	?abs(Product - P) <= 1.0e-10.
+	-- con ? writeln("Receiver::Sum-S: ",Sum - S),
+	-- con ? writeln("Receiver::Product-P: ",Product - P),
+	-- con ? writeln("Receiver::O.K.").
+list_is_sorted([],0.0,1.0):-!.
+--
+list_is_sorted(H1,[H2|Rest],N,S1,P1,S3,P3):-
+	H1 <= H2,
+	N > 0,!,
+	S2== S1 + H2,
+	P2== P1 * H2,
+	list_is_sorted(H2,Rest,N-1,S2,P2,S3,P3).
+list_is_sorted(_,[],0,S,P,S,P).
+]
+-----------------------------------------------------------------------
+class 'SortingEngine' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+suspending:
+--
+	input;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output;
+--
+-- AUXILIARY PROCESSES:
+--
+constant:
+--
+	left		= (('SortingEngine',
+				suspending:
+					input=A1,
+				protecting:
+					output=B1));
+--
+	right		= (('SortingEngine',
+				suspending:
+					input=A2,
+				protecting:
+					output=B2));
+--
+-- AUXILIARY ACTORS:
+--
+internal:
+--
+	receiver	= ('Distributor',
+				input,
+				output1=A1,
+				output2=A2);
+	sender		= ('Gatherer',
+				input0=input,
+				input1=B1,
+				input2=B2,
+				output);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Distributor' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+variable:
+--
+	input;
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	output1;
+	output2;
+--
+[
+goal:-!,
+	distribute_if_necessary(input,List1,List2),
+	output1== List1,
+	output2== List2.
+--
+distribute_if_necessary(#,#,#):-!.
+distribute_if_necessary([],#,#):-!.
+distribute_if_necessary([_],#,#):-!.
+distribute_if_necessary(List1,List2,List3):-
+	distribute(List1,List2,List3).
+--
+distribute([A,B|Rest1],[A|Rest2],[B|Rest3]):-!,
+	distribute(Rest1,Rest2,Rest3).
+distribute(List,List,[]).
+]
+-----------------------------------------------------------------------
+class 'Gatherer' (specialized 'Alpha'):
+--
+-- PROCESS INPUTS:
+--
+variable:
+--
+	input0;
+	input1;
+	input2;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output;
+--
+[
+goal:-!,
+	gather(input0,input1,input2,List),
+	output== List.
+--
+gather(List,_,_,List):-
+	List == [],!.
+gather(List,_,_,List):-
+	List == [_],!.
+gather(_,#,List,List):-!.
+gather(_,List,#,List):-!.
+gather(_,List1,List2,List3):-
+	gather(List1,List2,List3).
+--
+gather([A|Rest1],List2,[A|Rest3]):-
+	List2 == [B|_],
+	A < B,!,
+	gather(Rest1,List2,Rest3).
+gather(List1,[B|Rest2],[B|Rest3]):-!,
+	gather(List1,Rest2,Rest3).
+gather(List,_,List).
+]
+-----------------------------------------------------------------------

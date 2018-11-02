@@ -1,0 +1,25 @@
+
+CLAUSES:
+
+goal:-
+	select_item(
+		[
+		"Понедельник",
+		"Вторник",
+		"Среда",
+		"Четверг",
+		"Пятница",
+		"Суббота",
+		"Воскресенье",
+		"На следующей неделе",
+		"Никогда"],
+		0,ResultItem1,ResultIndex1),
+	
+	writeln(ResultItem1," ",ResultIndex1),
+	
+	select_item(
+		"Выберите предмет",
+		["Плюшевый мишка","Мячик","Рогатка"],
+		1,ResultItem2,ResultIndex2),
+	
+	writeln(ResultItem2," ",ResultIndex2).

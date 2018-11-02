@@ -1,0 +1,964 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+import .. from "morozov/Sound";
+
+class 'Main' (specialized 'Canvas3D'):
+--
+constant:
+--
+bounds		: BoundingSphere	= 'BoundingSphere'({});
+--
+clicked_color	: Appearance
+			= 'Appearance'({
+				material: 'Material'({
+					emissiveColor: 'Emerald',
+					lightingEnable: 'yes'
+					})
+				});
+entered_color	: Appearance
+			= 'Appearance'({
+				material: 'Material'({
+					emissiveColor: 'Lime',
+					lightingEnable: 'yes'
+					})
+				});
+exited_color	: Appearance
+			= 'Appearance'({
+				material: 'Material'({
+					emissiveColor: 'Black',
+					lightingEnable: 'yes'
+					})
+				});
+--
+fontName	: FontName		= 'helvetica';
+tessellationTolerance
+		: TessellationTolerance	= 0.1;
+--
+bold_font	: Font3D
+			= 'Font3D'({
+				fontName,
+				fontSize: 230,
+				fontStyle: ['bold'],
+				extrudePath: 'FontExtrusion'({
+					depth: 0
+					}),
+				tessellationTolerance
+				});
+normal_font	: Font3D
+			= 'Font3D'({
+				fontName,
+				fontSize: 230,
+				fontStyle: [],
+				extrudePath: 'FontExtrusion'({
+					depth: 0
+					}),
+				tessellationTolerance
+				});
+--
+background_color			= 'Black';
+enable_scene_antialiasing		= 'yes';
+--
+internal:
+--
+clip_0		= ('Clip',
+			name="jar:data/phone_button_0.wav");
+clip_1		= ('Clip',
+			name="jar:data/phone_button_1.wav");
+clip_2		= ('Clip',
+			name="jar:data/phone_button_2.wav");
+clip_3		= ('Clip',
+			name="jar:data/phone_button_3.wav");
+clip_4		= ('Clip',
+			name="jar:data/phone_button_4.wav");
+clip_5		= ('Clip',
+			name="jar:data/phone_button_5.wav");
+clip_6		= ('Clip',
+			name="jar:data/phone_button_6.wav");
+clip_7		= ('Clip',
+			name="jar:data/phone_button_7.wav");
+clip_8		= ('Clip',
+			name="jar:data/phone_button_8.wav");
+clip_9		= ('Clip',
+			name="jar:data/phone_button_9.wav");
+--
+calculator	= ('SimpleCalculator',
+			display=self);
+--
+con		= ('Console',
+			x= 40,
+			width= 40);
+--
+constant:
+--
+character_code_Sign		= 16#B1#;
+character_code_Backspace	= 16#2190#;
+character_code_Multiply		= 16#D7#;
+character_code_Minus		= 16#2212#;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+one_button(	Numerical,
+		Numerical,
+		STRING) = Node		- (i,i,i);
+one_button(	Numerical,
+		Numerical,
+		STRING,
+		Text3D_VerticalAlignment,
+		Numerical) = Node	- (i,i,i,i,i);
+--
+display(Numerical,Numerical) = Node		- (i,i);
+--
+point_light(	Numerical,
+		Numerical,
+		Angle,
+		TimeInterval,
+		Color) = Node		- (i,i,i,i,i);
+--
+update_appearance_and_font
+	(NodeLabels,Appearance,Font3D)		- (i,i,i);
+update_appearance_and_font_of_node
+	(NodeLabel,Appearance,Font3D)		- (i,i,i);
+--
+update_font(NodeLabels,Font3D)			- (i,i);
+update_font_of_node(NodeLabel,Font3D)		- (i,i);
+--
+get_sound(NodeLabel,'Clip')			- (i,o);
+get_numbered_sound(Numerical,'Clip')		- (i,o);
+--
+play_clip('Clip')				- (i);
+--
+process_mouse_click(NodeLabel)			- (i);
+show_value(_)					- (i);
+--
+determ:
+--
+concat(NodeLabel,NodeLabel,NodeLabel)	- (i,o,i)(i,i,o);
+--
+CLAUSES:
+--
+goal:-!,
+	clip_0 ? open,
+	clip_1 ? open,
+	clip_2 ? open,
+	clip_3 ? open,
+	clip_4 ? open,
+	clip_5 ? open,
+	clip_6 ? open,
+	clip_7 ? open,
+	clip_8 ? open,
+	clip_9 ? open,
+	--
+	Sign== ?codes_to_string([character_code_Sign]),
+	Backspace== ?codes_to_string([character_code_Backspace]),
+	Multiply== ?codes_to_string([character_code_Multiply]),
+	Minus== ?codes_to_string([character_code_Minus]),
+	--
+	Brightness== 1.0,
+	HalfBrightness== Brightness / 2,
+	--
+	DeltaX== 450,
+	X_U1== DeltaX,
+	X_U2== X_U1 + DeltaX,
+	X_D1== - (DeltaX),
+	X_D2== X_D1 - DeltaX,
+	--
+	DeltaY== 320,
+	Y_U1== DeltaY,
+	Y_U2== Y_U1 + 220,
+	Y_D1== - (DeltaY),
+	Y_D2== Y_D1 - DeltaY,
+	--
+	show([	'TransformGroup'({
+			allowChildrenWrite: 'yes',
+			transform3D: 'Transform3D'({
+				scale: 0.00059
+				}),
+			branches: [
+				?display(0,Y_U2),
+				?one_button(X_D2,Y_D2,"0"),
+				?one_button(X_D1,Y_D2,Sign),
+				?one_button(0,Y_D2,",",'ALIGN_TOP',0),
+				?one_button(X_D2,Y_D1,"1"),
+				?one_button(X_D1,Y_D1,"2"),
+				?one_button(0,Y_D1,"3"),
+				?one_button(X_D2,0,"4"),
+				?one_button(X_D1,0,"5"),
+				?one_button(0,0,"6"),
+				?one_button(X_D2,Y_U1,"7"),
+				?one_button(X_D1,Y_U1,"8"),
+				?one_button(0,Y_U1,"9"),
+				?one_button(X_U1,Y_U1,"/"),
+				?one_button(X_U1,0,Multiply,'ALIGN_CENTER',-35),
+				?one_button(X_U1,Y_D1,Minus,'ALIGN_CENTER',-60),
+				?one_button(X_U1,Y_D2,"+",'ALIGN_CENTER',-27),
+				?one_button(X_U2,Y_U1,"C"),
+				?one_button(X_U2,0,Backspace,'ALIGN_TOP',11),
+				?one_button(X_U2,Y_D1,"%"),
+				?one_button(X_U2,Y_D2,"=",'ALIGN_TOP',-14)
+				]
+			}),
+		'Background'({
+			color: background_color,
+			applicationBounds: bounds
+			}),
+		'AmbientLight'({
+			lightOn: 'yes',
+			color: 'White',
+			influencingBounds: bounds
+			}),
+		?point_light(-0.5,0.5,(?'-'(?pi()) / 4),7300,color3(Brightness,0.0,0.0)),
+		?point_light(0.1,0.5,?'-'(?pi()),15100,color3(0.0,Brightness,0.0)),
+		?point_light(-0.5,0.1,(?pi() / 4),9100,color3(0.0,0.0,Brightness)),
+		?point_light(0.5,0.1,(?pi() / 8),5310,color3(HalfBrightness,HalfBrightness,0.0)),
+		?point_light(-0.1,-0.5,(?'-'(?pi()) / 8),11010,color3(0.0,HalfBrightness,HalfBrightness)),
+		?point_light(-0.5,-0.1,(?'-'(?pi()) / 3),8310,color3(HalfBrightness,0.0,HalfBrightness)),
+		'PickCanvas'({
+			handleMouseClicked: 'yes',
+			handleMouseEntered: 'yes',
+			handleMouseExited: 'yes',
+			handleMousePressed: 'yes',
+			handleMouseReleased: 'no',
+			handleMouseDragged: 'no',
+			handleMouseMoved: 'no',
+			isPassive: 'no',
+			period: 150,
+			tolerance: 3,
+			mode: 'GEOMETRY'
+			})
+		]),
+	calculator ? display_current_value.
+--
+one_button(X,Y,Text)
+	= ?one_button(X,Y,Text,'ALIGN_CENTER',0).
+--
+one_button(X,Y,Text,VerticalAlignment,Y0)
+	= 'TransformGroup'({
+		allowChildrenWrite: 'yes',
+		transform3D: 'Transform3D'({
+			translation: [X,Y,0]
+			}),
+		branches: [
+			'Sphere'({
+				label: ?cast("NodeLabel",Text),
+				radius: 150,
+				divisions: 300,
+				enableGeometryPicking: 'yes',
+				enableAppearanceModify: 'yes',
+				generateNormals: 'yes',
+				generateNormalsInward: 'yes',
+				appearance: 'Appearance'({
+					material: 'Material'({
+						ambientColor: 'Black',
+						diffuseColor: 'Black',
+						specularColor: 'White',
+						emissiveColor: 'Black',
+						shininess: 25
+						})
+					})
+				}),
+			'Shape3D'({
+				label: LetterLabel,
+				allowGeometryRead: 'yes',
+				allowAppearanceWrite: 'yes',
+				geometry: 'Text3D'({
+					allowFont3DRead: 'yes',
+					allowFont3DWrite: 'yes',
+					font3D: normal_font,
+					string: Text,
+					position: p(0,Y0,0),
+					horizontalAlignment: 'ALIGN_CENTER',
+					verticalAlignment: VerticalAlignment,
+					path: 'PATH_RIGHT',
+					characterSpacing: 0.0
+					}),
+				appearance: exited_color
+				})
+			]
+		}) :-
+	LetterLabel== "letter_" + Text.
+	--
+display(X,Y)
+	= 'TransformGroup'({
+		allowChildrenWrite: 'yes',
+		transform3D: 'Transform3D'({
+			translation: [X,Y,0]
+			}),
+		branches: [
+			'Shape3D'({
+				label: "DISPLAY",
+				allowGeometryRead: 'yes',
+				allowAppearanceWrite: 'yes',
+				geometry: 'Text3D'({
+					allowFont3DRead: 'yes',
+					allowFont3DWrite: 'yes',
+					allowStringRead: 'yes',
+					allowStringWrite: 'yes',
+					font3D: 'Font3D'({
+						fontName,
+						fontSize: 270,
+						fontStyle: [],
+						extrudePath: 'FontExtrusion'({
+							depth: 0
+							}),
+						tessellationTolerance
+						}),
+					string: "",
+					position: p(0,0,0),
+					horizontalAlignment: 'ALIGN_CENTER',
+					verticalAlignment: 'ALIGN_CENTER',
+					path: 'PATH_RIGHT',
+					characterSpacing: 0.0
+					}),
+				appearance: exited_color
+				})
+			]
+		}).
+--
+point_light(X0,Y0,RotZ,Increasing,C)
+	= 'TransformGroup'({
+		allowTransformRead: 'yes',
+		allowTransformWrite: 'yes',
+		branches: [
+			'TransformGroup'({
+				transform3D: 'Transform3D'({
+					translation: [X0,Y0,0.5]
+					}),
+				branches: [
+					'PointLight'({
+						color: C,
+						influencingBounds: Bounds
+						})
+					]
+				}),
+			'RotationInterpolator'({
+				alpha: 'Alpha3D'({
+					increasingAlphaDuration: Increasing
+					}),
+				transformAxis: 'Transform3D'({
+					rotZ: RotZ
+					}),
+				schedulingBounds: Bounds
+				})
+			]
+		})
+	:-
+	Bounds== 'BoundingSphere'({radius: 10}).
+--
+mouse_clicked([NodeLabel|_]):-!,
+	update_font_of_node(NodeLabel,normal_font).
+--
+mouse_entered([NodeLabel|_]):-!,
+	update_appearance_and_font_of_node(
+		NodeLabel,entered_color,normal_font).
+--
+mouse_exited([NodeLabel|_]):-!,
+	update_appearance_and_font_of_node(
+		NodeLabel,exited_color,normal_font).
+--
+mouse_pressed([NodeLabel|_]):-!,
+	get_sound(NodeLabel,Clip),
+	play_clip(Clip),
+	update_appearance_and_font_of_node(
+		NodeLabel,clicked_color,bold_font),
+	process_mouse_click(NodeLabel).
+--
+mouse_released(_):-!.
+--
+mouse_dragged(_):-!.
+--
+mouse_moved(_):-!.
+--
+update_appearance_and_font([NL|Rest],Appearance,Font):-!,
+	update_appearance_and_font_of_node(NL,Appearance,Font),
+	update_appearance_and_font(Rest,Appearance,Font).
+update_appearance_and_font([],_,_).
+--
+update_appearance_and_font_of_node("DISPLAY",_,_):-!.
+update_appearance_and_font_of_node(NodeLabel,Appearance,Font):-
+	concat("letter_",_,NodeLabel),!,
+	set_appearance(NodeLabel,Appearance),
+	set_font3d(NodeLabel,Font).
+update_appearance_and_font_of_node(NodeLabel1,Appearance,Font):-
+	concat("letter_",NodeLabel1,NodeLabel2),!,
+	set_appearance(NodeLabel2,Appearance),
+	set_font3d(NodeLabel2,Font).
+update_appearance_and_font_of_node(_,_,_).
+--
+update_font([NL|Rest],Font):-!,
+	update_font_of_node(NL,Font),
+	update_font(Rest,Font).
+update_font([],_).
+--
+update_font_of_node("DISPLAY",_):-!.
+update_font_of_node(NodeLabel,Font):-
+	concat("letter_",_,NodeLabel),!,
+	set_font3d(NodeLabel,Font).
+update_font_of_node(NodeLabel1,Font):-
+	concat("letter_",NodeLabel1,NodeLabel2),!,
+	set_font3d(NodeLabel2,Font).
+update_font_of_node(_,_).
+--
+set_font3d(_,_):-!.
+--
+get_sound(NodeLabel,Clip):-
+	N== ?convert_to_integer(NodeLabel),!,
+	get_numbered_sound(N,Clip).
+get_sound("/",Clip):-!,
+	get_numbered_sound(1,Clip).
+get_sound("C",Clip):-!,
+	get_numbered_sound(2,Clip).
+get_sound(Label,Clip):-
+	Label == ?codes_to_string([character_code_Multiply]),!,
+	get_numbered_sound(3,Clip).
+get_sound(Label,Clip):-
+	Label == ?codes_to_string([character_code_Backspace]),!,
+	get_numbered_sound(4,Clip).
+get_sound(Label,Clip):-
+	Label == ?codes_to_string([character_code_Minus]),!,
+	get_numbered_sound(5,Clip).
+get_sound("%",Clip):-!,
+	get_numbered_sound(6,Clip).
+get_sound(",",Clip):-!,
+	get_numbered_sound(7,Clip).
+get_sound(Label,Clip):-
+	Label == ?codes_to_string([character_code_Sign]),!,
+	get_numbered_sound(8,Clip).
+get_sound("+",Clip):-!,
+	get_numbered_sound(9,Clip).
+get_sound("=",Clip):-!,
+	get_numbered_sound(0,Clip).
+get_sound(_,Clip):-
+	get_numbered_sound(0,Clip).
+--
+get_numbered_sound(0,clip_0):-!.
+get_numbered_sound(1,clip_1):-!.
+get_numbered_sound(2,clip_2):-!.
+get_numbered_sound(3,clip_3):-!.
+get_numbered_sound(4,clip_4):-!.
+get_numbered_sound(5,clip_5):-!.
+get_numbered_sound(6,clip_6):-!.
+get_numbered_sound(7,clip_7):-!.
+get_numbered_sound(8,clip_8):-!.
+get_numbered_sound(9,clip_9):-!.
+get_numbered_sound(_,clip_0).
+--
+play_clip(Clip):-
+	Clip ? stop,
+	Clip ? set_frame_position(0),
+	Clip ? start,!.
+play_clip(_).
+--
+process_mouse_click(Label):-
+	N== ?convert_to_integer(Label),!,
+	calculator ? enter_digit(N).
+process_mouse_click(Label):-
+	Label == ?codes_to_string([character_code_Sign]),!,
+	calculator ? change_sign.
+process_mouse_click(","):-!,
+	calculator ? begin_fractional_part.
+process_mouse_click("C"):-!,
+	calculator ? reset.
+process_mouse_click(Label):-
+	Label == ?codes_to_string([character_code_Backspace]),!,
+	calculator ? backspace.
+process_mouse_click("+"):-!,
+	calculator ? operation('plus').
+process_mouse_click(Label):-
+	Label == ?codes_to_string([character_code_Minus]),!,
+	calculator ? operation('minus').
+process_mouse_click(Label):-
+	Label == ?codes_to_string([character_code_Multiply]),!,
+	calculator ? operation('multiply').
+process_mouse_click("/"):-!,
+	calculator ? operation('divide').
+process_mouse_click("="):-!,
+	calculator ? enter.
+process_mouse_click("%"):-!,
+	calculator ? percent.
+process_mouse_click(_).
+--
+show_value(V):-
+	set_string("DISPLAY",V).
+]
+
+class 'SimpleCalculator' (specialized 'Database'):
+--
+internal:
+--
+display		: 'Main';
+--
+text_operations	= ('Text');
+--
+con		= ('Console');
+--
+[
+DOMAINS:
+--
+Target		= sign(INTEGER);
+		  integer_part(INTEGER);
+		  'has_fractional_part';
+		  fractional_part(INTEGER,INTEGER);
+		  first_argument(
+		  	INTEGER,INTEGER,INTEGER,INTEGER);
+		  second_argument(
+		  	INTEGER,INTEGER,INTEGER,INTEGER);
+		  current_operation(Operation);
+		  'first_argument_is_displayed';
+		  'result_is_displayed'.
+Operation	= 'plus'; 'minus'; 'multiply'; 'divide'.
+--
+PREDICATES:
+--
+imperative:
+--
+reset;
+prepare_display_if_necessary;
+clear_display;
+--
+enter_digit(INTEGER)				- (i);
+percent;
+change_sign;
+begin_fractional_part;
+backspace;
+--
+operation(Operation)				- (i);
+enter;
+--
+remember_second_argument;
+--
+implement_operation(
+	INTEGER /* Sign */,
+	INTEGER /* IntegerPart */,
+	INTEGER /* FractionalPart */,
+	INTEGER /* Counter */,
+	Operation)			- (i,i,i,i,i);
+implement_operation(
+	INTEGER /* Sign */,
+	INTEGER /* IntegerPart */,
+	INTEGER /* FractionalPart */,
+	INTEGER /* Counter */,
+	INTEGER /* Sign */,
+	INTEGER /* IntegerPart */,
+	INTEGER /* FractionalPart */,
+	INTEGER /* Counter */,
+	Operation)			- (i,i,i,i,i,i,i,i,i);
+implement_operation(
+	Numerical,
+	Numerical,
+	Operation) = Numerical		- (i,i,i);
+--
+determ:
+--
+is_zero(Numerical)				- (i);
+--
+imperative:
+--
+assemble_number(
+	INTEGER /* Sign */,
+	INTEGER /* IntegerPart */,
+	INTEGER /* FractionalPart */,
+	INTEGER /* Counter */) = Numerical	- (i,i,i,i);
+--
+dismantle_number(
+	Numerical,
+	INTEGER /* Sign */,
+	INTEGER /* IntegerPart */,
+	INTEGER /* FractionalPart */,
+	INTEGER /* Counter */)		- (i,o,o,o,o);
+dismantle_number(
+	Numerical,
+	INTEGER /* IntegerPart */,
+	INTEGER /* FractionalPart */,
+	INTEGER /* Counter */)		- (i,o,o,o);
+--
+determ:
+--
+search_dot(STRING) = INTEGER			- (i);
+--
+imperative:
+--
+count_nonzero_digits
+	(STRING,STRING,INTEGER,INTEGER)		- (i,o,i,o);
+--
+determ:
+--
+are_zeros(STRING)				- (i);
+--
+imperative:
+--
+convert_number(INTEGER,STRING) = INTEGER	- (i,i);
+--
+update_current_value(
+	INTEGER /* Sign */,
+	INTEGER /* IntegerPart */,
+	INTEGER /* FractionalPart */,
+	INTEGER /* Counter */)		- (i,i,i,i);
+--
+display_current_value;
+display_current_value(INTEGER)			- (i);
+--
+get_current_value(
+	INTEGER /* Sign */,
+	INTEGER /* IntegerPart */,
+	INTEGER /* FractionalPart */,
+	INTEGER /* Counter */)		- (o,o,o,o);
+--
+get_sign(INTEGER)				- (o);
+sign_to_text(INTEGER,STRING)			- (i,o);
+--
+determ:
+--
+get_fractional_part_or_Fail(INTEGER,INTEGER)	- (o,o);
+--
+imperative:
+--
+get_integer_part(INTEGER)			- (o);
+--
+'+'(Numerical,Numerical) = Numerical		- (i,i);
+'-'(Numerical,Numerical) = Numerical		- (i,i);
+'-'(Numerical) = Numerical			- (i);
+'*'(Numerical,Numerical) = Numerical		- (i,i);
+'/'(Numerical,Numerical) = Numerical		- (i,i);
+--
+CLAUSES:
+--
+reset:-
+	retract_all,
+	display_current_value.
+--
+prepare_display_if_necessary:-
+	find('result_is_displayed'),!,
+	retract_all('result_is_displayed'),
+	clear_display.
+prepare_display_if_necessary:-
+	find('first_argument_is_displayed'),!,
+	retract_all('first_argument_is_displayed'),
+	clear_display.
+prepare_display_if_necessary.
+--
+clear_display:-
+	retract_all('has_fractional_part'),
+	retract_all(sign(_)),
+	retract_all(integer_part(_)),
+	retract_all(fractional_part(_,_)).
+--
+enter_digit(_):-
+	prepare_display_if_necessary,
+	fail.
+enter_digit(Digit):-
+	Item== ?match(fractional_part(_,_)),
+	Item == fractional_part(N1,C1),!,
+	N2== N1 * 10 + Digit,
+	C2== C1 + 1,
+	retract_all(fractional_part(_,_)),
+	insert(fractional_part(N2,C2)),
+	display_current_value.
+enter_digit(N2):-
+	find('has_fractional_part'),!,
+	insert(fractional_part(N2,1)),
+	display_current_value.
+enter_digit(Digit):-
+	Item== ?match(integer_part(_)),
+	Item == integer_part(N1),!,
+	N2== N1 * 10 + Digit,
+	retract_all(integer_part(_)),
+	insert(integer_part(N2)),
+	display_current_value.
+enter_digit(N2):-
+	insert(integer_part(N2)),
+	display_current_value.
+--
+percent:-
+	Item1== ?match(first_argument(_,_,_,_)),
+	Item1 == first_argument(
+		Sign1,IntegerPart1,FractionalPart1,Counter1),!,
+	get_current_value(
+		Sign2,IntegerPart2,FractionalPart2,Counter2),
+	V1== ?assemble_number(
+		Sign1,IntegerPart1,FractionalPart1,Counter1),
+	V2== ?assemble_number(
+		Sign2,IntegerPart2,FractionalPart2,Counter2),
+	V3== V1 / 100 * V2,
+	dismantle_number(
+		V3,Sign3,IntegerPart3,FractionalPart3,Counter3),
+	update_current_value(
+		Sign3,IntegerPart3,FractionalPart3,Counter3),
+	display_current_value.
+percent.
+--
+change_sign:-
+	prepare_display_if_necessary,
+	fail.
+change_sign:-
+	Item== ?match(sign(_)),
+	Item == sign(N1),!,
+	N2== - (N1),
+	retract_all(sign(_)),
+	insert(sign(N2)),
+	display_current_value(N2).
+change_sign:-
+	N2== -1,
+	insert(sign(N2)),
+	display_current_value(N2).
+--
+begin_fractional_part:-
+	prepare_display_if_necessary,
+	fail.
+begin_fractional_part:-
+	find('has_fractional_part'),!.
+begin_fractional_part:-
+	insert('has_fractional_part'),
+	display_current_value.
+--
+backspace:-
+	prepare_display_if_necessary,
+	fail.
+backspace:-
+	Item== ?match(fractional_part(_,_)),
+	Item == fractional_part(_,1),!,
+	retract_all(fractional_part(_,_)),
+	display_current_value.
+backspace:-
+	Item== ?match(fractional_part(_,_)),
+	Item == fractional_part(N1,C1),!,
+	N2== ?div(N1,10),
+	C2== C1 - 1,
+	retract_all(fractional_part(_,_)),
+	insert(fractional_part(N2,C2)),
+	display_current_value.
+backspace:-
+	find('has_fractional_part'),!,
+	retract_all('has_fractional_part'),
+	display_current_value.
+backspace:-
+	Item== ?match(integer_part(_)),
+	Item == integer_part(N1),!,
+	N2== ?div(N1,10),
+	retract_all(integer_part(_)),
+	insert(integer_part(N2)),
+	display_current_value.
+backspace.
+--
+operation(Operation):-
+	find('result_is_displayed'),!,
+	retract_all(current_operation(_)),
+	insert(current_operation(Operation)).
+operation(Operation):-
+	find('first_argument_is_displayed'),!,
+	retract_all(current_operation(_)),
+	insert(current_operation(Operation)).
+operation(Operation):-
+	get_current_value(
+		Sign,IntegerPart,FractionalPart,Counter),
+	retract_all(first_argument(_,_,_,_)),
+	retract_all(second_argument(_,_,_,_)),
+	retract_all(current_operation(_)),
+	retract_all('first_argument_is_displayed'),
+	insert(first_argument(
+		Sign,IntegerPart,
+		FractionalPart,Counter)),
+	insert(current_operation(Operation)),
+	insert('first_argument_is_displayed').
+--
+enter:-
+	find('result_is_displayed'),
+	Item1== ?match(first_argument(_,_,_,_)),
+	Item2== ?match(current_operation(_)),
+	Item1 == first_argument(
+		Sign,IntegerPart,FractionalPart,Counter),
+	Item2 == current_operation(Operation),!,
+	implement_operation(
+		Sign,IntegerPart,FractionalPart,Counter,
+		Operation).
+enter:-
+	remember_second_argument,
+	Item1== ?match(first_argument(_,_,_,_)),
+	Item2== ?match(current_operation(_)),
+	Item1 == first_argument(
+		Sign,IntegerPart,FractionalPart,Counter),
+	Item2 == current_operation(Operation),!,
+	implement_operation(
+		Sign,IntegerPart,FractionalPart,Counter,
+		Operation).
+enter.
+--
+remember_second_argument:-
+	get_current_value(
+		Sign,IntegerPart,FractionalPart,Counter),
+	retract_all(second_argument(_,_,_,_)),
+	insert(second_argument(
+		Sign,IntegerPart,
+		FractionalPart,Counter)).
+--
+implement_operation(
+		Sign1,IntegerPart1,FractionalPart1,Counter1,
+		Operation):-
+	Item1== ?match(second_argument(_,_,_,_)),
+	Item1 == second_argument(
+		Sign2,IntegerPart2,FractionalPart2,Counter2),!,
+	implement_operation(
+		Sign1,IntegerPart1,FractionalPart1,Counter1,
+		Sign2,IntegerPart2,FractionalPart2,Counter2,
+		Operation).
+implement_operation(_,_,_,_,_):-
+	break('implement_operation').
+--
+implement_operation(
+		Sign1,IntegerPart1,FractionalPart1,Counter1,
+		Sign2,IntegerPart2,FractionalPart2,Counter2,
+		Operation):-
+	V1== ?assemble_number(
+		Sign1,IntegerPart1,FractionalPart1,Counter1),
+	V2== ?assemble_number(
+		Sign2,IntegerPart2,FractionalPart2,Counter2),
+	V3== ?implement_operation(V1,V2,Operation),
+	dismantle_number(
+		V3,Sign3,IntegerPart3,FractionalPart3,Counter3),
+	retract_all(first_argument(_,_,_,_)),
+	insert(first_argument(
+		Sign3,IntegerPart3,
+		FractionalPart3,Counter3)),
+	update_current_value(
+		Sign3,IntegerPart3,FractionalPart3,Counter3),
+	insert('result_is_displayed'),
+	display_current_value.
+--
+implement_operation(V1,V2,'plus') = V1 + V2 :-!.
+implement_operation(V1,V2,'minus') = V1 - V2 :-!.
+implement_operation(V1,V2,'multiply') = V1 * V2 :-!.
+implement_operation(V1,V2,'divide') = V1 :-
+	is_zero(V2),!,
+	con ? error("Division by zero error!").
+implement_operation(V1,V2,'divide') = V1 / V2.
+--
+is_zero(0):-!.
+is_zero(0.0).
+--
+assemble_number(Sign,IP,0,_) = Value
+	:-!,
+	Value== Sign * IP.
+assemble_number(Sign,IP,FP,Counter) = Value
+	:-
+	Format== text_operations?format("%%s%%d.%%0%dd",Counter),
+	sign_to_text(Sign,ST),
+	SignedValue== text_operations?format(Format,ST,IP,FP),
+	Value== ?convert_to_real(SignedValue),!.
+assemble_number(_,_,_,_) = _
+	:-
+	break('assemble_number').
+--
+dismantle_number(V1,-1,IP,FP,Counter):-
+	V1 < 0,!,
+	V2== -(V1),
+	dismantle_number(V2,IP,FP,Counter).
+dismantle_number(V,1,IP,FP,Counter):-
+	dismantle_number(V,IP,FP,Counter).
+--
+dismantle_number(V1,V2,0,0):-
+	V2== ?val("INTEGER",V1),!.
+dismantle_number(V,IP,FP,Counter):-
+	-- Text== text_operations?format("%1.15f",V),
+	Text== text_operations?format("%1.14f",V),
+	P1== ?search_dot(Text),
+	P2== P1 - 1,
+	text_operations?split(P2,Text,Front,Rest1),
+	text_operations?split(1,Rest1,_,Rest2),
+	IP== ?convert_to_integer(Front),!,
+	count_nonzero_digits(Rest2,Rest3,0,Counter),
+	FP== ?convert_number(Counter,Rest3).
+dismantle_number(_,_,_,_):-
+	break('dismantle_number').
+--
+search_dot(Text) = P :-
+	P== text_operations?search(Text,"."),!.
+search_dot(Text) = P :-
+	P== text_operations?search(Text,","),!.
+--
+count_nonzero_digits(S1,"",Counter,Counter):-
+	are_zeros(S1),!.
+count_nonzero_digits(S1,S4,C1,C2):-
+	text_operations?split(1,S1,Digit,S2),!,
+	count_nonzero_digits(S2,S3,C1+1,C2),
+	text_operations?concat(Digit,S3,S4).
+count_nonzero_digits(_,"",Counter,Counter).
+--
+are_zeros(S1):-
+	text_operations?concat("0",S2,S1),!,
+	are_zeros(S2).
+are_zeros("").
+--
+convert_number(0,_) = 0 :- !.
+convert_number(_,Text) = N :-
+	N== ?convert_to_integer(Text),!.
+convert_number(_,_) = _ :-
+	break('convert_number_if_necessary').
+--
+update_current_value(_,_,_,_):-
+	clear_display,
+	fail.
+update_current_value(Sign,IP,0,_):-!,
+	insert(sign(Sign)),
+	insert(integer_part(IP)).
+update_current_value(Sign,IP,FP,Counter):-
+	insert('has_fractional_part'),
+	insert(sign(Sign)),
+	insert(integer_part(IP)),
+	insert(fractional_part(FP,Counter)).
+--
+display_current_value:-
+	get_sign(Sign),
+	display_current_value(Sign).
+--
+display_current_value(Sign):-
+	get_fractional_part_or_Fail(FractionalPart,Counter),!,
+	sign_to_text(Sign,ST),
+	get_integer_part(IntegerPart),
+	Format== text_operations?format("%%s%%d,%%0%dd",Counter),
+	SignedValue==
+		text_operations?format(
+			Format,ST,IntegerPart,FractionalPart),
+	display ? show_value(SignedValue).
+display_current_value(Sign):-
+	find('has_fractional_part'),!,
+	sign_to_text(Sign,ST),
+	get_integer_part(IntegerPart),
+	display ? show_value(
+		text_operations?format("%s%d,",ST,IntegerPart)).
+display_current_value(Sign):-
+	sign_to_text(Sign,ST),
+	get_integer_part(IntegerPart),
+	display ? show_value(
+		text_operations?format("%s%d",ST,IntegerPart)).
+--
+get_current_value(Sign,IntegerPart,FractionalPart,Counter):-
+	get_fractional_part_or_Fail(FractionalPart,Counter),!,
+	get_sign(Sign),
+	get_integer_part(IntegerPart).
+get_current_value(Sign,IntegerPart,0,0):-
+	get_sign(Sign),
+	get_integer_part(IntegerPart).
+--
+get_sign(Sign):-
+	Item== ?match(sign(_)),
+	Item == sign(Sign),!.
+get_sign(1).
+--
+sign_to_text(-1,"-"):-!.
+sign_to_text(_,"").
+--
+get_fractional_part_or_Fail(N,Counter):-
+	Item== ?match(fractional_part(_,_)),
+	Item == fractional_part(N,Counter),!.
+--
+get_integer_part(N):-
+	Item== ?match(integer_part(_)),
+	Item == integer_part(N),!.
+get_integer_part(0).
+]

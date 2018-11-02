@@ -1,0 +1,422 @@
+mesh(80,40)
+failure_color('Red','White')
+diagram_font("Arial",23)
+dialog_font("Arial",14)
+window_font("Times New Roman",14)
+
+dialog '_Rock' ("Rock",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(up)
+		column(left)
+			"Type of rock"
+		end_of_column
+		column(left)
+			radiobuttons(type_of_rock)
+			vbox(left)
+				radiobutton("terrigenous")
+				radiobutton("carbonate")
+			end_of_vbox
+			end_of_radiobuttons
+		end_of_column
+	end_of_row
+	row(up)
+		column(left)
+			"Type of reservoir"
+		end_of_column
+		column(left)
+			radiobuttons(type_of_collector)
+			vbox(left)
+				radiobutton("porous")
+				radiobutton("fractured")
+				radiobutton("mixed")
+			end_of_vbox
+			end_of_radiobuttons
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Permeability (0.0001-20.0)"
+		end_of_column
+		column(left)
+			editreal(penetrability,10,1.5)
+		end_of_column
+		column(left)
+			"[micron^2]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Porosity (0.0001-0.5)"
+		end_of_column
+		column(left)
+			editreal(porosity,10,0.3)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Oil saturation (0.0-1.0)"
+		end_of_column
+		column(left)
+			editreal(saturation,10,0.8)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Bound water (0.01-0.7)"
+		end_of_column
+		column(left)
+			editreal(water,10,0.1)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Average moistening angle (0-180)"
+		end_of_column
+		column(left)
+			editreal(moist,10,50)
+		end_of_column
+		column(left)
+			"[degrees]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Close dialog")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Bed' ("Stratum",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Thickness of bed (0.0-100.0)"
+		end_of_column
+		column(left)
+			editreal(thickness,10,20)
+		end_of_column
+		column(left)
+			"[m]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Thickness of water-saturated rock (0.5-30.0)"
+		end_of_column
+		column(left)
+			editreal(water_thickness,10,0.05)
+		end_of_column
+		column(left)
+			"[m]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Thickness of burden (3.0-100.0)"
+		end_of_column
+		column(left)
+			editreal(rock_thickness,10,40)
+		end_of_column
+		column(left)
+			"[m]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Pressure (1.0-60.0)"
+		end_of_column
+		column(left)
+			editreal(pressure,10,10.0)
+		end_of_column
+		column(left)
+			"[MPa]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Temperature (0.0-200.0)"
+		end_of_column
+		column(left)
+			editreal(temperature,10,30.0)
+		end_of_column
+		column(left)
+			"[C]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Hade (0-90)"
+		end_of_column
+		column(left)
+			editreal(angle,10,3.0)
+		end_of_column
+		column(left)
+			"[degrees]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Depth of occurrence (0.0-6000.0)"
+		end_of_column
+		column(left)
+			editreal(depth,10,1000.0)
+		end_of_column
+		column(left)
+			"[m]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Close dialog")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Base_oil' ("Oil",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Density (575-1100)"
+		end_of_column
+		column(left)
+			editreal(density,10,700)
+		end_of_column
+		column(left)
+			"[kg/m^3]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Viscosity (0.001-1500)"
+		end_of_column
+		column(left)
+			editreal(viscosity,10,10)
+		end_of_column
+		column(left)
+			"[mPa*sec]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Acid number (0.01-10.0)"
+		end_of_column
+		column(left)
+			editreal(acid,10,0.1)
+		end_of_column
+		column(left)
+			"[mg/g]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Close dialog")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Stratal_water' ("Water",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Mineralization (0.0-210.0)"
+		end_of_column
+		column(left)
+			editreal(mineralization,10,100)
+		end_of_column
+		column(left)
+			"[g/litre]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"pH (2.0-14.0)"
+		end_of_column
+		column(left)
+			editreal(pH,10,7.0)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Hardness (0-100)"
+		end_of_column
+		column(left)
+			editreal(hardness,10,10.0)
+		end_of_column
+		column(left)
+			"[g/litre]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Close Dialog")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Native_gas' ("Gas",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Nitrogenous compounds (0.0-0.02)"
+		end_of_column
+		column(left)
+			editreal(nitrogen,10,0.0)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Presence of free gas"
+		end_of_column
+		column(left)
+			checkbox(free_gas," Does gas present? ")
+		end_of_column
+		column(left)
+			"Yes/No"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Close dialog")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Bedded_substances' ("Substances",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Paraffin (0.0-0.3)"
+		end_of_column
+		column(left)
+			editreal(paraph,10,0.01)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Asphaltenes (0.0-0.15)"
+		end_of_column
+		column(left)
+			editreal(asphalt,10,0.0)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Tar (0.0-0.4)"
+		end_of_column
+		column(left)
+			editreal(resin,10,0.0)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Sulfur (0.0-0.08)"
+		end_of_column
+		column(left)
+			editreal(sulphur,10,0.0)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Paraffin saturation point (8-65)"
+		end_of_column
+		column(left)
+			editreal(t_paraph,10,12)
+		end_of_column
+		column(left)
+			"[C]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Close dialog")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Mineral_constituents' ("Composition",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Cement (0.0-0.3)"
+		end_of_column
+		column(left)
+			editreal(cement,10,0.01)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Clay (0.0-0.25)"
+		end_of_column
+		column(left)
+			editreal(clay,10,0.01)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Carbonate (0.0-1.0)"
+		end_of_column
+		column(left)
+			editreal(carbon,10,0.03)
+		end_of_column
+		column(left)
+			"[0..1]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Close dialog")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog 'ParametersCheckDialog' ("Method",'White','Blue',default,centered,centered,default)
+	button(1000,"&Explain solution")
+	button(close,"&Close dialog")
+end_of_dialog
+
+dialog '_Display_solution' ("Advisable methods of oil-production",'White','Blue',default,centered,centered,default)
+vbox(center)
+	listbox['Sort'](value_i1,3000,30,9,[],[])
+	button(close,"&Close")
+end_of_vbox
+end_of_dialog

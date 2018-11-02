@@ -1,0 +1,235 @@
+package "Morozov/Web/Scanning/Messages":
+---------------------------------------------------------------
+--       The "SCANNING/MESSAGES" Actor Prolog package.       --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This is a set of auxiliary classes for creation of Web    --
+-- Agent reports.                                            --
+---------------------------------------------------------------
+import "MOROZOV/WEB/DATA/ADDRESS";
+---------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+ErrorDescription =
+		ReferenceList; ContentParameters.
+--
+---------------------------------------------------------------
+-- The 'ErrorMessages' class is intended for storage and     --
+-- report of error messages produced by the Web Agent.       --
+-- This class is a descendant of the 'Database' predefined   --
+-- class that implements some extra-logical methods of data  --
+-- storage.                                                  --
+---------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+OutputDeviceNumber	= INTEGER.
+--
+lazy:
+--
+OutputDeviceInstance	= ('GenericReport').
+--
+---------------------------------------------------------------
+interface 'ErrorMessages' (specialized 'Database'):
+--
+variable:
+--
+	report		: OutputDeviceInstance;
+--
+[
+DOMAINS:
+--
+mixed:
+--
+Target	=	current_ancestor(
+			Level,
+			WebAddressList);
+		message(Level,
+			Node,
+			WebAddressList,
+			WebAddressList,
+			ErrorDescription).
+--
+PREDICATES:
+--
+imperative:
+--
+write_header;
+write_footer;
+--
+append_message(	Level,
+		Node,
+		WebAddressList,
+		WebAddressList,
+		ErrorDescription);
+--
+/*
+determine_error_type(ReferenceList,ReferenceList)	- (i,o);
+*/
+--
+store_ancestor_name(Level,WebAddressList);
+--
+determ:
+--
+check_current_ancestor(Level,WebAddressList);
+--
+imperative:
+--
+flush_buffer;
+flush_buffer(Level);
+--
+determ:
+--
+check_current_level(Level);
+--
+imperative:
+--
+write_results_of_analysis(WebAddressList);
+write_relevant_messages(WebAddressList);
+--
+]
+---------------------------------------------------------------
+-- The 'AnalyserMessages' class is intended for producing    --
+-- error messages without saving them into the report file.  --
+---------------------------------------------------------------
+interface 'AnalyserMessages' (specialized 'ErrorMessages'):
+--
+internal:
+--
+	report		: 'GenericReport';
+--
+[
+]
+---------------------------------------------------------------
+-- The 'Plain_Report' class implements the output of error   --
+-- messages into the text window or plain text file.         --
+---------------------------------------------------------------
+interface 'Plain_Report' (specialized 'GenericReport'):
+[
+PREDICATES:
+--
+imperative:
+--
+select_color(ErrorDescription,Color,Color)	- (i,o,o);
+--
+]
+---------------------------------------------------------------
+-- The 'HTML_Report' class implements the output of error    --
+-- messages into the HTML file.                              --
+---------------------------------------------------------------
+interface 'HTML_Report' (specialized 'GenericReport'):
+--
+internal:
+--
+	html		: 'WebResource';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+select_HTML_color(ErrorDescription,Color)	- (i,o);
+--
+write_URL(WebAddressList)			- (i);
+--
+]
+---------------------------------------------------------------
+-- The 'GenericReport' class is auxiliary one.               --
+-- This class is an ancestor of the 'Plain_Report' and       --
+-- 'HTML_Report' classes.                                    --
+---------------------------------------------------------------
+interface 'GenericReport' (specialized 'Alpha'):
+--
+constant:
+--
+	comment_1	: STRING;
+--
+internal:
+--
+	output		: 'GeneralizedText';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+write_header;
+write_footer;
+--
+write_error_code(ErrorDescription)	- (i);
+--
+write_error_message(ErrorDescription)	- (i);
+--
+begin_title(STRING)			- (i);
+end_title;
+--
+write_valid_URL(WebAddressList)		- (i);
+write_bad_URL(
+	ErrorDescription,
+	WebAddressList)			- (i,i);
+--
+write_comment(ErrorDescription)		- (i);
+break_line;
+--
+get_string = STRING;
+--
+set_color(Color,Color)			- (i,i);
+set_color(Color)			- (i);
+--
+write(_*)				- (i);
+writeln(_*)				- (i);
+nl;
+--
+]
+---------------------------------------------------------------
+-- The 'ReportWindow' class is auxiliary one. It implements  --
+-- the output of error messages into the text window.        --
+-- This class is a descendant of the 'Report' predefined     --
+-- class that implements the text windows.                   --
+---------------------------------------------------------------
+interface 'ReportWindow'
+(specialized 'Report', 'GeneralizedText'):
+[
+]
+---------------------------------------------------------------
+-- The 'ReportFile' class is auxiliary one. It implements    --
+-- the output of error messages into the OS file.            --
+-- This class is a descendant of the 'File' predefined class --
+-- that implements reading from and writing to the OS files. --
+---------------------------------------------------------------
+interface 'ReportFile'
+(specialized 'File', 'GeneralizedText'):
+--
+variable:
+--
+	name		: STRING;
+--
+[
+]
+---------------------------------------------------------------
+interface 'GeneralizedText' (specialized 'Text'):
+--
+[
+PREDICATES:
+--
+imperative:
+--
+show;
+--
+set_color(Color,Color);
+set_color(Color);
+--
+PREDICATES:
+--
+imperative:
+--
+open(FileAccessMode);
+close;
+--
+]
+---------------------------------------------------------------

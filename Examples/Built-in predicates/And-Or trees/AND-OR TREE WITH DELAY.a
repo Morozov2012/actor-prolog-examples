@@ -1,0 +1,17 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+project: (('Test'))
+
+class 'Test' (specialized 'Report'):
+[
+goal:-
+	W ? p(1,2,3),
+	q(W).
+p(A,B,C):-
+	writeln(A,B,C).
+q(self):-
+	writeln("O.K.").
+]

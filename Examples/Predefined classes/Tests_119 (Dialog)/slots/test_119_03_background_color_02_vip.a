@@ -1,0 +1,33 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w01	= ('DemoPanel',
+		background_color= 'default',
+		x= 3,
+		y= 3);
+w02	= ('DemoPanel',
+		background_color= 'DkGreen',
+		x= 31,
+		y= 9);
+--
+[
+goal.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+--
+constant:
+--
+	x;
+	y	= 'centered';
+--
+[
+goal:-!,
+	show.
+]
+-----------------------------------------------------------------------

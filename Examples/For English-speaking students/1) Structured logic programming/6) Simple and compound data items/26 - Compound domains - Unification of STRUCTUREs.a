@@ -1,0 +1,75 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Structures.                           --
+--                                       --
+-- Questions: What are structures? What  --
+-- is the idea of structure unification? --
+-- Can one unify structures that have    --
+-- different names (functors)? Can one   --
+-- unify structures that are of          --
+-- different arity? Can one unify        --
+-- structures that include incompatible  --
+-- elements?                             --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+Event	= lecture(Name,MyDate,MyTime);
+	  meeting(Name,MyDate,MyTime).
+--
+MyDate	= date(INTEGER,INTEGER,INTEGER).
+MyTime	= time(INTEGER,INTEGER,INTEGER).
+Name	= STRING.
+
+PREDICATES:
+
+compare_terms(Event,Event)	- (i,i);
+
+CLAUSES:
+
+goal:-
+	compare_terms(
+		lecture("LP & AI",
+			date(2015,04,21),
+			time(10,0,0)),
+		lecture("Mathematics",
+			date(2015,04,23),
+			time(12,30,0))),
+	--
+	compare_terms(
+		lecture("LP & AI",
+			date(2015,04,21),
+			time(10,0,0)),
+		meeting("Meditation",
+			date(2015,04,25),
+			time(14,30,0))),
+	--
+	compare_terms(
+		lecture("LP & AI",
+			date(2015,04,21),
+			time(10,0,0)),
+		lecture("LP & AI",
+			date(2015,04,21),
+			time(10,0,0))).
+
+compare_terms(X,Y):-
+	X == Y,!,
+	set_color('DkGreen'),
+	writeln("These terms were ",
+		"unified successfully:"),
+	set_color('default'),
+	writeln("\t",X),
+	writeln("\t",Y).
+compare_terms(X,Y):-
+	set_color('Red'),
+	writeln("I cannot unify ",
+		"these terms:"),
+	set_color('default'),
+	writeln("\t",X),
+	writeln("\t",Y).

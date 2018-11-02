@@ -1,0 +1,40 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Deterministic,     --
+-- non-deterministic, and imperative     --
+-- predicates.                           --
+--                                       --
+-- Questions: What are imperative        --
+-- predicates? Is the p predicate        --
+-- deterministic or non-deterministic?   --
+-- Let us assume that X has a different  --
+-- value. Can the p predicate fail in    --
+-- this case?                            --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+p(INTEGER)	- (i);
+
+CLAUSES:
+
+goal:-
+	X== 1,
+	p(X),
+	writeln("The p(",X,") statement ",
+		"is true.").
+goal:-
+	writeln("The statement is false.").
+
+p(1):-!.
+p(2):-!.
+p(3):-!.
+p(Y):-
+	writeln(Y).

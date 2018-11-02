@@ -1,0 +1,157 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+IsThisFileLocal		= 'expected_to_be_local'; 'cannot_be_local'.
+DoesThisFileExist	= 'expected_to_be_found'; 'cannot_be_found'.
+--
+PREDICATES:
+--
+nondeterm:
+--
+resource_list
+	(FileName,IsThisFileLocal,DoesThisFileExist)	- (o,o,o);
+--
+imperative:
+--
+test(FileName,IsThisFileLocal,DoesThisFileExist)	- (i,i,i);
+--
+check_if_resource_is_local_file(FileName,Color)		- (i,o);
+check_if_file_does_exist(FileName,Color,Color,Color)	- (i,i,i,o);
+report_results_of_the_test
+	(IsThisFileLocal,DoesThisFileExist,Color)	- (i,i,i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Database'):
+--
+constant:
+--
+	extension	= "";
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+DOMAINS:
+--
+Target	= INTEGER.
+--
+CLAUSES:
+--
+goal:-
+	resource_list(FN,IsThisFileLocal,DoesThisFileExist),
+		test(FN,IsThisFileLocal,DoesThisFileExist),
+		fail.
+goal:-!.
+--
+resource_list(	"data.dir/database1.db",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"D:/Morozov/z/z-dj/DEMO/EXE/"
+		"EXAMPLES\\Predefined classes\\"
+		"Tests_111 (Database)/"
+		"5 File.Operations/data.dir/database1.db",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"../../Tests_111 (Database)/"
+		"5 File.Operations/data.dir/database1.db",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"../../Tests_111 (Database)/",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"../read.me",
+		'expected_to_be_local','cannot_be_found').
+resource_list(	"",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"../../Tests_111%20(Database)",
+		'expected_to_be_local','cannot_be_found').
+resource_list(	"file:data.dir/database1.db",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"file:///D:/Morozov/z/z-dj/DEMO/EXE/"
+		"EXAMPLES\\Predefined%20classes\\"
+		"Tests_111%20(Database)/"
+		"5 File.Operations/data.dir/database1.db",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"file:../../Tests_111%20(Database)/"
+		"5 File.Operations/data.dir/database1.db",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"file:../../Tests_111%20(Database)/",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"file:../read.me",
+		'expected_to_be_local','cannot_be_found').
+resource_list(	"file:///",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"file:../../Tests_111%20(Database)",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"file://"
+		"D:/Morozov/z/z-dj/DEMO/EXE/"
+		"EXAMPLES\\Predefined%20classes\\"
+		"Tests_111%20(Database)/"
+		"5 File.Operations/data.dir/database1.db",
+		'expected_to_be_local','expected_to_be_found').
+resource_list(	"http://xxx.yyy.zzz"
+		"/EXAMPLES\\Predefined%20classes\\"
+		"Tests_111%20(Database)/"
+		"5 File.Operations/data.dir/database1.db",
+		'cannot_be_local','cannot_be_found').
+resource_list(	"ftp://xxx.yyy.zzz"
+		"/EXAMPLES\\Predefined%20classes\\"
+		"Tests_111%20(Database)/"
+		"5 File.Operations/data.dir/database1.db",
+		'cannot_be_local','cannot_be_found').
+resource_list(	"https://xxx.yyy.zzz"
+		"/EXAMPLES\\Predefined%20classes\\"
+		"Tests_111%20(Database)/"
+		"files/data.dir/database1.db",
+		'cannot_be_local','cannot_be_found').
+resource_list(	"http://www.cplire.ru/Lab144/english.html",
+		'cannot_be_local','expected_to_be_found').
+--
+test(FN,IsThisFileLocal,DoesThisFileExist):-
+	Text== ?get_full_name(FN),
+	check_if_resource_is_local_file(FN,Color),
+	report_results_of_the_test(
+		IsThisFileLocal,DoesThisFileExist,Color),
+	con ? set_color(Color),
+	con ? writeln("FullName: ",Text),
+	con ? set_color('Black').
+--
+check_if_resource_is_local_file(FN,Color):-
+	is_local_resource(?get_full_name(FN)),
+	is_local_resource(?get_URL(FN)),!,
+	check_if_file_does_exist(FN,'DkGreen','Orange',Color).
+check_if_resource_is_local_file(FN,Color):-
+	check_if_file_does_exist(FN,'Cyan','Magenta',Color).
+--
+check_if_file_does_exist(FN,Color,_,Color):-
+	does_exist(?get_full_name(FN)),
+	does_exist(?get_URL(FN)),!.
+check_if_file_does_exist(_,_,Color,Color).
+--
+report_results_of_the_test(
+		'expected_to_be_local',
+		'expected_to_be_found',
+		'DkGreen'):-!,
+	con ? write("Test O.K.: ").
+report_results_of_the_test(
+		'expected_to_be_local',
+		'cannot_be_found',
+		'Orange'):-!,
+	con ? write("Test O.K.: ").
+report_results_of_the_test(
+		'cannot_be_local',
+		'expected_to_be_found',
+		'Cyan'):-!,
+	con ? write("Test O.K.: ").
+report_results_of_the_test(
+		'cannot_be_local',
+		'cannot_be_found',
+		'Magenta'):-!,
+	con ? write("Test O.K.: ").
+report_results_of_the_test(_,_,_):-
+	con ? set_color('Red'),
+	con ? write("Test failed: "),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

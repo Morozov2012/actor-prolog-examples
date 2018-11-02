@@ -1,0 +1,107 @@
+---------------------------------------------------------------
+--          The "TextScreen" Actor Prolog package.           --
+--          (c) 2011, IRE RAS, Alexei A. Morozov.            --
+---------------------------------------------------------------
+-- ѕакет предназначен дл€ имитации вывода текста на экран с  --
+-- возможностью перемещать текстовый курсор в произвольные   --
+-- позиции текстового окна. Ётот пакет создан, в основном,   --
+-- дл€ того чтобы перенести на јкторный ѕролог               --
+-- демонстрационную программу "—еквенциальное исчисление".   --
+---------------------------------------------------------------
+--
+DOMAINS:
+--
+ColoredText	= ColoredText*; ColoredTextItem.
+ColoredTextItem	= Color; STRING.
+--
+Row, Column	= INTEGER.
+--
+RowItems	= RowItem*.
+RowItem		= text(Column,STRING,Color).
+--
+---------------------------------------------------------------
+interface 'TextScreen' (specialized 'Alpha'):
+--
+internal:
+--
+con		: 'Console';
+--
+memory		: 'TextController';
+--
+text_operations	: 'Text';
+--
+output		: 'Report';
+--
+-- debug	: 'Report';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+cursor(Row,Column)				- (i,i);
+write(ColoredText*)				- (i);
+--
+length(ColoredText) = INTEGER			- (i);
+string_length(STRING) = INTEGER			- (i);
+--
+set_color(Color)				- (i);
+get_color(Color)				- (o);
+--
+display;
+clear;
+--
+]
+---------------------------------------------------------------
+interface 'TextController' (specialized 'Database'):
+--
+internal:
+--
+text_store	: 'TextDatabase';
+--
+[
+DOMAINS:
+--
+Target	=	current_position(Row,Column);
+		current_color(Color);
+		minimal_row(Row);
+		maximal_row(Row);
+		minimal_column(Column);
+		maximal_column(Column);
+		nearest_text_item(Column).
+--
+PREDICATES:
+--
+imperative:
+--
+clear;
+--
+append(Row,Column,STRING,Color)			- (i,i,i,i);
+--
+retrieve(Row,RowItems)				- (i,o);
+retrieve(Row,Column,STRING,Color)		- (i,i,o,o);
+--
+reverse_row(RowItems,RowItems,RowItems)		- (i,i,o);
+--
+compute_minimal_row(Row)			- (o);
+compute_maximal_row(Row)			- (o);
+compute_minimal_column(Column)			- (o);
+compute_maximal_column(Row,Column)		- (i,o);
+--
+determ:
+--
+compute_nearest_text_item(Row,Column,Column)	- (i,i,o);
+--
+imperative:
+--
+set_color(Color)				- (i);
+get_color(Color)				- (o);
+]
+---------------------------------------------------------------
+interface 'TextDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= row(Row,RowItems).
+]
+---------------------------------------------------------------

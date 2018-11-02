@@ -1,0 +1,75 @@
+------------------------------------------------------------------------
+--                                                                    --
+--              An example of Actor Prolog program.                   --
+--             (c) 2011, IRE RAS, Alexei A. Morozov.                  --
+--                                                                    --
+--            Use of the 'Database' predefined class.                 --
+--                                                                    --
+------------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+db	= ('MyDatabase');
+w1	= ('Report',title="Insert/Append",x=5,y=1,width=40,height=12);
+w2	= ('Report',title="Find",x=15,y=5,width=40,height=15);
+w3	= ('Report',title="Retract",x=30,y=15,width=40,height=9);
+--
+[
+goal:-!,
+	w1 ? writeln("Insert terms:"),
+	insert_terms(1),
+	list_database(w1),
+	w1 ? writeln("Save local database MY.DB"),
+	db ? save("MY"),
+	w1 ? writeln("Append terms:"),
+	append_terms(1,[]),
+	list_database(w1),
+	w2 ? writeln("Load local database MY.DB"),
+	db ? load("MY"),
+	list_database(w2),
+	w3 ? writeln("Clear local database"),
+	db ? retract_all,
+	list_database(w3),
+	w3 ? writeln("Load local database MY.DB"),
+	db ? load("MY"),
+	retract_terms,
+	list_database(w3).
+--
+insert_terms(N):-
+	N > 5,!.
+insert_terms(N1):-
+	Term == {n:N1},
+	w1 ? writeln(Term),
+	db ? insert(Term),
+	insert_terms(N1 + 1).
+--
+append_terms(N,_):-
+	N > 5,!.
+append_terms(N1,Rest):-
+	List == [N1|Rest],
+	Term == {i:N1,l:List},
+	w1 ? writeln(Term),
+	db ? append(Term),
+	append_terms(N1 + 1,List).
+--
+list_database(W):-
+	W ? writeln("Contents of database:"),
+	db ? find(Term),
+	W ? writeln(Term),
+	fail.
+list_database(W):-
+	Record== db ? match({i:_|_}),
+	Record == {l:List|_},
+	W ? writeln(List),
+	fail.
+list_database(_).
+--
+retract_terms:-
+	w3 ? writeln("Retract terms:"),
+	db ? retract(Term),
+	w3 ? writeln(Term),
+	fail.
+retract_terms.
+]
+------------------------------------------------------------------------

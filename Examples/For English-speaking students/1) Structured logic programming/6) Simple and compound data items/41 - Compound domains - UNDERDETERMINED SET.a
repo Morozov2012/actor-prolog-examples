@@ -1,0 +1,57 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Underdetermined sets.                 --
+--                                       --
+-- Questions: What are underdetermined   --
+-- sets? Why does an underdetermined set --
+-- contain pairs of terms? Is the order  --
+-- of the pairs essential? What is the   --
+-- name of a pair? What is the value of  --
+-- the pair? Can an underdetermined set  --
+-- contain two pairs with the same name? --
+-- Can the name of a pair be a symbol?   --
+-- Can the name of the pair be an        --
+-- integer number? What is the meaning   --
+-- of a prefix before the braces of an   --
+-- underdetermined set? How can one      --
+-- replace the prefix by a pair with the --
+-- 0 name inside the braces of the set?  --
+-- How many pairs can an underdetermined --
+-- set contain? Can an underdetermined   --
+-- set contain no pairs? What is an      --
+-- empty underdetermined set? Can an     --
+-- underdetermined set contain another   --
+-- compound term? What is the difference --
+-- between lists and underdetermined     --
+-- sets in Actor Prolog?                 --
+--                                       --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	T1== {name:"Ivan",age:21},
+	writeln(T1),
+	--
+	T2== {profession:'student'|T1},
+	writeln(T2),
+	--
+	T3== {researcher:T2,area:"EEG"},
+	writeln(T3),
+	--
+	T4== 'date'{year:2015,month:'May'},
+	writeln(T4),
+	--
+	T5== 144{floor:2,room:214},
+	writeln(T5),
+	--
+	T6== {0:144,floor:2,room:214},
+	writeln(T6),
+	--
+	T7== {1:"Ivan",2:"Tom",3:"Bob"},
+	writeln(T7).

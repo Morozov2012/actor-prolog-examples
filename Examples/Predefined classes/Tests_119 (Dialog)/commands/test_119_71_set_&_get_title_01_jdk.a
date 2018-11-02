@@ -1,0 +1,87 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+project: (('DemoPanel'))
+--
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(FrameTitle)	- (i);
+--
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+--
+constant:
+--
+	x		= 'centered';
+	y		= 'centered';
+	width		= 30;
+	height		= 10;
+	time_delay	= 1.0;
+--
+internal:
+--
+	con		= ('Console');
+	timer		= ('Timer');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	show,
+	timer ? sleep(time_delay),
+	test2("My Title"),
+	test1,
+	show,
+	timer ? sleep(time_delay),
+	test2('default'),
+	test1,
+	show.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_title(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	T== ?get_title(),!,
+	con ? write("title: "),
+	con ? set_color('Violet'),
+	con ? writeln(T),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test2(T):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	con ? writeln("I will set: title= ",T),
+	set_title(T),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

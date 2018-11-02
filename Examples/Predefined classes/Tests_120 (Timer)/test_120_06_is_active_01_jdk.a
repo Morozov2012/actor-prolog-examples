@@ -1,0 +1,78 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+timer1	= ('MainTimer');
+timer2	= ('AuxiliaryTimer',
+		main_timer=timer1);
+timer3	= ('Inspector',
+		main_timer=timer1);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'MainTimer' (specialized 'Timer'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	set_period(2),
+	activate.
+--
+tick:-!,
+	Time== ?time(),
+	con ? set_color('Blue'),
+	con ? writeln("Main Timer :: Tick :: Time: ",Time),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'AuxiliaryTimer' (specialized 'Timer'):
+--
+internal:
+--
+main_timer;
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	delay(5).
+--
+tick:-!,
+	con ? set_color('Magenta'),
+	con ? writeln(	"Auxiliary Timer :: "
+			"I will suspend the main timer."),
+	con ? set_color('default'),
+	main_timer ? suspend.
+]
+-----------------------------------------------------------------------
+class 'Inspector' (specialized 'Timer'):
+--
+internal:
+--
+main_timer;
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	activate.
+--
+tick:-
+	main_timer ? is_active,!,
+	con ? set_color('DkGreen'),
+	con ? writeln("Inspector :: The main timer is active."),
+	con ? set_color('default').
+tick:-!,
+	con ? set_color('Red'),
+	con ? writeln("Inspector :: The main timer is not active."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

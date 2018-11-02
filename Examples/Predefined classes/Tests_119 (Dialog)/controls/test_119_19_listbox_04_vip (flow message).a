@@ -1,0 +1,41 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import 'ColoredReport' from "report_toolbox";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+w1	= (('Sender',
+		output_slot_2=V));
+w2	= (('Receiver',
+		output_slot_1=V));
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Dialog'):
+--
+variable:
+--
+	output_slot_2;
+--
+[
+goal:-!,
+	show.
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Dialog'):
+--
+variable:
+--
+	output_slot_1;
+	output_slot_2;
+--
+[
+goal:-!,
+	show.
+]
+-----------------------------------------------------------------------

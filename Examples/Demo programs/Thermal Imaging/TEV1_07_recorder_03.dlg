@@ -1,0 +1,180 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+padding(1,1)
+draft('off')
+
+dialog 'Viewer'(
+	"Thermal Image Recorder",
+	default,default,default,centered,centered,default)
+vbox
+custom['KeepProportions'](main_window,70,50,"Control2D")
+grid
+	row
+		column
+			editreal[fill='HORIZONTAL'](1010,5,-10.0)
+		end_of_column
+		column
+			editreal[fill='HORIZONTAL'](1020,5,0.0)
+		end_of_column
+		column
+			editreal[fill='HORIZONTAL'](1030,5,0.0)
+		end_of_column
+		column
+			hscroll[fill='HORIZONTAL',gridwidth='REMAINDER'](1041,1042,50,[0,255],0)
+		end_of_column
+	end_of_row
+	row
+		column
+			editreal[fill='HORIZONTAL'](2010,5,100.0)
+		end_of_column
+		column
+			editreal[fill='HORIZONTAL'](2020,5,100.0)
+		end_of_column
+		column
+			editreal[fill='HORIZONTAL'](2030,5,100.0)
+		end_of_column
+		column
+			hscroll[fill='HORIZONTAL',gridwidth='REMAINDER'](2041,2042,50,[0,255],0)
+		end_of_column
+	end_of_row
+	row
+		column
+			togglebutton[fill='HORIZONTAL'](3010,"&Bounds",'yes')
+		end_of_column
+		column
+			togglebutton[fill='HORIZONTAL'](3020,"Q&1",'no')
+		end_of_column
+		column
+			togglebutton[fill='HORIZONTAL'](3030,"Q&2",'no')
+		end_of_column
+		column
+			togglebutton[fill='HORIZONTAL'](3040,"Aut&oranging",'yes')
+		end_of_column
+		column
+			togglebutton[fill='HORIZONTAL'](3050,"A&verage",'no')
+		end_of_column
+		column
+			togglebutton[fill='HORIZONTAL'](3060,"&Zoom")
+		end_of_column
+		column
+			button[fill='HORIZONTAL']("Photo","P&hoto")
+		end_of_column
+		column
+			button[fill='HORIZONTAL',gridwidth=2]("CalibrateCamera","Cal&ibrate Camera")
+		end_of_column
+	end_of_row
+	row
+		column
+			togglebutton[fill='HORIZONTAL',gridwidth=3](4010,"&Double Color Map",'no')
+		end_of_column
+		column
+			button[fill='HORIZONTAL']("AdjustRange","&Adjust Range")
+		end_of_column
+		column
+			button[fill='HORIZONTAL']("ResetRange","R&eset Range")
+		end_of_column
+		column
+			editname['ReadOnly','AlignCenter',fill='HORIZONTAL',gridwidth=2](4030,5,"")
+		end_of_column
+		column
+			listbutton[fill='HORIZONTAL',gridwidth='REMAINDER'](0,4040,15,7,
+				[
+				"Aqua",
+				"Autumn",
+				"Blackhot",
+				"Blaze",
+				"BlueRed",
+				"Bone",
+				"Bright Rainbow",
+				"Cool",
+				"Copper",
+				"Gray",
+				"Green",
+				"Hot",
+				"HSV",
+				"Iron",
+				"Jet",
+				"LightJet",
+				"Medical",
+				"Ocean",
+				"Parula",
+				"Pink",
+				"Prism",
+				"Purple",
+				"Red",
+				"Reptiloid",
+				"Soft Rainbow",
+				"Spring",
+				"Summer",
+				"Winter",
+				"Optical",
+				"None"
+				],
+				"Purple"
+				)
+		end_of_column
+	end_of_row
+	row
+		column
+			togglebutton[fill='HORIZONTAL',gridwidth=3](5010,"Co&nnect",'no')
+		end_of_column
+		column
+			hscroll[fill='HORIZONTAL',gridwidth='REMAINDER'](5021,5022,50,[0,255],0)
+		end_of_column
+	end_of_row
+	row
+		column
+			button[fill='HORIZONTAL']("Load","&Load")
+		end_of_column
+		column
+			ok[fill='HORIZONTAL']("Play","&Play")
+		end_of_column
+		column
+			button[fill='HORIZONTAL']("Pause","Pa&use")
+		end_of_column
+		column
+			button[fill='HORIZONTAL']("Record","&Record")
+		end_of_column
+		column
+			button[fill='HORIZONTAL']("Export","E&xport (AVI)")
+		end_of_column
+		column
+			button[fill='HORIZONTAL']("GIF","GI&F")
+		end_of_column
+		column
+			button[fill='HORIZONTAL']("Stop","S&top")
+		end_of_column
+		column
+			button[fill='HORIZONTAL']("Save","&Save")
+		end_of_column
+		column
+			button[fill='HORIZONTAL'](close,"&Quit")
+		end_of_column
+	end_of_row
+end_of_grid
+	padding(0,0)
+		statictext(
+			"The project is supported by the Russian "
+			"Foundation for Basic Research, "
+			"grant 16-29-09626-ofi_m.")
+	end_of_padding
+end_of_vbox
+end_of_dialog
+
+dialog 'FileInspection'(
+	"Please wait",
+	default,default,default,centered,centered,default)
+vbox('center')
+	"The file is investigated... Please wait."
+	hbox('center')
+		"Frame Number: "
+		editinteger['ReadOnly'](1010,5,0)
+	end_of_hbox
+	button("Cancel","&Cancel")
+end_of_vbox
+end_of_dialog

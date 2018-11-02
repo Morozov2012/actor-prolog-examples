@@ -1,0 +1,1852 @@
+-----------------------------------------------------------------------
+--                                                                   --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+--                                                                   --
+-- Predicate calls testing.                                          --
+--                                                                   --
+-- Requested: 1 argument, asterisk.                                  --
+-- Exists:    1 argument, asterisk.                                  --
+-- Flow direction: output.                                           --
+--                                                                   --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+D1	= INTEGER; REAL; SYMBOL; STRING.
+--
+reference:
+--
+D2	= INTEGER; REAL; SYMBOL; STRING.
+--
+lazy:
+--
+D3	= ('Testbed'); #.
+D4	= ('Testbed'); INTEGER; #.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+world1		= ('Test1');
+world2		= ('Test2',
+			first_test= world1);
+world3		= ('Test3',
+			second_test= world2);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Test1' (specialized 'Testbed'):
+--
+internal:
+--
+	world1	: 'Testbed';
+--
+variable:
+--
+	world21	: D3;
+	world22	: D3;
+	world23	: D3;
+	world24	: D3;
+--
+	world31	: D4;
+	world32	: D4;
+	world33	: D4;
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+internal:
+--
+	auxiliary_tools;
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 1"),
+	fail.
+--
+loop_D1(1001,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(R*),
+	--
+	fail.
+loop_D1(1002,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(A0101,R*),
+	con ? writeln("A0101: ",A0101),
+	--
+	fail.
+loop_D1(1003,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(B0101,B0102,R*),
+	con ? writeln("B0101: ",B0101," B0102: ",B0102),
+	--
+	fail.
+loop_D1(1004,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(C0101,C0102,C0103,R*),
+	con ? writeln("C0101: ",C0101," C0102: ",C0102," C0103: ",C0103),
+	--
+	fail.
+loop_D1(1005,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(R*),
+	--
+	fail.
+loop_D1(1006,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(A1001,R*),
+	con ? writeln("A1001: ",A1001),
+	--
+	fail.
+loop_D1(1007,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(B1001,B1002,R*),
+	con ? writeln("B1001: ",B1001," B1002: ",B1002),
+	--
+	fail.
+loop_D1(1008,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(C1001,C1002,C1003,R*),
+	con ? writeln("C1001: ",C1001," C1002: ",C1002," C1003: ",C1003),
+	--
+	fail.
+loop_D1(1009,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	loop_D1(R*).
+loop_D1():-
+	con ? writeln("END OF loop_D1").
+--
+loop_D2(2001,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(R*),
+	--
+	fail.
+loop_D2(2002,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(A0201,R*),
+	con ? writeln("A0201: ",A0201),
+	--
+	fail.
+loop_D2(2003,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(B0201,B0202,R*),
+	con ? writeln("B0201: ",B0201," B0202: ",B0202),
+	--
+	fail.
+loop_D2(2004,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(C0201,C0202,C0203,R*),
+	con ? writeln("C0201: ",C0201," C0202: ",C0202," C0203: ",C0203),
+	--
+	fail.
+loop_D2(2005,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world1 ? q(A1101,R*),
+	con ? writeln("A1101: ",A1101),
+	--
+	fail.
+loop_D2(2006,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world1 ? q(B1101,B1102,R*),
+	con ? writeln("B1101: ",B1101," B1102: ",B1102),
+	--
+	fail.
+loop_D2(2007,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world1 ? q(C1101,C1102,C1103,R*),
+	con ? writeln("C1101: ",C1101," C1102: ",C1102," C1103: ",C1103),
+	--
+	fail.
+loop_D2(2008,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(R*),
+	--
+	fail.
+loop_D2(2009,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(A2101,R*),
+	con ? writeln("A2101: ",A2101),
+	--
+	fail.
+loop_D2(2010,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(B2101,B2102,R*),
+	con ? writeln("B2101: ",B2101," B2102: ",B2102),
+	--
+	fail.
+loop_D2(2011,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(C2101,C2102,C2103,R*),
+	con ? writeln("C2101: ",C2101," C2102: ",C2102," C2103: ",C2103),
+	--
+	fail.
+loop_D2(2012,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(R*),
+	--
+	fail.
+loop_D2(2013,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(A2201,R*),
+	con ? writeln("A2201: ",A2201," (FREE)"),
+	--
+	fail.
+loop_D2(2014,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(B2201,B2202,R*),
+	con ? writeln("B2201: ",B2201," B2202: ",B2202," (FREE)"),
+	--
+	fail.
+loop_D2(2015,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(C2201,C2202,C2203,R*),
+	con ? writeln("C2201: ",C2201," C2202: ",C2202," C2203: ",C2203," (FREE)"),
+	--
+	fail.
+loop_D2(2016,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	--
+	fail.
+loop_D2(2017,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(A2301,R*),
+	con ? writeln("A2301: ",A2301," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("A2301: ",A2301),
+	--
+	fail.
+loop_D2(2018,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(B2301,B2302,R*),
+	con ? writeln("B2301: ",B2301," B2302: ",B2302," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("B2301: ",B2301," B2302: ",B2302),
+	--
+	fail.
+loop_D2(2019,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(C2301,C2302,C2303,R*),
+	con ? writeln("C2301: ",C2301," C2302: ",C2302," C2303: ",C2303," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("C2301: ",C2301," C2302: ",C2302," C2303: ",C2303),
+	--
+	fail.
+loop_D2(2020,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	--
+	fail.
+loop_D2(2021,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(A2401,R*),
+	con ? writeln("A2401: ",A2401," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	con ? writeln("A2401: ",A2401," (FREE)"),
+	--
+	fail.
+loop_D2(2022,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(B2401,B2402,R*),
+	con ? writeln("B2401: ",B2401," B2402: ",B2402," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	con ? writeln("B2401: ",B2401," B2402: ",B2402," (FREE)"),
+	--
+	fail.
+loop_D2(2023,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(C2401,C2402,C2403,R*),
+	con ? writeln("C2401: ",C2401," C2402: ",C2402," C2403: ",C2403," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	con ? writeln("C2401: ",C2401," C2402: ",C2402," C2403: ",C2403," (FREE)"),
+	--
+	fail.
+loop_D2(2024,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(R*),
+	--
+	fail.
+loop_D2(2025,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(A3101,R*),
+	con ? writeln("A3101: ",A3101),
+	--
+	fail.
+loop_D2(2026,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(B3101,B3102,R*),
+	con ? writeln("B3101: ",B3101," B3102: ",B3102),
+	--
+	fail.
+loop_D2(2027,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(C3101,C3102,C3103,R*),
+	con ? writeln("C3101: ",C3101," C3102: ",C3102," C3103: ",C3103),
+	--
+	fail.
+loop_D2(2028,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(R*),
+	--
+	fail.
+loop_D2(2029,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(A3201,R*),
+	con ? writeln("A3201: ",A3201," (FREE)"),
+	--
+	fail.
+loop_D2(2030,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(B3201,B3202,R*),
+	con ? writeln("B3201: ",B3201," B3202: ",B3202," (FREE)"),
+	--
+	fail.
+loop_D2(2031,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(C3201,C3202,C3203,R*),
+	con ? writeln("C3201: ",C3201," C3202: ",C3202," C3203: ",C3203," (FREE)"),
+	--
+	fail.
+loop_D2(2032,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(R*),
+	--
+	fail.
+loop_D2(2033,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(A3301,R*),
+	con ? writeln("A3301: ",A3301),
+	--
+	fail.
+loop_D2(2034,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(B3301,B3302,R*),
+	con ? writeln("B3301: ",B3301," B3302: ",B3302),
+	--
+	fail.
+loop_D2(2035,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(C3301,C3302,C3303,R*),
+	con ? writeln("C3301: ",C3301," C3302: ",C3302," C3303: ",C3303),
+	--
+	fail.
+loop_D2(2036,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	--
+	fail.
+loop_D2(2037,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(A3401,R*),
+	con ? writeln("A3401: ",A3401," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("A3401: ",A3401),
+	--
+	fail.
+loop_D2(2038,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(B3401,B3402,R*),
+	con ? writeln("B3401: ",B3401," B3402: ",B3402," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("B3401: ",B3401," B3402: ",B3402),
+	--
+	fail.
+loop_D2(2039,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(C3401,C3402,C3403,R*),
+	con ? writeln("C3401: ",C3401," C3402: ",C3402," C3403: ",C3403," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("C3401: ",C3401," C3402: ",C3402," C3403: ",C3403),
+	--
+	fail.
+loop_D2(2040,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	--
+	fail.
+loop_D2(2041,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(A3501,R*),
+	con ? writeln("A3501: ",A3501," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("A3501: ",A3501," (FREE)"),
+	--
+	fail.
+loop_D2(2042,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(B3501,B3502,R*),
+	con ? writeln("B3501: ",B3501," B3502: ",B3502," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("B3501: ",B3501," B3502: ",B3502," (FREE)"),
+	--
+	fail.
+loop_D2(2043,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(C3501,C3502,C3503,R*),
+	con ? writeln("C3501: ",C3501," C3502: ",C3502," C3503: ",C3503," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("C3501: ",C3501," C3502: ",C3502," C3503: ",C3503," (FREE)"),
+	--
+	fail.
+loop_D2(2044,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	--
+	fail.
+loop_D2(2045,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(A3601,R*),
+	con ? writeln("A3601: ",A3601," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	con ? writeln("A3601: ",A3601),
+	--
+	fail.
+loop_D2(2046,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(B3601,B3602,R*),
+	con ? writeln("B3601: ",B3601," B3602: ",B3602," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	con ? writeln("B3601: ",B3601," B3602: ",B3602),
+	--
+	fail.
+loop_D2(2047,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(C3601,C3602,C3603,R*),
+	con ? writeln("C3601: ",C3601," C3602: ",C3602," C3603: ",C3603," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	con ? writeln("C3601: ",C3601," C3602: ",C3602," C3603: ",C3603),
+	--
+	fail.
+loop_D2(2048,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	loop_D2(R*).
+loop_D2():-
+	con ? writeln("END OF loop_D2").
+--
+p(111001,111002,111003):-!,
+	con ? writeln("Test1 (1.1): p/3").
+p(112001,112002):-!,
+	con ? writeln("Test1 (1.2): p/2").
+p(113001):-!,
+	con ? writeln("Test1 (1.3): p/1").
+p(114001,Rest*):-!,
+	con ? writeln("Test1 (1.4): p/2*"),
+	p(Rest*).
+p():-
+	con ? writeln("Test1 (1.5): p/0").
+--
+q(121001,121002,121003):-!,
+	con ? writeln("Test1 (1.6): q/3").
+q(122001,122002):-!,
+	con ? writeln("Test1 (1.7): q/2").
+q(123001):-!,
+	con ? writeln("Test1 (1.8): q/1").
+q(124001,Rest*):-!,
+	con ? writeln("Test1 (1.9): q/2*"),
+	q(Rest*).
+q():-
+	con ? writeln("Test1 (1.10): q/0").
+--
+r(131001,131002,131003):-!,
+	con ? writeln("Test1 (1.11): r/3").
+r(132001,132002):-!,
+	con ? writeln("Test1 (1.12): r/2").
+r(133001):-!,
+	con ? writeln("Test1 (1.13): r/1").
+--
+r(140101,Rest*):-!,
+	con ? writeln("Test1 (1.14): r/2*"),
+	r(Rest*).
+r(_,Rest*):-!,
+	con ? writeln("Test1 (1.15): r/2*"),
+	r(Rest*).
+r():-
+	con ? writeln("Test1 (1.16): r/0").
+]
+-----------------------------------------------------------------------
+class 'Test2' (specialized 'Testbed'):
+--
+internal:
+--
+	world1	: 'Testbed';
+--
+variable:
+--
+	world21	: D3;
+	world22	: D3;
+	world23	: D3;
+	world24	: D3;
+--
+	world31	: D4;
+	world32	: D4;
+	world33	: D4;
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+internal:
+--
+	first_test;
+--
+	auxiliary_tools;
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 2"),
+	fail.
+--
+loop_D1(1001,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(R*),
+	--
+	fail.
+loop_D1(1002,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(A0101,R*),
+	con ? writeln("A0101: ",A0101),
+	--
+	fail.
+loop_D1(1003,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(B0101,B0102,R*),
+	con ? writeln("B0101: ",B0101," B0102: ",B0102),
+	--
+	fail.
+loop_D1(1004,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(C0101,C0102,C0103,R*),
+	con ? writeln("C0101: ",C0101," C0102: ",C0102," C0103: ",C0103),
+	--
+	fail.
+loop_D1(1005,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(R*),
+	--
+	fail.
+loop_D1(1006,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(A1001,R*),
+	con ? writeln("A1001: ",A1001),
+	--
+	fail.
+loop_D1(1007,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(B1001,B1002,R*),
+	con ? writeln("B1001: ",B1001," B1002: ",B1002),
+	--
+	fail.
+loop_D1(1008,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(C1001,C1002,C1003,R*),
+	con ? writeln("C1001: ",C1001," C1002: ",C1002," C1003: ",C1003),
+	--
+	fail.
+loop_D1(1009,R*):-!,
+	--
+	con ? writeln("loop_D1"),
+	--
+	loop_D1(R*).
+loop_D1():-!,
+	con ? writeln("END OF loop_D1").
+--
+loop_D2(2001,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(R*),
+	--
+	fail.
+loop_D2(2002,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(A0201,R*),
+	con ? writeln("A0201: ",A0201),
+	--
+	fail.
+loop_D2(2003,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(B0201,B0202,R*),
+	con ? writeln("B0201: ",B0201," B0202: ",B0202),
+	--
+	fail.
+loop_D2(2004,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(C0201,C0202,C0203,R*),
+	con ? writeln("C0201: ",C0201," C0202: ",C0202," C0203: ",C0203),
+	--
+	fail.
+loop_D2(2005,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world1 ? q(A1101,R*),
+	con ? writeln("A1101: ",A1101),
+	--
+	fail.
+loop_D2(2006,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world1 ? q(B1101,B1102,R*),
+	con ? writeln("B1101: ",B1101," B1102: ",B1102),
+	--
+	fail.
+loop_D2(2007,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world1 ? q(C1101,C1102,C1103,R*),
+	con ? writeln("C1101: ",C1101," C1102: ",C1102," C1103: ",C1103),
+	--
+	fail.
+loop_D2(2008,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(R*),
+	--
+	fail.
+loop_D2(2009,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(A2101,R*),
+	con ? writeln("A2101: ",A2101),
+	--
+	fail.
+loop_D2(2010,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(B2101,B2102,R*),
+	con ? writeln("B2101: ",B2101," B2102: ",B2102),
+	--
+	fail.
+loop_D2(2011,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(C2101,C2102,C2103,R*),
+	con ? writeln("C2101: ",C2101," C2102: ",C2102," C2103: ",C2103),
+	--
+	fail.
+loop_D2(2012,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(R*),
+	--
+	fail.
+loop_D2(2013,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(A2201,R*),
+	con ? writeln("A2201: ",A2201," (FREE)"),
+	--
+	fail.
+loop_D2(2014,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(B2201,B2202,R*),
+	con ? writeln("B2201: ",B2201," B2202: ",B2202," (FREE)"),
+	--
+	fail.
+loop_D2(2015,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(C2201,C2202,C2203,R*),
+	con ? writeln("C2201: ",C2201," C2202: ",C2202," C2203: ",C2203," (FREE)"),
+	--
+	fail.
+loop_D2(2016,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	--
+	fail.
+loop_D2(2017,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(A2301,R*),
+	con ? writeln("A2301: ",A2301," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("A2301: ",A2301),
+	--
+	fail.
+loop_D2(2018,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(B2301,B2302,R*),
+	con ? writeln("B2301: ",B2301," B2302: ",B2302," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("B2301: ",B2301," B2302: ",B2302),
+	--
+	fail.
+loop_D2(2019,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(C2301,C2302,C2303,R*),
+	con ? writeln("C2301: ",C2301," C2302: ",C2302," C2303: ",C2303," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("C2301: ",C2301," C2302: ",C2302," C2303: ",C2303),
+	--
+	fail.
+loop_D2(2020,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	--
+	fail.
+loop_D2(2021,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(A2401,R*),
+	con ? writeln("A2401: ",A2401," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	con ? writeln("A2401: ",A2401," (FREE)"),
+	--
+	fail.
+loop_D2(2022,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(B2401,B2402,R*),
+	con ? writeln("B2401: ",B2401," B2402: ",B2402," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	con ? writeln("B2401: ",B2401," B2402: ",B2402," (FREE)"),
+	--
+	fail.
+loop_D2(2023,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(C2401,C2402,C2403,R*),
+	con ? writeln("C2401: ",C2401," C2402: ",C2402," C2403: ",C2403," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	con ? writeln("C2401: ",C2401," C2402: ",C2402," C2403: ",C2403," (FREE)"),
+	--
+	fail.
+loop_D2(2024,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(R*),
+	--
+	fail.
+loop_D2(2025,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(A3101,R*),
+	con ? writeln("A3101: ",A3101),
+	--
+	fail.
+loop_D2(2026,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(B3101,B3102,R*),
+	con ? writeln("B3101: ",B3101," B3102: ",B3102),
+	--
+	fail.
+loop_D2(2027,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(C3101,C3102,C3103,R*),
+	con ? writeln("C3101: ",C3101," C3102: ",C3102," C3103: ",C3103),
+	--
+	fail.
+loop_D2(2028,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(R*),
+	--
+	fail.
+loop_D2(2029,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(A3201,R*),
+	con ? writeln("A3201: ",A3201," (FREE)"),
+	--
+	fail.
+loop_D2(2030,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(B3201,B3202,R*),
+	con ? writeln("B3201: ",B3201," B3202: ",B3202," (FREE)"),
+	--
+	fail.
+loop_D2(2031,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(C3201,C3202,C3203,R*),
+	con ? writeln("C3201: ",C3201," C3202: ",C3202," C3203: ",C3203," (FREE)"),
+	--
+	fail.
+loop_D2(2032,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(R*),
+	--
+	fail.
+loop_D2(2033,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(A3301,R*),
+	con ? writeln("A3301: ",A3301),
+	--
+	fail.
+loop_D2(2034,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(B3301,B3302,R*),
+	con ? writeln("B3301: ",B3301," B3302: ",B3302),
+	--
+	fail.
+loop_D2(2035,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(C3301,C3302,C3303,R*),
+	con ? writeln("C3301: ",C3301," C3302: ",C3302," C3303: ",C3303),
+	--
+	fail.
+loop_D2(2036,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	--
+	fail.
+loop_D2(2037,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(A3401,R*),
+	con ? writeln("A3401: ",A3401," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("A3401: ",A3401),
+	--
+	fail.
+loop_D2(2038,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(B3401,B3402,R*),
+	con ? writeln("B3401: ",B3401," B3402: ",B3402," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("B3401: ",B3401," B3402: ",B3402),
+	--
+	fail.
+loop_D2(2039,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(C3401,C3402,C3403,R*),
+	con ? writeln("C3401: ",C3401," C3402: ",C3402," C3403: ",C3403," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("C3401: ",C3401," C3402: ",C3402," C3403: ",C3403),
+	--
+	fail.
+loop_D2(2040,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	--
+	fail.
+loop_D2(2041,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(A3501,R*),
+	con ? writeln("A3501: ",A3501," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("A3501: ",A3501," (FREE)"),
+	--
+	fail.
+loop_D2(2042,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(B3501,B3502,R*),
+	con ? writeln("B3501: ",B3501," B3502: ",B3502," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("B3501: ",B3501," B3502: ",B3502," (FREE)"),
+	--
+	fail.
+loop_D2(2043,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(C3501,C3502,C3503,R*),
+	con ? writeln("C3501: ",C3501," C3502: ",C3502," C3503: ",C3503," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("C3501: ",C3501," C3502: ",C3502," C3503: ",C3503," (FREE)"),
+	--
+	fail.
+loop_D2(2044,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	--
+	fail.
+loop_D2(2045,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(A3601,R*),
+	con ? writeln("A3601: ",A3601," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	con ? writeln("A3601: ",A3601),
+	--
+	fail.
+loop_D2(2046,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(B3601,B3602,R*),
+	con ? writeln("B3601: ",B3601," B3602: ",B3602," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	con ? writeln("B3601: ",B3601," B3602: ",B3602),
+	--
+	fail.
+loop_D2(2047,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(C3601,C3602,C3603,R*),
+	con ? writeln("C3601: ",C3601," C3602: ",C3602," C3603: ",C3603," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	con ? writeln("C3601: ",C3601," C3602: ",C3602," C3603: ",C3603),
+	--
+	fail.
+loop_D2(2048,R*):-!,
+	--
+	con ? writeln("loop_D2"),
+	--
+	loop_D2(R*).
+loop_D2():-!,
+	con ? writeln("END OF loop_D2").
+--
+M(N*):-!,
+	con ? writeln("Test2 (1): M=",M),
+	first_test ? M(N*),
+	con ? writeln("Test2 (2): M=",M).
+--
+M(1000,N*):-!,
+	con ? writeln("Test2 (3): M=",M),
+	first_test ? M(N*),
+	con ? writeln("Test2 (4): M=",M).
+]
+-----------------------------------------------------------------------
+class 'Test3' (specialized 'Testbed'):
+--
+internal:
+--
+	world1	: 'Testbed';
+--
+variable:
+--
+	world21	: D3;
+	world22	: D3;
+	world23	: D3;
+	world24	: D3;
+--
+	world31	: D4;
+	world32	: D4;
+	world33	: D4;
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+internal:
+--
+	second_test;
+--
+	auxiliary_tools;
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 3"),
+	fail.
+--
+loop_D1(1001,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(R*),
+	--
+	fail.
+loop_D1(1002,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(A0101,R*),
+	con ? writeln("A0101: ",A0101),
+	--
+	fail.
+loop_D1(1003,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(B0101,B0102,R*),
+	con ? writeln("B0101: ",B0101," B0102: ",B0102),
+	--
+	fail.
+loop_D1(1004,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	p(C0101,C0102,C0103,R*),
+	con ? writeln("C0101: ",C0101," C0102: ",C0102," C0103: ",C0103),
+	--
+	fail.
+loop_D1(1005,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(R*),
+	--
+	fail.
+loop_D1(1006,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(A1001,R*),
+	con ? writeln("A1001: ",A1001),
+	--
+	fail.
+loop_D1(1007,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(B1001,B1002,R*),
+	con ? writeln("B1001: ",B1001," B1002: ",B1002),
+	--
+	fail.
+loop_D1(1008,R*):-
+	--
+	con ? writeln("loop_D1"),
+	--
+	world1 ? p(C1001,C1002,C1003,R*),
+	con ? writeln("C1001: ",C1001," C1002: ",C1002," C1003: ",C1003),
+	--
+	fail.
+loop_D1(1009,R*):-!,
+	--
+	con ? writeln("loop_D1"),
+	--
+	loop_D1(R*).
+loop_D1():-!,
+	con ? writeln("END OF loop_D1").
+--
+loop_D2(2001,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(R*),
+	--
+	fail.
+loop_D2(2002,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(A0201,R*),
+	con ? writeln("A0201: ",A0201),
+	--
+	fail.
+loop_D2(2003,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(B0201,B0202,R*),
+	con ? writeln("B0201: ",B0201," B0202: ",B0202),
+	--
+	fail.
+loop_D2(2004,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	q(C0201,C0202,C0203,R*),
+	con ? writeln("C0201: ",C0201," C0202: ",C0202," C0203: ",C0203),
+	--
+	fail.
+loop_D2(2005,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world1 ? q(A1101,R*),
+	con ? writeln("A1101: ",A1101),
+	--
+	fail.
+loop_D2(2006,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world1 ? q(B1101,B1102,R*),
+	con ? writeln("B1101: ",B1101," B1102: ",B1102),
+	--
+	fail.
+loop_D2(2007,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world1 ? q(C1101,C1102,C1103,R*),
+	con ? writeln("C1101: ",C1101," C1102: ",C1102," C1103: ",C1103),
+	--
+	fail.
+loop_D2(2008,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(R*),
+	--
+	fail.
+loop_D2(2009,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(A2101,R*),
+	con ? writeln("A2101: ",A2101),
+	--
+	fail.
+loop_D2(2010,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(B2101,B2102,R*),
+	con ? writeln("B2101: ",B2101," B2102: ",B2102),
+	--
+	fail.
+loop_D2(2011,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world21 ? r(C2101,C2102,C2103,R*),
+	con ? writeln("C2101: ",C2101," C2102: ",C2102," C2103: ",C2103),
+	--
+	fail.
+loop_D2(2012,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(R*),
+	--
+	fail.
+loop_D2(2013,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(A2201,R*),
+	con ? writeln("A2201: ",A2201," (FREE)"),
+	--
+	fail.
+loop_D2(2014,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(B2201,B2202,R*),
+	con ? writeln("B2201: ",B2201," B2202: ",B2202," (FREE)"),
+	--
+	fail.
+loop_D2(2015,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world22 ? r(C2201,C2202,C2203,R*),
+	con ? writeln("C2201: ",C2201," C2202: ",C2202," C2203: ",C2203," (FREE)"),
+	--
+	fail.
+loop_D2(2016,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	--
+	fail.
+loop_D2(2017,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(A2301,R*),
+	con ? writeln("A2301: ",A2301," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("A2301: ",A2301),
+	--
+	fail.
+loop_D2(2018,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(B2301,B2302,R*),
+	con ? writeln("B2301: ",B2301," B2302: ",B2302," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("B2301: ",B2301," B2302: ",B2302),
+	--
+	fail.
+loop_D2(2019,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world23 ? r(C2301,C2302,C2303,R*),
+	con ? writeln("C2301: ",C2301," C2302: ",C2302," C2303: ",C2303," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("C2301: ",C2301," C2302: ",C2302," C2303: ",C2303),
+	--
+	fail.
+loop_D2(2020,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	--
+	fail.
+loop_D2(2021,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(A2401,R*),
+	con ? writeln("A2401: ",A2401," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	con ? writeln("A2401: ",A2401," (FREE)"),
+	--
+	fail.
+loop_D2(2022,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(B2401,B2402,R*),
+	con ? writeln("B2401: ",B2401," B2402: ",B2402," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	con ? writeln("B2401: ",B2401," B2402: ",B2402," (FREE)"),
+	--
+	fail.
+loop_D2(2023,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world24 ? r(C2401,C2402,C2403,R*),
+	con ? writeln("C2401: ",C2401," C2402: ",C2402," C2403: ",C2403," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	con ? writeln("C2401: ",C2401," C2402: ",C2402," C2403: ",C2403," (FREE)"),
+	--
+	fail.
+loop_D2(2024,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(R*),
+	--
+	fail.
+loop_D2(2025,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(A3101,R*),
+	con ? writeln("A3101: ",A3101),
+	--
+	fail.
+loop_D2(2026,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(B3101,B3102,R*),
+	con ? writeln("B3101: ",B3101," B3102: ",B3102),
+	--
+	fail.
+loop_D2(2027,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world31 ? r(C3101,C3102,C3103,R*),
+	con ? writeln("C3101: ",C3101," C3102: ",C3102," C3103: ",C3103),
+	--
+	fail.
+loop_D2(2028,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(R*),
+	--
+	fail.
+loop_D2(2029,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(A3201,R*),
+	con ? writeln("A3201: ",A3201," (FREE)"),
+	--
+	fail.
+loop_D2(2030,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(B3201,B3202,R*),
+	con ? writeln("B3201: ",B3201," B3202: ",B3202," (FREE)"),
+	--
+	fail.
+loop_D2(2031,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world32 ? r(C3201,C3202,C3203,R*),
+	con ? writeln("C3201: ",C3201," C3202: ",C3202," C3203: ",C3203," (FREE)"),
+	--
+	fail.
+loop_D2(2032,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(R*),
+	--
+	fail.
+loop_D2(2033,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(A3301,R*),
+	con ? writeln("A3301: ",A3301),
+	--
+	fail.
+loop_D2(2034,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(B3301,B3302,R*),
+	con ? writeln("B3301: ",B3301," B3302: ",B3302),
+	--
+	fail.
+loop_D2(2035,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world33 ? r(C3301,C3302,C3303,R*),
+	con ? writeln("C3301: ",C3301," C3302: ",C3302," C3303: ",C3303),
+	--
+	fail.
+loop_D2(2036,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	--
+	fail.
+loop_D2(2037,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(A3401,R*),
+	con ? writeln("A3401: ",A3401," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("A3401: ",A3401),
+	--
+	fail.
+loop_D2(2038,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(B3401,B3402,R*),
+	con ? writeln("B3401: ",B3401," B3402: ",B3402," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("B3401: ",B3401," B3402: ",B3402),
+	--
+	fail.
+loop_D2(2039,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world34 ? r(C3401,C3402,C3403,R*),
+	con ? writeln("C3401: ",C3401," C3402: ",C3402," C3403: ",C3403," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("C3401: ",C3401," C3402: ",C3402," C3403: ",C3403),
+	--
+	fail.
+loop_D2(2040,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	--
+	fail.
+loop_D2(2041,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(A3501,R*),
+	con ? writeln("A3501: ",A3501," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("A3501: ",A3501," (FREE)"),
+	--
+	fail.
+loop_D2(2042,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(B3501,B3502,R*),
+	con ? writeln("B3501: ",B3501," B3502: ",B3502," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("B3501: ",B3501," B3502: ",B3502," (FREE)"),
+	--
+	fail.
+loop_D2(2043,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world35 ? r(C3501,C3502,C3503,R*),
+	con ? writeln("C3501: ",C3501," C3502: ",C3502," C3503: ",C3503," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("C3501: ",C3501," C3502: ",C3502," C3503: ",C3503," (FREE)"),
+	--
+	fail.
+loop_D2(2044,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(R*),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	--
+	fail.
+loop_D2(2045,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(A3601,R*),
+	con ? writeln("A3601: ",A3601," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	con ? writeln("A3601: ",A3601),
+	--
+	fail.
+loop_D2(2046,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(B3601,B3602,R*),
+	con ? writeln("B3601: ",B3601," B3602: ",B3602," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	con ? writeln("B3601: ",B3601," B3602: ",B3602),
+	--
+	fail.
+loop_D2(2047,R*):-
+	--
+	con ? writeln("loop_D2"),
+	--
+	world36 ? r(C3601,C3602,C3603,R*),
+	con ? writeln("C3601: ",C3601," C3602: ",C3602," C3603: ",C3603," (FREE)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	con ? writeln("C3601: ",C3601," C3602: ",C3602," C3603: ",C3603),
+	--
+	fail.
+loop_D2(2048,R*):-!,
+	--
+	con ? writeln("loop_D2"),
+	--
+	loop_D2(R*).
+loop_D2():-!,
+	con ? writeln("END OF loop_D2").
+--
+M(R*):-
+	con ? writeln("Test3 (1): M=",M),
+	second_test ? M(R*),
+	con ? writeln("Test3 (2): M=",M,", R=",R).
+]
+-----------------------------------------------------------------------
+class 'Testbed':
+--
+internal:
+--
+	world1	: 'Testbed'	= self;
+--
+variable:
+--
+	world21	: D3		= self;
+	world22	: D3		= #;
+	world23	: D3		= _;
+	world24	: D3		= _;
+--
+	world31	: D4		= self;
+	world32	: D4		= #;
+	world33	: D4		= -100;
+	world34	: D4		= _;
+	world35	: D4		= _;
+	world36	: D4		= _;
+--
+internal:
+--
+	auxiliary_tools		= ('AuxiliaryTools',
+					world23,
+					world24,
+					world34,
+					world35,
+					world36);
+--
+	con			= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+loop_D1(D1*)		- (o);
+loop_D2(D4*)		- (o);
+--
+p(D1*)			- (o);
+q(D4*)			- (o);
+--
+r(D4*)			- (o)(i);
+r(D4,D4*)		- (i,o)(i,i);
+--
+CLAUSES:
+--
+goal:-
+	--
+	loop_D1(N1001,N0101,N0102,N0103),
+	con ? writeln("N1001: ",N1001," N0101: ",N0101," N0102: ",N0102," N0103: ",N0103),
+	--
+	loop_D2(N1002,N0201,N0202,N0203),
+	con ? writeln("N1002: ",N1002," N0201: ",N0201," N0202: ",N0202," N0203: ",N0203),
+	--
+	con ? writeln("O.K.").
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'AuxiliaryTools' (specialized 'Alpha'):
+--
+variable:
+--
+	world23	: D3;
+	world24	: D3;
+--
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_world23(D3)		- (i);
+set_world24(D3)		- (i);
+--
+set_world34(D4)		- (i);
+set_world35(D4)		- (i);
+set_world36(D4)		- (i);
+--
+CLAUSES:
+--
+set_world23(world23):-!.
+set_world23(_).
+--
+set_world24(world24):-!.
+set_world24(_).
+--
+set_world34(world34):-!.
+set_world34(_).
+--
+set_world35(world35):-!.
+set_world35(_).
+--
+set_world36(world36):-!.
+set_world36(_).
+]
+-----------------------------------------------------------------------

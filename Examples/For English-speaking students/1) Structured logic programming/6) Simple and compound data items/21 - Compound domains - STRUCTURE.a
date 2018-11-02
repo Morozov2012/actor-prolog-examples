@@ -1,0 +1,29 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Structures.                           --
+--                                       --
+-- Questions: What are structures? What  --
+-- type of arguments can a structure     --
+-- contain? How many terms can the       --
+-- structure contain? Can the structure  --
+-- contain no arguments? Can the         --
+-- structure contain another structure?  --
+--                                       --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	T1== date(2015,04,21),
+	writeln(T1),
+	--
+	T2== time(10,0,0),
+	writeln(T2),
+	--
+	T3== lecture('LP & AI',T1,T2),
+	writeln(T3).

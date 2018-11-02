@@ -1,0 +1,53 @@
+-------------------------------------------
+--                                       --
+-- Элементы структурного логического     --
+-- программирования.                     --
+--                                       --
+-- Построить список всех пар элементов,  --
+-- взятых из первого и второго списков   --
+-- соответственно, таких, что сумма      --
+-- элементов пары отрицательное число.   --
+--                                       --
+-- Использованы "кирпичики":             --
+-- 1) разборка списка;                   --
+-- 2) входная сборка;                    --
+-- 3) выходной аргумент.                 --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= Element*.
+Element	= INTEGER.
+
+Pairs	= Pair*.
+Pair	= p(Element,Element).
+
+PREDICATES:
+
+imperative:
+
+loop1(List,List,Pairs,Pairs)	- (i,i,i,o);
+loop2(Element,List,Pairs,Pairs)	- (i,i,i,o);
+
+CLAUSES:
+
+goal:-
+	L1== [-5,-3,-1,1,3,5],
+	L2== [1,2,3,4,5],
+	writeln("L1: ",L1),
+	writeln("L2: ",L2),
+	loop1(L1,L2,[],L3),
+	writeln("L3: ",L3).
+
+loop1([Head1|Rest1],List2,Pairs1,Pairs3):-
+	loop2(Head1,List2,Pairs1,Pairs2),
+	loop1(Rest1,List2,Pairs2,Pairs3).
+loop1([],_,Pairs,Pairs).
+
+loop2(Head1,[Head2|Rest2],Pairs1,Pairs2):-
+	Head1 + Head2 < 0,!,
+	loop2(Head1,Rest2,[p(Head1,Head2)|Pairs1],Pairs2).
+loop2(Head1,[_|Rest2],Pairs1,Pairs2):-
+	loop2(Head1,Rest2,Pairs1,Pairs2).
+loop2(_,[],Pairs,Pairs).

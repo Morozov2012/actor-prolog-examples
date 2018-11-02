@@ -1,0 +1,29 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test1.
+--
+test1:-
+	A== "ABCDEFG",
+	B== "HIJKL",
+	con ? writeln("A: ",A),
+	con ? writeln("B: ",B),
+	concat(A,B,C),
+	con ? writeln("C: ",C).
+]

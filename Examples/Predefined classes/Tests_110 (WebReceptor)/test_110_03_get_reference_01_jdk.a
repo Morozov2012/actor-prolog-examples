@@ -1,0 +1,244 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+RefSTRING	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test2(URL);
+test3;
+test4;
+test4(URL);
+test5;
+test5(URL);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+r1	= ('ExternalResource',
+		location=
+			"file:///"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_110%20(WebReceptor)/"
+			"data/report1.html",
+		x=0,
+		y=0);
+r2	= ('ExternalResource',
+		location=
+			"file:///"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_110%20(WebReceptor)/",
+		x=1,
+		y=1);
+r3	= ('ExternalResource',
+		location=
+			"data/report1.html",
+		x=2,
+		y=2);
+r4	= ('ExternalResource',
+		location="",
+		x=3,
+		y=3);
+r5	= ('ExternalResource',
+		location=
+			"D:\\Morozov\\z\\z-dj\\DEMO\\EXE\\"
+			"EXAMPLES\\Predefined classes\\"
+			"Tests_110 (WebReceptor)\\"
+			"data\\report1.html",
+		x=4,
+		y=4);
+r6	= ('ExternalResource',
+		location=
+			"D:\\Morozov\\z\\z-dj\\DEMO\\EXE\\"
+			"EXAMPLES\\Predefined classes\\"
+			"Tests_110 (WebReceptor)\\",
+		x=5,
+		y=5);
+r7	= ('ExternalResource',
+		location=
+			"D:\\Morozov\\z\\z-dj\\DEMO\\EXE\\"
+			"EXAMPLES\\Predefined classes\\"
+			"Tests_110 (WebReceptor)",
+		x=6,
+		y=6);
+r8	= ('ExternalResource',
+		location=
+			"http://www.cplire.ru/Lab144/"
+			"index.html",
+		x=7,
+		y=7);
+--
+[
+goal:-
+	r1 ? test_resource,
+	r2 ? test_resource,
+	r3 ? test_local_resource,
+	r4 ? test_local_resource("data/report1.html"),
+	r5 ? test_resource,
+	r6 ? test_resource,
+	r7 ? test_resource,
+	r8 ? test_resource.
+]
+-----------------------------------------------------------------------
+class 'ExternalResource' (specialized 'WebReceptor'):
+--
+internal:
+--
+	con		= ('MyReport',title,x,y);
+--
+constant:
+--
+	location	: RefSTRING;
+	x		: X;
+	y		: Y;
+--
+variable:
+--
+	title		: RefSTRING;
+--
+[
+IMPERATIVES:
+--
+test_resource;
+test_local_resource;
+test_local_resource(URL);
+--
+PREDICATES:
+--
+nondeterm:
+--
+get_reference(RefSTRING) = STRING;
+get_reference(RefSTRING,FileMask) = STRING;
+--
+CLAUSES:
+--
+goal:-!,
+	title== location.
+--
+test_resource:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5.
+--
+test_local_resource:-!,
+	test1,
+	test3.
+test_local_resource(URL):-!,
+	test2(URL),
+	test4(URL),
+	test5(URL).
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1"),
+	con ? set_color('Green'),
+	?get_reference(),
+	fail.
+test1.
+--
+test2:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2"),
+	con ? set_color('Green'),
+	?get_reference(location),
+	fail.
+test2.
+--
+test2(URL):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2"),
+	con ? set_color('Green'),
+	?get_reference(URL),
+	fail.
+test2(_).
+--
+test3:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 3"),
+	con ? set_color('Green'),
+	R== ?get_reference(),
+		con ? writeln(R),
+		fail.
+test3:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("=== End of list ==="),
+	con ? set_color('default').
+--
+test4:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 4"),
+	con ? set_color('Green'),
+	R== ?get_reference(location),
+		con ? writeln(R),
+		fail.
+test4:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("=== End of list ==="),
+	con ? set_color('default').
+--
+test4(URL):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 4"),
+	con ? set_color('Green'),
+	R== ?get_reference(URL),
+		con ? writeln(R),
+		fail.
+test4(_):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("=== End of list ==="),
+	con ? set_color('default').
+--
+test5:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 5"),
+	con ? set_color('Green'),
+	R== ?get_reference(location,"*.a"),
+		con ? writeln(R),
+		fail.
+test5:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("=== End of list ==="),
+	con ? set_color('default').
+--
+test5(URL):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 5"),
+	con ? set_color('Green'),
+	R== ?get_reference(URL,"*.a"),
+		con ? writeln(R),
+		fail.
+test5(_):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("=== End of list ==="),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyReport' (specialized 'Report'):
+--
+constant:
+--
+	width	= 73;
+	height	= 20;
+--
+variable:
+--
+	title	: RefSTRING;
+--
+[]
+-----------------------------------------------------------------------

@@ -1,0 +1,65 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+-- Warning: The writef predicate in the VIP version does not output
+-- the 0 code and outputs two codes 16#0D#, 16#0A# instead of one
+-- code 16#0A#. The Java version of the predicate processes these
+-- codes well; the result of the %c format is a Unicode character.
+
+DOMAINS:
+
+N		= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+loop(N)		- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+	output1	= ('File',
+		name="output1.txt",
+		character_set='none',
+		random_access='off');
+	output2	= ('File',
+		name="output2.txt",
+		character_set='ISO_8859_1',
+		random_access='off');
+	output3	= ('File',
+		name="output3.txt",
+		character_set='default',
+		random_access='on');
+	output4	= ('File',
+		name="output4.txt",
+		character_set='none',
+		random_access='on');
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	output1 ? open('writing'),
+	output2 ? open('writing'),
+	output3 ? open('writing'),
+	output4 ? open('writing'),
+	loop(0),
+	output1 ? close,
+	output2 ? close,
+	output3 ? close,
+	output4 ? close.
+--
+loop(C):-
+	C <= 255,!,
+	con ? writef("%3x\n",C),
+	output1 ? writef("%c",C),
+	output2 ? writef("%c",C),
+	output3 ? writef("%c",C),
+	output4 ? writef("%c",C),
+	loop(C+1).
+loop(_).
+]

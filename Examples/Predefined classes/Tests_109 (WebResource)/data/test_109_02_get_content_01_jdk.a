@@ -1,0 +1,190 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+REF_STRING	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test2(URL);
+test3;
+test4;
+test4(URL);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+r1	= ('ExternalResource',
+		location=
+			"file:///"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_109%20(WebResource)/"
+			"data/data.dir/report1.html",
+		x=0,
+		y=0);
+r2	= ('ExternalResource',
+		location=
+			"file:///"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_109%20(WebResource)/",
+		x=1,
+		y=1);
+r3	= ('ExternalResource',
+		location=
+			"data.dir/report1.html",
+		x=2,
+		y=2);
+r4	= ('ExternalResource',
+		location=
+			"",
+		x=3,
+		y=3);
+r5	= ('ExternalResource',
+		location=
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined classes/"
+			"Tests_109 (WebResource)/"
+			"data/data.dir/report1.html",
+		x=4,
+		y=4);
+r6	= ('ExternalResource',
+		location=
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined classes/"
+			"Tests_109 (WebResource)/",
+		x=5,
+		y=5);
+r7	= ('ExternalResource',
+		location=
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined classes/"
+			"Tests_109 (WebResource)",
+		x=6,
+		y=6);
+r8	= ('ExternalResource',
+		location=
+			"http://www.cplire.ru/Lab144/"
+			"index.html",
+		x=7,
+		y=7);
+--
+[
+goal:-
+	r1 ? test_resource,
+	r2 ? test_resource,
+	r3 ? test_local_resource,
+	r4 ? test_local_resource("data.dir/report1.html"),
+	r5 ? test_resource,
+	r6 ? test_resource,
+	r7 ? test_resource,
+	r8 ? test_resource.
+]
+-----------------------------------------------------------------------
+class 'ExternalResource' (specialized 'WebResource'):
+--
+internal:
+--
+	con		= ('MyReport',title,x,y);
+--
+constant:
+--
+	location	: REF_STRING;
+	x		: X;
+	y		: Y;
+--
+variable:
+--
+	title		: REF_STRING;
+--
+[
+IMPERATIVES:
+--
+test_resource;
+test_local_resource;
+test_local_resource(URL);
+--
+get_content(REF_STRING) = PlainContent		- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	title== location.
+--
+test_resource:-!,
+	test1,
+	test2,
+	test3,
+	test4.
+--
+test_local_resource:-!,
+	test1,
+	test3.
+test_local_resource(URL):-!,
+	test2(URL),
+	test4(URL).
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1"),
+	con ? set_color('Green'),
+	?get_content().
+--
+test2:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2"),
+	con ? set_color('Green'),
+	?get_content(location).
+test2(URL):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2"),
+	con ? set_color('Green'),
+	?get_content(URL).
+--
+test3:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 3"),
+	con ? set_color('Green'),
+	Content== ?get_content(),
+	con ? writeln(Content).
+--
+test4:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 4"),
+	con ? set_color('Green'),
+	Content== ?get_content(location),
+	con ? writeln(Content).
+test4(URL):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 4"),
+	con ? set_color('Green'),
+	Content== ?get_content(URL),
+	con ? writeln(Content).
+]
+-----------------------------------------------------------------------
+class 'MyReport' (specialized 'Report'):
+--
+constant:
+--
+	width	= 71;
+	height	= 18;
+--
+variable:
+--
+	title	: REF_STRING;
+--
+[
+]
+-----------------------------------------------------------------------

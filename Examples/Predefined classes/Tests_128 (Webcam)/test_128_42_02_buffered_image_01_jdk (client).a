@@ -1,0 +1,70 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute the server example in the first environment and
+-- this example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	panel		= ('MyPanel');
+--
+	text		= ('Text');
+	con		= ('Console');
+--
+	text_file	= ('File',
+				name="MyFile1.txt");
+--
+variable:
+--
+	buffered_image;
+--
+[
+goal:-!,
+	con ? set_color('Orange'),
+	con ? write("READING THE FILE... "),
+	text_file ? open('reading'),
+	T== text_file?read_term(),
+	text_file ? close,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	buffered_image== ?cast('BufferedImage',T),
+	set_period(0.1),
+	panel ? show,
+	activate.
+--
+tick:-
+	[buffered_image],!,
+	panel ? draw_buffered_image(buffered_image).
+tick:-!.
+--
+alarm(ExceptionName):-!,
+	con ? set_color('Red'),
+	con ? writeln(ExceptionName),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyPanel' (specialized 'Canvas2D'):
+--
+con		= ('Console');
+--
+[
+draw_buffered_image(BufferedImage):-
+	bound(BufferedImage),!,
+	clear('no'),
+	draw_image(BufferedImage,0,0,1,1),
+	draw_now.
+draw_buffered_image(_):-
+	con ? set_color('Red'),
+	con ? writeln("The buffered_image slot is unbound."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

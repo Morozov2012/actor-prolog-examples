@@ -1,0 +1,146 @@
+------------------------------------------------------------------------
+--              An example of Actor Prolog program.                   --
+--              (c) 2007-2015, Alexei A. Morozov, IRE RAS.            --
+------------------------------------------------------------------------
+--              Use of the 'Dialog' predefined class.                 --
+------------------------------------------------------------------------
+project: (('Main'))
+------------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+agent1	= (('ControlPanel',
+		constant:
+			agent2,
+		variable:
+			target_title = Title,
+			target_x = X,
+			target_y = Y,
+			target_text_color = TextColor,
+			target_space_color = SpaceColor,
+			target_background_color = BackgroundColor,
+			target_font_name = FontName,
+			target_font_size = FontSize,
+			target_bold = Bold,
+			target_italic = Italic,
+			target_underlined = Underlined));
+agent2	= (('DemoPanel',
+		variable:
+			title = Title,
+			x = X,
+			y = Y,
+			text_color = TextColor,
+			space_color = SpaceColor,
+			background_color = BackgroundColor,
+			font_name = FontName,
+			font_size = FontSize,
+			target_bold = Bold,
+			target_italic = Italic,
+			target_underlined = Underlined));
+--
+[
+goal:-!.
+]
+------------------------------------------------------------------------
+class 'ControlPanel' (specialized 'Dialog'):
+--
+constant:
+--
+	agent2;
+--
+variable:
+--
+	target_title;
+	target_x;
+	target_y;
+	target_text_color;
+	target_space_color;
+	target_background_color;
+	target_font_name;
+	target_font_size;
+	target_bold;
+	target_italic;
+	target_underlined;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	show.
+--
+action(0500):-
+	con ? input_font(FontName,FontSize,FontStyle),
+	put('target_font_name',FontName),
+	put('target_font_size',FontSize),
+	put('target_bold',?contains(FontStyle,'bold')),
+	put('target_italic',?contains(FontStyle,'italic')),
+	put('target_underlined',?contains(FontStyle,'underlined')),!.
+action(0710):-!,
+	agent2 <- show.
+action(0720):-!,
+	agent2 <- show("DiagramIdentifier","DiagramName").
+action(0730):-!,
+	agent2 <- activate.
+action(0740):-!,
+	agent2 <- redraw.
+action(0750):-!,
+	agent2 <- hide.
+action(0800):-!,
+	agent2 <- hide,
+	hide.
+action(_):-!.
+--
+contains(Name1,Name2)= 'yes' :-
+	are_equal_font_styles(Name1,Name2),!.
+contains([Name|_],Name)= 'yes' :-!.
+contains([_|Rest],Name)= ?contains(Rest,Name) :-!.
+contains(_,_)= 'no'.
+--
+are_equal_font_styles(Name,Name).
+]
+------------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+--
+variable:
+--
+	title;
+	x;
+	y;
+	text_color;
+	space_color;
+	background_color;
+	font_name;
+	font_size;
+--
+	target_bold;
+	target_italic;
+	target_underlined;
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-
+	[target_bold,target_italic,target_underlined],
+	form_font_style(
+		FontStyle,
+		target_bold,target_italic,target_underlined),
+	put('font_style',FontStyle),!.
+--
+action(Name):-
+	put(2010,2),
+	put(3010,'yes'),
+	put(3020,'unknown'),!,
+	con ? note("Action",Name).
+--
+form_font_style(S3,Bold,Italic,Underlined):-
+	insert_style_item([],S1,Bold,'bold'),
+	insert_style_item(S1,S2,Italic,'italic'),
+	insert_style_item(S2,S3,Underlined,'underlined').
+--
+insert_style_item(L,[Item|L],'yes',Item):-!.
+insert_style_item(Style,Style,_,_).
+]
+------------------------------------------------------------------------

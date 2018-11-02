@@ -1,0 +1,29 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Webcam";
+import .. from "morozov/Vision";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	subtractor	: 'ImageSubtractor';
+	buffer		: 'BufferedImage';
+	timer		: 'Timer';
+	con		: 'Console';
+	database	: 'MyDatabase';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= ('ImageSubtractor').
+--
+]
+-----------------------------------------------------------------------

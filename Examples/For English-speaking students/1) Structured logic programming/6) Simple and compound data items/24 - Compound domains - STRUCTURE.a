@@ -1,0 +1,32 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Structures.                           --
+--                                       --
+-- Questions: What are structures? Can a --
+-- structure contain a term that is a    --
+-- structure of the same domain? Is it   --
+-- O.K. to use recursive definitions of  --
+-- domains?                              --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+MyStructure = s1(MyStructure); s2(INTEGER).
+
+PREDICATES:
+
+p(MyStructure)	- (i);
+
+CLAUSES:
+
+goal:-
+	p(s1(s1(s2(1000)))).
+
+p(X):-
+	writeln(X).

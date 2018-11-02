@@ -1,0 +1,92 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+interface 'MyPredicates':
+[
+PREDICATES:
+--
+nondeterm:
+--
+test1;
+test2;
+--
+nondeterm:
+--
+p1;
+p2;
+p3;
+]
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'MyPredicates', 'Console'):
+catch	: 'MyPredicates';
+[
+PREDICATES:
+--
+determ:
+--
+alarm(ExceptionName,SYMBOL)		- (i,i);
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+catch	= ('Trap',
+		world=self,
+		handler=self);
+--
+[
+CLAUSES:
+--
+goal:-
+	catch ? test1,!.
+--
+test1:-
+	writeln("Main:: I will call p1/1."),
+	catch ? p1,
+	writeln("Main:: I will call p2/1."),
+	catch ? p2,
+	writeln("Main:: I will call p3/1."),
+	catch ? p3,
+	writeln("Success"),
+	fail.
+test1:-
+	writeln("No more solutions.").
+--
+p1:-
+	writeln("\tMain:: p1"),
+	catch ? test2.
+p1.
+--
+p2:-
+	writeln("\tMain:: p2"),
+	catch ? test2.
+p2.
+--
+p3:-
+	writeln("\tMain:: p3"),
+	catch ? test2.
+p3:-
+	break('SpecialException').
+--
+test2:-
+	writeln("\tTest 2: clause 1.").
+test2:-
+	writeln("\tTest 2: clause 2.").
+--
+alarm(Name):-
+	writeln("Alarm: ",Name),
+	fail.
+alarm(Exception,'test1'):-
+	writeln("The test1 predicate has been terminated "
+		"by exception: ",Exception).
+alarm(Exception,'p1'):-
+	writeln("The p1 predicate has been terminated "
+		"by exception: ",Exception).
+alarm(Exception,'p2'):-
+	writeln("The p2 predicate has been terminated "
+		"by exception: ",Exception).
+alarm(Exception,'p3'):-
+	writeln("The p3 predicate has been terminated "
+		"by exception: ",Exception).
+]
+-----------------------------------------------------------------------

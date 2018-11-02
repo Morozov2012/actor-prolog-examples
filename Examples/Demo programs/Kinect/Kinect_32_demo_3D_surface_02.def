@@ -1,0 +1,42 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	frame_type	: KinectFrameType;
+	people_index	: KinectPeopleIndexMode;
+--
+internal:
+--
+	main_label	: NodeLabel;
+	window		: 'Canvas3D';
+	dialog		: 'Dialog';
+	buffer		: 'BufferedScene';
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+create_list_of_nodes(NodeList)			- (o);
+create_main_group(Node)				- (o);
+]
+-----------------------------------------------------------------------
+interface 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	graphic_window	: 'Canvas3D';
+--
+[
+]
+-----------------------------------------------------------------------

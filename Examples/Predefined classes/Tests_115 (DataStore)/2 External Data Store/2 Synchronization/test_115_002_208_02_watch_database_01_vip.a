@@ -1,0 +1,91 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute this example in the first environment and
+-- the separate_writer example in the second one.
+-- Warning: the VIP version does not support the activate and
+-- the update predicates of the Database and the DataStore classes.
+-- Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+	store	= ('DataStore',
+			name="SharedDataStore.dat",
+			access_mode='modifying',
+			sharing_mode='shared_access');
+	reader	= ('MyDatabase',
+			place=shared(store,"MyTable"),
+			con);
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	-- store ? delete,
+	con ? set_color('Orange'),
+	con ? write("OPENING DATA STORE... "),
+	store ? open,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	reader ? activate.
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	con;
+--
+[
+update:-!,
+	con ? set_color('Magenta'),
+	con ? writeln("AN UPDATE IS REPORTED!"),
+	con ? set_color('default'),
+	report_whether_database_is_updated,
+	inspect_database.
+	-- set_watch_updates('no').
+--
+report_whether_database_is_updated:-
+	is_updated,!,
+	con ? set_color('White','DkGreen'),
+	con ? writeln("The database is updated!"),
+	con ? set_color('default','default').
+report_whether_database_is_updated:-
+	con ? set_color('Navy','default'),
+	con ? writeln("The database is NOT updated!"),
+	con ? set_color('default','default').
+--
+inspect_database:-
+	con ? writeln("Test database reading."),
+	begin_transaction('reading'),!,
+	end_transaction.
+inspect_database:-
+	con ? set_color('White','Violet'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default','default').
+--
+check_database(Color):-
+	T1== ?match(_),
+	T1 == my_data(V1),!,
+	report_checksum(V1,Color).
+check_database(_).
+--
+report_checksum(V1,_):-
+	V1 <> 0.0,
+	con ? set_color('White','Red'),
+	con ? writeln("Illegal check sum value!"),
+	con ? set_color('default','default'),
+	fail.
+report_checksum(V1,Color):-
+	con ? set_color(Color,'default'),
+	con ? writeln("Check sum: ",V1),
+	con ? set_color('default','default').
+]
+-----------------------------------------------------------------------

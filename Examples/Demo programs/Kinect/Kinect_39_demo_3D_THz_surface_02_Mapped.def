@@ -1,0 +1,95 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	first_frame	: INTEGER;
+	end_frame	: INTEGER;
+	frame_type	: KinectFrameType;
+	people_index	: KinectPeopleIndexMode;
+	skeletons	: KinectSkeletonsMode;
+--
+internal:
+--
+	main_label	: NodeLabel;
+	window		: 'Canvas2D';
+	dialog		: 'Dialog';
+	buffer		: 'BufferedImage';
+	buffer3d	: 'BufferedScene';
+	image		: 'BufferedImage';
+	state		: 'ProgramState';
+	text		: 'Text';
+	con		: 'Console';
+--
+constant:
+--
+	cylinder_radius		: Radius;
+	joint_radius		: Radius;
+	head_radius		: Radius;
+	limb_transparency	: Numerical;
+	up_vector		: Point3D;
+--
+	texture_file_format	: STRING;
+	texture_directory	: STRING;
+	texture_frame_rate	: REAL;
+	texture_time_shift	: INTEGER;
+	lookup_table_file_name	: STRING;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+process_frame(FrameNumber,INTEGER)		- (i,i);
+--
+compute_time(
+	INTEGER,INTEGER,INTEGER,INTEGER,REAL)	- (i,i,i,i,o);
+--
+PREDICATES:
+--
+imperative:
+--
+'-'(Numerical) = Numerical			- (i);
+'-'(Numerical,Numerical) = Numerical		- (i,i);
+'+'(Numerical,Numerical) = Numerical		- (i,i);
+'*'(Point3D,Point3D) = Numerical		- (i,i);
+'*'(Numerical,Numerical) = Numerical		- (i,i);
+'/'(Numerical,Numerical) = Numerical		- (i,i);
+sqrt(Numerical) = Numerical			- (i);
+power(Numerical,INTEGER) = Numerical		- (i,i);
+arccos(Numerical) = Numerical			- (i);
+]
+-----------------------------------------------------------------------
+interface 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	kinect_buffer	: 'KinectBuffer';
+	graphic_window	: 'Canvas2D';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= f(INTEGER,INTEGER).
+--
+PREDICATES:
+--
+imperative:
+--
+set_first_frame_time(INTEGER,INTEGER)		- (i,i);
+get_first_frame_time(INTEGER,INTEGER)		- (o,o);
+]
+-----------------------------------------------------------------------

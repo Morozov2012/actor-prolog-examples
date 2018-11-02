@@ -1,0 +1,693 @@
+/* ------------------------------------------------------------------- */
+/*                                                                     */
+/*                       Программа работы с графом                     */
+/*                                                                     */
+/*      (c) Автор - Коробков Борис. ВМиК МГУ, группа 327. 1997 г.      */
+/*                                                                     */
+/* ------------=============== (С) "КоБра" ===============------------ */
+/*                                                                     */
+/* Перенесено с Турбо Пролога на Акторный Пролог Морозовым А.А.        */
+/*                                                                     */
+/* ------------------------------------------------------------------- */
+--
+import .. from "morozov/Java2D";
+--
+PREDICATES:
+--
+imperative:
+--
+append_dart(Vertex,Vertex)			- (i,i);
+delete_dart(Vertex,Vertex)			- (i,i);
+--
+/* Поиск циклов */
+find_one_cycle(Vertex)				- (i);
+/* Найти все циклы */
+find_all_cycles(Vertex)				- (i);
+/* Найти длиннейший путь */
+find_longest_path(Vertex)			- (i);
+find_longest_path(Vertex,STRING)		- (i,i);
+/* Найти длиннейший путь в дереве */
+analyse_tree;
+analyse_tree(Vertex)				- (i);
+/* Найти кратчайший путь */
+find_shortest_path(Vertex,Vertex,Vertex)	- (i,i,i);
+find_shortest_path(Vertex,Vertex,Vertex,STRING)	- (i,i,i,i);
+--
+determ:
+--
+is_tree;
+--
+check_path(STRING,Path)		- (i,i);
+--
+imperative:
+--
+write_vertex(Vertex)		- (i);	/* Нарисовать вершины */
+write_dart;				/* Нарисовать дуги */
+write_path(Path)		- (i);	/* Нарисовать путь */
+--
+redraw_graph;
+--
+/* ------------------------------------------------------------------- */
+class 'Main' (specialized 'Kernel'):
+--
+constant:
+--
+	x				= 0;
+	y				= 0;
+	width				= 49;
+	height				= 21;
+--
+	center_x			= 170;	/* Центр графа */
+	center_y			= 130;	/* Центр графа */
+	radius				= 100;	/* Радиус графа */
+	max_vertex_number : Vertex	= 8;
+--
+	background_color		= 'White';
+	scaling_factor			= 'INDEPENDENT';
+	enable_scene_antialiasing	= 'yes';
+--
+	menu	= [
+		submenu("Команды",[
+			item("Добавить дугу","pressed 1"),
+			item("Удалить дугу","pressed 2"),
+			item("Удалить все дуги","pressed 3"),
+			item("Ориентированный цикл","pressed 4"),
+			item("Все ориентированные циклы","pressed 5"),
+			item("Длиннейший путь в графе","pressed 6"),
+			item("Длиннейший путь в дереве","pressed 7"),
+			item("Кратчайший путь","pressed 8"),
+			-- item("Выход","pressed ESCAPE")
+			item("Выход","pressed 9")
+			])
+		];
+--
+internal:
+--
+	store;
+--
+	main_window	= ('AuxiliaryWindow',
+				title=" Программа GRAPH ",
+				y=21,
+				height=4,
+				font_size=22,
+				main_window=self,
+				menu);
+	menu_window	= ('AuxiliaryWindow',
+				title=" Меню ",
+				x=49,
+				y=0,
+				width=31,
+				height=10,
+				font_size=18,
+				main_window=self,
+				menu);
+	menu_2_window	= ('AuxiliaryWindow',
+				x=49,
+				y=10,
+				width=31,
+				height=11,
+				main_window=self,
+				menu);
+	con		= ('Console');
+--
+[
+goal:-
+	--
+	main_window ? write(
+		"   Программа перечисляет все ориентированные ",
+		"циклы заданной длины."),
+	main_window ? nl,
+	main_window ? write(
+		"             ",
+		"(c) Коробков Борис. ",
+		"ВМиК МГУ, группа 327. 1997 г."),
+	--
+	menu_window ? nl,
+	menu_window ? writeln(" 1 - добавить дугу"),
+	menu_window ? writeln(" 2 - удалить дугу"),
+	menu_window ? writeln(" 3 - удалить все дуги"),
+	menu_window ? writeln(" 4 - ориентированный цикл"),
+	menu_window ? writeln(" 5 - все ориентированные циклы"),
+	menu_window ? writeln(" 6 - длиннейший путь в графе"),
+	menu_window ? writeln(" 7 - длиннейший путь в дереве"),
+	menu_window ? writeln(" 8 - кратчайший путь"),
+	menu_window ? writeln(" 9 - выход"),
+	--
+	menu_2_window ? show,
+	--
+	set_menu([
+		submenu("Команды",[
+			item("Добавить дугу","pressed 1"),
+			item("Удалить дугу","pressed 2"),
+			item("Удалить все дуги","pressed 3"),
+			item("Ориентированный цикл","pressed 4"),
+			item("Все ориентированные циклы","pressed 5"),
+			item("Длиннейший путь в графе","pressed 6"),
+			item("Длиннейший путь в дереве","pressed 7"),
+			item("Кратчайший путь","pressed 8"),
+			-- item("Выход","pressed ESCAPE")
+			item("Выход","pressed 9")
+			])
+		]),
+	--
+	fail.
+goal:-
+	--
+	/* Исходное состояние БД */
+	store ? append(dart(1,5)),
+	store ? append(dart(2,1)),
+	store ? append(dart(2,5)),
+	store ? append(dart(4,2)),
+	store ? append(dart(5,4)),
+	store ? append(dart(5,6)),
+	store ? append(dart(6,1)),
+	store ? append(dart(6,8)),
+	store ? append(dart(8,2)),
+	store ? append(dart(8,4)),
+	--
+	redraw_graph,
+	--
+	fail.
+goal:-!.
+--
+action(_):-
+	redraw_graph,
+	fail.
+action("Добавить дугу"):-
+	menu_2_window ? clear,
+	menu_2_window ? nl,
+	menu_2_window ? write(" Добавить дугу\n\n"),
+	menu_2_window ? write(" Откуда?"),
+	P1== con?input_integer("Добавить дугу","Откуда?",""),
+	P1 > 0,
+	P1 <= max_vertex_number,	/* Номер вершины */
+	menu_2_window ? write(" ",P1),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	menu_2_window ? write(" Куда?"),
+	P2== con?input_integer("Добавить дугу","Куда?",""),
+	P2 > 0,
+	P2 <= max_vertex_number,	/* Номер вершины */
+	P1 <> P2,!,			/* Вершины различны */
+	menu_2_window ? write(" ",P2),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	append_dart(P1,P2).		/* Добавить дугу */
+action("Удалить дугу"):-
+	menu_2_window ? clear,
+	menu_2_window ? nl,
+	menu_2_window ? write(" Удалить дугу\n\n"),
+	menu_2_window ? write(" Откуда?"),
+	P1== con?input_integer("Удалить дугу","Откуда?",""),
+	P1 > 0,
+	P1 <= max_vertex_number,	/* Номер вершины */
+	menu_2_window ? write(" ",P1),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	menu_2_window ? write(" Куда?"),
+	P2== con?input_integer("Удалить дугу","Куда?",""),
+	P2 > 0,
+	P2 <= max_vertex_number,	/* Номер вершины */
+	P1 <> P2,!,			/* Вершины различны */
+	menu_2_window ? write(" ",P2),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	delete_dart(P1,P2).		/* Удалить дугу */
+action("Удалить все дуги"):-
+	menu_2_window ? clear,
+	menu_2_window ? nl,
+	menu_2_window ? write(" Удалить все дуги\n\n"),
+	Message==
+		"Вы действительно хотите\n"
+		"удалить все дуги?",
+	Answer== con?ask("",Message,["Да","Нет"]),
+	Answer == "Да",!,
+	store ? retract_all,		/* Удалить все дуги */
+	redraw_graph.
+action("Ориентированный цикл"):-
+	menu_2_window ? clear,
+	menu_2_window ? nl,
+	menu_2_window ? write(" Искать ориентированный цикл\n\n"),
+	menu_2_window ? write(" Длина цикла?"),
+	N== con?input_integer("Искать цикл","Длина цикла?",""),
+	N > 1,!,
+	menu_2_window ? write(" ",N),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	find_one_cycle(N).		/* Найти цикл заданной длины */
+action("Все ориентированные циклы"):-!,
+	menu_2_window ? clear,
+	menu_2_window ? nl,
+	menu_2_window ? write(" Найти все ориентированные циклы\n\n"),
+	find_all_cycles(
+		max_vertex_number).	/* Найти все циклы */
+action("Длиннейший путь в графе"):-!,
+	menu_2_window ? clear,
+	menu_2_window ? nl,
+	menu_2_window ? write(
+		" Найти длиннейший ациклический\n",
+		" путь в графе\n\n"),
+	N== max_vertex_number - 1,
+	find_longest_path(N).		/* Найти длиннейший путь */
+action("Длиннейший путь в дереве"):-!,
+	menu_2_window ? clear,
+	menu_2_window ? nl,
+	menu_2_window ? write(
+		" Найти длиннейший путь\n",
+		" в дереве\n\n"),
+	analyse_tree.			/* Проверить дерево */
+action("Кратчайший путь"):-
+	menu_2_window ? clear,
+	menu_2_window ? nl,
+	menu_2_window ? write(" Найти кратчайший путь\n\n"),
+	menu_2_window ? write(" Откуда?"),
+	P1== con?input_integer("Найти кратчайший путь","Откуда?",""),
+	P1 > 0,
+	P1 <= max_vertex_number,	/* Номер вершины */
+	menu_2_window ? write(" ",P1),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	menu_2_window ? write(" Куда?"),
+	P2== con?input_integer("Найти кратчайший путь","Куда?",""),
+	P2 > 0,
+	P2 <= max_vertex_number,	/* Номер вершины */
+	P1 <> P2,!,			/* Вершины различны */
+	menu_2_window ? write(" ",P2),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	find_shortest_path(P1,P2,1).	/* Поиск кратчайшего пути */
+action("Выход"):-!,
+	break.
+action(_):-!,
+	menu_2_window ? write(" Команда отменена!"),
+	menu_2_window ? nl.
+--
+append_dart(P1,P2):-			/* Добавить дугу */
+	store ? find(dart(P1,P2)),!.
+append_dart(P1,P2):-
+	store ? append(dart(P1,P2)),
+	redraw_graph.
+--
+delete_dart(P1,P2):-			/* Удалить дугу */
+	store ? retract(dart(P1,P2)),!,
+	redraw_graph.
+delete_dart(_,_).
+--
+find_one_cycle(N):-			/* Найти цикл длины N */
+	menu_2_window ? write(
+		" Идёт поиск цикла длины ",N,"\n\n"),
+	find_o_p(N,X),
+	is_oriented_cycle(X),!,		/* Это ориентированный цикл? */
+	menu_2_window ? write(" Цикл - ",X),
+	write_path(X).			/* Нарисовать путь */
+find_one_cycle(_):-
+	menu_2_window ? write(
+		" Цикл не найден!").
+--
+find_all_cycles(N):-			/* Найти все циклы длины N */
+	N > 1,
+	menu_2_window ? write(
+		" Идёт поиск циклов длины ",N),
+	menu_2_window ? nl,
+	find_o_p(N,X),
+	is_oriented_cycle(X),		/* Это ориентированный цикл? */
+	menu_2_window ? nl,
+	menu_2_window ? write(" Цикл - ",X),
+	write_path(X),			/* Нарисовать путь */
+	Message== con?format(
+		"%s%s\n%s",
+		" Цикл - ",
+		X,
+		" Продолжать поиск?"),
+	Answer== con?ask("",Message,["Да","Нет"]),
+	Answer == "Нет",!,
+	redraw_graph.
+find_all_cycles(_):-
+	redraw_graph,
+	fail.
+find_all_cycles(N1):-			/* Найти все циклы длины N1 */
+	N1 > 1,
+	find_o_p(N1,X),
+	is_oriented_cycle(X),!,		/* Это ориентированный цикл? */
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	N2== N1 - 1,
+	find_all_cycles(N2).		/* Найти все циклы длины N2 */
+find_all_cycles(N1):-			/* Найти все циклы длины N1 */
+	N1 > 1,!,
+	menu_2_window ? nl,
+	N2== N1 - 1,
+	find_all_cycles(N2).		/* Найти все циклы длины N2 */
+find_all_cycles(_).
+--
+find_longest_path(N):-			/* Найти длиннейший путь */
+	Answer== con?ask(
+		"",
+		"Какой путь искать?",
+		[
+		"Ориентированный",
+		"Неориентированный",
+		"Отмена"]),
+	Answer <> "Отмена",!,
+	menu_2_window ? write(" Ваш выбор: ",Answer),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	find_longest_path(N,Answer).
+find_longest_path(_).
+--
+find_longest_path(N,Mode):-		/* Найти длиннейший путь */
+	N > 0,
+	menu_2_window ? write(" Идёт поиск путей длины ",N),
+	menu_2_window ? nl,
+	find_path(N,X),
+	check_path(Mode,X),		/* Проверить путь */
+	is_acyclic_path(X),!,		/* Это ациклический путь? */
+	menu_2_window ? nl,
+	menu_2_window ? write(" Длиннейший путь - ",X),
+	menu_2_window ? nl,
+	write_path(X).			/* Нарисовать путь */
+find_longest_path(N,Mode):-
+	N > 1,!,
+	menu_2_window ? nl,
+	find_longest_path(N-1,Mode).
+find_longest_path(_,_):-
+	menu_2_window ? nl,
+	menu_2_window ? write(" Путь не найден!").
+--
+analyse_tree:-
+	is_tree,!,
+	N== max_vertex_number - 1,
+	analyse_tree(N).		/* Найти длиннейший путь */
+analyse_tree:-
+	menu_2_window ? write(" Это не дерево!"),
+	menu_2_window ? nl.
+--
+analyse_tree(N):-			/* Проверить дерево */
+	Answer== con?ask(
+		"",
+		"Какой путь искать?",
+		[
+		"Ориентированный",
+		"Неориентированный",
+		"Отмена"]),
+	Answer <> "Отмена",!,
+	menu_2_window ? write(" Ваш выбор: ",Answer),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	find_longest_path(N,Answer).	/* Найти длиннейший путь */
+analyse_tree(_).
+--
+is_tree:-				/* Является ли граф деревом? */
+	there_is_a_cycle(max_vertex_number),!,
+	fail.
+is_tree.
+--
+find_shortest_path(V1,V2,N):-		/* Найти кратчайший путь */
+	Answer== con?ask(
+		"",
+		"Какой путь искать?",
+		[
+		"Ориентированный",
+		"Неориентированный",
+		"Отмена"]),
+	Answer <> "Отмена",!,
+	menu_2_window ? write(" Ваш выбор: ",Answer),
+	menu_2_window ? nl,
+	menu_2_window ? nl,
+	find_shortest_path(V1,V2,N,Answer).
+find_shortest_path(_,_,_).
+--
+find_shortest_path(V1,V2,N,Answer):-	/* Найти кратчайший путь */
+	N < max_vertex_number,
+	menu_2_window ? write(
+		" Идёт поиск кратчайшего\n",
+		" пути длины ",N),
+	menu_2_window ? nl,
+	find_path(N,X),
+	check_path(Answer,X),		/* Проверить путь */
+	first_is_final([V2|X]),
+	is_first_vertex(V1,X),!,	/* Запретить откат - */
+	menu_2_window ? nl,		/* путь только один */
+	menu_2_window ? write(" Кратчайший путь - ",X),
+	menu_2_window ? nl,
+	write_path(X).			/* Нарисовать путь */
+find_shortest_path(V1,V2,N1,Answer):-	/* Найти кратчайший путь */
+	N1 < max_vertex_number,!,
+	N2== N1 + 1,
+	menu_2_window ? nl,
+	find_shortest_path(V1,V2,N2,Answer).
+find_shortest_path(_,_,_,_):-
+	menu_2_window ? write(" Путь не найден!").
+--
+check_path("Ориентированный",X):-!,
+	is_oriented_path(X).		/* Это ориентированный путь? */
+check_path(_,_).
+--
+write_vertex(VertexN):-			/* Нарисовать вершины */
+	VertexN < max_vertex_number,!,
+	Angle== 2 * 3.14 / max_vertex_number,
+	/* Координаты вершины */
+	X== center_x + radius * ?sin(Angle*VertexN) - 2,
+	Y== center_y - radius * ?cos(Angle*VertexN) - 2,
+	set_brush('Red'),
+	draw_ellipse(X,Y,4,4),		/* Нарисовать вершину */
+	N== VertexN + 1,
+	S== ?convert_to_string(N),
+	/* Координаты номера вершины */
+	X1== center_x + (radius+15) * ?sin(Angle*VertexN),
+	Y1== center_y - (radius+15) * ?cos(Angle*VertexN),
+	set_pen('Navy'),
+	draw_text(X1,Y1,S),		/* Надписать вершину */
+	write_vertex(N).
+write_vertex(_).
+--
+write_dart:-				/* Нарисовать дуги */
+	Angle== 2 * 3.14 / max_vertex_number,
+	Item== store?match(dart(_,_)),
+	Item == dart(N1,N2),
+	N3== N1 - 1,
+	N4== N2 - 1,
+	/* Координаты вершин */
+	X1== center_x + radius * ?sin(Angle*N3),
+	Y1== center_y - radius * ?cos(Angle*N3),
+	X2== center_x + radius * ?sin(Angle*N4),
+	Y2== center_y - radius * ?cos(Angle*N4),
+	X3== (3 * X2 + X1) / 4,		/* Координаты "стрелки" */
+	Y3== (3 * Y2 + Y1) / 4,		/* Направление дуги */
+	DeltaX== X2 - X1,
+	DeltaY== Y2 - Y1,
+	Ratio== DeltaY / DeltaX,
+	R== 7,
+	DX== ?sqrt(R*R / (1 + Ratio*Ratio)),
+	DY== DX * ?abs(Ratio),
+	X4== X2 - DX * ?signum(DeltaX),
+	Y4== Y2 - DY * ?signum(DeltaY),
+	set_pen({color:'Navy',lineWidth:1}),
+	draw_line(X1,Y1,X2,Y2),		/* Нарисовать дугу */
+	set_pen({color:'Blue',lineWidth:3}),
+	draw_line(X3,Y3,X4,Y4),		/* Нарисовать "стрелку" */
+	fail.
+write_dart.
+--
+write_path([_]):-!.
+write_path([N1,N2|Tail]):-!,		/* Нарисовать заданный путь */
+	Angle== 2 * 3.14 / max_vertex_number,
+	N3== N1 - 1,
+	N4== N2 - 1,
+	/* Координаты вершины */
+	X1== center_x + radius*?sin(Angle*N3),
+	Y1== center_y - radius*?cos(Angle*N3),
+	X2== center_x + radius*?sin(Angle*N4),
+	Y2== center_y - radius*?cos(Angle*N4),
+	X3== (3 * X2 + X1) / 4,		/* Координаты надписи */
+	Y3== (3 * Y2 + Y1) / 4,
+	set_pen({color:'Red',lineWidth:1}),
+	draw_line(X1,Y1,X2,Y2),
+	set_pen({color:'Red',lineWidth:3}),
+	draw_line(X3,Y3,X2,Y2),
+	write_path([N2|Tail]).
+write_path(_).
+--
+redraw_graph:-
+	clear,
+	set_mesh(340,260),
+	set_background_color('DkGreen'),
+	set_pen('Navy'),
+	set_font({size:36}),
+	set_text_alignment('CENTER','CENTER'),
+	write_vertex(0),		/* Нарисовать вершины */
+	write_dart.
+]
+/* ------------------------------------------------------------------- */
+--
+DOMAINS:
+--
+reference:
+--
+Path	= Vertex*.		/* Путь */
+Vertex	= INTEGER.		/* Вершина */
+--
+PREDICATES:
+--
+nondeterm:
+--
+find_o_p(Vertex,Path)		- (i,_);/* Найти ориентированный путь */
+find_path(Vertex,Path)		- (i,_);/* Найти путь заданной длины */
+--
+determ:
+--
+is_oriented_cycle(Path)		- (i);	/* Это ориентированный цикл? */
+is_cycle(Path)			- (i);	/* Цикл ли это? */
+first_is_final(Path)		- (i);	/* Первая вершина = последней? */
+first_is_final(Vertex,Path)	- (i,i);/* Первая вершина = последней? */
+is_path(Path)			- (i);	/* Путь ли это? */
+is_edge(Vertex,Path)		- (i,i);/* Ребро ли это? */
+delete_last_vertex(Path,Path)	- (i,o);/* Отрезать последнюю вершину */
+is_acyclic_path(Path)		- (i);	/* Это ациклический путь? */
+is_not_element(Vertex,Path)	- (i,i);/* Вершины нет в списке? */
+is_oriented_path(Path)		- (i);	/* Это ориентированный путь? */
+there_is_a_cycle(Vertex)	- (i);	/* Найти хоть один цикл */
+is_first_vertex(Vertex,Path)	- (i,i);/* Первая вершина пути? */
+--
+imperative:
+--
+create_unbound_path(Path)	- (_);
+--
+/* ------------------------------------------------------------------- */
+class 'Kernel' (specialized 'Canvas2D'):
+--
+internal:
+--
+	store		= ('GraphStructure');
+--
+[
+PREDICATES:
+--
+determ:
+--
+'>'(Vertex,Vertex)		- (i,i);
+'<'(Vertex,Vertex)		- (i,i);
+'>='(Vertex,Vertex)		- (i,i);
+'<='(Vertex,Vertex)		- (i,i);
+'<>'(Vertex,Vertex)		- (i,i);
+--
+imperative:
+--
+'+'(Vertex,Vertex) = Vertex	- (i,i);
+'-'(Vertex,Vertex) = Vertex	- (i,i);
+'*'(REAL,Vertex) = REAL		- (i,i);
+'/'(REAL,Vertex) = REAL		- (i,i);
+--
+CLAUSES:
+--
+find_o_p(N1,[H1|Tail]):-		/* Найти путь длины N1 */
+	N1 > 0,
+	store ? find(dart(H1,H2)),	/* Ориентированное ребро */
+	N2== N1 - 1,
+	create_unbound_path(Tail),	/* Создать переменную */
+	Tail == [H2|_],
+	find_o_p(N2,Tail).		/* Найти путь длины N2 */
+find_o_p(0,[_]).
+--
+find_path(N1,[H1|Tail]):-		/* Найти путь длины N1 */
+	N1 > 0,
+	store ? find(dart(H1,H2)),	/* Ориентированное ребро... */
+	N2== N1 - 1,
+	create_unbound_path(Tail),	/* Создать переменную */
+	Tail == [H2|_],
+	find_path(N2,Tail).		/* Найти путь длины N2 */
+find_path(N1,[H1|Tail]):-		/* Найти путь длины N1 */
+	N1 > 0,
+	store ? find(dart(H2,H1)),	/* ... или неориентированное */
+	N2== N1 - 1,
+	create_unbound_path(Tail),	/* Создать переменную */
+	Tail == [H2|_],
+	find_path(N2,Tail).		/* Найти путь длины N2 */
+find_path(0,[_]).
+--
+is_oriented_cycle(X):-		/* Это ориентированный цикл? */
+	is_cycle(X),		/* Цикл ли это? */
+	is_oriented_path(X).	/* Ориентированный ли это путь? */
+--
+is_cycle(X):-			/* Цикл ли это? */
+	first_is_final(X),	/* Первая вершина = последней? */
+	is_path(X),		/* Путь ли это? */
+	delete_last_vertex(X,Y),/* Отрезать последнюю вершину */
+	is_acyclic_path(Y).	/* Ациклический ли это путь? */
+--
+first_is_final([H,H]):-!.	/* Равна ли первая вершина последней? */
+first_is_final([H1,_|Tail]):-
+	first_is_final(H1,Tail)./* Убрать все внутренние вершины */
+--
+first_is_final(H,[H]):-!.	/* Равна ли первая вершина последней? */
+first_is_final(H,[_|Tail]):-
+	first_is_final(H,Tail).	/* Убрать все внутренние вершины */
+--
+is_path([_]):-!.		/* Окончание рекурсии */
+is_path([Head|Tail]):-		/* Путь ли это? */
+	is_edge(Head,Tail),	/* Ребро ли это? */
+	is_path(Tail).		/* Путь ли это? */
+--
+is_edge(H1,[H2|_]):-		/* Дуга ли это? */
+	store ? find(dart(H1,H2)),!.
+is_edge(H1,[H2|_]):-		/* Дуга ли это? */
+	store ? find(dart(H2,H1)),!.
+--
+delete_last_vertex([_],[]):-!.	/* Последнюю вершину не копировать */
+delete_last_vertex([H|X],[H|Y]):-
+	delete_last_vertex(X,Y)./* Отрезать последнюю вершину */
+--
+is_acyclic_path([_]):-!.	/* Окончание рекурсии */
+is_acyclic_path(Path):-		/* Это ациклический путь? */
+	Path == [Head|Tail],
+	/* Вершина не встречается в списке? */
+	is_not_element(Head,Tail),
+	is_edge(Head,Tail),	/* Ребро ли это? */
+	is_acyclic_path(Tail).	/* Это ациклический путь? */
+--
+is_not_element(Head,[H2|Tail]):-!,	/* Вершины нет в списке? */
+	Head <> H2,			/* Вершины не совпадают */
+	is_not_element(Head,Tail).	/* Вершины нет в списке? */
+is_not_element(_,[]).
+--
+is_oriented_path([_]):-!.	/* Окончание рекурсии */
+is_oriented_path([H1|Tail]):-	/* Это ориентированный путь? */
+	Tail == [H2|_],
+	store ? find(dart(H1,H2)),!,
+	is_oriented_path(Tail).	/* Это ориентированный путь? */
+--
+there_is_a_cycle(N1):-		/* Найти хоть один цикл */
+	N1 > 2,
+	N2== N1 - 1,
+	there_is_a_cycle(N2),!.	/* Есть более короткий путь */
+there_is_a_cycle(N):-		/* Найти хоть один цикл */
+	N > 2,
+	find_path(N,X),		/* Найти путь длины N */
+	is_cycle(X),!.		/* Это цикл? */
+--
+is_first_vertex(V1,[V1|_]).	/* Совпадает ли первая вершина? */
+--
+create_unbound_path(_).		/* Создать несвязанную переменную */
+]
+/* ------------------------------------------------------------------- */
+class 'GraphStructure' (specialized 'Database'):
+[
+DOMAINS:
+--
+mixed:
+--
+Target	= dart(Vertex,Vertex).
+--
+]
+/* ------------------------------------------------------------------- */
+class 'AuxiliaryWindow' (specialized 'Report'):
+--
+internal:
+--
+	main_window;
+--
+[
+action(Name):-!,
+	main_window ? action(Name).
+]
+/* ------------------------------------------------------------------- */

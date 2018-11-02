@@ -1,0 +1,34 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- SYMBOL.                               --
+--                                       --
+-- Questions: What are symbols? When the --
+-- symbols are more appropriate than the --
+-- strings? How can the compiler         --
+-- distinguish a symbol from a string?   --
+-- How can one declare a symbol argument --
+-- of a predicate? How can one create a  --
+-- new domain that is a kind of symbols? --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+MonthName	= SYMBOL.
+
+PREDICATES:
+
+p(MonthName)	- (i);
+
+CLAUSES:
+
+goal:-
+	p('April').
+
+p(N):-
+	writeln(N).

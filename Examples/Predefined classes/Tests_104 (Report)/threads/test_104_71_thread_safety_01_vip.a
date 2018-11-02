@@ -1,0 +1,47 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Run the program and try to select/deselect text in the window     --
+-- by mouse during the execution of the program.                     --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('MyReport');
+[
+goal:-!,
+	set_period(0.1),
+	activate.
+--
+tick:-!,
+	con ? write_line.
+]
+
+class 'MyReport' (specialized 'Report'):
+[
+DOMAINS:
+
+List	= N*.
+N	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+write_line;
+create_line(N,List)	- (i,o);
+
+CLAUSES:
+
+write_line:-
+	create_line(1,List),
+	writeln(List).
+--
+create_line(N,[N|Rest]):-
+	N < 1000,!,
+	create_line(N+1,Rest).
+create_line(_,[]).
+]

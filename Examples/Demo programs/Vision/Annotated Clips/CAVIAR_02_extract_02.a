@@ -1,0 +1,453 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+--
+DOMAINS:
+--
+ground:
+--
+N		= INTEGER.
+--
+StringList	= STRING*.
+IntegerList	= N*.
+--
+PREDICATES:
+--
+imperative:
+--
+show_frames(TreeContent)			- (i);
+show_frame(ContentItem)				- (i);
+show_frame(ContentList,ContentList)		- (i,i);
+show_frame_number_and_content
+	(STRING,ContentList)			- (i,i);
+--
+show_frame_content(ContentList,N,PointX,PointY)	- (i,i,i,i);
+show_frame_item(ContentItem,N,PointX,PointY)	- (i,i,i,i);
+--
+show_object_list(ContentList,N,PointX,PointY)	- (i,i,i,i);
+show_object(ContentItem,N,PointX,PointY)	- (i,i,i,i);
+show_object_attributes(
+	ContentList,STRING,N,PointX,PointY)	- (i,i,i,i,i);
+show_object_attribute(
+	ContentItem,STRING,N,PointX,PointY)	- (i,i,i,i,i);
+--
+show_group_list(ContentList,N,PointX,PointY)	- (i,i,i,i);
+show_group(ContentItem,N,PointX,PointY)		- (i,i,i,i);
+--
+show_group_attributes(
+		ContentList,
+		STRING,
+		N,
+		PointX,
+		PointY,
+		Color,
+		Numerical)	- (i,i,i,i,i,i,i);
+--
+check_group_context(
+	ContentList,Color,Numerical)		- (i,o,o);
+--
+determ:
+--
+it_is_a_fighting(ContentList)			- (i);
+--
+imperative:
+--
+show_group_attribute(
+		ContentItem,
+		STRING,
+		N,
+		PointX,
+		PointY,
+		Color,
+		Numerical)	- (i,i,i,i,i,i,i);
+--
+show_box_attributes(
+		ContentList,
+		STRING,
+		N,
+		STRING,
+		STRING,
+		STRING,
+		STRING,
+		PointX,
+		PointY,
+		Color,
+		Numerical)	- (i,i,i,i,i,i,i,i,i,i,i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	data_directory		= "data";
+	target_directory	= "Fight_RunAway1";
+	sampling_rate		= 25;
+--
+	target_CVML_description	= "fra1gt.xml";
+	-- target_CVML_description	= "fra1gt_short.xml";
+--
+internal:
+--
+	description	= ('CVML_Resource',
+				location= data_directory);
+	store		= ('CVML_Store');
+	coordinates	= ('ObjectCoordinates');
+--
+	image		= ('BufferedImage');
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	prompt_window	= ('Report',
+				y= 22,
+				height= 3);
+	con		= ('Console',
+				x= 40,
+				y= 22,
+				height= 3);
+--
+[
+PREDICATES:
+--
+imperative:
+--
+'-'(PointX,PointX) = PointX		- (i,i);
+'-'(PointY,PointY) = PointY		- (i,i);
+'/'(PointX,PointX) = PointX		- (i,i);
+'/'(PointY,PointY) = PointY		- (i,i);
+--
+CLAUSES:
+--
+goal:-!,
+	graphic_window ? show,
+	prompt_window ? write(
+		"The data are coming from the EC Funded CAVIAR ",
+		"project / IST 2001 37540,\n",
+		"found at URL: ",
+		"http://homepages.inf.ed.ac.uk/rbf/CAVIAR/."),
+	Content== description?get_trees(
+		"jar:" + data_directory + "/" +
+		target_directory + "_jpg" + "/" +
+		target_CVML_description),
+	show_frames(Content),
+	coordinates ? save_tables.
+--
+show_frames([Frame|Rest]):-!,
+	show_frame(Frame),
+	show_frames(Rest).
+show_frames([]):-!.
+show_frames(ErrorMessage):-
+	con ? writeln(
+		"I cannot read the \"",
+		target_CVML_description,
+		"\" file: ",
+		ErrorMessage).
+--
+show_frame(block("FRAME",FrameContent)):-!,
+	show_frame(FrameContent,FrameContent).
+show_frame(_).
+--
+show_frame([attribute("NUMBER",T)|_],FrameContent):-!,
+	show_frame_number_and_content(T,FrameContent).
+show_frame([_|Rest],FrameContent):-!,
+	show_frame(Rest,FrameContent).
+show_frame(_,_).
+--
+show_frame_number_and_content(T,FrameContent):-
+	N== ?convert_to_integer(T),!,
+	ImageToBeDrawn==
+		"jar:" + data_directory + "/" +
+		target_directory + "_jpg" + "/JPEGS/" +
+		target_directory +
+		con?format("%03d",N) + ".jpg",
+	image ? load(ImageToBeDrawn),
+	image ? get_size_in_pixels(IW,IH),
+	graphic_window ? clear('no'),
+	graphic_window ? draw_image(image,0,0,1,1),
+	show_frame_content(FrameContent,N,IW,IH),
+	graphic_window ? draw_now.
+show_frame_number_and_content(_,_).
+--
+show_frame_content([attribute("NUMBER",_)|Rest],N,IW,IH):-!,
+	show_frame_content(Rest,N,IW,IH).
+show_frame_content([Item|Rest],N,IW,IH):-!,
+	show_frame_item(Item,N,IW,IH),
+	show_frame_content(Rest,N,IW,IH).
+show_frame_content(_,_,_,_).
+--
+show_frame_item(block("OBJECTLIST",Objects),N,IW,IH):-!,
+	show_object_list(Objects,N,IW,IH).
+show_frame_item(block("GROUPLIST",Groups),N,IW,IH):-!,
+	show_group_list(Groups,N,IW,IH).
+show_frame_item(_,_,_,_).
+--
+show_object_list([Object|Rest],N,IW,IH):-!,
+	show_object(Object,N,IW,IH),
+	show_object_list(Rest,N,IW,IH).
+show_object_list(_,_,_,_).
+--
+show_object(block("OBJECT",ObjectAttributes),N,IW,IH):-!,
+	show_object_attributes(ObjectAttributes,"",N,IW,IH).
+show_object(_,_,_,_).
+--
+show_object_attributes([attribute("ID",Id)|Rest],_,N,IW,IH):-!,
+	show_object_attributes(Rest,Id,N,IW,IH).
+show_object_attributes([Attribute|Rest],Id,N,IW,IH):-!,
+	show_object_attribute(Attribute,Id,N,IW,IH),
+	show_object_attributes(Rest,Id,N,IW,IH).
+show_object_attributes(_,_,_,_,_).
+--
+show_object_attribute(block("BOX",BoxAttributes),Id,N,IW,IH):-!,
+	show_box_attributes(
+		BoxAttributes,Id,N,"","","","",IW,IH,'Yellow',3).
+show_object_attribute(_,_,_,_,_).
+--
+show_group_list([Group|Rest],N,IW,IH):-!,
+	show_group(Group,N,IW,IH),
+	show_group_list(Rest,N,IW,IH).
+show_group_list(_,_,_,_).
+--
+show_group(block("GROUP",GroupAttributes),N,IW,IH):-!,
+	show_group_attributes(
+		GroupAttributes,"",N,IW,IH,'Green',1).
+show_group(_,_,_,_).
+--
+show_group_attributes([attribute("ID",Id)|Rest],_,N,IW,IH,_,_):-!,
+	check_group_context(Rest,Color,LineWidth),
+	show_group_attributes(Rest,Id,N,IW,IH,Color,LineWidth).
+show_group_attributes([Attribute|Rest],Id,N,IW,IH,Color,LineWidth):-!,
+	show_group_attribute(Attribute,Id,N,IW,IH,Color,LineWidth),
+	show_group_attributes(Rest,Id,N,IW,IH,Color,LineWidth).
+show_group_attributes(_,_,_,_,_,_,_).
+--
+check_group_context([block("SITUATION",Context)|_],'Red',5):-
+	it_is_a_fighting(Context),!.
+check_group_context([_|Rest],Color,LineWidth):-!,
+	check_group_context(Rest,Color,LineWidth).
+check_group_context(_,'Green',1).
+--
+it_is_a_fighting([Context|_]):-
+	con?lower(con?convert_to_string(Context)) == "fighting",!.
+it_is_a_fighting([_|Rest]):-
+	it_is_a_fighting(Rest).
+--
+show_group_attribute(
+		block("BOX",BoxAttributes),
+		Id,N,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		BoxAttributes,Id,N,"","","","",IW,IH,Color,LineWidth).
+show_group_attribute(_,_,_,_,_,_,_).
+--
+show_box_attributes(
+		[attribute("H",TH)|Rest],
+		Id,N,TX,TY,TW,_,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,N,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		[attribute("W",TW)|Rest],
+		Id,N,TX,TY,_,TH,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,N,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		[attribute("XC",TX)|Rest],
+		Id,N,_,TY,TW,TH,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,N,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		[attribute("YC",TY)|Rest],
+		Id,N,TX,_,TW,TH,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,N,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		[_|Rest],Id,N,TX,TY,TW,TH,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,N,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		_,Id,N,TX,TY,TW,TH,IW,IH,Color,LineWidth):-
+	X1== ?convert_to_numerical(TX),
+	Y1== ?convert_to_numerical(TY),
+	W1== ?convert_to_numerical(TW),
+	H1== ?convert_to_numerical(TH),!,
+	coordinates ? remember_coordinates(Id,N,X1,Y1,W1,H1),
+	X2== (X1 - W1 / 2) / IW,
+	Y2== (Y1 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? set_pen({color:Color,lineWidth:LineWidth}),
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	Text== con?format("%s : %s",Id,N),
+	graphic_window ? draw_text(X1/IW,Y1/IH,Text).
+show_box_attributes(_,_,_,_,_,_,_,_,_,_,_).
+]
+-----------------------------------------------------------------------
+class 'CVML_Resource' (specialized 'WebReceptor'):
+--
+constant:
+--
+tags	= [	/*
+		"?xml",
+		"dataset",
+		*/
+		"frame",
+		"objectlist",
+		"object",
+		"grouplist",
+		"group",
+		/*
+		"orientation",
+		*/
+		"box",
+		/*
+		"context",
+		*/
+		"situation"
+		/*
+		"appearance",
+		"hypothesislist",
+		"hypothesis",
+		"movement",
+		"role",
+		"context",
+		"situation"
+		*/];
+--
+extract_attributes	= 'yes';
+--
+[
+unpaired_tags_table(_):-!,
+	fail.
+flat_tags_table(_):-!,
+	fail.
+reference_containers_table(_,_):-!,
+	fail.
+special_entities_table(_,_):-!,
+	fail.
+]
+-----------------------------------------------------------------------
+class 'CVML_Store' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+TargetKey	= INTEGER.
+TargetValue	= ContentList.
+--
+]
+-----------------------------------------------------------------------
+class 'ObjectCoordinates' (specialized 'Database'):
+--
+internal:
+--
+set_of		= ('SetOfIdentifiers',
+			world= self);
+output1		= ('File',
+			name= "names.txt");
+output2		= ('File',
+			name= "points.txt");
+con		= ('Console');
+--
+[
+DOMAINS:
+--
+Target		= object(
+			STRING,		-- Id
+			N,		-- Time
+			PointX, 	-- X
+			PointY,		-- Y
+			PointX,		-- Width
+			PointY).	-- Height
+--
+PREDICATES:
+--
+imperative:
+--
+remember_coordinates(
+		STRING,		-- Id
+		N,		-- Time
+		PointX, 	-- X
+		PointY,		-- Y
+		PointX,		-- Width
+		PointY);	-- Height
+--
+nondeterm:
+--
+get_identifier()	= STRING;
+get_time()		= N;
+--
+imperative:
+--
+save_tables;
+write_names(StringList)			- (i);
+write_points(IntegerList,StringList)	- (i,i);
+write_row(N,StringList)			- (i,i);
+write_column(N,STRING)			- (i,i);
+--
+CLAUSES:
+--
+remember_coordinates(Id,N,X,Y,W,H):-
+	find(object(Id,N,X,Y,W,H)),!.
+remember_coordinates(Id,N,X,Y,W,H):-
+	append(object(Id,N,X,Y,W,H)).
+--
+get_identifier= Identifier :-
+	Item== ?match(object(_,_,_,_,_,_)),
+	Item == object(Identifier,_,_,_,_,_).
+--
+get_time= N :-
+	Item== ?match(object(_,_,_,_,_,_)),
+	Item == object(_,N,_,_,_,_).
+--
+save_tables:-
+	Names== set_of ? get_identifier,
+	Times== set_of ? get_time,
+	con ? writeln(Names),
+	con ? writeln(Times),
+	output1 ? open('writing'),
+	write_names(Names),
+	output1 ? close,
+	output2 ? open('writing'),
+	write_points(Times,Names),
+	output2 ? close.
+--
+write_names([Name|Rest]):-!,
+	output1 ? writeln(Name),
+	write_names(Rest).
+write_names(_).
+--
+write_points([Time|Rest],Names):-!,
+	output2 ? writef("%d",Time),
+	write_row(Time,Names),
+	output2 ? nl,
+	write_points(Rest,Names).
+write_points(_,_).
+--
+write_row(Time,[Name|Rest]):-!,
+	write_column(Time,Name),
+	write_row(Time,Rest).
+write_row(_,_).
+--
+write_column(Time,Name):-
+	Item== ?match(object(Name,Time,_,_,_,_)),
+	Item == object(_,_,X,Y,_,_),!,
+	output2 ? writef("\t%d\t%d",X,Y).
+write_column(_,_):-
+	output2 ? writef("\tNaN\tNaN").
+]
+-----------------------------------------------------------------------
+class 'SetOfIdentifiers' (specialized 'FindAll'):
+--
+mode	= 'set';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+get_identifier()	= StringList;
+get_time()		= IntegerList;
+]
+-----------------------------------------------------------------------

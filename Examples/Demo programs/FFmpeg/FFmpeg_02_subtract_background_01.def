@@ -1,0 +1,507 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+import .. from "morozov/FFmpeg";
+--
+DOMAINS:
+--
+reference:
+--
+ItemList		= STRING; ItemList*.
+YesNoUnknown		= 'yes'; 'no'; 'unknown'.
+--
+ground:
+--
+GraphAnalysisMethod	= 'off';
+			  'method_one';
+			  'method_two';
+			  'method_three';
+			  'method_four'.
+--
+IsAnomalous		= 'yes'; 'no'.
+--
+DepthOfSearch		= INTEGER.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	inverse_transformation_matrix	: TransformationMatrix;
+	sampling_rate			: REAL;
+--
+	stage_one		: 'ImagePreprocessor';
+	stage_two		: 'ImageAnalyzer';
+--
+internal:
+--
+	low_level_analyzer	: 'ImageSubtractor';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ImagePreprocessor' (specialized 'FFmpeg'):
+--
+constant:
+--
+	sampling_rate		: REAL;
+--
+	low_level_analyzer	: 'ImageSubtractor';
+	stage_two		: 'ImageAnalyzer';
+--
+internal:
+--
+	subtractor		: 'SynchronizedImageSubtractor';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	state			: 'ProgramState';
+	con			: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_target_data_file(STRING)			- (i);
+]
+-----------------------------------------------------------------------
+interface 'ImageAnalyzer' (specialized 'Dialog'):
+--
+constant:
+--
+	low_level_analyzer	: 'ImageSubtractor';
+	preprocessor		: 'ImagePreprocessor';
+--
+	running_speed_threshold_value			: REAL;
+	running_speed_threshold_halfwidth		: REAL;
+	walking_speed_threshold_value			: REAL;
+	walking_speed_threshold_halfwidth		: REAL;
+	movement_duration_threshold_value		: REAL;
+	movement_duration_threshold_halfwidth		: REAL;
+	shape_coefficient_threshold_value		: REAL;
+	shape_coefficient_threshold_halfwidth		: REAL;
+	running_wr2_cardinality_threshold_value		: INTEGER;
+	running_wr2_cardinality_threshold_halfwidth	: INTEGER;
+	running_wr2_mean_threshold_value		: REAL;
+	running_wr2_mean_threshold_halfwidth		: REAL;
+	running_wr2_skewness_threshold_value		: REAL;
+	running_wr2_skewness_threshold_halfwidth	: REAL;
+--
+	velocity_bound_1			: REAL;
+	velocity_bound_2			: REAL;
+	velocity_bound_3			: REAL;
+	velocity_bound_4			: REAL;
+	velocity_bound_5			: REAL;
+	velocity_bound_6			: REAL;
+	velocity_bound_7			: REAL;
+	velocity_bound_8			: REAL;
+--
+	velocity_color_1			: Color;
+	velocity_color_2			: Color;
+	velocity_color_3			: Color;
+	velocity_color_4			: Color;
+	velocity_color_5			: Color;
+	velocity_color_6			: Color;
+	velocity_color_7			: Color;
+	velocity_color_8			: Color;
+	velocity_color_9			: Color;
+--
+	maximal_depth_of_search			: DepthOfSearch;
+--
+	sampling_rate		: REAL;
+	circle_radius		: REAL;
+
+--
+internal:
+--
+	subtractor		: 'SynchronizedImageSubtractor';
+	graphic_window		: 'Canvas2D';
+	prompt_window		: 'Report';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	timer			: 'Timer';
+	con			: 'Console';
+	env			: 'DesktopWindow';
+	files			: 'File';
+--
+variable:
+--
+	target_image		: ItemList;
+	target_objects		: ItemList;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+draw_scene;
+draw_target_image(ItemList)			- (i);
+draw_target_objects(ItemList,FrameNumber)	- (i,i);
+--
+draw_blobs(PointX,PointY,BlobList)		- (i,i,i);
+draw_blob(PointX,PointY,Blob)			- (i,i,i);
+--
+draw_blob_identifier(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER)		- (i,i,i,i,i);
+--
+draw_tracks(PointX,PointY,TrackList)		- (i,i,i);
+draw_track(PointX,PointY,Track)			- (i,i,i);
+--
+draw_track_segments(
+	PointX,
+	PointY,
+	INTEGER,
+	TrackSegmentList)	- (i,i,i,i);
+draw_track_segment(
+	PointX,
+	PointY,
+	INTEGER,
+	TrackSegment)		- (i,i,i,i);
+--
+draw_circle(PointX,PointY)	- (i,i);
+--
+draw_track_identifier(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER)		- (i,i,i,i,i);
+--
+draw_graphs(
+	PointX,
+	PointY,
+	GraphList,
+	INTEGER,
+	GraphAnalysisMethod,
+	FrameNumber)		- (i,i,i,i,i,i);
+--
+determ:
+--
+do_analyse_graph(GraphAnalysisMethod)		- (i);
+--
+is_a_kind_of_a_running_away(
+	GraphAnalysisMethod,
+	ConnectedGraph,
+	INTEGER,
+	ConnectedGraph,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	ConnectedGraphEdge,
+	EdgeNumber)		- (i,i,i,i,o,o,o,o,o,o);
+contains_a_fast_object(
+	EdgeNumbers,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_fast_object(
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_fast_object(
+	FrameNumber,
+	FrameNumber,
+	REAL,
+	REAL,
+	REAL)			- (i,i,i,o,o);
+contains_a_running_person(
+	EdgeNumbers,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_running_person(
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+fast_object_is_a_runner(
+	REAL,
+	REAL,
+	REAL,
+	REAL,
+	INTEGER)		- (i,i,i,i,i);
+contains_a_slow_object(
+	EdgeNumbers,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_slow_object(
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_slow_object(
+	FrameNumber,
+	FrameNumber,
+	REAL,
+	REAL,
+	REAL)			- (i,i,i,o,o);
+is_a_meeting(
+	EdgeNumbers,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,i,i,i,o,o,i);
+is_a_delay(
+	ConnectedGraphEdge,
+	ConnectedGraphEdge)	- (i,i);
+does_not_contain_person(
+	EdgeNumbers,
+	EdgeNumber,
+	ConnectedGraph,
+	EdgeNumbers)		- (i,i,i,i);
+--
+is_not_element(
+	EdgeNumber,
+	EdgeNumbers)		- (i,i);
+--
+imperative:
+--
+delete_element(
+	EdgeNumber,
+	EdgeNumbers,
+	EdgeNumbers)		- (i,i,o);
+--
+imperative:
+--
+fuzzy_metrics(REAL,REAL,REAL) = REAL		- (i,i,i);
+fuzzy_metrics(INTEGER,INTEGER,INTEGER) = REAL	- (i,i,i);
+--
+imperative:
+--
+draw_graph(
+	PointX,
+	PointY,
+	ConnectedGraph,
+	ConnectedGraph,
+	IsAnomalous,
+	GraphAnalysisMethod,
+	INTEGER,
+	FrameNumber)		- (i,i,i,i,i,i,i,i);
+--
+draw_edge(
+	PointX,
+	PointY,
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	IsAnomalous,
+	GraphAnalysisMethod,
+	INTEGER,
+	FrameNumber)		- (i,i,i,i,i,i,i,i);
+--
+recognize_object(
+	FrameNumber,
+	FrameNumber,
+	REAL,
+	REAL,
+	REAL,
+	REAL,
+	REAL,
+	INTEGER,
+	STRING)			- (i,i,i,i,i,i,i,i,o);
+recognize_fast_object(
+	REAL,
+	REAL,
+	REAL,
+	REAL,
+	INTEGER,
+	STRING)			- (i,i,i,i,i,o);
+--
+draw_graph_identifier(
+	GraphAnalysisMethod,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER)		- (i,i,i,i,i,i);
+--
+draw_origins(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	EdgeNumbers,
+	ConnectedGraph)		- (i,i,i,i,i,i);
+draw_origin(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	EdgeNumber,
+	ConnectedGraph)		- (i,i,i,i,i,i);
+draw_origin_arrow(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+--
+determ:
+--
+get_edge(
+	INTEGER,
+	ConnectedGraph,
+	ConnectedGraphEdge)	- (i,i,o);
+--
+imperative:
+--
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	TrackOfBlob,
+	IsAnomalous,
+	REAL)			- (i,i,i,i,i);
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	TrackOfBlob,
+	IsAnomalous,
+	REAL)			- (i,i,i,i,i,i,i);
+--
+select_line_color
+	(IsAnomalous,REAL,Color,INTEGER)	- (i,i,o,o);
+select_line_color(REAL,Color)			- (i,o);
+--
+draw_rectangle(
+	IsAnomalous,
+	EdgeNumbers,
+	TrackOfBlob,
+	PointX,
+	PointY,
+	FrameNumber,
+	STRING,
+	INTEGER,
+	FrameNumber,
+	FrameNumber)		- (i,i,i,i,i,i,i,i,i,i);
+draw_colored_rectangle(
+	TrackOfBlob,
+	PointX,
+	PointY,
+	FrameNumber,
+	Color,
+	INTEGER,
+	STRING,
+	INTEGER,
+	FrameNumber,
+	FrameNumber)		- (i,i,i,i,i,i,i,i,i,i);
+--
+restore_settings;
+ynu2yn(YesNoUnknown,YesNo)			- (i,o);
+--
+switch_background_gaussian_filter_radius(YesNo)		- (i);
+switch_background_rank_filter_threshold(YesNo)		- (i);
+switch_velocity_median_filter_halfwidth(YesNo)		- (i);
+switch_fuzzy_thresholds(YesNo)				- (i);
+--
+dump_graphs(ItemList,GraphList)				- (i,i);
+dump_graphs(GraphAnalysisMethod,GraphList,INTEGER)	- (i,i,i);
+--
+report_obtained_edges(
+	GraphAnalysisMethod,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	EdgeNumber)		- (i,i,i,i,i,i);
+report_delay_attributes(
+	ConnectedGraphEdge,
+	ConnectedGraphEdge)	- (i,i);
+--
+dump_graph(
+	ConnectedGraph,
+	ConnectedGraph,
+	INTEGER)		- (i,i,i);
+--
+check_edge(ConnectedGraphEdge,ConnectedGraph)	- (i,i);
+report_metrics_value(REAL,Color,Color)		- (i,i,i);
+dump_edge(ConnectedGraphEdge)			- (i);
+--
+draw_legend;
+--
+report_time(FrameNumber)			- (i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= current_video_file(STRING);
+		  beginning_time(INTEGER);
+		  current_frame(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_target_file(STRING)			- (o);
+get_beginning_time(INTEGER)		- (o);
+get_current_frame(INTEGER)		- (o);
+--
+imperative:
+--
+set_target_file(STRING)			- (i);
+set_beginning_time(INTEGER)		- (i);
+set_current_frame(INTEGER)		- (i);
+]
+-----------------------------------------------------------------------

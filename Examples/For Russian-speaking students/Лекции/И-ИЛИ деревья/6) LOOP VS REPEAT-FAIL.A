@@ -1,0 +1,36 @@
+----------------------------------------------------
+--                                                --
+-- Два способа организовать цикл:                 --
+-- 1) рекурсия (loop);                            --
+-- 2) откат (repeat).                             --
+--                                                --
+----------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+loop;
+
+nondeterm:
+
+repeat;
+
+CLAUSES:
+
+goal:-
+	loop.
+/*
+goal:-
+	repeat,
+	writeln("Привет"),
+	fail.
+*/
+
+loop:-
+	writeln("Привет"),
+	loop.
+
+repeat.
+repeat:-
+	repeat.

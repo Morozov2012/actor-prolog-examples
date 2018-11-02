@@ -1,0 +1,114 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- SYMBOL.                               --
+--                                       --
+-- Questions: Why cannot the 1 integer   --
+-- number be unified with the 1.0 real   --
+-- number? Can data items of different   --
+-- simple domains be unified             --
+-- successfully?                         --
+--                                       --
+-------------------------------------------
+
+-- A programmer can define the accuracy
+-- of real numbers in the options of the
+-- program (see the "Window | Options |
+-- Number of significant digits in Reals"
+-- item. The REAL_ACCURACY pragma does
+-- not assert the accuracy of the real
+-- numbers. Instead of this, the
+-- REAL_ACCURACY = N assertion informs
+-- compiler that the programmer should
+-- define the accuracy N of the real
+-- numbers. The compiler stops translation
+-- and outputs an error message if the
+-- accuracy N is not assigned. The
+-- REAL_ACCURACY = 0 assertion means that
+-- the default accuracy of the real numbers
+-- is to be used.
+
+-- pragma: REAL_ACCURACY= 0;
+pragma: REAL_ACCURACY= 4;
+
+PREDICATES:
+
+compare_terms(REAL,REAL)	- (i,i);
+
+CLAUSES:
+
+goal:-
+	compare_terms(
+		1.0,
+		1.0),
+	compare_terms(
+		1.000000001,
+		1.000000000),
+	compare_terms(
+		0.10005,
+		0.10000).
+
+-- Before the unification of given real
+-- numbers, the program rounds the numbers
+-- in accordance with the defined real
+-- numbers accuracy. The so-called
+-- HALF_EVEN rounding rule is used, that
+-- is, a number is rounded towards the
+-- "nearest neighbor" unless both neighbors
+-- are equidistant. If the neighbors are
+-- equidistant, the number is rounded in
+-- the following way. If the digit to the
+-- left of the discarded fraction is odd,
+-- the HALF_UP rounding rule is to be used,
+-- otherwise, the HALF_DOWN rounding rule
+-- is to be used. The HALF_UP rounding
+-- rule means that the number is rounded
+-- away from zero, if the discarded
+-- fraction is MORE than or EQUAL to 0.5,
+-- otherwise the number is rounded towards
+-- zero. The HALF_DOWN rounding rule means
+-- that the number is rounded away from
+-- zero, if the discarded fraction is MORE
+-- than 0.5, otherwise the number is
+-- rounded towards zero. Note that this
+-- complex rounding rule statistically
+-- minimizes cumulative error when applied
+-- repeatedly over a sequence of
+-- calculations. It is sometimes known as
+-- Banker's rounding.
+
+compare_terms(X,Y):-
+	X == Y,!,
+	set_color('DkGreen'),
+	write(	"These terms were ",
+		"unified successfully: "),
+	set_color('default'),
+	writeln([X,Y]).
+compare_terms(X,Y):-
+	set_color('Red'),
+	write(	"I cannot unify ",
+		"these terms: "),
+	set_color('default'),
+	writeln([X,Y]).
+
+-- Note that, in special cases, the
+-- compiler cannot guarantee the success
+-- of the unification of real numbers,
+-- because of the presence of unpredictable
+-- small fractions in the mantissa of the
+-- numbers. For instance, the 0.10005
+-- number is approximated to 0.1001 in the
+-- interpreter and to 0.1000 in the Java
+-- implementation of the language. Thus,
+-- the result of the unification of the
+-- numbers 0.10005 and 0.10000 may differ
+-- in different implementations of the
+-- language. We recommend you to avoid the
+-- unification of real numbers in your
+-- programs; the better practice is the
+-- usage of the <, <=, >, and >= operations
+-- for the comparison of the real numbers.

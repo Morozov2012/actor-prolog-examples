@@ -1,0 +1,119 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N	= INTEGER.
+Values	= Value*.
+Value	= f(N).
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+constant:
+--
+	test2	= (('Test2'));
+--
+[
+goal:-!,
+	test2 <- delay(2).
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Test2' (specialized 'Test'):
+--
+variable:
+--
+	results;
+--
+internal:
+--
+	con;
+--
+[
+--
+goal:-!,
+	con ? writeln("Test2, results: ",results).
+--
+alarm(Exception):-!,
+	con ? set_color('Red'),
+	con ? writeln("Test2: ",Exception),
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Test' (specialized 'Timer'):
+--
+variable:
+--
+	results	: Values	= ??r(key);
+--
+internal:
+--
+	accumulator	= ('Accumulator',key);
+--
+	con		= ('Console');
+--
+protecting:
+--
+	key	: N;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+delay(Numerical)	- (i);
+message;
+--
+r(N) = Value		- (i);
+--
+CLAUSES:
+--
+tick:-!,
+	self <- message.
+--
+message:-
+	con ? set_color('Green'),
+	con ? writeln("key:= 100"),
+	key:= 100,!.
+message:-
+	con ? writeln("Failure: key= ",key).
+--
+r(100) = f(10000) :-!,
+	con ? set_color('Blue'),
+	con ? writeln("r(100)"),
+	break('user_defined_error').
+r(N) = f(30000) :-
+	con ? set_color('Blue'),
+	con ? writeln("r(",N,")").
+]
+-----------------------------------------------------------------------
+class 'Accumulator' (specialized 'Console'):
+--
+variable:
+--
+	key	: N;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+keep_value(N)	- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	keep_value(key).
+--
+keep_value(V):-
+	set_color('Maroon'),
+	writeln("key=",V).
+]
+-----------------------------------------------------------------------

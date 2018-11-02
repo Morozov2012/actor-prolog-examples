@@ -1,0 +1,74 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+D1	= f(INTEGER,D2).
+D2	= D3*.
+D3	= {a:REAL,b:SYMBOL,c:STRING}.
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2;
+
+class 'Main' (specialized 'File'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	Text==
+		"f(1,[])\n"
+		"f(2,[{}])\n"
+		"f(3,[{a:3.14}])\n"
+		"f(4,[{b:'name',c:\"Text\"}])\n"
+		"f(5,[{a:100.0,b:'name',c:\"Text\"}])\n",
+	set_string(Text),
+	open('reading'),
+	test2,
+	test1,
+	test2,
+	test0,
+	test2,
+	test1,
+	test2,
+	test1,
+	test2,
+	test1,
+	test2,
+	test1,
+	test2,
+	close.
+--
+test0:-
+	con ? writeln("Test 0"),
+	con ? writeln("\tI will try to read a term from the file."),
+	?read_term(),!,
+	con ? writeln("\tDone.").
+test0:-
+	con ? writeln("\tI cannot read it.").
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tI will try to read a term from the file."),
+	Term== ?cast("D1",?read_term()),!,
+	con ? writeln("\tTerm: ",Term).
+test1:-
+	con ? writeln("\tI cannot read it.").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tIs this the end of the file?"),
+	?eof(),!,
+	con ? writeln("\tYes, it is!").
+test2:-
+	con ? writeln("\tNo, it is not.").
+]

@@ -1,0 +1,108 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007 IRE RAS Alexei A. Morozov.   --
+-- Transmitting of direct and flow       --
+-- messages between SADT blocks.         --
+-------------------------------------------
+DOMAINS:
+--
+reference:
+--
+MyText		= STRING.
+MyValue		= INTEGER.
+TimerMode	= 'no'; 'yes'; 'unknown'.
+TimePeriod	= REAL; STRING.
+--
+----------------------------------------------
+interface 'MyProtocol':
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+user_message(MyText)	- (i);
+timer_message(MyText)	- (i);
+]
+----------------------------------------------
+interface '_Control'
+(specialized '_Block', 'Dialog'):
+--
+entry_o1	: 'MyProtocol';
+value_o1	: MyValue;
+--
+[
+]
+----------------------------------------------
+interface '_Sender'
+(specialized
+	'_Block', 'MyProtocol', 'Dialog'):
+--
+constant:
+--
+	entry_o1	: 'MyProtocol';
+--
+variable:
+--
+	value_o1	: MyText;
+--
+internal:
+--
+	generator	: 'SpecialTimer';
+--
+variable:
+--
+	text		: MyText;
+--
+protecting:
+--
+	period		: TimePeriod;
+--
+variable:
+--
+	mode_of_timer	: TimerMode;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+private:
+--
+control_period(TimePeriod)		- (i);
+control_mode(TimerMode)			- (i);
+--
+visible:
+--
+send_message;
+]
+----------------------------------------------
+interface 'SpecialTimer'
+(specialized 'Timer'):
+--
+world		: '_Sender';
+--
+[
+]
+----------------------------------------------
+interface '_Receiver'
+(specialized '_Block', 'MyProtocol', 'Alpha'):
+--
+entry_i1	: 'MyProtocol';
+value_c1	: MyValue;
+--
+con		: 'Report';
+--
+[
+PREDICATES:
+--
+private:
+--
+determ:
+--
+check(MyValue)			- (i);
+--
+concat(STRING,STRING,MyValue)	- (i,o,i);
+]
+----------------------------------------------

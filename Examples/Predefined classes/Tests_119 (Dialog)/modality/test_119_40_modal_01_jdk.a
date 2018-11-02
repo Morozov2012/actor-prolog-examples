@@ -1,0 +1,121 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N	= STRING; INTEGER.
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+internal:
+--
+	w	= ('MyDialog',
+			slot1,
+			slot2);
+--
+variable:
+--
+	slot1;
+	slot2;
+--
+constant:
+--
+	watch1	= ('Watch',
+			target_slot= slot1,
+			x= 0,
+			width= 40);
+	watch2	= ('Watch',
+			target_slot= slot2,
+			x= 40,
+			width= 40);
+--
+[
+goal:-
+	w ? demo.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	con	= ('Report',
+			y= 10);
+--
+variable:
+--
+	value1	: N;
+	value2	: N;
+--
+	slot1	: N;
+	slot2	: N;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+demo;
+--
+CLAUSES:
+--
+demo:-
+	value1== 1000,!,
+	con ? writeln("I will call the show predicate."),
+	show,
+	con ? writeln(
+		"I have returned from the show predicate."),
+	con ? writeln("demo:: value1= ",value1),
+	con ? writeln("demo:: value2= ",value2).
+demo.
+--
+action("action1"):-
+	con ? writeln(
+		"action2:: ?get('slot1'): ",?get('slot1')),
+	con ? writeln(
+		"action2:: ?get('slot2'): ",?get('slot2')),
+	con ? writeln(
+		"action2:: put('slot1',value1), ",
+		"value1= ",value1),
+	con ? writeln(
+		"action2:: put('slot2',value2), ",
+		"value2= ",value2),
+	put('slot1',value1),
+	put('slot2',value2),
+	con ? writeln("action2:: value2:= 3000"),
+	value2== 3000,!,
+	show.
+action("action2"):-!,
+	show.
+action("action3"):-!,
+	put('font_size',14).
+action("action4"):-!,
+	hide.
+action(Name):-!,
+	con ? writeln("Action: ",Name).
+]
+-----------------------------------------------------------------------
+class 'Watch' (specialized 'Report'):
+--
+constant:
+--
+	y		= 0;
+	height		= 10;
+--
+variable:
+-- suspending:
+--
+	target_slot	: N;
+--
+[
+goal:-!,
+	writeln("Slot value: ",target_slot).
+]
+-----------------------------------------------------------------------

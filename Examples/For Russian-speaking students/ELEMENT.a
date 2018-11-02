@@ -1,0 +1,30 @@
+---------------------------------------------------------------
+--                     Предикат element.                     --
+--          Программа написана на Акторном Прологе.          --
+--           (c) 2005 ИРЭ РАН, Алексей А. Морозов.           --
+---------------------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+N	= INTEGER.
+List	= N*.
+
+PREDICATES:
+
+nondeterm:
+
+element(N,List)		- (_,_);
+
+CLAUSES:
+
+goal:-
+	element(3,[1,2,3,4,5]),
+	writeln("Yes").
+goal:-
+	writeln("No").
+
+element(H,[H|_]).
+element(H,[_|Rest]):-
+	element(H,Rest).

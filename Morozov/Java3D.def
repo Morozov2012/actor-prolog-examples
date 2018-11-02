@@ -1,0 +1,942 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2012 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Java3D":
+
+import 'BufferedImage' from "Morozov/Java2D";
+import 'WritableImageProducer' from "Morozov/Java2D";
+
+DOMAINS:
+
+ProjectionPolicy
+		= 'PARALLEL_PROJECTION'; 'PERSPECTIVE_PROJECTION'.
+WindowResizePolicy
+		= 'VIRTUAL_WORLD'; 'PHYSICAL_WORLD'.
+WindowMovementPolicy
+		= 'VIRTUAL_WORLD'; 'PHYSICAL_WORLD'.
+VisibilityPolicy
+		= 'VISIBILITY_DRAW_VISIBLE';
+		  'VISIBILITY_DRAW_INVISIBLE';
+		  'VISIBILITY_DRAW_ALL'.
+TransparencySortingPolicy
+		= 'TRANSPARENCY_SORT_NONE';
+		  'TRANSPARENCY_SORT_GEOMETRY'.
+FieldOfView	= 'default'; Numerical.
+ClipDistance	= 'default'; Numerical.
+--
+NodeList	= Node*.
+--
+Node		= Group; Leaf.
+--
+-- Group
+--
+Group		= 'Group'(GroupAttributes);
+		  BranchGroup;
+		  TransformGroup;
+		  Primitive;
+		  MovingShadow;
+		  PickCanvas.
+GroupAttributes	= {
+		allowChildrenExtend: YesNo,
+		allowChildrenRead: YesNo,
+		allowChildrenWrite: YesNo,
+		allowCollisionBoundsRead: YesNo,
+		allowCollisionBoundsWrite: YesNo,
+		branches: NodeList
+		}; NodeAttributes.
+--
+NodeAttributes	= {
+		label: NodeLabel,
+		collisionDetectors: CollisionDetectorList
+		}.
+CollisionDetectorList
+		= CollisionDetector*.
+--
+Primitive	= Box; Cone; Cylinder; Sphere.
+--
+Leaf		= Background;
+		  Behavior;
+		  Light;
+		  ModelClip;
+		  Shape3D.
+Behavior	= CustomizedBehavior;
+		  RotationInterpolator;
+		  MouseBehavior;
+		  OrbitBehavior.
+MouseBehavior	= MouseRotate;
+		  MouseTranslate;
+		  MouseWheelZoom;
+		  MouseZoom.
+--
+Light		= AmbientLight; DirectionalLight; PointLight.
+--
+-- BranchGroup
+--
+BranchGroup	= 'BranchGroup'(BranchGroupAttributes);
+		  ('BufferedScene').
+BranchGroupAttributes
+		= {
+		allowDetach: YesNo,
+		compile: YesNo
+		}; GroupAttributes.
+--
+-- TransformGroup
+--
+TransformGroup	= 'TransformGroup'(TransformGroupAttributes).
+TransformGroupAttributes
+		= {
+		allowTransformRead: YesNo,
+		allowTransformWrite: YesNo,
+		transform3D: Transform3D
+		}; GroupAttributes.
+--
+Transform3D	= 'Transform3D'(Transform3D_Attributes).
+Transform3D_Attributes
+		= {
+		rotation: Rotation,
+		rotX: Angle,
+		rotY: Angle,
+		rotZ: Angle,
+		scale: Numerical,
+		translation: Translation
+		}.
+--
+Rotation	= Numerical*.
+Translation	= Numerical*.
+--
+-- Box
+--
+Box		= 'Box'(BoxAttributes).
+BoxAttributes	= {
+		xdim: Numerical,
+		ydim: Numerical,
+		zdim: Numerical
+		}; PrimitiveAttributes.
+--
+-- Cone
+--
+Cone		= 'Cone'(ConeAttributes).
+ConeAttributes	= {
+		radius: Radius,
+		height: Numerical,
+		xdivisions: Divisions,
+		ydivisions: Divisions
+		}; PrimitiveAttributes.
+--
+-- Cylinder
+--
+Cylinder	= 'Cylinder'(CylinderAttributes).
+CylinderAttributes
+		= {
+		radius: Radius,
+		height: Numerical,
+		xdivisions: Divisions,
+		ydivisions: Divisions
+		}; PrimitiveAttributes.
+--
+-- Sphere
+--
+Sphere		= 'Sphere'(SphereAttributes).
+SphereAttributes
+		= {
+		radius: Radius,
+		divisions: Divisions
+		}; PrimitiveAttributes.
+--
+PrimitiveAttributes
+		= {
+		enableAppearanceModify: YesNo,
+		enableGeometryPicking: YesNo,
+		generateNormals: YesNo,
+		generateNormalsInward: YesNo,
+		generateTextureCoords: YesNo,
+		generateTextureCoordsYUp: YesNo,
+		geometryNotShared: YesNo,
+		appearance: Appearance
+		}; GroupAttributes.
+--
+-- Background
+--
+Background	= 'Background'(BackgroundAttributes).
+BackgroundAttributes
+		= {
+		color: Color,
+		image: ImageSource,
+		scaleMode: ImageScaleMode,
+		applicationBounds: Bounds
+		}; NodeAttributes.
+--
+ImageSource	= ('BufferedImage'); FileName; STRING.
+ImageScaleMode	= 'SCALE_FIT_ALL';
+		  'SCALE_FIT_MAX'; 'SCALE_FIT_MIN';
+		  'SCALE_NONE'; 'SCALE_NONE_CENTER';
+		  'SCALE_REPEAT'.
+--
+-- CustomizedBehavior
+--
+CustomizedBehavior =
+		'CustomizedBehavior'
+			(CustomizedBehaviorAttributes).
+CustomizedBehaviorAttributes
+		= {
+		name: BehaviorName,
+		wakeupOn: WakeupCondition,
+		schedulingBounds: Bounds
+		}; NodeAttributes.
+--
+BehaviorName	= STRING; INTEGER.
+--
+WakeupCondition	= WakeupOnAWTEvent;
+		  WakeupOnElapsedFrames;
+		  WakeupOnElapsedTime.
+--
+-- WakeupOnAWTEvent
+--
+WakeupOnAWTEvent
+		= 'KEY_PRESSED'; 'KEY_RELEASED'; 'KEY_TYPED'.
+--
+-- WakeupOnElapsedFrames
+--
+WakeupOnElapsedFrames =
+		'ElapsedFrames'(WakeupOnElapsedFramesAttributes).
+WakeupOnElapsedFramesAttributes
+		= {
+		frameCount: NumberOfFrames,
+		isPassive: YesNo
+		}.
+--
+NumberOfFrames	= INTEGER.
+--
+-- WakeupOnElapsedTime
+--
+WakeupOnElapsedTime =
+		'ElapsedTime'(WakeupOnElapsedTimeAttributes).
+WakeupOnElapsedTimeAttributes
+		= {
+		time: TimeInterval
+		}.
+--
+-- CollisionDetector
+--
+CollisionDetector =
+		'CollisionDetector'(CollisionDetectorAttributes).
+CollisionDetectorAttributes
+		= {
+		name: BehaviorName,
+		wakeupOn: CollisionDetectorWakeupCondition,
+		speedHint: CollisionDetectorSpeedHint,
+		schedulingBounds: Bounds
+		}; NodeAttributes.
+--
+CollisionDetectorWakeupCondition
+		= 'ENTRY'; 'EXIT'; 'MOVEMENT'.
+CollisionDetectorSpeedHint
+		= 'USE_GEOMETRY'; 'USE_BOUNDS'.
+--
+-- RotationInterpolator
+--
+RotationInterpolator =
+		'RotationInterpolator'
+			(RotationInterpolatorAttributes).
+RotationInterpolatorAttributes
+		= {
+		alpha: Alpha3D,
+		schedulingBounds: Bounds,
+		transformAxis: Transform3D,
+		minimumAngle: Angle,
+		maximumAngle: Angle
+		}; NodeAttributes.
+--
+Angle		= Numerical.
+--
+-- Alpha3D
+--
+Alpha3D		= 'Alpha3D'(Alpha3D_Attributes).
+Alpha3D_Attributes
+		= {
+		increasingEnable: YesNo,
+		decreasingEnable: YesNo,
+		increasingAlphaDuration: TimeInterval,
+		decreasingAlphaDuration: TimeInterval,
+		alphaAtZeroDuration: TimeInterval,
+		alphaAtOneDuration: TimeInterval,
+		increasingAlphaRampDuration: TimeInterval,
+		decreasingAlphaRampDuration: TimeInterval,
+		loopCount: LoopCount,
+		startTime: TimeInterval,
+		triggerTime: TimeInterval,
+		phaseDelayDuration: TimeInterval
+		}.
+--
+LoopCount	= INTEGER.
+--
+-- Mouse
+--
+MouseRotate	= 'MouseRotate'(MouseBehaviorAttributes).
+MouseTranslate	= 'MouseTranslate'(MouseBehaviorAttributes).
+MouseWheelZoom	= 'MouseWheelZoom'(MouseBehaviorAttributes).
+MouseZoom	= 'MouseZoom'(MouseBehaviorAttributes).
+--
+MouseBehaviorAttributes
+		= {
+		schedulingBounds: Bounds
+		}; NodeAttributes.
+--
+-- OrbitBehavior
+--
+OrbitBehavior	= 'OrbitBehavior'(OrbitBehaviorAttributes).
+OrbitBehaviorAttributes
+		= {
+		enableRotate: YesNo,
+		enableTranslate: YesNo,
+		enableZoom: YesNo,
+		proportionalZoom: YesNo,
+		reverseAll: YesNo,
+		reverseRotate: YesNo,
+		reverseTranslate: YesNo,
+		reverseZoom: YesNo,
+		stopZoom: YesNo,
+		zoomFactor: Numerical,
+		minRadius: Radius,
+		rotationCenter: Point3D,
+		schedulingBounds: Bounds
+		}; NodeAttributes.
+--
+-- AmbientLight
+--
+AmbientLight	= 'AmbientLight'(AmbientLightAttributes).
+AmbientLightAttributes =
+		LightAttributes.
+--
+-- DirectionalLight
+--
+DirectionalLight
+		= 'DirectionalLight'(DirectionalLightAttributes).
+DirectionalLightAttributes
+		= {
+		direction: Direction
+		};
+		LightAttributes.
+--
+Direction	= Numerical*.
+--
+-- PointLight
+--
+PointLight	= 'PointLight'(PointLightAttributes).
+PointLightAttributes
+		= {
+		position: Point3D,
+		attenuation: Attenuation
+		};
+		LightAttributes.
+--
+LightAttributes	= {
+		lightOn: YesNo,
+		color: Color,
+		influencingBounds: Bounds
+		}; NodeAttributes.
+--
+-- Attenuation
+--
+Attenuation	= a(	ConstantAttenuation,
+			LinearAttenuation,
+			QuadraticAttenuation).
+--
+ConstantAttenuation	= Numerical.
+LinearAttenuation	= Numerical.
+QuadraticAttenuation	= Numerical.
+--
+-- ModelClip
+--
+ModelClip	= 'ModelClip'(ModelClipAttributes).
+ModelClipAttributes
+		= {
+		1: ClippingPane,
+		2: ClippingPane,
+		3: ClippingPane,
+		4: ClippingPane,
+		5: ClippingPane,
+		6: ClippingPane,
+		influencingBounds: Bounds
+		}; NodeAttributes.
+--
+ClippingPane	= Numerical*.
+--
+-- Shape3D
+--
+Shape3D		= 'Shape3D'(Shape3D_Attributes);
+		  ColorCube;
+		  Billboard;
+		  Text2D.
+Shape3D_Attributes
+		= {
+		geometry: Geometry,
+		appearance: Appearance,
+		cullFace: FaceCullingMode,
+		allowAppearanceOverrideRead: YesNo,
+		allowAppearanceOverrideWrite: YesNo,
+		allowAppearanceRead: YesNo,
+		allowAppearanceWrite: YesNo,
+		allowCollisionBoundsRead: YesNo,
+		allowCollisionBoundsWrite: YesNo,
+		allowGeometryRead: YesNo,
+		allowGeometryWrite: YesNo,
+		pickingDetailLevel: PickingDetailLevel
+		}; NodeAttributes.
+--
+Geometry	= geometryArray(GeometryInfo);
+		  GeometryArray;
+		  Text3D.
+GeometryArray	= GeometryStripArray;
+		  IndexedGeometryArray;
+		  PointArray;
+		  LineArray;
+		  TriangleArray;
+		  QuadArray.
+GeometryStripArray =
+		  LineStripArray;
+		  TriangleStripArray;
+		  TriangleFanArray.
+IndexedGeometryArray =
+		  IndexedGeometryStripArray;
+		  IndexedPointArray;
+		  IndexedLineArray;
+		  IndexedTriangleArray;
+		  IndexedQuadArray.
+IndexedGeometryStripArray =
+		  IndexedLineStripArray;
+		  IndexedTriangleStripArray;
+		  IndexedTriangleFanArray.
+--
+GeometryAttributes
+		= {
+		allowIntersect: YesNo
+		}.
+--
+GeometryInfo	= 'GeometryInfo'(GeometryInfoAttributes).
+GeometryInfoAttributes
+		= {
+		primitive: GeometryInfoPrimitive,
+		coordinates: Vertices,
+		coordinateIndices: Indices,
+		stripCounts: StripCounts,
+		generateNormals: YesNo,
+		creaseAngle: Angle,
+		stripify: YesNo
+		}.
+--
+GeometryInfoPrimitive =
+		'POLYGON_ARRAY';
+		'QUAD_ARRAY';
+		'TRIANGLE_ARRAY';
+		'TRIANGLE_FAN_ARRAY';
+		'TRIANGLE_STRIP_ARRAY'.
+--
+Vertices	= Point3D*.
+Point3D		= p(Numerical,Numerical,Numerical).
+--
+Indices		= Index*.
+Index		= INTEGER.
+--
+StripCounts	= StripCount*.
+StripCount	= INTEGER.
+--
+-- PointArray
+--
+PointArray	= 'PointArray'(PlainGeometryArrayAttributes).
+--
+-- LineArray
+--
+LineArray	= 'LineArray'(PlainGeometryArrayAttributes).
+--
+-- TriangleArray
+--
+TriangleArray	= 'TriangleArray'(PlainGeometryArrayAttributes).
+--
+-- QuadArray
+--
+QuadArray	= 'QuadArray'(PlainGeometryArrayAttributes).
+--
+PlainGeometryArrayAttributes
+		= {
+		vertexCount: VertexCount,
+		includeVertexPositions: YesNo,
+		includePerVertexNormals: YesNo,
+		coordinates: Vertices,
+		normals: Normals
+		}; GeometryAttributes.
+--
+-- LineStripArray
+--
+LineStripArray	= 'LineStripArray'(GeometryStripArrayAttributes).
+--
+-- TriangleStripArray
+--
+TriangleStripArray
+		= 'TriangleStripArray'(GeometryStripArrayAttributes).
+--
+-- TriangleFanArray
+--
+TriangleFanArray
+		= 'TriangleFanArray'(GeometryStripArrayAttributes).
+--
+GeometryStripArrayAttributes
+		= {
+		stripVertexCounts: StripCounts
+		}; PlainGeometryArrayAttributes.
+--
+-- IndexedPointArray
+--
+IndexedPointArray
+		= 'IndexedPointArray'(IndexedGeometryArrayAttributes).
+--
+-- IndexedLineArray
+--
+IndexedLineArray
+		= 'IndexedLineArray'(IndexedGeometryArrayAttributes).
+--
+-- IndexedTriangleArray
+--
+IndexedTriangleArray
+		= 'IndexedTriangleArray'(IndexedGeometryArrayAttributes).
+--
+-- IndexedQuadArray
+--
+IndexedQuadArray
+		= 'IndexedQuadArray'(IndexedGeometryArrayAttributes).
+--
+IndexedGeometryArrayAttributes
+		= {
+		indexCount: IndexCount,
+		coordinateIndices: Indices,
+		normalIndices: Indices
+		}; PlainGeometryArrayAttributes.
+--
+-- IndexedLineStripArray
+--
+IndexedLineStripArray
+		= 'IndexedLineStripArray'
+			(IndexedGeometryStripArrayAttributes).
+--
+-- IndexedTriangleStripArray
+--
+IndexedTriangleStripArray
+		= 'IndexedTriangleStripArray'
+			(IndexedGeometryStripArrayAttributes).
+--
+-- IndexedTriangleFanArray
+--
+IndexedTriangleFanArray
+		= 'IndexedTriangleFanArray'
+			(IndexedGeometryStripArrayAttributes).
+--
+IndexedGeometryStripArrayAttributes
+		= {
+		stripIndexCounts: IndexCounts
+		}; IndexedGeometryArrayAttributes.
+--
+VertexCount	= INTEGER.
+--
+IndexCounts	= IndexCount*.
+IndexCount	= INTEGER.
+--
+Normals		= Direction*.
+--
+-- Text3D
+--
+Text3D		= 'Text3D'(Text3D_Attributes).
+Text3D_Attributes
+		= {
+		font3D: Font3D,
+		string: STRING,
+		position: Point3D,
+		horizontalAlignment: Text3D_HorizontalAlignment,
+		verticalAlignment: Text3D_VerticalAlignment,
+		path: Text3D_Path,
+		characterSpacing: Numerical,
+		allowAlignmentRead: YesNo,
+		allowAlignmentWrite: YesNo,
+		allowBoundingBoxRead: YesNo,
+		allowCharacterSpacingRead: YesNo,
+		allowCharacterSpacingWrite: YesNo,
+		allowFont3DRead: YesNo,
+		allowFont3DWrite: YesNo,
+		allowPathRead: YesNo,
+		allowPathWrite: YesNo,
+		allowPositionRead: YesNo,
+		allowPositionWrite: YesNo,
+		allowStringRead: YesNo,
+		allowStringWrite: YesNo
+		}; GeometryAttributes.
+--
+Font3D		= 'Font3D'(Font3D_Attributes).
+Font3D_Attributes
+		= {
+		fontName: FontName,
+		fontSize: FontSize,
+		fontStyle: FontStyle,
+		tessellationTolerance: TessellationTolerance,
+		extrudePath: FontExtrusion
+		}.
+--
+FontExtrusion	= 'FontExtrusion'(FontExtrusionAttributes).
+FontExtrusionAttributes
+		= {
+		depth: Text3D_Depth,
+		tessellationTolerance: TessellationTolerance
+		}.
+--
+Text3D_Depth	= Numerical.
+TessellationTolerance
+		= Numerical.
+--
+Text3D_HorizontalAlignment
+		= 'ALIGN_FIRST'; 'ALIGN_LAST'; 'ALIGN_CENTER'.
+Text3D_VerticalAlignment
+		= 'ALIGN_TOP'; 'ALIGN_BOTTOM'; 'ALIGN_CENTER'.
+Text3D_Path	= 'PATH_RIGHT'; 'PATH_LEFT'; 'PATH_UP'; 'PATH_DOWN'.
+--
+Appearance	= 'Appearance'(AppearanceAttributes).
+AppearanceAttributes
+		= {
+		material: Material,
+		coloringAttributes: ColorSelectionAndShadingModel,
+		polygonAttributes: PolygonRenderingMode,
+		transparencyAttributes: ObjectTransparency,
+		texture: Texture,
+		allowMaterialRead: YesNo,
+		allowMaterialWrite: YesNo,
+		allowColoringAttributesRead: YesNo,
+		allowColoringAttributesWrite: YesNo,
+		allowPolygonAttributesRead: YesNo,
+		allowPolygonAttributesWrite: YesNo,
+		allowTransparencyAttributesRead: YesNo,
+		allowTransparencyAttributesWrite: YesNo,
+		allowTextureRead: YesNo,
+		allowTextureWrite: YesNo
+		}.
+--
+Material	= 'Material'(MaterialAttributes).
+MaterialAttributes
+		= {
+		ambientColor: Color,
+		emissiveColor: Color,
+		diffuseColor: Color,
+		specularColor: Color,
+		shininess: Shininess,
+		lightingEnable: YesNo
+		}.
+--
+Shininess	= Numerical.
+--
+ColorSelectionAndShadingModel
+		= 'ColoringAttributes'
+			(ColorSelectionAndShadingModelAttributes).
+ColorSelectionAndShadingModelAttributes
+		= {
+		color: Color,
+		shadeModel: ShadeModel,
+		allowColorRead: YesNo,
+		allowColorWrite: YesNo,
+		allowShadeModelRead: YesNo,
+		allowShadeModelWrite: YesNo
+		}.
+--
+ShadeModel	= 'FASTEST'; 'NICEST'; 'SHADE_FLAT';
+		  'SHADE_GOURAUD'.
+--
+PolygonRenderingMode
+		= 'PolygonAttributes'(PolygonAttributes).
+PolygonAttributes
+		= {
+		rasterizationMode: RasterizationMode,
+		cullFace: FaceCullingMode,
+		polygonOffsetBias: Numerical,
+		polygonOffsetFactor: Numerical,
+		backFaceNormalFlip: YesNo
+		}.
+--
+RasterizationMode
+		= 'POLYGON_POINT'; 'POLYGON_LINE'; 'POLYGON_FILL'.
+--
+FaceCullingMode	= 'CULL_BACK'; 'CULL_FRONT'; 'CULL_NONE'.
+--
+PickingDetailLevel
+		= 'INTERSECT_TEST';
+		  'INTERSECT_COORD';
+		  'INTERSECT_FULL'.
+--
+-- ObjectTransparency
+--
+ObjectTransparency
+		= 'TransparencyAttributes'(TransparencyAttributes).
+TransparencyAttributes
+		= {
+		transparency: Numerical,
+		transparencyMode: TransparencyMode,
+		dstBlendFunction: DestinationBlendFunction,
+		srcBlendFunction: SourceBlendFunction
+		}.
+--
+TransparencyMode
+		= 'NONE';
+		  'FASTEST'; 'NICEST';
+		  'SCREEN_DOOR'; 'BLENDED'.
+DestinationBlendFunction
+		= 'BLEND_SRC_COLOR'; 'BLEND_ONE_MINUS_SRC_COLOR';
+		  CommonBlendFunction.
+SourceBlendFunction
+		= 'BLEND_DST_COLOR'; 'BLEND_ONE_MINUS_DST_COLOR';
+		  CommonBlendFunction.
+CommonBlendFunction
+		= 'BLEND_ZERO'; 'BLEND_ONE';
+		  'BLEND_SRC_ALPHA'; 'BLEND_ONE_MINUS_SRC_ALPHA'.
+--
+-- Texture
+--
+Texture		= Texture2D.
+Texture2D	= 'Texture2D'(Texture2D_Attributes).
+Texture2D_Attributes
+		= {
+		image: ImageSource,
+		format: TextureFormat,
+		enableTextureMapping: YesNo,
+		magnificationFilter: MagnificationFilter,
+		minificationFilter: MinificationFilter
+		}.
+--
+TextureFormat	= 'INTENSITY'; 'LUMINANCE';
+		  'ALPHA'; 'LUMINANCE_ALPHA';
+		  'RGB'; 'RGBA'.
+MagnificationFilter
+		= 'FASTEST'; 'NICEST';
+		  'BASE_LEVEL_POINT'; 'BASE_LEVEL_LINEAR';
+		  'LINEAR_SHARPEN'; 'LINEAR_SHARPEN_RGB';
+		  'LINEAR_SHARPEN_ALPHA';
+		  'FILTER4'.
+MinificationFilter
+		= 'FASTEST'; 'NICEST';
+		  'BASE_LEVEL_POINT'; 'BASE_LEVEL_LINEAR';
+		  'MULTI_LEVEL_POINT'; 'MULTI_LEVEL_LINEAR';
+		  'FILTER4'.
+--
+-- ColorCube
+--
+ColorCube	= 'ColorCube'(ColorCubeAttributes).
+ColorCubeAttributes
+		= {
+		scale: Numerical
+		};
+		Shape3D_Attributes.
+--
+-- Billboard
+--
+-- Note: the Billboard node is implemented using the OrientedShape3D
+-- class of Java3D (but not the Billboard class).
+--
+Billboard	= 'Billboard'(BillboardAttributes).
+BillboardAttributes
+		= {
+		mode: BillboardAlignmentMode,
+		point: Point3D,
+		axis: RotationAxis,
+		enableConstantScale: YesNo,
+		scale: Numerical
+		};
+		Shape3D_Attributes.
+--
+BillboardAlignmentMode	=
+		'ROTATE_ABOUT_AXIS';
+		'ROTATE_ABOUT_POINT';
+		'ROTATE_NONE'.
+RotationAxis	= Numerical*.
+--
+-- Text2D
+--
+Text2D		= 'Text2D'(Text2D_Attributes).
+Text2D_Attributes
+		= {
+		string: STRING,
+		color: Color,
+		fontName: FontName,
+		fontSize: FontSize,
+		fontStyle: FontStyle,
+		rectangleScaleFactor: Numerical
+		};
+		Shape3D_Attributes.
+--
+-- MovingShadow
+--
+MovingShadow	= 'MovingShadow'(MovingShadowAttributes).
+MovingShadowAttributes
+		= {
+		object: NodeLabel,
+		pointLight: NodeLabel,
+		plane: PlaneCoefficients,
+		standoff: Standoff,
+		appearance: Appearance,
+		schedulingBounds: Bounds
+		}; NodeAttributes.
+--
+PlaneCoefficients	= Numerical*.
+Standoff		= Numerical.
+--
+-- PickCanvas
+--
+PickCanvas	= 'PickCanvas'(PickCanvasAttributes).
+PickCanvasAttributes
+		= {
+		handleMouseClicked: YesNo,
+		handleMouseEntered: YesNo,
+		handleMouseExited: YesNo,
+		handleMousePressed: YesNo,
+		handleMouseReleased: YesNo,
+		handleMouseDragged: YesNo,
+		handleMouseMoved: YesNo,
+		isPassive: YesNo,
+		period: TimeInterval,
+		tolerance: Numerical,
+		mode: PickingMode
+		}; NodeAttributes.
+--
+PickingMode	= 'BOUNDS'; 'GEOMETRY'; 'GEOMETRY_INTERSECT_INFO'.
+--
+-- Bounds
+--
+Bounds		= BoundingSphere.
+--
+BoundingSphere	= 'BoundingSphere'(BoundingSphereAttributes).
+BoundingSphereAttributes
+		= {
+		center: Point3D,
+		radius: Radius
+		}.
+--
+Radius		= Numerical.
+--
+Divisions	= INTEGER.
+--
+NodeLabels	= NodeLabel*.
+NodeLabel	= STRING; INTEGER.
+
+--------------------------------------------------------------------
+-- The 'Canvas3D' class is specialized class 'Alpha'.             --
+--------------------------------------------------------------------
+
+interface 'Canvas3D'
+
+(specialized
+	'Alpha',
+	'DimensionedFrame',
+	'DataResourceConsumer',
+	'WritableImageProducer',
+	'CustomControl'):
+
+projection_policy		: ProjectionPolicy;
+window_resize_policy		: WindowResizePolicy;
+window_movement_policy		: WindowMovementPolicy;
+visibility_policy		: VisibilityPolicy;
+transparency_sorting_policy	: TransparencySortingPolicy;
+minimum_frame_cycle_time	: WaitingInterval;
+--
+field_of_view			: FieldOfView;
+front_clip_distance		: ClipDistance;
+back_clip_distance		: ClipDistance;
+--
+enable_scene_antialiasing	: YesNo;
+enable_depth_buffer_freezing	: YesNo;
+enable_local_eye_lighting	: YesNo;
+
+[
+IMPERATIVES:
+--
+show(BranchGroup)				- (i);
+show(NodeList)					- (i);
+--
+set_node(NodeLabel,BranchGroup)			- (i,i);
+set_transform(NodeLabel,Transform3D)		- (i,i);
+set_translation(NodeLabel,Translation)		- (i,i);
+set_appearance(NodeLabel,Appearance)		- (i,i);
+--
+set_coloring_attributes(
+	NodeLabel,
+	ColorSelectionAndShadingModel)		- (i,i);
+--
+set_font3d(NodeLabel,Font3D)			- (i,i);
+set_string(NodeLabel,_)				- (i,i);
+--
+attach_offscreen_canvas();
+detach_offscreen_canvas();
+--
+get_image('BufferedImage')			- (i);
+get_image('BufferedImage',PointX,PointY)	- (i,i,i);
+--
+set_projection_policy(ProjectionPolicy)				- (i);
+set_window_resize_policy(WindowResizePolicy)			- (i);
+set_window_movement_policy(WindowMovementPolicy)		- (i);
+set_visibility_policy(VisibilityPolicy)				- (i);
+set_transparency_sorting_policy(TransparencySortingPolicy)	- (i);
+set_minimum_frame_cycle_time(WaitingInterval)			- (i);
+set_field_of_view(FieldOfView)					- (i);
+set_front_clip_distance(ClipDistance)				- (i);
+set_back_clip_distance(ClipDistance)				- (i);
+set_enable_scene_antialiasing(YesNo)				- (i);
+set_enable_depth_buffer_freezing(YesNo)				- (i);
+set_enable_local_eye_lighting(YesNo)				- (i);
+--
+get_projection_policy() = ProjectionPolicy;
+get_window_resize_policy() = WindowResizePolicy;
+get_window_movement_policy() = WindowMovementPolicy;
+get_visibility_policy() = VisibilityPolicy;
+get_transparency_sorting_policy() = TransparencySortingPolicy;
+get_minimum_frame_cycle_time() = WaitingInterval;
+get_field_of_view() = FieldOfView;
+get_front_clip_distance() = ClipDistance;
+get_back_clip_distance() = ClipDistance;
+get_enable_scene_antialiasing() = YesNo;
+get_enable_depth_buffer_freezing() = YesNo;
+get_enable_local_eye_lighting() = YesNo;
+--
+-- These methods are to be implemented by the programmer:
+--
+action(BehaviorName)				- (i);
+--
+mouse_clicked(NodeLabels)			- (i);
+mouse_entered(NodeLabels)			- (i);
+mouse_exited(NodeLabels)			- (i);
+mouse_pressed(NodeLabels)			- (i);
+mouse_released(NodeLabels)			- (i);
+mouse_dragged(NodeLabels)			- (i);
+mouse_moved(NodeLabels)				- (i);
+]
+
+--------------------------------------------------------------------
+-- The 'BufferedScene' class is specialized                       --
+-- class 'DataAbstraction'.                                       --
+--------------------------------------------------------------------
+
+interface 'BufferedScene'
+
+(specialized
+	'DataAbstraction',
+	'OperatingSystemResource',
+	'DataResourceConsumer'):
+
+[
+IMPERATIVES:
+--
+load;
+load(FileName)					- (i);
+load(STRING)					- (i);
+--
+save;
+save(FileName)					- (i);
+save(STRING)					- (i);
+--
+set_scene_group(BranchGroup)			- (i);
+--
+set_binary(BINARY)				- (i);
+get_binary() = BINARY;
+]

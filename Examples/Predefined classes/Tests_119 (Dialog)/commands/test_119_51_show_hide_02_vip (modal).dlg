@@ -1,0 +1,16 @@
+mesh(80,25)
+failure_color('Red','White')
+dialog_font("SansSerif",24)
+
+modal dialog 'MyDialog'("Demo Dialog",default,default,default,centered,centered,default)
+vbox(center)
+	button("action1","M&aximize this dialog box")
+	button("action2","M&inimize this dialog box")
+	button("action3","R&estore this dialog box")
+	hbox(center)
+		button(reset,"&Reset")
+		button(verify,"&Verify")
+		button(close,"&Close")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

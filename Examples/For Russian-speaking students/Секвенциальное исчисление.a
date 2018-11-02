@@ -1,0 +1,463 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--                           Программа PROVINT                       --
+--                                                                   --
+--                         Автор: Спанопуло В.В.                     --
+--             аспирант кафедры мат. кибернетики ВМиК МГУ            --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+-- Перенесено с Турбо Пролога на Акторный Пролог Морозовым А.А.      --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+-- Программа строит логический вывод в секвенциальном исчислении     --
+-- логики высказываний.                                              --
+--                                                                   --
+-- Вход: формула X логики высказываний (вводится)                    --
+-- Выход: вывод секвенции |- X (показывается на экране)              --
+--                                                                   --
+-- Представление формул и выводов на экране:                         --
+-- <Логические связки> ::= 1)  - (импликация)                        --
+--                         2)  & (конъюнкция)                        --
+--                         3)  # (дизъюнкция)                        --
+--                         4)  0 (ложь)                              --
+-- <Формулы> ::= 1)  <пропозициональная переменная>                  --
+--               2)  (<формула>-<формула>)                           --
+--               3)  (<формула>&<формула>)                           --
+--               4)  (<формула>#<формула>)                           --
+--               5)  0                                               --
+-- <Секвенция> ::= <Список формул> |- <формула>                      --
+-- <Аксиомы> ::= 1)  S,Y |- Y                                        --
+--               2)  S,0 |- Y                                        --
+-- <Правила вывода> ::=                                              --
+--    S,Y |- Z            S,Z |- X;  S |- Y                          --
+-- 1) -------- ri      2) ----------------- li                       --
+--    S |- Y-Z                S,Y-Z |- X                             --
+--                                                                   --
+--    S |- Y; S |- Z          S,Y,Z |- X                             --
+-- 3) -------------- rc    4) ---------- lc                          --
+--       S |- Y&Z             S,Y&Z |- X                             --
+--                                                                   --
+--     S |- Y          S |- Z         S,Y |- X;  S,Z |- X            --
+-- 5) -------- rd  6) -------- rd  7) ------------------- ld         --
+--    S |- YVZ        S |- YVZ             S,YVZ |- X                --
+--                                                                   --
+-- Представление формул и выводов в программе                        --
+-- (в виде терма):                                                   --
+-- <Формула> ::= 1) var(<переменная>)                                --
+--               2) impl(<формула>,<формула>)                        --
+--               3) conj(<формула>,<формула>)                        --
+--               4) disj(<формула>,<формула>)                        --
+--               5) 'false'                                          --
+-- Например: ((0&a)-b)  <=>  impl(conj('false',var(a)),var(b))       --
+-- <Секвенция> ::= <Список формул>,<формула>                         --
+-- <Аксиомы> ::=                                                     --
+--   1) s(<список S, содержащий формулу Y>, <формула Y>)             --
+--   2) f(<список S, содержащий формулу false>, <формула Y>)         --
+-- <Правила вывода> ::=                                              --
+-- 1) ri(<список S>, <формула impl(Y,Z)>,                            --
+--                                 <вывод секвенции S,Y|-Z>)         --
+-- 2) li(<список S, содержащий формулу impl(Y,Z)>, <формула X>,      --
+--         <вывод секвенции S,Z|-X>, <вывод секвенции S|-Y>)         --
+-- 3) rc(<список S>, <формула conj(Y,Z)>,                            --
+--       <вывод секвенции S,Y|-X>, <вывод секвенции S,Z|-X>)         --
+-- 4) lc(<список S, содержащий формулу conj(Y,Z)>, <формула X>,      --
+--                               <вывод секвенции S,Y,Z|-X>)         --
+-- 5) rd(<список S>, <формула disj(Y,Z)>,                            --
+--                                   <вывод секвенции S|-Y>)         --
+-- 6) rd(<список S>, <формула disj(Y,Z)>,                            --
+--                                   <вывод секвенции S|-Z>)         --
+-- 7) ld(<список S, содержащий формулу disj(Y,Z)>, <формула X>,      --
+--       <вывод секвенции S,Y|-X>, <вывод секвенции S,Z|-Y>)         --
+--                                                                   --
+-- Например:                                                         --
+-- a,b |- a  0,b |- a        ld(   [disj(var(a),'false)',b],         --
+-- ------------------ ld <=>                         var(a),         --
+--    (a#0),b |- a                s([var(a),var(b)],var(a)),         --
+--                               f(['false',var(b)],var(a)) )        --
+--                                                                   --
+-----------------------------------------------------------------------
+--
+import 'TextScreen' from "Текстовый экран";
+--
+DOMAINS:
+--
+Formula		= var(Token);
+		  impl(Formula,Formula);
+		  conj(Formula,Formula);
+		  disj(Formula,Formula);
+		  'false'.
+Context		= Formula*.
+Proof		= s(Context,Formula);
+		  ri(Context,Formula,Proof);
+		  li(Context,Formula,Proof,Proof);
+		  rc(Context,Formula,Proof,Proof);
+		  lc(Context,Formula,Proof);
+		  rd(Context,Formula,Proof);
+		  ld(Context,Formula,Proof,Proof);
+		  f(Context,Formula).
+I		= Column.
+--
+Token		= STRING.
+PrintMode	= "ri"; "lc"; "rd"; "li"; "rc"; "ld".
+--
+-----------------------------------------------------------------------
+--
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+dialog_window	= ('Console',
+			title="Dialog",
+			x=0,
+			y=0,
+			height=9,
+			background_color='Black');
+--
+proof_window	= ('Report',
+			title="Proof",
+			x=0,
+			y=9,
+			background_color='Black');
+--
+output_window	= ('TextScreen',
+			output= proof_window);
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+repeat;
+prove;
+--
+imperative:
+--
+write_prompt;
+input_and_prove_formula;
+--
+determ:
+--
+check_user_input(STRING)			- (i);
+--
+imperative:
+--
+translate_and_derive_formula(STRING,STRING)	- (i,i);
+derive_formula(Formula,STRING,STRING)		- (i,i,i);
+--
+determ:
+--
+readform(STRING,STRING,Formula)			- (i,o,o);
+--
+imperative:
+--
+conv(Token,STRING,STRING,Formula)		- (i,i,o,o);
+--
+nondeterm:
+--
+derivable(Context,Formula,Proof)			- (i,i,o);
+splimpl(Context,Context,Context,Context,Formula)	- (i,i,o,o,o);
+delconj(Context,Context,Context)			- (i,i,o);
+spldisj(Context,Context,Context,Context)		- (i,i,o,o);
+--
+determ:
+--
+in(Formula,Context);
+--
+imperative:
+--
+incl(Formula,Context,Context)			- (i,i,o);
+connect(Context,Context,Context)		- (i,i,o);
+--
+print_proof(Proof,Row,I,I,I,I)			- (i,i,i,o,o,o);
+nobranch(Context,Formula,Row,I,I)		- (i,i,i,i,o);
+onebranch(Proof,Row,I,I,I,I)			- (i,i,i,o,o,o);
+twobranch(Proof,Proof,Row,I,I,I,I)		- (i,i,i,i,o,o,o);
+--
+printnode(
+	Context,
+	Formula,
+	Row,I,I,I,I,I,I,
+	PrintMode)	- (i,i,i,i,i,i,o,o,o,i);
+--
+maximum(I,I,I,I,I,I,I,I)			- (i,i,i,i,o,o,o,o);
+lenth(STRING,I)					- (i,o);
+--
+printsym(Token,I)					- (i,i);
+printseq(Context,Formula,I)				- (i,i,o);
+sequence2string(Context,Formula,ColoredText)		- (i,i,o);
+context2string(Context,ColoredText)			- (i,o);
+form2string(Formula,ColoredText)			- (i,o);
+conj2string(Formula,Formula,ColoredText,ColoredText)	- (i,i,i,o);
+--
+-- cursor(I,I);
+-----------------------------------------------------------------------
+--
+CLAUSES:
+--
+goal:-
+	prove,!.
+-----------------------------------------------------------------------
+-- Prove: ввод формулы S,                                            --
+--        её преобразование в терм F,                                --
+--        поиск вывода секвенции |-F,                                --
+--        запись вывода в окно "Proof".                              --
+-----------------------------------------------------------------------
+repeat.
+repeat:-
+	repeat.
+--
+prove:-
+	dialog_window ? set_color('Yellow'),
+	dialog_window ? write("Добрый день.\n"),
+	Demo==	"((((q&(0#p))-(p#q))&(((p&(q#0))&(p#r))-q))&"
+		"((p&(p-q))-q))",
+	Message== "Пример формулы: ",
+	translate_and_derive_formula(Demo,Message),
+	repeat,
+		write_prompt,
+		input_and_prove_formula,
+		fail.
+--
+write_prompt:-
+	dialog_window ? set_color('White'),
+	dialog_window ? writeln(
+		"Введите, пожалуйста, новую формулу, "
+		"например, (p-p) или ((p&q)-p)."),
+	dialog_window ? writeln(
+		"Обозначения: импликация - (минус), конъюнкция &, "
+		"дизъюнкция #, ложь 0.").
+--
+input_and_prove_formula:-
+	S== dialog_window ? input_string(
+		"Введите, пожалуйста, Вашу формулу",
+		""),
+	check_user_input(S),!,
+	output_window ? clear,
+	dialog_window ? clear,
+	translate_and_derive_formula(S,"Вы ввели формулу:\n").
+input_and_prove_formula:-
+	break.
+--
+check_user_input(""):-!,
+	fail.
+check_user_input(_).
+--
+alarm(0):-!,
+	dialog_window ? set_color('Yellow'),
+	dialog_window ? write("До свидания.\n").
+--
+translate_and_derive_formula(S,Message):-
+	readform(S,R,F),
+	R== "",!,
+	derive_formula(F,S,Message).
+translate_and_derive_formula("",_):-!.
+translate_and_derive_formula(S,_):-
+	dialog_window ? set_color('Red'),
+	dialog_window ? writeln("Извините, это не формула: ",S,".").
+--
+derive_formula(F,S,Message):-
+	derivable([],F,P),!,
+	dialog_window ? writeln(Message,S,"."),
+	print_proof(P,20,1,_,_,_),
+	output_window ? display.
+derive_formula(_,S,_):-
+	dialog_window ? set_color('Red'),
+	dialog_window ? writeln("Формула ",S," невыводима.").
+-----------------------------------------------------------------------
+-- ReadForm: преобразование формулы S в терм F.                      --
+-----------------------------------------------------------------------
+readform(S,R,F):-
+	dialog_window ? extract_front_token(S,C,S1),
+	conv(C,S1,R,F),!.
+--
+conv("(",S,R,impl(F1,F2)):-
+	readform(S,R1,F1),
+	dialog_window ? extract_front_token(R1,"-",R2),
+	readform(R2,R3,F2),
+	dialog_window ? extract_front_token(R3,")",R),!.
+conv("(",S,R,conj(F1,F2)):-
+	readform(S,R1,F1),
+	dialog_window ? extract_front_token(R1,"&",R2),
+	readform(R2,R3,F2),
+	dialog_window ? extract_front_token(R3,")",R),!.
+conv("(",S,R,disj(F1,F2)):-
+	readform(S,R1,F1),
+	dialog_window ? extract_front_token(R1,"#",R2),
+	readform(R2,R3,F2),
+	dialog_window ? extract_front_token(R3,")",R),!.
+conv("0",R,R,'false'):-!.
+conv(C,R,R,var(C)).
+-----------------------------------------------------------------------
+-- Derivable: поиск вывода секвенции S|-X.                           --
+-----------------------------------------------------------------------
+derivable(S,X,s(S,X)):-
+	in(X,S).
+derivable(S,X,f(S,X)):-
+	in('false',S).
+derivable(S,impl(X,Y),ri(S,impl(X,Y),P)):-
+	incl(X,S,S1),
+	derivable(S1,Y,P).
+derivable(S,conj(X,Y),rc(S,conj(X,Y),P1,P2)):-
+	derivable(S,X,P1),
+	derivable(S,Y,P2).
+derivable(S,disj(X,Y),rd(S,disj(X,Y),P)):-
+	derivable(S,X,P).
+derivable(S,disj(X,Y),rd(S,disj(X,Y),P)):-
+	derivable(S,Y,P).
+derivable(S,X,li(S,X,P1,P2)):-
+	splimpl([],S,S1,S2,X1),
+	derivable(S1,X1,P1),
+	derivable(S2,X,P2).
+derivable(S,X,lc(S,X,P)):-
+	delconj([],S,S1),
+	derivable(S1,X,P).
+derivable(S,X,ld(S,X,P1,P2)):-
+	spldisj([],S,S1,S2),
+	derivable(S1,X,P1),
+	derivable(S2,X,P2).
+--
+splimpl(G,[impl(Y,Z)|S],S1,S2,Y):-
+	connect(G,S,S1),
+	incl(Z,S1,S2).
+splimpl(G,[X|S],S1,S2,X1):-
+	splimpl([X|G],S,S1,S2,X1).
+--
+delconj(G,[conj(X,Y)|S],G2):-
+	connect(G,S,G0),
+	incl(X,G0,G1),
+	incl(Y,G1,G2).
+delconj(G,[X|S],G1):-
+	delconj([X|G],S,G1).
+--
+spldisj(G,[disj(X,Y)|S],S1,S2):-
+	connect(G,S,G0),
+	incl(X,G0,S1),
+	incl(Y,G0,S2).
+spldisj(G,[X|S],S1,S2):-
+	spldisj([X|G],S,S1,S2).
+--
+in(X,[X|_]):-!.
+in(X,[_|S]):-
+	in(X,S).
+--
+incl(X,[],[X]).
+incl(X,[X|S],[X|S]):-!.
+incl(X,[Y|S],[Y|S1]):-
+	incl(X,S,S1).
+--
+connect([],S,S).
+connect([X|S],S1,S2):-
+	connect(S,[X|S1],S2).
+-----------------------------------------------------------------------
+-- Print_Proof: представление вывода на экране.                      --
+-----------------------------------------------------------------------
+print_proof(s(S,X),L,B,B,E,E):-
+	nobranch(S,X,L,B,E).
+print_proof(f(S,X),L,B,B,E,E):-
+	nobranch(S,X,L,B,E).
+print_proof(ri(S,X,P),L,B,BD,E,ED):-
+	onebranch(P,L,B,BD1,E1,ED1),
+	printnode(S,X,L,BD1,E1,ED1,BD,E,ED,"ri").
+print_proof(lc(S,X,P),L,B,BD,E,ED):-
+	onebranch(P,L,B,BD1,E1,ED1),
+	printnode(S,X,L,BD1,E1,ED1,BD,E,ED,"lc").
+print_proof(rd(S,X,P),L,B,BD,E,ED):-
+	onebranch(P,L,B,BD1,E1,ED1),
+	printnode(S,X,L,BD1,E1,ED1,BD,E,ED,"rd").
+print_proof(li(S,X,P1,P2),L,B,BD,E,ED):-
+	twobranch(P1,P2,L,B,BD1,E1,ED1),
+	printnode(S,X,L,BD1,E1,ED1,BD,E,ED,"li").
+print_proof(rc(S,X,P1,P2),L,B,BD,E,ED):-
+	twobranch(P1,P2,L,B,BD1,E1,ED1),
+	printnode(S,X,L,BD1,E1,ED1,BD,E,ED,"rc").
+print_proof(ld(S,X,P1,P2),L,B,BD,E,ED):-
+	twobranch(P1,P2,L,B,BD1,E1,ED1),
+	printnode(S,X,L,BD1,E1,ED1,BD,E,ED,"ld").
+--
+nobranch(S,X,L,B,E):-
+	output_window ? cursor(L,B),
+	printseq(S,X,I),
+	E== B + I.
+--
+onebranch(P,L,B,BD,E,ED):-
+	L1== L - 2,
+	print_proof(P,L1,B,BD,E,ED).
+--
+twobranch(P1,P2,L,B,BD,E,ED):-
+	L1== L - 2,
+	print_proof(P1,L1,B,BD,E1,_),
+	E0== E1 + 5,
+	print_proof(P2,L1,E0,_,E,ED).
+--
+printnode(G,X,L,BDI,EI,EDI,BD,E,ED,N):-
+	sequence2string(G,X,S),
+	I== output_window ? length(S),
+	maximum(I,BDI,EI,EDI,BD,E,ED,IL),
+	L1== L - 1,
+	output_window ? cursor(L1,BDI),
+	printsym("-",IL),
+	output_window ? write('Magenta'," ",?cast("STRING",N)),
+	output_window ? cursor(L,BD),
+	output_window ? write(S).
+--
+maximum(I,BDI,EI,EDI,BD,EI,ED,IL):-
+	IL== EDI - BDI,
+	I < IL,!,
+	D== IL - I,
+	BD== BDI + ?cast("I",?round(D/2)),
+	ED== BD + I.
+maximum(I,BDI,EI,_,BDI,EI,ED,I):-
+	I1== EI - BDI,
+	I < I1,!,
+	ED== BDI + I.
+maximum(I,BDI,_,_,BDI,E,E,I):-
+	E== BDI + I.
+--
+lenth(S,I+1):-
+	dialog_window ? extract_front_code(S,_,S1),!,
+	lenth(S1,I).
+lenth(_,0).
+--
+printsym(_,0):-!.
+printsym(C,I):-
+	output_window ? write(['White',?cast("STRING",C)]),
+	I1== I - 1,
+	printsym(C,I1).
+--
+printseq(G,X,I):-
+	sequence2string(G,X,S),
+	I== output_window ? length(S),
+	output_window ? write(S).
+--
+sequence2string(G,F,S3):-
+	context2string(G,S1),
+	form2string(F,S2),
+	S3== [S1,S2].
+--
+context2string([],['White',"|- "]):-!.
+context2string([F],S2):-!,
+	form2string(F,S1),
+	S2== [S1,'White'," |- "].
+context2string([F|G],S3):-!,
+	form2string(F,S1),
+	context2string(G,S2),
+	S3== [S1,['White',","],S2].
+context2string(_,['White'," |- "]).
+--
+form2string(var(C),['Green',?cast("STRING",C)]):-!.
+form2string(impl(F1,F2),S):-
+	conj2string(F1,F2,['Cyan',"->"],S).
+form2string(conj(F1,F2),S):-
+	conj2string(F1,F2,['Cyan',"&"],S).
+form2string(disj(F1,F2),S):-
+	conj2string(F1,F2,['Cyan',"V"],S).
+form2string('false',['Red',"0"]).
+--
+conj2string(F1,F2,C,S5):-
+	form2string(F1,S1),
+	form2string(F2,S2),
+	S5== ['Yellow',"(",S1,C,S2,'Yellow',")"].
+]
+-----------------------------------------------------------------------	

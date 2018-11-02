@@ -1,0 +1,92 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	recorder	= ('DataRecorder');
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln('Start data recording.'),
+	recorder ? start,
+	delay(60.0).
+--
+tick:-!,
+	con ? writeln('Stop data recording.'),
+	recorder ? stop.
+]
+-----------------------------------------------------------------------
+class 'DataRecorder' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	name		= "Test001.k2j";
+--
+	operating_mode	= 'RECORDING';
+--
+	people_index	= 'TINCTURE_PEOPLE';
+	-- people_index	= 'PAINT_PEOPLE';
+	-- people_index	= 'EXTRACT_PEOPLE';
+	-- people_index	= 'ADAPTIVELY_EXTRACT_PEOPLE';
+	-- people_index	= 'PROJECT_PEOPLE';
+	-- people_index	= 'NONE';
+--
+	circumscription	= [
+			'TOTAL_RECTANGLES',
+			'SKELETON_RECTANGLES',
+			'TOTAL_PARALLELEPIPEDS',
+			'SKELETON_PARALLELEPIPEDS'
+			-- 'NONE'
+			];
+--
+	skeletons	= 'DETECT_SKELETONS';
+	-- skeletons	= 'DETECT_AND_TRACK_SKELETONS';
+	-- skeletons	= 'NONE';
+--
+	displaying_mode	= {
+		people_index,
+		circumscription,
+		skeletons};
+--
+	data_acquisition_mode	= [
+		-- 'DEPTH_MAPS'
+		'COLORED_DEPTH_MAPS'
+		-- 'INFRARED',
+		-- 'LONG_EXPOSURE_INFRARED'
+		-- 'MAPPED_COLOR'
+		-- 'POINT_CLOUDS'
+		-- 'COLOR'
+		];
+--
+	input_device	= device(kinect,data_acquisition_mode);
+--
+	write_buffer_size	= 50;
+--
+internal:
+--
+	kinect	= ('Kinect');
+--
+	con	= ('Console');
+--
+[
+buffer_overflow:-!,
+	con ? set_color('White','Red'),
+	con ? writeln("Buffer overflow!"),
+	con ? set_color('default').
+--
+buffer_deallocation:-!,
+	con ? set_color('White','DkGreen'),
+	con ? writeln("Buffer restored."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

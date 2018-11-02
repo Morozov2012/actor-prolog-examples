@@ -1,0 +1,12 @@
+dialog 'EditKeywords' (
+	"List of Keywords",default,default,default,
+	centered,centered,default)
+vbox(center)
+	edittext(editing_text,30,14,"")
+	hbox
+		button("load","&Load")
+		button("clear","&Clear")
+		ok(close,"&O.K.")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

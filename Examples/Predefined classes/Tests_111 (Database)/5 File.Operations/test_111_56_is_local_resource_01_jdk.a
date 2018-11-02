@@ -1,0 +1,163 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+r11	= ('MyDatabase',
+		name=	"data.dir/database1.db");
+r12	= ('MyDatabase',
+		name=	"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES\\Predefined classes\\"
+			"Tests_111 (Database)/"
+			"5 File.Operations/data.dir/database1.db");
+r13	= ('MyDatabase',
+		name=	"../../Tests_111 (Database)/"
+			"5 File.Operations/data.dir/database1.db");
+r14	= ('MyDatabase',
+		name=	"../../Tests_111 (Database)/");
+r15	= ('MyDatabase',
+		name=	"../read.me");
+r16	= ('MyDatabase',
+		name=	"");
+r17	= ('MyDatabase',
+		name=	"../../Tests_111%20(Database)");
+r21	= ('MyDatabase',
+		name=	"file:data.dir/database1.db");
+r22	= ('MyDatabase',
+		name=	"file:///D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES\\Predefined%20classes\\"
+			"Tests_111%20(Database)/"
+			"5 File.Operations/data.dir/database1.db");
+r23	= ('MyDatabase',
+		name=	"file:../../Tests_111%20(Database)/"
+			"5 File.Operations/data.dir/database1.db");
+r24	= ('MyDatabase',
+		name=	"file:../../Tests_111%20(Database)/");
+r25	= ('MyDatabase',
+		name=	"file:../read.me");
+r26	= ('MyDatabase',
+		name=	"file:///");
+r27	= ('MyDatabase',
+		name=	"file:../../Tests_111%20(Database)");
+r31	= ('MyDatabase',
+		name=	"file://"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES\\Predefined%20classes\\"
+			"Tests_111%20(Database)/"
+			"5 File.Operations/data.dir/database1.db");
+r41	= ('MyDatabase',
+		name=	"http://xxx.yyy.zzz"
+			"/EXAMPLES\\Predefined%20classes\\"
+			"Tests_111%20(Database)/"
+			"5 File.Operations/data.dir/database1.db");
+r42	= ('MyDatabase',
+		name=	"ftp://xxx.yyy.zzz"
+			"/EXAMPLES\\Predefined%20classes\\"
+			"Tests_111%20(Database)/"
+			"5 File.Operations/data.dir/database1.db");
+r43	= ('MyDatabase',
+		name=	"https://xxx.yyy.zzz"
+			"/EXAMPLES\\Predefined%20classes\\"
+			"Tests_111%20(Database)/"
+			"files/data.dir/database1.db");
+r44	= ('MyDatabase',
+		name=	"http://www.cplire.ru/Lab144/english.html");
+--
+[
+goal:-
+	r11 ? test('expected_to_be_local','expected_to_be_found'),
+	r12 ? test('expected_to_be_local','expected_to_be_found'),
+	r13 ? test('expected_to_be_local','expected_to_be_found'),
+	r14 ? test('expected_to_be_local','expected_to_be_found'),
+	r15 ? test('expected_to_be_local','cannot_be_found'),
+	r16 ? test('expected_to_be_local','expected_to_be_found'),
+	r17 ? test('expected_to_be_local','cannot_be_found'),
+	r21 ? test('expected_to_be_local','expected_to_be_found'),
+	r22 ? test('expected_to_be_local','expected_to_be_found'),
+	r23 ? test('expected_to_be_local','expected_to_be_found'),
+	r24 ? test('expected_to_be_local','expected_to_be_found'),
+	r25 ? test('expected_to_be_local','cannot_be_found'),
+	r26 ? test('expected_to_be_local','expected_to_be_found'),
+	r27 ? test('expected_to_be_local','cannot_be_found'),
+	r31 ? test('expected_to_be_local','expected_to_be_found'),
+	r41 ? test('cannot_be_local','cannot_be_found'),
+	r42 ? test('cannot_be_local','cannot_be_found'),
+	r43 ? test('cannot_be_local','cannot_be_found'),
+	r44 ? test('cannot_be_local','expected_to_be_found').
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+con			= ('Console');
+--
+[
+DOMAINS:
+--
+Target	= INTEGER.
+--
+IsThisFileLocal		= 'expected_to_be_local'; 'cannot_be_local'.
+DoesThisFileExist	= 'expected_to_be_found'; 'cannot_be_found'.
+--
+PREDICATES:
+--
+imperative:
+--
+test(IsThisFileLocal,DoesThisFileExist)			- (i,i);
+--
+check_if_resource_is_local_file(Color)			- (o);
+check_if_file_does_exist(Color,Color,Color)		- (i,i,o);
+report_results_of_the_test
+	(IsThisFileLocal,DoesThisFileExist,Color)	- (i,i,i);
+--
+CLAUSES:
+--
+test(IsThisFileLocal,DoesThisFileExist):-
+	Text== ?get_full_name(),
+	check_if_resource_is_local_file(Color),
+	report_results_of_the_test(
+		IsThisFileLocal,DoesThisFileExist,Color),
+	con ? set_color(Color),
+	con ? writeln("FullName: ",Text),
+	con ? set_color('Black').
+--
+check_if_resource_is_local_file(Color):-
+	is_local_resource(),!,
+	check_if_file_does_exist('DkGreen','Orange',Color).
+check_if_resource_is_local_file(Color):-
+	check_if_file_does_exist('Cyan','Magenta',Color).
+--
+check_if_file_does_exist(Color,_,Color):-
+	does_exist(),!.
+check_if_file_does_exist(_,Color,Color).
+--
+report_results_of_the_test(
+		'expected_to_be_local',
+		'expected_to_be_found',
+		'DkGreen'):-!,
+	con ? write("Test O.K.: ").
+report_results_of_the_test(
+		'expected_to_be_local',
+		'cannot_be_found',
+		'Orange'):-!,
+	con ? write("Test O.K.: ").
+report_results_of_the_test(
+		'cannot_be_local',
+		'expected_to_be_found',
+		'Cyan'):-!,
+	con ? write("Test O.K.: ").
+report_results_of_the_test(
+		'cannot_be_local',
+		'cannot_be_found',
+		'Magenta'):-!,
+	con ? write("Test O.K.: ").
+report_results_of_the_test(_,_,_):-
+	con ? set_color('Red'),
+	con ? write("Test failed: "),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

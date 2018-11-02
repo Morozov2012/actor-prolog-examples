@@ -1,0 +1,147 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013-2015 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+-- Thanks to Computer graphics using Java 2D and 3D                  --
+-- by Hong Zhang, Y. Daniel Liang - Armstrong Atlantic State         --
+-- University, 2006                                                  --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java2D";
+
+class 'Main' (specialized 'Canvas2D'):
+--
+constant:
+--
+	background_color		= 'White';
+	scaling_factor			= 'INDEPENDENT';
+	enable_scene_antialiasing	= 'yes';
+--
+	image_width			= 500;
+	image_height			= 500;
+	x_min				= -2;
+	y_min				= -2;
+	max_count			= 512;
+--
+internal:
+--
+	image		= ('BufferedImage',
+				image_type= 'TYPE_INT_RGB');
+--
+	timer		= ('Timer');
+	con		= ('Console',
+				title= "The Mandelbrot set",
+				x= 50,
+				y= 0,
+				height= 3);
+--
+[
+DOMAINS:
+--
+Count		= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+loop1(INTEGER,INTEGER,INTEGER,REAL,REAL);
+loop2(INTEGER,INTEGER,INTEGER,INTEGER,REAL,REAL);
+--
+iter_count(REAL,REAL) = Count		- (i,i);
+loop3(REAL,REAL,Count,REAL,REAL,Count)	- (i,i,i,i,i,o);
+--
+abstime(Hours,
+	Minutes,
+	Seconds,
+	Milliseconds,
+	REAL)				- (i,i,i,i,o);
+--
+save_image;
+--
+CLAUSES:
+--
+goal:-!,
+	show,
+	DrawingMarker== ?mark_drawing(),
+	set_font({size:18}),
+	set_text_alignment('CENTER','CENTER'),
+	draw_text(0.5,0.5,"Wait a moment, please..."),
+	draw_now,
+	image ? create(image_width,image_height),
+	XScale== 4 / image_width,
+	YScale== 4 / image_height,
+	timer ? time(Hr1,Min1,Sec1,MSEC1),
+	loop1(0,image_width,image_height,XScale,YScale),
+	timer ? time(Hr2,Min2,Sec2,MSEC2),
+	retract_drawing(DrawingMarker),
+	get_size_in_pixels(TotalWidth,TotalHeight),
+	X0== (TotalWidth - image_width) / 2 / TotalWidth,
+	Y0== (TotalHeight - image_height) / 2 / TotalHeight,
+	RelativeWidth== image_width / TotalWidth,
+	RelativeHeight== image_height / TotalHeight,
+	draw_image(image,X0,Y0,RelativeWidth,RelativeHeight),
+	abstime(Hr1,Min1,Sec1,MSEC1,SA),
+	abstime(Hr2,Min2,Sec2,MSEC2,MA),
+	con ? write(
+		"Image width & height:  ",
+		image_width," x ",image_height,"\n"),
+	con ? write(
+		"Elapsed time: ",MA-SA," [sec]").
+	-- save_image.
+--
+loop1(I,Width,Height,XScale,YScale):-
+	I < Height,!,
+	loop2(I,0,Width,Height,XScale,YScale),
+	loop1(I+1,Width,Height,XScale,YScale).
+loop1(_,_,_,_,_).
+--
+loop2(I,J,Width,Height,XScale,YScale):-
+	J < Width,!,
+	Cr== x_min + J * XScale,
+	Ci== y_min + I * YScale,
+	Count== ?iter_count(Cr,Ci),
+	R== ?bitleft(?bitand(Count,16#07#),5),
+	G== ?bitleft(?bitand(?bitright(Count,3),16#07#),5),
+	B== ?bitleft(?bitand(?bitright(Count,6),16#07#),5),
+	image?set_pixel(J,I,R,G,B),
+	loop2(I,J+1,Width,Height,XScale,YScale).
+loop2(_,_,_,_,_,_).
+--
+iter_count(Cr,Ci)= max_count - Count :-
+	loop3(0.0,0.0,0,Cr,Ci,Count).
+--
+loop3(Zr1,Zi1,Count,Cr,Ci,Result):-
+	Count < max_count,
+	Zr1Sq== ?power(Zr1,2),
+	Zi1Sq== ?power(Zi1,2),
+	LengthSq== Zr1Sq + Zi1Sq,
+	LengthSq < 4.0,!,
+	Zr2== Zr1Sq - Zi1Sq + Cr,
+	Zi2== 2 * Zr1 * Zi1 + Ci,
+	loop3(Zr2,Zi2,Count+1,Cr,Ci,Result).
+loop3(_,_,Count,_,_,Count).
+--
+abstime(Hr,Min,Sec,MSEC,Abs):-
+	Abs== Hr*3600.0 + Min*60 + Sec + MSEC/1000.0.
+--
+save_image:-
+	FileName== con?input_new_file_name(
+		"Enter file name please",
+		"*.png",
+		[
+		"*.jpg","JPEG files",
+		"*.png","PNG files",
+		"*.gif","GIF files",
+		"*.bmp","BMP files"
+		]),!,
+	image ? save(FileName,{
+		format:'default',
+		compressionQuality:0.95,
+		progressiveMode:'off',
+		interlacing:'on',
+		comment:"The Actor Prolog graphic art"
+		}).
+save_image.
+]
+----------------------------------------------------------------------
+

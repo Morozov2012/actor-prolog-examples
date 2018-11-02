@@ -1,0 +1,71 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- REAL.                                 --
+--                                       --
+-- Questions: What are real (float)      --
+-- numbers? When the real numbers are    --
+-- more appropriate than the integer     --
+-- numbers? How can the compiler         --
+-- distinguish a real number from an     --
+-- integer number? How can one define    --
+-- octal and hexadecimal numbers? What   --
+-- number systems are supported in Actor --
+-- Prolog? Should one use an exponent    --
+-- part in the real numbers in Actor     --
+-- Prolog? Is it enabled to use the plus --
+-- and the minus signs in the exponent   --
+-- part of the real numbers? Is it       --
+-- enabled to omit the dot sign in the   --
+-- real numbers?                         --
+--                                       --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	T1== 1000.0,
+	writeln(T1),
+	--
+	T2== -1000.0,
+	writeln(T2),
+	--
+	T3== 70_000_000.0,
+	writeln(T3),
+	--
+	T4== 1.0e3,
+	writeln(T4),
+	--
+	T5== 1.0E+3,
+	writeln(T5),
+	--
+	T6== 16#0057C900.0#,
+	writeln(T6),
+	--
+	T7== 2#011111.0#,
+	writeln(T7),
+	--
+	T8== 36#PROLOG.0#,
+	writeln(T8),
+	--
+	T9== 8#1777.0#e3,
+	writeln(T9),
+	--
+	T10== 5#00144.0#E+3,
+	writeln(T10),
+	--
+	T11== 10#3.141592653589793238462643#,
+	writeln(T11),
+	--
+	T12== 3_141592_653589_793238_462643.0e-24,
+	writeln(T12),
+	--
+	T13== 1.6021892e-19,
+	writeln(T13),
+	--
+	T14== 96_484.56,
+	writeln(T14).

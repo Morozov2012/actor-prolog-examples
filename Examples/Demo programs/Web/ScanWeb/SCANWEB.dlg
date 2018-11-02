@@ -1,0 +1,5 @@
+
+mesh(80,25)
+
+failure_color('Red','White')
+dialog_font("Times New Roman",12)

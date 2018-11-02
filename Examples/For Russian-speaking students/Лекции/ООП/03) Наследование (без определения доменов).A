@@ -1,0 +1,22 @@
+
+class 'Main' (specialized 'A1'):
+
+n	= 100;
+
+[
+
+goal:-
+	p.
+
+]
+
+class 'A1' (specialized 'Report'):
+
+n	= 300;
+
+[
+
+p:-
+	writeln(n).
+
+]

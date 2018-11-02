@@ -1,0 +1,106 @@
+------------------------------------------------------------------------
+--                                                                    --
+--              An example of Actor Prolog program.                   --
+--             (c) 2011, IRE RAS, Alexei A. Morozov.                  --
+--                                                                    --
+--              Use of the 'File' predefined class.                   --
+--                                                                    --
+------------------------------------------------------------------------
+class 'TextFile' (specialized 'File'):
+--
+extension	= ".txt";
+type		= 'text';
+character_set	= 'none';
+--
+[]
+------------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+z	= ('TextFile',
+		name="X",
+		random_access='on');
+w1	= ('Report',
+		title="Creating file X.TXT",
+		x=20,
+		y=2,
+		width=40,
+		height=5);
+w2	= ('Report',
+		title="Reading file X.TXT",
+		x=20,
+		y=7,
+		width=40,
+		height=10);
+w3	= ('Report',
+		title="Erasing file X.TXT",
+		x=20,
+		y=17,
+		width=40,
+		height=5);
+--
+[
+PREDICATES:
+--
+imperative:
+--
+write_file;
+read_file;
+search_end_of_file;
+delete_file;
+--
+CLAUSES:
+--
+goal:-!,
+	write_file,
+	read_file,
+	delete_file.
+--
+write_file:-
+	LN == "ABCDEFGH",
+	w1 ? writeln("Open file for writing"),
+	z ? open('writing'),
+	w1 ? writeln("Output string ",LN),
+	z ? write(LN),
+	w1 ? write("Flush file, close file"),
+	z ? flush,
+	z ? close.
+--
+read_file:-
+	w2 ? writeln("Open file for reading"),
+	z ? open('reading'),
+	w2 ? writeln("Read line"),
+	LN== z ? read_line(),
+	w2 ? writeln("File contains: ",LN),
+	w2 ? writeln("Random access reading..."),
+	z ? set_position(3,'start'),
+	X== z ? read_byte(),!,
+	w2 ? writef("Position 3: ASCII %c\n",X),
+	Pos == z ? get_position(),
+	w2 ? writeln("Current position is ",Pos),
+	w2 ? write("Search the end of file:"),
+	search_end_of_file,
+	w2 ? write("Close file"),
+	z ? close.
+read_file.
+--
+search_end_of_file:-
+	z ? eof,!,
+	w2 ? writeln(" <EOF>").
+search_end_of_file:-
+	C== z ? read_byte(),!,
+	w2 ? writef(" %c",C),
+	search_end_of_file.
+search_end_of_file.
+--
+delete_file:-
+	z ? does_exist,!,
+	w3 ? writeln("File does exist"),
+	w3 ? writeln("Erase file..."),
+	z ? delete,
+	delete_file.
+delete_file:-
+	w3 ? write("File does not exist").
+]
+------------------------------------------------------------------------

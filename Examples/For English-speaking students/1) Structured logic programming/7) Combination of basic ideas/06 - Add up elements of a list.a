@@ -1,0 +1,37 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: add up elements of a list.  --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Disassembling of a list.           --
+-- 2) Counter increase.                  --
+-- 3) An output argument.                --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+p(List,INTEGER,INTEGER)	- (i,i,o);
+
+CLAUSES:
+
+goal:-
+	p([1,2,3,4,5],0,N),
+	writeln("Total: ",N).
+
+p([X|Rest],S,Result):-
+	p(Rest,S+X,Result).
+p([],Y,Y).

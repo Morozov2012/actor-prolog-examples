@@ -1,0 +1,46 @@
+package "Morozov/Web/Browsing/Editor":
+---------------------------------------------------------------
+--             The "EDITOR" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package implements dialog box for editing lists      --
+-- of strings.                                               --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Keywords";
+---------------------------------------------------------------
+DOMAINS:
+--
+reference:
+--
+TextValue	= STRING.
+--
+---------------------------------------------------------------
+interface 'EditKeywords' (specialized 'Dialog'):
+--
+variable:
+--
+	editing_text	: TextValue;
+--
+	input_text	: KeywordList;
+--
+protecting:
+--
+	output_text	: KeywordList;
+--
+internal:
+--
+	text		: 'TextOperations';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+check_content(TextValue)	- (i);
+load_list;
+]
+---------------------------------------------------------------
+interface 'TextOperations' (specialized 'Text'):
+[
+]
+---------------------------------------------------------------

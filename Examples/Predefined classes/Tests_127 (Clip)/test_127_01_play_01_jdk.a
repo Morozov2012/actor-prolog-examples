@@ -1,0 +1,28 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'Clip' from "morozov/Sound";
+
+class 'Main' (specialized 'Clip'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("Start the test..."),
+	play("jar:data/phone_button_0.wav"),
+	play("jar:data/phone_button_1.wav"),
+	play("jar:data/phone_button_2.wav"),
+	play("jar:data/phone_button_3.wav"),
+	play("jar:data/phone_button_4.wav"),
+	play("jar:data/phone_button_5.wav"),
+	play("jar:data/phone_button_6.wav"),
+	play("jar:data/phone_button_7.wav"),
+	play("jar:data/phone_button_8.wav"),
+	play("jar:data/phone_button_9.wav"),
+	con ? writeln("Done!").
+]

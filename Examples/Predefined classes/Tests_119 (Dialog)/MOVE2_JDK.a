@@ -1,0 +1,55 @@
+------------------------------------------------------------------------
+--              An example of Actor Prolog program.                   --
+--              (c) 2007, Alexei A. Morozov, IRE RAS.                 --
+------------------------------------------------------------------------
+--              Use of the 'Dialog' predefined class.                 --
+------------------------------------------------------------------------
+project: (('Main'))
+------------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+RefX, RefY	= REAL; STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+check(RefX,RefY)	- (i,i);
+--
+------------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+demo	= (('DemoPanel'));
+--
+[
+goal:-!,
+	demo <- put('title',"Edit co-ordinates of the dialog window!"),
+	demo <- show.
+]
+------------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+--
+variable:
+--
+	x	: RefX	= _;
+	y	: RefY	= _;
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	check(x,y).
+--
+check(X,Y):-
+	con ? writeln(X," ",Y).
+--
+action(_):-!,
+	Message== con?format("X= %s\nY= %s",?get('x'),?get('y')),
+	con ? note(Message).
+]
+------------------------------------------------------------------------

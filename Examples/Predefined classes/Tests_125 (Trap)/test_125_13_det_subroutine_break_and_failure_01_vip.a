@@ -1,0 +1,74 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+D1	= INTEGER.
+D3	= STRING.
+--
+D4	= SYMBOL.
+D6	= INTEGER.
+--
+D7	= REAL.
+D9	= SYMBOL.
+--
+reference:
+--
+D2	= REAL.
+D5	= REAL.
+D8	= REAL.
+--
+-----------------------------------------------------------------------
+interface 'MyPredicates':
+[
+PREDICATES:
+determ:
+p(D1,D2,D3)				- (i,o,i);
+p(D4,D5,D6)				- (i,o,i);
+p(D7,D8,D9)				- (i,o,i);
+]
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'MyPredicates', 'Console'):
+catch	: 'MyPredicates';
+[
+PREDICATES:
+determ:
+alarm(ExceptionName,SYMBOL,D1,D2,D3)	- (i,i,i,o,i);
+alarm(ExceptionName,SYMBOL,D4,D5,D6)	- (i,i,i,o,i);
+alarm(ExceptionName,SYMBOL,D7,D8,D9)	- (i,i,i,o,i);
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+catch	= ('Trap',
+		world=self,
+		handler=self);
+--
+[
+CLAUSES:
+--
+goal:-
+	writeln("Main:: I will call p/3."),
+	catch ? p(1,B1,"Hello World!"),
+	catch ? p('Symbol',B2,100),
+	catch ? p(1.0,B3,'xyz'),!,
+	writeln("Success: B1=",B1,", B2=",B2,", B3=",B3).
+goal:-!,
+	writeln("Failure").
+--
+p(A,3.14,C):-
+	writeln("Main:: p: A=",A,", C=\"",C,"\""),
+	break('SpecialException').
+--
+alarm(Name):-
+	writeln("Alarm: ",Name),
+	fail.
+alarm(Exception,Name,A,_,C):-!,
+	writeln("Alarm: ",Exception,", Name: ",Name,", A=",A,", C=",C),
+	fail.
+]
+-----------------------------------------------------------------------

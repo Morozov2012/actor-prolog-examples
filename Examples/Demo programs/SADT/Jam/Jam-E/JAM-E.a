@@ -1,0 +1,534 @@
+------------------------------------------------------------------------
+--                 An example of visual expert system.                --
+--               The program is written in Actor Prolog.              --
+--               (c) Alexei A. Morozov, March 19, 1999.               --
+------------------------------------------------------------------------
+-- This is my favorite program. It helps to cook black rowan, apple,  --
+-- and strawberry jam. Actually I wrote this program to train myself  --
+-- in carrying out the SADT interview. For that I have asked my       --
+-- mother to tell me how one should cook the jam. I made an effort to --
+-- draw the model as detailed as possible; thus the interview has     --
+-- lengthened about two days. The result was unexpected for both of   --
+-- us. My mother was very surprised when I have showed her the total  --
+-- list of cooking battery that she usually uses for cooking ordinary --
+-- jam. Besides I have learned to cook a little.                      --
+-- Mother, thank you for the help!                                    --
+------------------------------------------------------------------------
+-- A logical description of the blocks of the SADT model.             --
+------------------------------------------------------------------------
+-- This class opens a dialog box for choosing berries and fruits.     --
+------------------------------------------------------------------------
+class '_Choose_berries_and_fruits' (specialized '_Block'):
+--
+value_o1;
+--
+[
+show(_,_):-!,
+	show.
+]
+------------------------------------------------------------------------
+-- The following classes correspond to blocks of the SADT model.      --
+-- The main purpose of these classes is keeping lists of cooking      --
+-- battery corresponding to various blocks of the SADT model.         --
+-- In addition to this purpose some blocks implement the following    --
+-- functions:                                                         --
+-- 1) They transmit some values (names of selected berries and        --
+--    fruits) from an input to the outputs of block.                  --
+-- 2) They check if selected berries and fruits are conformed to      --
+--    given block. If they do not conform, then the execution of the  --
+--    'goal' actor is terminated with failure and the process changes --
+--    its state to "failed". In this case the color of corresponding  --
+--    block on the screen becomes red.                                --
+-- 3) They calculate suggested period of the heat of sugar mixture    --
+--    for selected berries and fruits.                                --
+-- The classes corresponding to compound blocks are descendants of    --
+-- the '_Block' class. The destination of this class we will discuss  --
+-- later in the course of consideration of the "Analysis of model"    --
+-- block.                                                             --
+------------------------------------------------------------------------
+class '_Wash_up_jars_and_lids' (specialized '_Block'):
+[
+]
+------------------------------------------------------------------------
+class '_Boil_some_water_in_a_kettle' (specialized '_Block'):
+[
+instrument()= "A kettle".
+]
+------------------------------------------------------------------------
+class '_Cleanse_lids_by_boiling_water' (specialized '_Block'):
+[
+instrument()= "A saucepan for boiling water".
+]
+------------------------------------------------------------------------
+class '_Cleanse_jam-jars_by_boiled_water' (specialized '_Block'):
+[
+instrument()= "A kettle".
+]
+------------------------------------------------------------------------
+class '_Dry_jam-jars_and_lids' (specialized '_Block'):
+[
+]
+------------------------------------------------------------------------
+class '_Wash_berries_and_fruits' (specialized '_Block'):
+--
+value_i1	: Ingredient;
+--
+protecting:
+--
+value_o1	: Ingredient;
+--
+[
+goal:-!,
+	value_o1 == value_i1,!.
+--
+instrument()= "A colander".
+]
+------------------------------------------------------------------------
+class '_Prepare_some_mixture_of_hard_berries_and_sugar'
+(specialized '_Block'):
+--
+value_i1	: Ingredient;
+--
+[
+goal:-!,
+	check_fruits(value_i1).
+--
+check_fruits("Black rowan"):-!.
+]
+------------------------------------------------------------------------
+class '_Prepare_some_mixture_of_large_fruits_and_sugar'
+(specialized '_Block'):
+--
+value_i1;
+--
+[
+goal:-!,
+	check_fruits(value_i1).
+--
+check_fruits("The \"Antonovka\" apples"):-!.
+]
+------------------------------------------------------------------------
+class '_Prepare_some_mixture_of_soft_berries_and_sugar'
+(specialized '_Block'):
+--
+value_i1;
+--
+[
+goal:-!,
+	check_fruits(value_i1).
+--
+check_fruits("Strawberry"):-!.
+]
+------------------------------------------------------------------------
+class '_Boil_some_water_in_the_saucepan' (specialized '_Block'):
+[
+instrument()= "A saucepan for boiling water".
+]
+------------------------------------------------------------------------
+class '_Prepare_some_syrup' (specialized '_Block'):
+--
+value_i1	: Ingredient;
+value_o1	: Ingredient;
+--
+[
+goal:-!,
+	value_o1 == value_i1,!.
+--
+instrument()= "A saucepan or copper basin".
+instrument()= "Wooden spoon".
+]
+------------------------------------------------------------------------
+class '_Blanch_berries' (specialized '_Block'):
+--
+value_i2	: Ingredient;
+value_o1	: Ingredient;
+--
+[
+goal:-!,
+	value_o1 == value_i2,!.
+--
+instrument()= "A colander".
+instrument()= "A saucepan for boiling water".
+]
+------------------------------------------------------------------------
+class '_Put_berries_in_syrup' (specialized '_Block'):
+--
+value_i1;
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == value_i1,!.
+--
+instrument()= "A saucepan or copper basin".
+]
+------------------------------------------------------------------------
+class '_Cut_fruits_into_lobules' (specialized '_Block'):
+--
+value_i1	: Ingredient;
+value_o1	: Ingredient;
+--
+[
+goal:-!,
+	value_o1 == value_i1,!.
+--
+instrument()= "A knife made of stainless steel".
+]
+------------------------------------------------------------------------
+class '_Sprinkle_with_sugar' (specialized '_Block'):
+--
+value_i1	: Ingredient;
+value_o1	: Ingredient;
+--
+[
+goal:-!,
+	value_o1 == value_i1,!.
+--
+instrument()= "A saucepan or copper basin".
+]
+------------------------------------------------------------------------
+class '_Suspend_the_process_for_6-8_hours' (specialized '_Block'):
+--
+value_i1	: Ingredient;
+value_o1	: Ingredient;
+--
+[
+goal:-!,
+	value_o1 == value_i1,!.
+--
+instrument()= "A saucepan or copper basin".
+]
+------------------------------------------------------------------------
+class '_Add_some_water_in_the_mixture' (specialized '_Block'):
+--
+value_i1;
+value_o1;
+--
+[
+goal:-!,
+	value_o1 == value_i1,!.
+--
+instrument()= "A saucepan or copper basin".
+]
+------------------------------------------------------------------------
+class '_Boiling_cycle_for_hard_berries_and_fruits'
+(specialized '_Block'):
+--
+value_i1;
+--
+[
+goal:-!,
+	check_fruits(value_i1).
+--
+check_fruits("Black rowan"):-!.
+check_fruits("The \"Antonovka\" apples"):-!.
+]
+------------------------------------------------------------------------
+class '_Boiling_cycle_for_soft_berries_and_fruits'
+(specialized '_Block'):
+--
+value_i1;
+--
+[
+goal:-!,
+	check_fruits(value_i1).
+--
+check_fruits("Strawberry"):-!.
+]
+------------------------------------------------------------------------
+class '_Heat_the_mixture' (specialized 'HeatUpMixture'):
+--
+variable:
+--
+	value_i2;
+	time;
+--
+variable:
+--
+	fruits		= value_i2;
+--
+[
+goal:-!,
+	set_time(value_i2,time).
+--
+set_time(#,"3-5"):-!.
+set_time("Black rowan",3):-!.
+set_time("The \"Antonovka\" apples",5):-!.
+set_time("Strawberry","---"):-!.
+set_time(_,"3-5"):-!.
+--
+instrument()= "A saucepan or copper basin".
+instrument()= "Wooden spoon".
+]
+------------------------------------------------------------------------
+class 'HeatUpMixture' (specialized '_Block'):
+--
+protecting:
+--
+	time;
+--
+variable:
+--
+	fruits;
+--
+[
+show(_,_):-!,
+	show.
+]
+------------------------------------------------------------------------
+class '_Suspend_the_process' (specialized '_Block'):
+[
+instrument()= "A saucepan or copper basin".
+]
+------------------------------------------------------------------------
+class '_Check_if_jam_is_ready' (specialized '_Block'):
+[
+instrument()= "Wooden spoon".
+instrument()= "A saucer".
+]
+------------------------------------------------------------------------
+class '_Main_phase_of_boiling' (specialized 'HeatUpMixture'):
+--
+variable:
+--
+	value_i1;
+	time;
+--
+variable:
+--
+	fruits		= value_i1;
+--
+[
+goal:-!,
+	set_time(value_i1,time).
+--
+set_time(#,"---"):-!.
+set_time("Strawberry",10):-!.
+set_time(_,"---"):-!.
+--
+instrument()= "A saucepan or copper basin".
+instrument()= "Wooden spoon".
+]
+------------------------------------------------------------------------
+class '_Supplementary_phase_of_boiling' (specialized '_Block'):
+[
+instrument()= "A saucepan or copper basin".
+instrument()= "Wooden spoon".
+]
+------------------------------------------------------------------------
+class '_Cool_jam' (specialized '_Block'):
+[
+instrument()= "A saucepan or copper basin".
+]
+------------------------------------------------------------------------
+class '_Pour_jam_into_jars' (specialized '_Block'):
+[
+instrument()= "Wooden spoon".
+instrument()= "Canning equipment".
+]
+------------------------------------------------------------------------
+-- This block creates and demonstrates total list of cooking battery  --
+-- necessary for jam-making with chose berries and fruits.            --
+-- This block implements the following idea:                          --
+-- 1) The values of the "container" slots are created automatically   --
+--    during the translation of the SADT diagrams. This slot contains --
+--    a process corresponding to the block that contains the given    --
+--    block. It is the "JAM-MAKING" block. A special resident proves  --
+--    the 'instrument' predicate in this block.                       --
+-- 2) The "JAM-MAKING" block as well as other compound blocks are     --
+--    implemented on the basis of the '_Block' class in the course of --
+--    translation of the SADT model. The '_Block' class is an         --
+--    ancestor of corresponding classes.                              --
+-- 3) The '_Block' class is defined in the text of the program. At    --
+--    the same time there is the 'instrument' function that must be   --
+--    defined in the '_Block' class. The result calculated by this    --
+--    function is a result of the 'component' function.               --
+-- 4) The 'component' function is non-deterministic one. It is        --
+--    defined automatically during the translation of compound        --
+--    blocks. The results calculated by this function are processes   --
+--    that correspond to the blocks that are internal components of   --
+--    given compound block.                                           --
+-- 5) Thus the "Analysis of model" block gets a list of processes     --
+--    corresponding to the neighboring blocks with the help of a      --
+--    resident.                                                       --
+-- 6) ѕолученный список передаЄтс€ другому резиденту в рекурсивном    --
+--    определении процесса 'Instruments', который доказывает в этих   --
+--    мирах тот же самый предикат instrument.                         --
+-- 6) Obtained list is transmitted to other resident in the recursive --
+--    definition of the 'Instruments' process.                        --
+-- 7) In the case if the 'instrument' predicate is proven in a simple --
+--    block, the corresponding process returns a list of cooking      --
+--    battery related to given block. In the case if the predicate is --
+--    proven in a compound block, the execution of the predicate      --
+--    occurs to be the same as in the "JAM-MAKING" block considered   --
+--    above. Thus the resident computes a list containing cooking     --
+--    battery as like as processes corresponding to some internal     --
+--    blocks.                                                         --
+-- 8) Created list is transmitted to the next level of recursion and  --
+--    processed by the next resident. This recursive processing       --
+--    continues till the list is not refined on the given stage of    --
+--    recursion. If the input list is equal to the output list on     --
+--    given stage of recursion, then the examination of the tree of   --
+--    blocks has reached all the leafs of the tree. In this case      --
+--    there are no more processes in the list of cooking battery.     --
+-- 9) Processed list of cooking battery is sorted and demonstrated    --
+--    in the dialog box.                                              --
+------------------------------------------------------------------------
+class '_Analysis_of_model:_What_kitchen_utensils_are_we_need?'
+(specialized '_Block'):
+--
+constant:
+--
+	title;
+	name;
+	number;
+	total_model;
+	x;
+	y;
+	text_color;
+	container;
+	con;
+--
+variable:
+--
+	result;
+--
+protecting:
+--
+	instruments;
+--
+constant:
+--
+	agent	= (('FindInstruments',
+			container,
+			result));
+--
+[
+goal:-
+	refine_list(result,[],instruments),!.
+goal:-!,
+	[result].
+--
+refine_list([],List,List):-!.
+refine_list([#|Rest],List1,List2):-!,
+	refine_list(Rest,List1,List2).
+refine_list([Item|Rest],List1,List3):-
+	is_list(Item),!,
+	refine_list(Item,List1,List2),
+	refine_list(Rest,List2,List3).
+refine_list([Item|Rest],List1,List2):-
+	is_not_element(Item,List1),!,
+	refine_list(Rest,[Item|List1],List2).
+refine_list([_|Rest],List1,List2):-!,
+	refine_list(Rest,List1,List2).
+refine_list(_,List,List):-!.
+--
+is_list([]):-!.
+is_list([_|_]):-!.
+--
+is_not_element(_,[]):-!.
+is_not_element(Item,[Item|_]):-!,
+	fail.
+is_not_element(Item,[_|List]):-!,
+	is_not_element(Item,List).
+--
+show(_,_):-!,
+	show.
+]
+------------------------------------------------------------------------
+class 'FindInstruments':
+--
+constant:
+--
+	container;
+--
+variable:
+--
+	result;
+--
+constant:
+--
+	agent	= (('Instruments',
+			suspending:
+				source_list= [],
+			variable:
+				target_list= [container],
+			protecting:
+				result
+		));
+
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+------------------------------------------------------------------------
+class 'Instruments' (specialized 'Alpha'):
+--
+variable:
+--
+	source_list;
+	target_list;
+	result;
+--
+protecting:
+--
+	tail_list;
+--
+variable:
+--
+	tail_result;
+--
+constant:
+--
+	tail	= (('Instruments',
+			suspending:
+				source_list =
+					tail_list,
+			variable:
+				target_list =
+					target_list ?? instrument(),
+			protecting:
+				result =
+					tail_result
+			));
+	con	= ('Console');
+--
+[
+goal:-
+	-- source_list == target_list,
+	contains_no_worlds(target_list),
+	result == target_list,!.
+goal:-
+	tail_list== target_list,
+	result== tail_result,!.
+--
+contains_no_worlds(#):-!.
+contains_no_worlds(Name):-
+	string(Name),!.
+contains_no_worlds([Item|Rest]):-!,
+	contains_no_worlds(Item),
+	contains_no_worlds(Rest).
+contains_no_worlds([]).
+]
+------------------------------------------------------------------------
+class '_Block' (specialized 'Dialog'):
+--
+total_model;
+--
+[
+component(_):-
+	fail.
+--
+instrument()= Block
+	:-!,
+	component(Block).
+--
+check_fruits(_):-
+	fail.
+--
+show(Identifier,_):-!,
+	total_model << show_description(Identifier).
+]
+------------------------------------------------------------------------

@@ -1,0 +1,65 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(STRING)	- (i);
+--
+class 'Main' (specialized 'Application'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2("my.txt"),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_arguments(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	Text== ?get_arguments(),!,
+	con ? writeln("Arguments:"),
+	con ? set_color('Violet'),
+	con ? writeln(Text),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test2(Text):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_arguments(Text),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

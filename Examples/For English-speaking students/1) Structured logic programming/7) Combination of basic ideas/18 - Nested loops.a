@@ -1,0 +1,53 @@
+---------------------------------------------------
+--                                               --
+--             Actor Prolog lessons              --
+--          (c) 2015 Alexei A. Morozov           --
+--                                               --
+-- The topic: Basics of the structured logic     --
+-- programming. Combination of basic ideas.      --
+--                                               --
+-- The task: calculate a Cartesian product of    --
+-- two sets.                                     --
+--                                               --
+-- Basic ideas to be used:                       --
+-- 1) Disassembling of a list.                   --
+-- 2) Input assembling a list.                   --
+-- 3) An output argument.                        --
+--                                               --
+---------------------------------------------------
+
+DOMAINS:
+
+List	= Element*.
+Element	= INTEGER.
+
+Pairs	= Pair*.
+Pair	= p(Element,Element).
+
+PREDICATES:
+
+imperative:
+
+loop1(List,List,Pairs,Pairs)	- (i,i,i,o);
+loop2(Element,List,Pairs,Pairs)	- (i,i,i,o);
+
+CLAUSES:
+
+goal:-
+	L1== [-5,-3,-1],
+	L2== [1,2,3,4,5],
+	writeln("L1: ",L1),
+	writeln("L2: ",L2),
+	loop1(L1,L2,[],L3),
+	writeln("L3: ",L3).
+
+loop1([Head1|Rest1],List2,Pairs1,Pairs3):-
+	loop2(Head1,List2,Pairs1,Pairs2),
+	loop1(Rest1,List2,Pairs2,Pairs3).
+loop1([],_,Pairs,Pairs).
+
+loop2(Head1,[Head2|Rest2],Pairs1,Pairs2):-
+	loop2(	Head1,Rest2,
+		[p(Head1,Head2)|Pairs1],
+		Pairs2).
+loop2(_,[],Pairs,Pairs).

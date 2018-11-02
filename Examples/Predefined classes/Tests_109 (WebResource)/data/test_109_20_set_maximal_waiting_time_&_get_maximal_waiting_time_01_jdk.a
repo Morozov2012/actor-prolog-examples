@@ -1,0 +1,83 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+write_waiting_interval(WaitingInterval)		- (i);
+test2(WaitingInterval)				- (i);
+--
+class 'Main' (specialized 'WebResource'):
+--
+constant:
+--
+	location	= "";
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2(100.0),
+	test1,
+	test2(years(3.0)),
+	test1,
+	test2('default'),
+	test1,
+	test2('any'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_maximal_waiting_time(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	Interval== ?get_maximal_waiting_time(),!,
+	con ? set_color('Black'),
+	con ? write("Max waiting time: "),
+	con ? set_color('Violet'),
+	write_waiting_interval(Interval),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+write_waiting_interval(Interval):-
+	symbol(Interval),!,
+	con ? writeln("'",Interval,"'").
+write_waiting_interval(Interval):-
+	con ? writeln(Interval).
+--
+test2(Interval):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_maximal_waiting_time(Interval),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

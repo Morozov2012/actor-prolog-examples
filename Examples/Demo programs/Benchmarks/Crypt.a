@@ -1,0 +1,177 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  CRYPT                                                            --
+--                                                                   --
+--  Cryptomultiplication:                                            --
+--  Find the unique answer to:                                       --
+--                                                                   --
+--       OEE                                                         --
+--        EE                                                         --
+--       ---                                                         --
+--      EOEE                                                         --
+--      EOE                                                          --
+--      ----                                                         --
+--      OOEE                                                         --
+--                                                                   --
+--  where E=even, O=odd.                                             --
+--  This program generalizes easily to any such problem.             --
+--  Written by Peter Van Roy                                         --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  2015.06.28 02:32                                                 --
+--  Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB         --
+--  Windows7 - PM.64 (RUS)                                           --
+--  ========================================================         --
+--  AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                           --
+--                                                                   --
+--  g:\temp1\jv>java -version                                        --
+--  java version "1.7.0_80"                                          --
+--  Java(TM) SE Runtime Environment (build 1.7.0_80-b15)             --
+--  Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)  --
+--                                                                   --
+--  java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation            --
+--  -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch       --
+--                                                                   --
+--  100000 iterations take 182088 msec                               --
+--  1.820880 milliseconds per iteration                              --
+--                                                                   --
+--  EXE file:                                                        --
+--                                                                   --
+--  100000 iterations take 331670 msec                               --
+--  3.3167 milliseconds per iteration                                --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities' from "HARNESS"(Result:=N_List);
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N_List		= N*.
+N		= INTEGER.
+--
+PREDICATES:
+--
+nondeterm:
+--
+crypt(Result)				- (o);
+--
+determ:
+--
+sum2(N_List,N_List,N_List)		- (i,i,i);
+sum2(N_List,N_List,N,N_List)		- (i,i,i,i);
+--
+nondeterm:
+--
+mult(N_List,N,N_List)			- (i,i,i);
+mult(N_List,N,N,N_List)			- (i,i,i,i);
+--
+zero(N_List)				- (i);
+--
+nondeterm:
+--
+odd2(N)					- (i)(o);
+even2(N)				- (i)(o);
+lefteven(N)				- (i)(o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+'+'(N,N) = N				- (i,i);
+'*'(N,N) = N				- (i,i);
+mod(N,N) = INTEGER			- (i,i);
+div(N,N) = INTEGER			- (i,i);
+--
+CLAUSES:
+--
+benchmark(_,Out):-
+	crypt(Out).
+--
+data([]).
+--
+crypt([A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P]):-
+	odd2(A), even2(B), even2(C), even2(E),
+	mult([C,B,A],E,[I,H,G,F|X]),
+	lefteven(F), odd2(G), even2(H), even2(I), zero(X),
+	lefteven(D),
+	mult([C,B,A],D,[L,K,J|Y]),
+	lefteven(J), odd2(K), even2(L), zero(Y),
+	sum2([I,H,G,F],[0,L,K,J],[P,O,N,M|Z]),
+	odd2(M), odd2(N), even2(O), even2(P), zero(Z).
+	/*
+	con ? writeln(" ",A,B,C),
+	con ? writeln("  ",D,E),
+	con ? writeln(F,G,H,I),
+	con ? writeln(J,K,L),
+	con ? writeln(M,N,O,P).
+	*/
+--
+sum2(AL,BL,CL):-
+	sum2(AL,BL,0,CL).
+--
+sum2([A|AL],[B|BL],Carry,[C|CL]):-!,
+	X== A + B + Carry,
+	C== ?mod(X,10),
+	NewCarry== ?div(X,10),
+	sum2(AL,BL,NewCarry,CL).
+sum2([],BL,0,BL):-!.
+sum2(AL,[],0,AL):-!.
+sum2([],[B|BL],Carry,[C|CL]):-!,
+	X== B + Carry,
+	NewCarry== ?div(X,10),
+	C== ?mod(X,10),
+	sum2([],BL,NewCarry,CL).
+sum2([A|AL],[],Carry,[C|CL]):-!,
+	X== A + Carry,
+	NewCarry== ?div(X,10),
+	C== ?mod(X,10),
+	sum2([],AL,NewCarry,CL).
+sum2([],[],Carry,[Carry]).
+--
+mult(AL,D,BL):-
+	mult(AL,D,0,BL).
+--
+mult([],_,Carry,[C,Cend]):-
+	C== ?mod(Carry,10),
+	Cend== ?div(Carry,10).
+mult([A|AL],D,Carry,[B|BL]):-
+	X== A * D + Carry,
+	B== ?mod(X,10),
+	NewCarry== ?div(X,10),
+	mult(AL,D,NewCarry,BL).
+--
+zero([]).
+zero([0|L]):-
+	zero(L).
+--
+odd2(1).
+odd2(3).
+odd2(5).
+odd2(7).
+odd2(9).
+--
+even2(0).
+even2(2).
+even2(4).
+even2(6).
+even2(8).
+--
+lefteven(2).
+lefteven(4).
+lefteven(6).
+lefteven(8).
+]
+-----------------------------------------------------------------------

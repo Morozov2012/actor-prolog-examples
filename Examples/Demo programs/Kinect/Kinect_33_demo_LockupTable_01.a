@@ -1,0 +1,169 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-----------------------------------------------------------------------
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Thanks to Andrew Davison                                          --
+-- Davison A. Kinect Open Source Programming Secrets (KOPS). -       --
+-- McGraw Hill, 2012.                                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	name	=	"J:/J4K (2018-04-01-Second_Attempt)/"
+			"Kinect/Session 02/"
+			"001.k2j";
+--
+	operating_mode	= 'PLAYING';
+	frame_type	= 'POINT_CLOUDS';
+	people_index	= 'EXTRACT_PEOPLE';
+--
+	displaying_mode	= {
+		frame_type,
+		people_index};
+--
+	color_map	= 'OPTICAL';
+	-- color_map	= 'NONE';
+--
+internal:
+--
+	window	= ('Canvas3D');
+	dialog	= ('MainDialog',
+			graphic_window= window);
+	buffer	= ('BufferedScene');
+	image	= ('BufferedImage');
+	state	= ('ProgramState');
+	text	= ('Text');
+	con	= ('Console');
+--
+constant:
+--
+	main_label		= "Content";
+--
+	texture_file_format	= "%08d.png";
+--
+	texture_directory	=
+		"J:/J4K (2018-04-01-Second_Attempt)/"
+		"TEV1/Session 02/2018-04-01-01-58-0";
+--
+	texture_frame_rate	= 8.878385283597343;
+	texture_time_shift	= 3130;
+--
+	lookup_table_file_name	=
+		"J:/J4K (2018-04-01-Second_Attempt)/"
+		"Kinect/Session 02/"
+		-- "LookUpTable.txt";
+		"IdealLookUpTable.txt";
+--
+[
+goal:-!,
+	dialog ? maximize,
+	set_lookup_table(lookup_table_file_name,0,-7),
+	create_list_of_nodes(VisualScene),
+	window ? show(VisualScene),
+	start.
+--
+create_list_of_nodes(Nodes):-
+	Bounds== 'BoundingSphere'({radius:5.0}),
+	create_main_group(MainGroup),
+	Nodes == [
+		MainGroup,
+		'OrbitBehavior'({
+			rotationCenter: p(-0.5,-0.7,-3.0),
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			})
+		].
+--
+create_main_group(MainGroup):-
+	MainGroup== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			scale: 3,
+			rotX: 0.5,
+			rotY: -0.5,
+			translation: [-1.5,-1.5,0]
+			}),
+		allowChildrenRead: 'yes',
+		allowChildrenWrite: 'yes',
+		branches: [
+			'BranchGroup'({
+				label: main_label,
+				allowDetach: 'yes',
+				compile: 'yes',
+				branches: []
+				})
+			]
+		}).
+--
+frame_obtained:-
+	commit,
+	get_recent_frame_number(N1),
+	get_recent_frame_time(Time1),
+	state ? set_first_frame_time(N1,Time1),
+	state ? get_first_frame_time(N0,Time0),
+	compute_time(N1,Time1,N0,Time0,Time2),
+	FileNumber== texture_frame_rate * Time2 / 1000,
+	-- con ? writeln(Time2," -> ",FileNumber),
+	ShortFileName== text?format(
+		texture_file_format,?round(FileNumber)),
+	ImageToBeLoaded==
+		texture_directory + "/" +
+		ShortFileName,
+	image ? does_exist(ImageToBeLoaded),!,
+	image ? load(ImageToBeLoaded),
+	get_recent_scene(buffer,image),
+	window ? set_node(
+		main_label,
+		'BranchGroup'({
+			label: main_label,
+			allowDetach: 'yes',
+			compile: 'yes',
+			branches: [buffer]
+		})).
+--
+compute_time(N0,_,N0,_,Time):-!,
+	Time== 0.0 - texture_time_shift.
+compute_time(N1,Time1,N0,Time0,Time3):-
+	Time2== N1 * (Time1-Time0) / (N1-N0),
+	Time3== Time2 - texture_time_shift.
+--
+data_transfer_completion:-!,
+	stop,
+	start.
+]
+-----------------------------------------------------------------------
+class 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	graphic_window;
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+[
+set_first_frame_time(_,_):-
+	find(_),!.
+set_first_frame_time(Number,Time):-
+	insert(f(Number,Time)).
+--
+get_first_frame_time(Number,Time):-
+	Item== ?match(_),!,
+	Item == f(Number,Time).
+get_first_frame_time(0,0).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,25 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'Report'):
+--
+constant:
+--
+	x	= 'centered';
+	y	= 'centered';
+	height	= 5;
+	width	= 40;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("I will write new line."),
+	nl,
+	Text== ?get_string(),
+	con ? writeln(">>>",Text,"<<<").
+]

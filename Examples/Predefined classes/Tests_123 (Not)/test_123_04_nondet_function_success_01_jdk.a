@@ -1,0 +1,74 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+D1	= INTEGER.
+D3	= STRING.
+--
+reference:
+--
+DR	= STRING.
+--
+reference:
+--
+D2	= REAL.
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+--
+-----------------------------------------------------------------------
+interface 'MyPredicates':
+[
+PREDICATES:
+nondeterm:
+f(D1,D2,D3) = DR			- (i,o,i);
+]
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'MyPredicates', 'Console'):
+not	: 'MyPredicates';
+[
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+not	= ('Not',
+		world=self);
+--
+[
+CLAUSES:
+--
+goal:-!,
+	test0,
+	test1.
+--
+test0:-
+	writeln("Test 0"),
+	writeln("Main:: I will call f/3."),
+	not ? f(1,B1,"Hello World!"),!,
+	writeln("Success: B1=",B1).
+test0:-
+	writeln("Failure").
+--
+test1:-
+	writeln("Test 1"),
+	writeln("Main:: I will call f/3."),
+	R1== not ? f(1,B1,"Hello World!"),!,
+	writeln("Success: B1=",B1,", R1=",R1).
+test1:-
+	writeln("Failure").
+--
+f(A,3.14,C) = "Answer":-
+	writeln("Main:: [1]f: A=",A,", C=\"",C,"\"").
+f(A,3.14,C) = "Answer":-
+	writeln("Main:: [2]f: A=",A,", C=\"",C,"\"").
+]
+-----------------------------------------------------------------------

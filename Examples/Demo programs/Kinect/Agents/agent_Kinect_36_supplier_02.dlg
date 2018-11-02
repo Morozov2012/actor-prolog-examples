@@ -1,0 +1,35 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',24,'bold')
+draft('off')
+
+dialog 'MainDialog'("3D Thermal Data Supplier",default,default,default,centered,centered,default)
+vbox(left)
+	custom['KeepProportions'](graphic_window,51,42,"Control3D")
+	hbox(center)
+		custom(message_window,51,7,"ReportControl")
+		vbox(justify)
+			padding(1,1)
+			hbox(center)
+				button("play","&Play")
+				button("pause","Pa&use")
+			end_of_hbox
+			hbox(center)
+				button(close,"&Exit")
+				button("reset","&Reset")
+			end_of_hbox
+			end_of_padding
+		end_of_vbox
+	end_of_hbox
+	padding(0,0)
+	statictext(
+		"(c) 2018 www.fullvision.ru "
+		"The project is supported by RFBR, "
+		"No. 16-29-09626-ofi_m.")
+	end_of_padding
+end_of_vbox
+end_of_dialog

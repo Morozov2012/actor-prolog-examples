@@ -1,0 +1,111 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+Value	= ('MyClass'); INTEGER; #.
+
+PREDICATES:
+
+imperative:
+
+create_value(Value)		- (o);
+testF1(Value)			- (i);
+--
+test0;
+test1;
+test2;
+test3;
+test4;
+
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	w1	= (('MyClass'));
+--
+internal:
+--
+	w2	= ('MyClass');
+--
+	con	= ('Console');
+--
+[
+PREDICATES:
+
+determ:
+
+internal_world(Value*)		- (i);
+
+CLAUSES:
+
+goal:-!,
+	create_value(V),
+	testF1(V),
+	test0,
+	test1,
+	test2,
+	test3,
+	test4.
+--
+create_value(_).
+--
+testF1(V):-
+	con ? writeln("Test F1:"),
+	con ? writeln("\tv=",V),
+	?internal_world(V),!,
+	con ? writeln("Failure: x is an internal world.").
+testF1(_):-
+	con ? writeln("\tO.K.: x is not an internal world.").
+--
+test0:-
+	con ? writeln("Test 0:"),
+	?internal_world(),!,
+	con ? writeln("\tO.K.").
+test0:-
+	con ? writeln("Failure").
+--
+test1:-
+	con ? writeln("Test 1:"),
+	X== w1,
+	con ? writeln("\tx=",X),
+	?internal_world(X),!,
+	con ? writeln("Failure").
+test1:-
+	con ? writeln("\tO.K.: x is not an internal world.").
+--
+test2:-
+	con ? writeln("Test 2:"),
+	X== w2,
+	con ? writeln("\tx=",X),
+	?internal_world(X),!,
+	con ? writeln("\tO.K.: x is an internal world.").
+test2:-
+	con ? writeln("Failure").
+--
+test3:-
+	con ? writeln("Test 3:"),
+	X== 1000,
+	con ? writeln("\tx=",X),
+	?internal_world(X),!,
+	con ? writeln("Failure").
+test3:-
+	con ? writeln("\tO.K.: x is not an internal world.").
+--
+test4:-
+	con ? writeln("Test 4:"),
+	X== #,
+	con ? writeln("\tx=",X),
+	?internal_world(X),!,
+	con ? writeln("Failure").
+test4:-
+	con ? writeln("\tO.K.: x is not an internal world.").
+]
+
+class 'MyClass' (specialized 'Alpha'):
+[
+]

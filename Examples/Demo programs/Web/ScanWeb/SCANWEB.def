@@ -1,0 +1,61 @@
+---------------------------------------------------------------------
+--               An example of Actor Prolog program.               --
+--            (c) 2002-2011, IRE RAS, Alexei A. Morozov.           --
+---------------------------------------------------------------------
+import 'AddressTable'	from "Morozov/Web/Scanning/Tables";
+import 'SpecialScanner'	from "Morozov/Web/Scanning/Analyser";
+import 'Statistics'	from "Morozov/Web/Scanning/Counter";
+import 'LogicProgrammingKeywords'
+			from "Morozov/Web/Data/Keywords";
+---------------------------------------------------------------------
+interface 'ScanWeb' (specialized 'Timer'):
+--
+variable:
+--
+	keywords	: KeywordList;
+--
+constant:
+--
+	control		: 'LogicProgrammingKeywords';
+--
+internal:
+--
+	resource_table	: 'AddressTable';
+--
+	main_engine	: 'SpecialScanner';
+--
+	site_statistics	: 'Statistics';
+--
+variable:
+--
+	results		: WebResourceRecords;
+--
+internal:
+--
+	special_actor	: 'Acceptor';
+--
+-- internal:
+--
+--	con		: 'Console';
+--
+[
+]
+---------------------------------------------------------------------
+interface 'Acceptor':
+--
+variable:
+--
+	results		: WebResourceRecords;
+--
+internal:
+--
+	resource_table	: 'AddressTable';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+save_results(WebResourceRecords);
+]
+---------------------------------------------------------------------

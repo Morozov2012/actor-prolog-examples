@@ -1,0 +1,335 @@
+#VRML V2.0 utf8
+WorldInfo{
+  title "Actor Prolog. An Example of Web Agent Report."
+  info ["(c) 2016 IRE RAS Alexei A. Morozov"]
+}
+NavigationInfo{
+  type "FLY"
+  headlight TRUE
+}
+DEF SENSOR1 SphereSensor{
+}
+DEF TRAN1 Transform{
+  children [
+    Shape{
+      geometry IndexedLineSet{
+        coord Coordinate{
+          point [
+            -2.5 -1.7 -2.5,
+            2.5 -1.7 -2.5,
+            -2.5 1.7 -2.5,
+            -2.5 -1.7 2.5,
+            2.5 1.7 -2.5,
+            2.5 -1.7 2.5,
+            -2.5 1.7 2.5
+          ]
+        }
+        coordIndex [
+          0 1 -1 0 2 -1 0 3 -1
+          2 6 -1 3 6 -1 2 4 -1
+          1 4 -1 3 5 -1 1 5 -1
+        ]
+      }
+      appearance Appearance{
+        material Material{
+          emissiveColor 1 1 1
+        }
+      }
+    }
+    Transform{
+      translation -2.5 1.7 -2.5
+      children[
+        Shape{
+          geometry Text{
+            string ["Size"]
+            fontStyle FontStyle{
+              family "SANS"
+              size 0.5
+            }
+          }
+        }
+      ]
+    }
+    Transform{
+      translation 2.5 -1.7 -2.5
+      children[
+        Shape{
+          geometry Text{
+            string ["Date"]
+            fontStyle FontStyle{
+              family "SANS"
+              size 0.5
+            }
+          }
+        }
+      ]
+    }
+    Transform{
+      translation 0 0 -2.5
+      children[
+        Shape{
+          geometry Text{
+            string ["VRML"]
+            fontStyle FontStyle{
+              family "SANS"
+              size 0.8
+              justify "MIDDLE"
+            }
+          }
+        }
+      ]
+    }
+    Shape{
+      geometry IndexedFaceSet{
+        coord Coordinate{
+          point [
+            -2.5 -1.7 -2.5,
+            2.5 -1.7 -2.5,
+            -2.5 1.7 -2.5,
+            -2.5 -1.7 2.5,
+            2.5 1.7 -2.5,
+            2.5 -1.7 2.5,
+            -2.5 1.7 2.5
+            2.5 1.7 2.5
+          ]
+        }
+        coordIndex [
+          0 1 4 2 -1
+          0 2 6 3 -1
+          0 3 5 1 -1
+        ]
+      }
+      appearance Appearance{
+        material Material{
+          diffuseColor 0 0 0
+          emissiveColor 0 0 0
+          transparency 1
+        }
+      }
+    }
+    Transform{
+      translation 0.0 -1.7 0.0
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.18 1.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    1.25 0 -0.63,
+                    0.63 0 -1.25,
+                    -0.63 0 -1.25,
+                    -1.25 0 -0.63,
+                    -1.25 0 0.63,
+                    -0.63 0 1.25,
+                    0.63 0 1.25,
+                    1.25 0 0.63,
+                    1.25 0.85 -0.63,
+                    0.63 0.85 -1.25,
+                    -0.63 0.85 -1.25,
+                    -1.25 0.85 -0.63,
+                    -1.25 0.85 0.63,
+                    -0.63 0.85 1.25,
+                    0.63 0.85 1.25,
+                    1.25 0.85 0.63,
+                    0 2.1 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 3.35 0
+              children[
+                Shape{
+                  appearance Appearance{
+                    material Material{
+                      diffuseColor 1 1 1
+                      transparency 0
+                    }
+                  }
+                  geometry Sphere{
+                    radius 0
+                  }
+                }
+                Billboard{
+                  axisOfRotation 0 0 0
+                  children[
+                    Shape{
+                      geometry Text{
+                        string ["Carro"]
+                        fontStyle FontStyle{
+                          family "SANS"
+                          size 0.2
+                          justify "MIDDLE"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Carro [recent update 20-Sep-2011; 1 times; 383 links to ouside]"
+          url [
+            "../i_carro.html"
+          ]
+        }
+      ]
+    }
+  ]
+}
+ROUTE SENSOR1.rotation_changed TO TRAN1.rotation
+DEF SVP Viewpoint{
+  position 5 2 7
+  orientation 20 -40 3 -0.7
+  fieldOfView 0.78
+}
+DEF TRAN_PL_1 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T1 TimeSensor{
+  cycleInterval 17
+  loop TRUE
+}
+DEF CI1 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25
+  ]
+}
+ROUTE T1.fraction_changed TO CI1.set_fraction
+ROUTE CI1.value_changed TO TRAN_PL_1.translation
+DEF TRAN_PL_2 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T2 TimeSensor{
+  cycleInterval 11
+  loop TRUE
+}
+DEF CI2 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25
+  ]
+}
+ROUTE T2.fraction_changed TO CI2.set_fraction
+ROUTE CI2.value_changed TO TRAN_PL_2.translation
+DEF TRAN_PL_3 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T3 TimeSensor{
+  cycleInterval 7
+  loop TRUE
+}
+DEF CI3 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25
+  ]
+}
+ROUTE T3.fraction_changed TO CI3.set_fraction
+ROUTE CI3.value_changed TO TRAN_PL_3.translation
+DEF TRAN_PL_3 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T3 TimeSensor{
+  cycleInterval 3
+  loop TRUE
+}
+DEF CI3 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25
+  ]
+}
+ROUTE T3.fraction_changed TO CI3.set_fraction
+ROUTE CI3.value_changed TO TRAN_PL_3.translation
+PointLight{
+  location 0 0 0
+}

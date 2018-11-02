@@ -1,0 +1,103 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+MyData	= REAL.
+--
+PREDICATES:
+--
+imperative:
+--
+fill_array(INTEGER)			- (i);
+list_array(INTEGER)			- (i);
+list_all_items;
+--
+-----------------------------------------------------------------------
+class 'MyArray' (specialized 'BacktrackableArray'):
+--
+-- maximal_index	= 10000;
+indices_range		= [[-10000,10000],[-10000,10000]];
+--
+[
+DOMAINS:
+--
+reference:
+--
+Target	= MyData.
+--
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+-- The 'BacktrackableArray' predefined class implements sparse arrays
+-- with the index range from 0 to given maximum.
+--
+internal:
+--
+array	= ('MyArray');
+con	= ('Console');
+w1	= ('Report',
+		title="Fill",x=5,y=1,width=40,height=15);
+w2	= ('Report',
+		title="List",x=15,y=5,width=40,height=15);
+w3	= ('Report',
+		title="List all items",
+		x=30,y=9,width=40,height=15);
+--
+[
+PREDICATES:
+--
+'>='(ArrayIndex,ArrayIndex)	- (i,i);
+--
+CLAUSES:
+--
+goal:-!,
+	w1 ? show,
+	w1 ? writeln("Fill array:"),
+	fill_array(0),			-- Infilling array.
+	w2 ? writeln("List array:"),
+	list_array(0),			-- Listing some items.
+	w3 ? writeln("List all items:"),
+	list_all_items.			-- Listing all items.
+--
+-- This procedure assigns values to the elements of the array
+-- that have index inside the [0 .. 2000, 10] range.
+--
+fill_array(I):-
+	I > 2000,!.
+fill_array(I1):-
+	array[I1,10] == ?sin(I1) + ?cos(I1),
+	w1 ? writeln("array[",I1,",10] = ", array[I1,10] ),!,
+	I2 == I1 + 100,
+	fill_array(I2).
+fill_array(_).
+--
+-- This procedure writes the values of these items.
+--
+list_array(I):-
+	I > 2000,!.
+list_array(I1):-
+	w2 ? writeln("array[",I1,",10] = ", array[I1,10] ),!,
+	I2 == I1 + 100,
+	list_array(I2).
+list_array(_).
+--
+-- This procedure lists all the elements of the array inside
+-- the [0 .. 300, 10] index range.
+-- The Array ? element(Value,Index) predicate is used for
+-- this purpose. The call of the predicate is designated as
+-- Array[Index].
+--
+list_all_items:-
+	Z == array[I1,I2],
+	w3 ? writeln("array[",I1,",",I2,"] = ",Z),
+	I1 >= 11,!,
+	w3 ? writeln("...").
+list_all_items.
+]
+-----------------------------------------------------------------------

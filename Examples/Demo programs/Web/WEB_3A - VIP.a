@@ -1,0 +1,79 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving information from several          --
+--       Web resources.                               --
+--------------------------------------------------------
+project: (('Main'))
+--------------------------------------------------------
+class 'Main':
+--
+internal:
+--
+	actor1	= ('MyReceptor',
+		location=
+			"http://www.cplire.ru/Lab144/"
+			"space/prolog.html",
+			--- "http://www.cplire.ru/Lab144/index.html",
+		x=10,
+		y=0);
+	actor2	= ('MyReceptor',
+		location=
+			"http://www.comlab.ox.ac.uk/"
+			"archive/logic-prog.html",
+		x=25,
+		y=7);
+	actor3	= ('MyReceptor',
+		location=
+			"http://www.cetus-links.org/"
+			"oo_prolog.html",
+		x=40,
+		y=14);
+--
+[
+goal.
+alarm(_).
+]
+--------------------------------------------------------
+class 'MyReceptor' (specialized 'WebReceptor'):
+--
+constant:
+--
+	location;
+	maximal_waiting_time	= 0.0001; -- 12.0;
+	revision_period		= 5.0;
+	attempt_period		= 1.0;
+--
+	x;
+	y;
+--
+internal:
+--
+	con	= ('Report',
+		x,
+		y,
+		height=11,
+		width=30);
+--
+[
+goal:-!,
+	con ? set_title(location),
+	Parameters== ?get_parameters(),
+	write_parameters(Parameters).
+--
+write_parameters(entry(URL,Date,Time,Size)):-
+	con ? writeln("URL:  ",URL),
+	write_date(Date),
+	write_time(Time),!,
+	con ? writeln("Size: ",Size).
+write_parameters(Error):-
+	con ? writeln(Error).
+--
+write_date(date(Year,Month,Day)):-
+	con ? writeln("Date: ",Year,"-",Month,"-",Day).
+--
+write_time(time(Hours,Minutes,Seconds,_)):-
+	con ? writeln(
+		"Time: ",Hours,":",Minutes,":",Seconds).
+]
+--------------------------------------------------------

@@ -1,0 +1,74 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+--
+mixed:
+--
+A1	= structure(INTEGER,M1,D1).
+A2	= {year:INTEGER,month:M1,day_of_week:D1}.
+A3	= {_}.
+--
+B1	= structure(YearNumber,M2,D2).
+B2	= {day_of_week:D2,month:M2,year:YearNumber}.
+B3	= {day_of_week:D2,month:M2,year:YearNumber}.
+--
+DOMAINS:
+--
+ground:
+--
+YearNumber	= INTEGER.
+M2		= INTEGER.
+--
+reference:
+--
+M1		= INTEGER.
+--
+D1		= INTEGER.
+D2		= [1 .. 7].
+
+IMPERATIVES:
+
+test1(A1)		- (i);
+test2(A2)		- (i);
+test3(A3)		- (i);
+
+CLAUSES:
+
+goal:-
+	test1(structure(2012,9,3)),
+	test2({month:9,day_of_week:3,year:2012}),
+	test3({month:9,day_of_week:3,year:2012}).
+--
+test1(T):-
+	set_color('RoyalBlue'),
+	writeln("Test 1"),
+	writeln("\t",?val("B1",T)),!,
+	set_color('DkGreen'),
+	writeln("\tTest O.K.").
+test1(_):-
+	set_color('Magenta'),
+	writeln("\tFailure").
+--
+test2(T):-
+	set_color('RoyalBlue'),
+	writeln("Test 2"),
+	writeln("\t",?val("B2",T)),!,
+	set_color('DkGreen'),
+	writeln("\tTest O.K.").
+test2(_):-
+	set_color('Magenta'),
+	writeln("\tFailure").
+--
+test3(T):-
+	set_color('RoyalBlue'),
+	writeln("Test 3"),
+	writeln("\t",?val("B3",T)),!,
+	set_color('DkGreen'),
+	writeln("\tTest O.K.").
+test3(_):-
+	set_color('Magenta'),
+	writeln("\tFailure").
+]

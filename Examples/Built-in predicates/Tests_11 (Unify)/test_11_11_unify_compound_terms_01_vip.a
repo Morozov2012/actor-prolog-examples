@@ -1,0 +1,98 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+ground:
+
+A1	= s1(B1).
+B1	= INTEGER.
+
+DOMAINS:
+
+reference:
+
+A2	= s1(B2).
+B2	= INTEGER.
+
+DOMAINS:
+
+mixed:
+
+A3	= s1(B3).
+B3	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+
+determ:
+
+p1(A1)		- (i);
+p2(A2)		- (i);
+p3(A3)		- (i);
+
+class 'Main' (specialized 'DemoConsole'):
+[
+goal:-
+	test1,
+	test2,
+	test3.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test 1"),
+	set_color('default'),
+	X== s1(700),
+	writeln("X= ",X),
+	p1(X),!,
+	set_color('Green'),
+	writeln("O.K.").
+test1:-
+	set_color('Red'),
+	writeln("Failure").
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("Test 2"),
+	set_color('default'),
+	X== s1(700),
+	writeln("X= ",X),
+	p2(X),!,
+	set_color('Green'),
+	writeln("O.K.").
+test2:-
+	set_color('Red'),
+	writeln("Failure").
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("Test 3"),
+	set_color('default'),
+	X== s1(700),
+	writeln("X= ",X),
+	p3(X),!,
+	set_color('Green'),
+	writeln("O.K.").
+test3:-
+	set_color('Red'),
+	writeln("Failure").
+--
+p1(X):-
+	X== s1(Y),
+	writeln("Y= ",Y).
+--
+p2(X):-
+	X== s1(Y),
+	writeln("Y= ",Y).
+--
+p3(X):-
+	X== s1(Y),
+	writeln("Y= ",Y).
+]

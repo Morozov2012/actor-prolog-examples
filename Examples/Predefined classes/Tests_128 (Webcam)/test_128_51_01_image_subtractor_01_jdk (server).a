@@ -1,0 +1,73 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute this example in the first environment and
+-- the client example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+-----------------------------------------------------------------------
+import .. from "morozov/Webcam";
+import .. from "morozov/Vision";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	subtractor	= ('ImageSubtractor',
+				extract_blobs= 'yes',
+				track_blobs= 'no',
+				minimal_training_interval= 0,
+				maximal_training_interval= -1,
+				use_grayscale_colors= 'no',
+				apply_gaussian_filtering_to_background= 'no',
+				-- background_gaussian_filter_radius= 1,
+				apply_rank_filtering_to_background= 'yes',
+				background_rank_filter_threshold= 4,
+				background_standard_deviation_factor= 1.5, -- 1.2,
+				horizontal_blob_border= 3,
+				vertical_blob_border= 3,
+				horizontal_extra_border_coefficient= -1.0,
+				vertical_extra_border_coefficient= -1.0,
+				minimal_blob_intersection_area= 1,
+				minimal_blob_size= 1000,
+				sampling_rate= 1000.0,
+				synthesized_image_transparency= 64,
+				make_rectangular_blobs_in_synthesized_image= 'no',
+				image_encoding_attributes= {
+					format:'JPEG',
+					compressionQuality:0.9});
+--
+	buffer		= ('BufferedImage');
+	timer		= ('Timer');
+	con		= ('Console');
+--
+	database	= ('MyDatabase',
+				name="MyDatabase2.db");
+--
+[
+goal:-!,
+	con ? set_color('Orange'),
+	con ? write("CREATION OF THE DATABASE... "),
+	database ? insert(subtractor),
+	database ? save,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	watch_webcam_state('yes'),
+	set_default_resolution('VGA'),
+	-- set_default_resolution('HD720'),
+	open.
+--
+webcam_image_obtained(_):-!,
+	get_image(buffer),
+	FrameNumber== ?cast("FrameNumber",timer?milliseconds()),
+	subtractor ? subtract(FrameNumber,buffer).
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------

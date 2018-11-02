@@ -1,0 +1,92 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+[
+goal:-!,
+	write(	"Try to enter a number and press the OK button;\n"
+		"try to press the Cancel button;\n"
+		"try to press the Close (x) button;\n"
+		"and try to press the Escape key.\n\n"),
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6.
+--
+test1:-
+	writeln("Test 1:"),
+	Number== ?input_integer(
+		"Input an integer number, please!",
+		1000),!,
+	writeln("\tThe user input: ",Number).
+test1:-
+	writeln("\tThe input was canceled by the user.").
+--
+test2:-
+	writeln("Test 2:"),
+	?input_integer(
+		"Input an integer number, please!",
+		2000),!,
+	writeln("\tThe user has entered something.").
+test2:-
+	writeln("\tThe input was canceled by the user.").
+--
+test3:-
+	writeln("Test 3:"),
+	Number== ?input_integer(
+		"Integer number input",
+		"Input an integer number, please!",
+		3000),!,
+	writeln("\tThe user input: ",Number).
+test3:-
+	writeln("\tThe input was canceled by the user.").
+--
+test4:-
+	writeln("Test 4:"),
+	?input_integer(
+		"Integer number input",
+		"Input an integer number, please!",
+		4000),!,
+	writeln("\tThe user has entered something.").
+test4:-
+	writeln("\tThe input was canceled by the user.").
+--
+test5:-
+	writeln("Test 5:"),
+	Number== ?input_integer(
+		"Integer number input",
+		"Input an integer number, please!",
+		"A wrong text",
+		"This is not an integer!"),!,
+	writeln("\tThe user input: ",Number).
+test5:-
+	writeln("\tThe input was canceled by the user.").
+--
+test6:-
+	writeln("Test 6:"),
+	?input_integer(
+		"Integer number input",
+		"Input an integer number, please!",
+		"",
+		"This is not an integer!"),!,
+	writeln("\tThe user has entered something.").
+test6:-
+	writeln("\tThe input was canceled by the user.").
+]
+-----------------------------------------------------------------------

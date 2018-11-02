@@ -1,0 +1,76 @@
+-------------------------------------------------------------------
+--              An example of Actor Prolog program.              --
+--          (c) 2002-2011, IRE RAS, Alexei A. Morozov.           --
+-------------------------------------------------------------------
+-- This is an auxiliary utility that processes data collected    --
+-- by the ScanWeb program. Execute it after the Step3 program.   --
+-------------------------------------------------------------------
+import 'TableOfResults'	from "Morozov/Web/Scanning/Tables";
+import 'ShortName'	from "Morozov/VRML/Names";
+import 'ColorDatabase'	from "Morozov/VRML/Colors";
+import 'Color_Table'	from "Morozov/VRML/Colors";
+import "Morozov/VRML/Items";
+-------------------------------------------------------------------
+--
+DOMAINS:
+--
+mixed:
+--
+N_Pairs		= N_Pair*.
+N_Pair		= pair(Keyword,N).
+--
+-------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+create_intermediate_file(
+	TemporaryAttributesTable,KeywordList)		- (i,i);
+--
+get_list_of_keywords(KeywordList)			- (o);
+--
+write_row(Keyword,_*)					- (i,i);
+--
+date_to_string(WebResourceDate) = STRING		- (i);
+--
+write_dictionary(N_Pairs)				- (i);
+--
+write_color_row(Color,Keyword,N)			- (i,i,i);
+write_value_or_spase(N)					- (i);
+--
+-------------------------------------------------------------------
+interface 'Step4' (specialized 'Console'):
+--
+input		: 'TableOfResults';
+--
+output		: 'File';
+--
+color_table	: 'ColorDatabase';
+--
+names		: 'ShortName';
+colors		: 'Color_Table';
+--
+size_of_letters	: FontSize;
+--
+sorting		: 'PairSet';
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+get_pair(KeywordList,N_List) = N_Pair;
+--
+]
+-------------------------------------------------------------------
+interface 'PairSet' (specialized 'FindAll'):
+[
+PREDICATES:
+--
+imperative:
+--
+get_pair(KeywordList,N_List) = N_Pairs			- (i,i);
+--
+]
+-------------------------------------------------------------------

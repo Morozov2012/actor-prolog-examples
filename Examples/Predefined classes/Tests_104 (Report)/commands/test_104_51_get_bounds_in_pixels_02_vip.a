@@ -1,0 +1,55 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Console',
+			title=	"Current bounds of "
+				"the Test window",
+			x=35,
+			y=0,
+			width=45,
+			height=25,
+			font_size=16);
+--
+	report	= ('Report',
+			title="Test window",
+			x=5,
+			y='centered',
+			width=25,
+			height=5,
+			text_color='Lemon',
+			background_color='RoyalBlue',
+			font_style='bold');
+--
+[
+goal:-!,
+	report ? write("Move and resize me!"),
+	set_period(0.1),
+	activate.
+--
+tick:-!,
+	report ? get_bounds_in_pixels(X,Y,W,H),
+	con ? set_color('default'),
+	con ? write("X= "),
+	con ? set_color('Fuchsia'),
+	con ? write(X),
+	con ? set_color('default'),
+	con ? write(", Y= "),
+	con ? set_color('Fuchsia'),
+	con ? write(Y),
+	con ? set_color('default'),
+	con ? write(", Width= "),
+	con ? set_color('Fuchsia'),
+	con ? write(W),
+	con ? set_color('default'),
+	con ? write(", Height= "),
+	con ? set_color('Fuchsia'),
+	con ? writeln(H),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,70 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Lists.                                --
+--                                       --
+-- Questions: What are lists? What is    --
+-- the idea of list unification? Can one --
+-- unify lists that contain different    --
+-- numbers of elements? Can a variable   --
+-- be a rest (tail) of a list? Can this  --
+-- variable be substituted during the    --
+-- unification? Can one unify lists that --
+-- contain incompatible elements?        --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+MyList	= INTEGER*.
+
+PREDICATES:
+
+compare(MyList,MyList)	- (i,i);
+
+CLAUSES:
+
+goal:-
+	compare([1,2,3],[1,2,3]),
+	compare([1,2,3],[3,2,1]),
+	compare([1,2,3],[1,2,3,4,5]),
+	compare([1,2,3,4,5],[2,3,4,5]),
+	compare([2,3,4,5],[1,2,3,4,5]).
+
+compare(X,Y):-
+	X == [_|Y],
+	set_color('Blue'),
+	writeln("The second term is the "
+		"tail of the first one:"),
+	set_color('default'),
+	writeln(X),
+	writeln(Y),
+	fail.
+compare(X,Y):-
+	[_|X] == Y,
+	set_color('Blue'),
+	writeln("The first term is the "
+		"tail of the second one:"),
+	set_color('default'),
+	writeln(X),
+	writeln(Y),
+	fail.
+compare(X,Y):-
+	X == Y,!,
+	set_color('DkGreen'),
+	writeln("These terms were ",
+		"unified successfully:"),
+	set_color('default'),
+	writeln(X),
+	writeln(Y).
+compare(X,Y):-
+	set_color('Red'),
+	writeln("I cannot unify ",
+		"these terms:"),
+	set_color('default'),
+	writeln(X),
+	writeln(Y).

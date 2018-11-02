@@ -1,0 +1,152 @@
+KIT ;
+  IDL VERSION 1.2.8 ;
+  TITLE 'SADT example 3. Flow and direct messages.' ;
+  AUTHOR 'Alexei A. Morozov' ;
+  CREATION DATE 19/11/1998 ;
+  PROJECT NAME 'Direct & Flow' ;
+
+  MODEL 'Direct & Flow'
+    {LWI
+    F 0 -13 0 0 0 400
+      0 0 0 0 3 2 1 34
+      100 'Arial'
+    F 1 -11 0 0 0 400
+      0 0 0 0 3 2 1 49
+      80 'Courier New'
+    F 2 -27 0 0 0 400
+      0 0 0 0 3 2 1 34
+      200 'Arial'
+    F 3 -21 0 0 0 400
+      0 0 0 0 3 2 1 34
+      160 'Arial'
+    F 4 -16 0 0 0 400
+      0 0 0 0 3 2 1 34
+      120 'Arial'
+    F 5 -19 0 0 0 400
+      0 0 0 0 3 2 1 34
+      140 'Arial'
+    F 6 -24 0 0 0 400
+      0 0 0 0 3 2 1 34
+      180 'Arial'
+    F 7 -13 0 900 900 400
+      0 0 0 0 3 2 1 34
+      100 'Arial'
+    F 8 -29 0 0 0 700
+      0 0 0 204 3 2 1 34
+      220 'Arial'
+    F 9 -21 0 0 0 700
+      0 0 0 204 3 2 1 34
+      160 'Arial'
+    D 2 3 3 4 5 0 0 0 1
+    G 0 6
+    T 'PUBLICATION'
+    R 60
+    M 0  }
+ ;
+    AUTHOR 'Alexei A. Morozov' ;
+    PROJECT NAME 'Direct & Flow' ;
+
+    DIAGRAM GRAPHIC A-0 ;
+      AUTHOR 'Alexei A. Morozov' ;
+      CREATION DATE 19/11/1998 ;
+      REVISION DATE 13/8/2002 ;
+      TITLE 'SADT example 3. Flow and direct messages.' ;
+      STATUS PUBLICATION ;
+
+      BOX 0 ;
+        NAME '{LWI I 8 255 255 255}SADT example 3.<CR>Flow and direct<CR>messa
+ges.' ;
+        BOX COORDINATES (0,32203;0,77491) (0,74011;0,22140) ;
+        DETAIL REFERENCE N A0 ;
+      ENDBOX ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A0 ;
+      AUTHOR 'Alexei A. Morozov' ;
+      CREATION DATE 27/11/1998 ;
+      REVISION DATE 13/8/2002 ;
+      TITLE 'SADT example 3. Flow and direct messages.' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 9 255 255 255}Sender' ;
+        BOX COORDINATES (0,10734;0,92251) (0,32203;0,51661)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 9 255 255 255}Control' ;
+        BOX COORDINATES (0,36158;0,47970) (0,57627;0,07380)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 9 255 255 255}Receiver' ;
+        BOX COORDINATES (0,67232;0,92251) (0,88701;0,51661)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,58192;0,27675) (0,77966;0,27675) (0,77966;0,51661) ;
+        LABEL '{LWI I 4 7 0 }Flow messages' ;
+        LABEL COORDINATES (0,67232;0,20295) ;
+        SQUIGGLE COORDINATES (0,72542;0,21033) (0,72316;0,27675) ;
+        SINK BOX 3C1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,32203;0,71956) (0,67232;0,71956) ;
+        LABEL '{LWI I 4 7 2 }Direct messages' ;
+        LABEL COORDINATES (0,34576;0,88192) ;
+        SQUIGGLE COORDINATES (0,41356;0,81550) (0,40678;0,71956) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GLOSSARY A0G {LWI A 
+      TERM 'SADT example 3. Flow and direct messages.'
+      ''
+      A 'Alexei A. Morozov'
+      S 'PUBLICATION'
+      C 7 1 7
+      F 1.000000
+      TERM 'Sender'
+      ''
+      N 'This process sends direct messages.<CR>Use left mouse click to open co
+ntrol<CR>dialog of the process. Press the<CR>"Send message" button of the dial
+og.<CR>'
+      S 'PUBLICATION'
+      C 7 1 7
+      F 1.000000
+      TERM 'Receiver'
+      ''
+      N 'This process receives direct messages<CR>and writes them in a text win
+dow.<CR>Left mouse click shows<CR>the text window of the process.<CR>'
+      S 'PUBLICATION'
+      C 7 1 7
+      F 1.000000
+      TERM 'Control'
+      ''
+      N 'This process sends flow messages.<CR>Use left mouse click to open cont
+rol<CR>dialog of the process. Select output<CR>value of the process.<CR>'
+      S 'PUBLICATION'
+      C 7 1 7
+      F 1.000000
+     ENDGLOSS } ;
+     GLOSSARY ;
+      TERM 'Direct messages'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Flow messages'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+     ENDGLOSS ;
+    ENDDIAGRAM ;
+  ENDMODEL ;
+
+ENDKIT ;

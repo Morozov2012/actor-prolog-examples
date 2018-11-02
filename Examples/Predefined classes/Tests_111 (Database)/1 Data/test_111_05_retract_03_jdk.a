@@ -1,0 +1,77 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+MyData		= {x:R_INTEGER,y:R_INTEGER,z:R_INTEGER}.
+R_INTEGER	= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+Target	= INTEGER.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyDatabase');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test2.
+--
+test1:-
+	writeln("Test 1: append(i)"),
+	writeln("\tI will store data items."),
+	store ? append(1000),
+	store ? append(3000),
+	store ? append(5000),
+	writeln("\tDone.").
+--
+test2:-
+	writeln("Test 2: find(o)"),
+	writeln("\tI have found data items:"),
+	store ? find(Item),
+	writeln("\t",Item),
+	fail.
+test2:-
+	writeln("\tDone.").
+--
+test3:-
+	writeln("Test 3: retract(o)"),
+	writeln("\tI will delete data items."),
+	store ? retract(Item),
+	writeln("\tI have deleted data item: ",Item),
+	test4,
+	fail.
+test3:-
+	writeln("\tDone.").
+--
+test4:-
+	writeln("\tTest 4: retract(o)"),
+	writeln("\t\tI will delete one data item."),
+	store ? retract(Item),!,
+	writeln("\t\tI have deleted data item: ",Item).
+test4:-
+	writeln("\t\tFailure.").
+]
+-----------------------------------------------------------------------

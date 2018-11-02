@@ -1,0 +1,94 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Output of information retrieved from         --
+--       several Web resources.                       --
+--------------------------------------------------------
+project: (('Main'))
+--------------------------------------------------------
+class 'Main' (specialized 'Dialog'):
+--
+internal:
+--
+	actor1	= ('MyReceptor',
+		location=
+			"http://www.cplire.ru/Lab144/"
+			"space/prolog.html",
+		x=10,
+		y=1);
+	actor2	= ('MyReceptor',
+		location=
+			"http://www.comlab.ox.ac.uk/"
+			"archive/logic-prog.html",
+		x=20,
+		y=8);
+	actor3	= ('MyReceptor',
+		location=
+			"http://www.cetus-links.org/"
+			"oo_prolog.html",
+		x=30,
+		y=15);
+--
+variable:
+--
+	target_worlds	= [actor1,actor2,actor3];
+	results		= target_worlds ?? get_data();
+--
+[
+goal:-!,
+	show.
+]
+--------------------------------------------------------
+class 'MyReceptor' (specialized 'WebReceptor'):
+--
+constant:
+--
+	location;
+	maximal_waiting_time	= 2.0;
+	revision_period		= 5.0;
+	attempt_period		= 1.0;
+--
+	x;
+	y;
+--
+internal:
+--
+	con	= ('Report',
+			x,
+			y,
+			height=10,
+			width=30);
+--
+variable:
+--
+	parameters;
+--
+[
+goal:-!,
+	con ? set_title(location),
+	Parameters== ?get_parameters(),
+	-- con ? writeln(Parameters),
+	Parameters == parameters.
+--
+get_data= Line
+	:-
+	[parameters],
+	parameters := entry(URL,Date,Time,Size),
+	Line== ?format(
+		"%d\t%s\t%s\t%s",
+		Size,
+		?time_to_string(Time),
+		?date_to_string(Date),
+		URL).
+--
+date_to_string(date(Year,Month,Day))=
+	?format("%d-%02d-%04d",Day,Month,Year)
+	:-!.
+date_to_string(_)="".
+--
+time_to_string(time(Hours,Minutes,Seconds,_))=
+	?format("%d:%d:%d",Hours,Minutes,Seconds)
+	:-!.
+time_to_string(_)="".
+]
+--------------------------------------------------------

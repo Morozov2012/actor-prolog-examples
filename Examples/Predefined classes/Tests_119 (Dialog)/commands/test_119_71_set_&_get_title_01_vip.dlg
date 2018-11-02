@@ -1,0 +1,9 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',12,'bold')
+
+dialog 'DemoPanel' ("Demo Panel",'White',default,default,5,5,'RoyalBlue')
+scaling(3.0,1.5)
+	ok(close,"&O.K.")
+end_of_scaling
+end_of_dialog

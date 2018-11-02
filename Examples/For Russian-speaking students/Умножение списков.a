@@ -1,0 +1,38 @@
+
+-- (c) 2001 Nesterova Julya, MSU, groop 320
+
+-- Условия задачи:
+-- A и B - списки целых чисел одинаковой длины.
+-- Построить список С, содержащий элементы списка B
+-- в обратном порядке. Затем построить список D,
+-- каждый элемент которого di равен произведению
+-- соответствующих элементов ai и ci списков A и C.
+
+DOMAINS:
+
+	List = INTEGER*.
+
+PREDICATES:
+
+	back(List,List,List)	- (i,i,o);
+	mul(List,List,List)	- (i,i,o);
+
+CLAUSES:
+
+goal:-
+	A== [1,2,3,4,5,6,7],
+	write("A= ",A),nl,
+	B== [3,4,5,6,7,8,9],
+	write("B= ",B),nl,
+	back(B,[],C),
+	write("C= ",C),nl,
+	mul(A,C,D),
+	write("D= ",D).
+
+back([H|Rest1],Rest2,Res):-
+	back(Rest1,[H|Rest2],Res).
+back([],Res,Res).
+
+mul([H1|Rest1],[H2|Rest2],[H1*H2|Rest3]):-
+	mul(Rest1,Rest2,Rest3).
+mul([],[],[]).

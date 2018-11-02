@@ -1,0 +1,147 @@
+package "Morozov/Web/Scanning/Control":
+---------------------------------------------------------------
+--        The "SCANNING/CONTROL" Actor Prolog package.       --
+--         (c) 2002-2005, IRE RAS, Alexei A. Morozov.        --
+---------------------------------------------------------------
+import 'Plain_Report'	from "Morozov/Web/Scanning/Messages";
+import 'HTML_Report'	from "Morozov/Web/Scanning/Messages";
+import 'ReportWindow'	from "Morozov/Web/Scanning/Messages";
+import 'ReportFile'	from "Morozov/Web/Scanning/Messages";
+import 'ExternalBrowser'
+			from "Morozov/Web/Browsing/Browser";
+---------------------------------------------------------------
+-- This package supports user interface that provides        --
+-- control of the analysis of the Web Sites.                 --
+---------------------------------------------------------------
+class 'ControlDialog' (specialized 'Dialog'):
+--
+-- constant:
+--
+--	identifier		= "AnalysisControl";
+--
+variable:
+--
+	location;
+	output_mode;
+	output_file_name;
+--
+constant:
+--
+	default_output_file	= "REPORT.HTML";
+--
+variable:
+--
+	maximal_waiting_time;
+	domain;
+	use_max_depth;
+	max_depth;
+	alternative_names;
+--
+internal:
+--
+	engine;
+--
+variable:
+--
+	output_device;
+	virtual_resources;
+--
+internal:
+--
+	reporter_1	= ('Plain_Report',
+				output=('ReportWindow'));
+	reporter_2	= ('HTML_Report',
+				output=report_file);
+--
+	report_file	= ('ReportFile',
+				variable:
+					name=output_file_name);
+--
+	switch	= ('Switch',
+			internal:
+				dialog=self,
+			variable:
+				location,
+				output_mode,
+			internal:
+				reporter_1,
+				reporter_2,
+			variable:
+				output_device,
+				alternative_names,
+				virtual_resources);
+--
+	browser	= ('ExternalBrowser',
+			variable:
+				arguments=
+					name_of_report_file);
+--
+variable:
+--
+	name_of_report_file;
+--
+[
+goal:-!,
+	put('output_mode',1),
+	put('output_file_name',default_output_file),
+	put('maximal_waiting_time',7.0),
+	put('use_max_depth','yes'),
+	put('max_depth',5).
+--
+action("start"):-!,
+	engine <- start.
+action("show_report"):-
+	-- name_of_report_file==
+	--	"file:///" +
+	--	?val("STRING",report_file?get_full_name),!,
+	name_of_report_file==
+		?val("STRING",report_file?get_URL()),!,
+	browser ? activate.
+action(_):-!.
+]
+------------------------------------------------------------------
+class 'Switch' (specialized 'File'):
+--
+dialog		= self;
+--
+location;
+--
+extension	= ".html";
+--
+output_mode;
+reporter_1;
+reporter_2;
+output_device;
+--
+alternative_names;
+virtual_resources;
+--
+[
+goal:-!,
+	[location,output_mode,alternative_names],
+	select_domain(location),
+	select_output_device(output_mode,output_device),
+	determine_virtual_resources(alternative_names).
+--
+select_domain(#):-!.
+select_domain(Location):-
+	bound(Location),
+	extract_path(?val("STRING",Location),Prefix1,_),
+	Prefix2== ?replace_all(?cast("STRING",Prefix1),"\\","/"),
+	dialog ? put('domain',Prefix2),!.
+select_domain(_).
+--
+select_output_device(#,#):-!.
+select_output_device(1,reporter_1):-!.
+select_output_device(_,reporter_2):-!.
+select_output_device(_,_).
+--
+determine_virtual_resources(#):-!.
+determine_virtual_resources(Names):-
+	virtual_resources==
+		?val("WebAddressList",
+			?extract_lines(
+				?val("STRING",Names))),!.
+determine_virtual_resources(_).
+]
+------------------------------------------------------------------

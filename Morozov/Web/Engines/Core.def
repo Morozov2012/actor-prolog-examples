@@ -1,0 +1,156 @@
+package "Morozov/Web/Engines/Core":
+---------------------------------------------------------------
+--         The "ENGINES/CORE" Actor Prolog package.          --
+--       (c) 2002-2005, IRE RAS, Alexei A. Morozov.          --
+---------------------------------------------------------------
+-- This is a design pattern for implementing interfaces to   --
+-- the Web Search Engines.                                   --
+---------------------------------------------------------------
+import 'WebAddressRegistry'
+		from "Morozov/Web/Scanning/Counter";
+import 'ControlDialog'
+		from "Morozov/Web/Engines/Control";
+import 'EngineControl'
+		from "Morozov/Web/Engines/Control";
+import 'EngineInput'
+		from "Morozov/Web/Engines/Control";
+---------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+SpecialEngineOutput	= ('EngineOutput'); #.
+DebugReport		= ('TextWindow'); #.
+--
+---------------------------------------------------------------
+interface 'SearchEngine'
+(specialized 'EngineControl', 'EngineInput', 'Alpha'):
+--
+internal:
+--
+	control			: 'ControlDialog';
+--
+variable:
+--
+	limit_number_of_pages	: LimitNumberOfPages;
+	max_page		: PageNumber;
+--
+internal:
+--
+	receiver	 	: 'WebReceptor';
+--
+variable:
+--
+	location		: WebAddress;
+	maximal_waiting_time	: MaximalWaitingTime;
+	tags			: S_List;
+--
+internal:
+--
+	registry	 	: 'WebAddressRegistry';
+--
+constant:
+--
+	engine_output	 	: SpecialEngineOutput;
+	debug_output	 	: DebugReport;
+--
+internal:
+--
+	text		 	: 'TextOperations';
+--
+[
+
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+show(_*)					- (i);
+--
+private:
+--
+replace_spaces(	STRING,
+		STRING,
+		SearchPattern,
+		SearchPattern)	- (i,i,i,o);
+--
+inspect_page(PageNumber,WebAddress)		- (i,i);
+--
+determ:
+--
+check_number_of_page(PageNumber)		- (i);
+--
+determ:
+--
+check_keywords(SearchPattern)			- (i);
+--
+imperative:
+--
+refine_address(WebAddress,WebAddress)		- (i,o);
+--
+visible:
+--
+nondeterm:
+--
+get_resource = WebAddressList;
+--
+private:
+--
+imperative:
+--
+'+'(PageNumber,PageNumber) = PageNumber		- (i,i);
+--
+determ:
+--
+'<='(PageNumber,PageNumber)			- (i,i);
+'>'(PageNumber,PageNumber)			- (i,i);
+--
+-- To be defined in descendant class:
+--
+determ:
+--
+extract_address_of_next_page
+	(TreeContent,PageNumber,WebAddress)	- (i,i,o);
+--
+]
+---------------------------------------------------------------
+interface 'SpecialReceptor' (specialized 'WebReceptor'):
+--
+variable:
+--
+	location		: WebAddress;
+	maximal_waiting_time	: MaximalWaitingTime;
+--
+[
+]
+---------------------------------------------------------------
+interface 'EngineOutput':
+[
+--
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+find_reference(WebAddress)		- (i);
+next_page(PageNumber,WebAddress)	- (i,i);
+--
+]
+---------------------------------------------------------------
+interface 'TextOperations' (specialized 'Text'):
+[
+]
+---------------------------------------------------------------
+interface 'TextWindow' (specialized 'Report'):
+[
+visible:
+--
+imperative:
+--
+writeln(_*)		- (i);
+--
+]
+---------------------------------------------------------------

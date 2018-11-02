@@ -1,0 +1,34 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- STRING.                               --
+--                                       --
+-- Questions: What are strings? When the --
+-- strings are more appropriate than the --
+-- symbols? How can the compiler         --
+-- distinguish a string from a symbol?   --
+-- How can one declare a string argument --
+-- of a predicate? How can one create a  --
+-- new domain that is a kind of strings? --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+FamilyName		= STRING.
+
+PREDICATES:
+
+p(FamilyName)	- (i);
+
+CLAUSES:
+
+goal:-
+	p("Colmerauer").
+
+p(N):-
+	writeln(N).

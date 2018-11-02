@@ -1,0 +1,114 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+List	= Numerical*.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+[
+DOMAINS:
+--
+Target		= List.
+--
+PREDICATES:
+--
+determ:
+--
+input_term(
+	STRING/*Prompt*/,
+	STRING/*Default*/) = Target/*Answer*/	- (i,i);
+input_term(
+	STRING/*Title*/,
+	STRING/*Prompt*/,
+	STRING/*Default*/) = Target/*Answer*/	- (i,i,i);
+--
+process_input(
+	STRING/*UserInput*/,
+	STRING/*Title*/,
+	STRING/*Prompt*/,
+	STRING/*Default*/,
+	Target/*Answer*/)			- (i,i,i,i,o);
+--
+CLAUSES:
+--
+goal:-!,
+	write(	"Try to enter a valid term and press the OK button;\n"
+		"try to enter a wrong term and press the OK button;\n"
+		"try to press the Cancel button;\n"
+		"try to press the Close (x) button;\n"
+		"and try to press the Escape key.\n\n"),
+	test1,
+	test2,
+	test3,
+	test4.
+--
+test1:-
+	writeln("Test 1:"),
+	Number== ?cast("List",?input_term(
+		"Input a term, please!",
+		"[100]")),!,
+	writeln("\tThe user input: ",Number).
+test1:-
+	writeln("\tThe input was canceled by the user.").
+--
+test2:-
+	writeln("Test 2:"),
+	?input_term(
+		"Input a term, please!",
+		"[300]"),!,
+	writeln("\tThe user has entered something.").
+test2:-
+	writeln("\tThe input was canceled by the user.").
+--
+test3:-
+	writeln("Test 3:"),
+	Number== ?cast("List",?input_term(
+		"Term input",
+		"Input a term, please!",
+		"[500]")),!,
+	writeln("\tThe user input: ",Number).
+test3:-
+	writeln("\tThe input was canceled by the user.").
+--
+test4:-
+	writeln("Test 4:"),
+	?input_term(
+		"Term input",
+		"Input a term, please!",
+		"[700]"),!,
+	writeln("\tThe user has entered something.").
+test4:-
+	writeln("\tThe input was canceled by the user.").
+--
+input_term(Prompt,InitialValue) =
+	?input_term("",Prompt,InitialValue).
+--
+input_term(Title,Prompt,InitialValue) = Term
+	:-
+	Text== ?input_string(Title,Prompt,InitialValue),!,
+	process_input(Text,Title,Prompt,InitialValue,Term).
+--
+process_input(Text,_,_,_,Result):-
+	Result== ?val("Target",?string_to_term(Text)),!.
+process_input(Text,Title,Prompt,InitialValue,Result):-
+	Message== ?format(
+		"%s\n\n%s",
+		"Sorry, this is not a valid term!",
+		Text),
+	error("",Message),
+	Result== ?input_term(Title,Prompt,InitialValue).
+]
+-----------------------------------------------------------------------

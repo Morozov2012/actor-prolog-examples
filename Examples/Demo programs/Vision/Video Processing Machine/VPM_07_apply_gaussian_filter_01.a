@@ -1,0 +1,178 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	data_directory		= "F:/= Video =/DSC_0109";
+	file_name_format	= "DSC_0109%05d.jpg";
+	frame_rate		= 29.97;
+--
+internal:
+--
+	vpm		= ('VideoProcessingMachine',
+				synthesized_image_transparency= 48);
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	prompt_window	= ('Report',
+				y= 22,
+				height= 3);
+	text		= ('Text');
+	image1		= ('BufferedImage');
+	image2		= ('BufferedImage');
+	state		= ('ProgramState');
+--
+[
+goal:-!,
+	graphic_window ? show,
+	prompt_window ? write(
+		"The data are coming from "
+		"the Actor Prolog project."),
+	Time0== ?milliseconds(),
+	state ? set_beginning_time(Time0),
+	set_period(1/(frame_rate*2),0),
+	input_instructions,
+	activate.
+--
+input_instructions:-
+	vpm ? suspend_processing,
+	vpm ? retract_all_instructions,
+	vpm ? img_apply_gaussian_filter(5),
+	vpm ? process_now.
+--
+tick:-
+	T2== ?milliseconds(),
+	state ? get_beginning_time(T1),
+	Delta== (T2 - T1) / 1000.0 * frame_rate,
+	N== ?convert_to_integer(?round(Delta)),!,
+	load_figure(N,T2).
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	state ? set_current_frame(N),
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	image1 ? load(ImageToBeLoaded,3,3,0,0),
+	vpm ? process_realtime_frame(image1),
+	state ? increase_global_counter,
+	draw_scene.
+load_figure(_,T2):-
+	state ? set_beginning_time(T2).
+--
+draw_scene:-
+	vpm ? commit,
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	-- vpm ? get_recent_image(image2),
+	-- vpm ? get_background_image(image2),
+	-- vpm ? get_sigma_image(image2),
+	-- vpm ? get_foreground_image(image2),
+	vpm ? get_synthesized_image(image2),
+	graphic_window ? draw_image(image2,0,0,1,1),
+	draw_legend,
+	graphic_window ? draw_now.
+--
+draw_legend:-
+	state ? get_current_frame(FrameNumber),!,
+	state ? get_stopwatch_time(Delay),
+	state ? get_frame_counter(FrameQuantity),
+	state ? get_global_counter(GlobalCounter),
+	Time== Delay / 1000.0,
+	FrameRate== FrameQuantity / Time,
+	graphic_window ? set_brush('Red'),
+	graphic_window ? set_font({size:32}),
+	graphic_window ? set_text_alignment('LEFT','TOP'),
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %3.2f [sec]; Frame: %d (%d)",
+			Time,FrameNumber,GlobalCounter)),
+	graphic_window ? set_text_alignment('RIGHT','TOP'),
+	graphic_window ? draw_text(
+		0.98, 0.02,
+		text?format(
+			"Frame Rate: %3.2f [Hz]",
+			FrameRate)).
+draw_legend.
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		= ('Timer');
+--
+[
+CLAUSES:
+--
+get_beginning_time(Time):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(Time),!.
+--
+set_beginning_time(Time):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(Time)),
+	reset_stopwatch,
+	reset_frame_counter.
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)),
+	increase_frame_counter.
+--
+reset_stopwatch:-
+	retract_all(stop_watch_time(_)),
+	append(stop_watch_time(timer?milliseconds())).
+--
+get_stopwatch_time(Delay):-
+	T2== timer?milliseconds(),
+	Item== ?match(stop_watch_time(_)),
+	Item == stop_watch_time(T1),!,
+	Delay== T2 - T1.
+get_stopwatch_time(0).
+--
+reset_frame_counter:-
+	retract_all(frame_counter(_)).
+--
+increase_frame_counter:-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!,
+	retract_all(frame_counter(_)),
+	append(frame_counter(N+1)).
+increase_frame_counter:-
+	append(frame_counter(1)).
+--
+get_frame_counter(N):-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!.
+get_frame_counter(0).
+--
+increase_global_counter:-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!,
+	retract_all(global_counter(_)),
+	append(global_counter(N+1)).
+increase_global_counter:-
+	append(global_counter(1)).
+--
+get_global_counter(N):-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!.
+get_global_counter(0).
+]
+-----------------------------------------------------------------------

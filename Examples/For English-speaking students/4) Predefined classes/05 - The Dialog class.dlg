@@ -1,0 +1,17 @@
+
+dialog 'Main' (
+		"Demo Dialog",	-- The title
+		'Red',		-- Text color
+		'White',	-- Text envelope color
+		20,		-- Font size
+		10,		-- X
+		7,		-- Y
+		'Green')	-- Background color
+
+	statictext("Please enter text:")
+
+	edittext("MyValue",12,2,"Text")
+
+	button(1,"&Action")
+
+end_of_dialog

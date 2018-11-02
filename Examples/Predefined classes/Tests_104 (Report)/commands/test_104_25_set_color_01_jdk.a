@@ -1,0 +1,154 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+Colors		= Color*.
+--
+PREDICATES:
+--
+imperative:
+--
+demo_colors(Colors)	- (i);
+--
+determ:
+--
+is_bright(Color)	- (i);
+is_dark(Color)		- (i);
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+color_set	= [
+		  'Red', 'Green', 'DkGreen', 'Blue', 'Cyan',
+		  'Magenta', 'Yellow',
+		  'Black', 'DkGray', 'Gray', 'LtGray',
+		  'SystemControl', 'White',
+		  'Orange', 'Pink', 'Violet', 'Brown',
+		  'Silver', 'Maroon', 'Purple',
+		  'Fuchsia', 'Lime', 'Olive',
+		  'Navy', 'Teal', 'Aqua',
+		  'Terracotta', 'Lilac', 'Gold', 'Indigo',
+		  'RoyalBlue', 'Lemon', 'Emerald', 'SkyBlue',
+		  'default',
+		  "RED","GrEEn","blue",
+		  16#0000FF00#, 16#0000FF00.0#
+		  ];
+--
+w1	= ('Window1',
+		color_set,
+		x= 0);
+w2	= ('Window2',
+		color_set,
+		x= 1);
+w3	= ('Window3',
+		color_set,
+		x= 2);
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Window1' (specialized 'MyWindow'):
+--
+constant:
+--
+color_set;
+--
+[
+goal:-!,
+	writeln("Initial color"),
+	demo_colors(color_set).
+--
+demo_colors([Color|Rest]):-!,
+	set_color(Color),
+	writeln(Color),
+	demo_colors(Rest).
+demo_colors(_).
+]
+-----------------------------------------------------------------------
+class 'Window2' (specialized 'MyWindow'):
+--
+constant:
+--
+color_set;
+--
+[
+goal:-!,
+	writeln("Initial color"),
+	demo_colors(color_set).
+--
+demo_colors([Color|Rest]):-
+	is_bright(Color),!,
+	set_color(Color,'Navy'),
+	writeln(Color),
+	demo_colors(Rest).
+demo_colors([Color|Rest]):-!,
+	set_color(Color,'Yellow'),
+	writeln(Color),
+	demo_colors(Rest).
+demo_colors(_).
+]
+-----------------------------------------------------------------------
+class 'Window3' (specialized 'MyWindow'):
+--
+constant:
+--
+color_set;
+--
+[
+goal:-!,
+	writeln("Initial color"),
+	demo_colors(color_set).
+--
+demo_colors([Color|Rest]):-
+	is_dark(Color),!,
+	set_color('White',Color),
+	writeln(Color),
+	demo_colors(Rest).
+demo_colors([Color|Rest]):-!,
+	set_color('Black',Color),
+	writeln(Color),
+	demo_colors(Rest).
+demo_colors(_).
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	color_set	: Colors;
+--
+	y= 0;
+	width= 1;
+	height= 1;
+--
+	font_name= 'helvetica';
+	font_style= 'bold';
+	font_size= 36;
+--
+[
+is_bright('White'):-!.
+is_bright('LtGray'):-!.
+is_bright('Silver'):-!.
+is_bright('Yellow'):-!.
+is_bright('Lemon'):-!.
+is_bright('Lime'):-!.
+is_bright('Pink'):-!.
+--
+is_dark('Black'):-!.
+is_dark('DkGray'):-!.
+is_dark('Blue'):-!.
+is_dark('Navy'):-!.
+is_dark('Indigo'):-!.
+is_dark('RoyalBlue'):-!.
+is_dark('Maroon'):-!.
+is_dark('Brown'):-!.
+is_dark("blue"):-!.
+]
+-----------------------------------------------------------------------

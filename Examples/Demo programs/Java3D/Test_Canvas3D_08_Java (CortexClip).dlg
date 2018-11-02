@@ -1,0 +1,7 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+resource("data/cortex1.db")
+resource("data/cortex2.db")

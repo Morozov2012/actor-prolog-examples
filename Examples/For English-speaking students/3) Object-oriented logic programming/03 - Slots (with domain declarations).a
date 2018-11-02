@@ -1,0 +1,45 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Object-oriented logic      --
+-- programming. Classes and slots.       --
+--                                       --
+-- Questions: What are classes? What are --
+-- instances of classes (the worlds)?    --
+-- What are attributes of classes? What  --
+-- are slots of class instances? Can a   --
+-- slot be a free variable? Is the value --
+-- of this variable backtrackable?       --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+reference:
+
+M	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+p;
+
+class 'Main' (specialized 'DemoConsole'):
+
+variable:
+
+a	: M;
+
+[
+
+goal:-
+	a == 100,
+	p.
+
+p:-
+	writeln(a).
+
+]

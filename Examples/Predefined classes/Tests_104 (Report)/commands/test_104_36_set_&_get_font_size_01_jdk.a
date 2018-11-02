@@ -1,0 +1,79 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+write_font_size(FontSize)	- (i);
+test2(FontSize)			- (i);
+--
+class 'Main' (specialized 'Report'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2(12),
+	test1,
+	test2(12.0),
+	test1,
+	test2(12.5),
+	test1,
+	test2('default'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_font_size(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	Size== ?get_font_size(),!,
+	con ? set_color('Black'),
+	con ? write("Font size: "),
+	con ? set_color('Violet'),
+	write_font_size(Size),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+write_font_size(Size):-
+	symbol(Size),!,
+	con ? writeln("'",Size,"'").
+write_font_size(Size):-
+	con ? writeln(Size).
+--
+test2(Size):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_font_size(Size),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

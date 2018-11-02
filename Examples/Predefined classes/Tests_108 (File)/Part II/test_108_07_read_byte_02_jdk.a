@@ -1,0 +1,115 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+-- Warning: The read_byte predicate in the VIP version ignores
+-- the following codes: 0, 16#0D#; but the Java version of the
+-- predicate processes these codes well.
+
+DOMAINS:
+
+N			= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+writing_loop(N)		- (i);
+reading_loop_1(N)	- (i);
+reading_loop_2(N)	- (i);
+reading_loop_3(N)	- (i);
+reading_loop_4(N)	- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	file_name	= "input.txt";
+--
+internal:
+--
+	output		= ('File',
+				name=file_name,
+				character_set='none',
+				random_access='off');
+--
+	input1		= ('File',
+				name=file_name,
+				character_set='none',
+				random_access='off');
+	input2		= ('File',
+				name=file_name,
+				character_set='ISO_8859_1',
+				random_access='off');
+	input3		= ('File',
+				name=file_name,
+				character_set='default',
+				random_access='on');
+	input4		= ('File',
+				name=file_name,
+				character_set='none',
+				random_access='on');
+--
+	report1		= ('Report',
+				x=0,
+				width=20);
+	report2		= ('Report',
+				x=20,
+				width=20);
+	report3		= ('Report',
+				x=40,
+				width=20);
+	report4		= ('Report',
+				x=60,
+				width=20);
+--
+[
+goal:-!,
+	output ? open('writing'),
+	writing_loop(0),
+	output ? close,
+	input1 ? open('reading'),
+	input2 ? open('reading'),
+	input3 ? open('reading'),
+	input4 ? open('reading'),
+	reading_loop_1(1),
+	reading_loop_2(1),
+	reading_loop_3(1),
+	reading_loop_4(1),
+	input1 ? close,
+	input2 ? close,
+	input3 ? close,
+	input4 ? close.
+--
+writing_loop(C):-
+	C <= 255,!,
+	-- con ? writef("%3x\n",C),
+	output ? writef("%c%c",C,C),
+	writing_loop(C+1).
+writing_loop(_).
+--
+reading_loop_1(N):-
+	C1== input1 ? read_byte(),!,
+	report1 ? writef("%03d) %3x\n",N,C1),
+	reading_loop_1(N+1).
+reading_loop_1(_).
+--
+reading_loop_2(N):-
+	C2== input2 ? read_byte(),!,
+	report2 ? writef("%03d) %3x\n",N,C2),
+	reading_loop_2(N+1).
+reading_loop_2(_).
+--
+reading_loop_3(N):-
+	C3== input3 ? read_byte(),!,
+	report3 ? writef("%03d) %3x\n",N,C3),
+	reading_loop_3(N+1).
+reading_loop_3(_).
+--
+reading_loop_4(N):-
+	C4== input4 ? read_byte(),!,
+	report4 ? writef("%03d) %3x\n",N,C4),
+	reading_loop_4(N+1).
+reading_loop_4(_).
+]

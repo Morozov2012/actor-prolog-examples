@@ -1,0 +1,25 @@
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+write_list(List)	- (i);
+
+CLAUSES:
+
+goal:-
+	L1== ?input_string("¬ведите список целых чисел",[1,2,3,4,5]),
+	
+	write_list(?val("List",?string_to_term(L1))),
+	
+	L2== ?input_string(
+		"¬вод списка",
+		"¬ведите список целых чисел",[7,8,9]),
+	
+	write_list(?val("List",?string_to_term(L2))).
+
+write_list([Head|Rest]):-
+	writeln(Head),
+	write_list(Rest).
+write_list([]).

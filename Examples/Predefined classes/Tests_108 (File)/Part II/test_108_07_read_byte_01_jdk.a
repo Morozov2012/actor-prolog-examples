@@ -1,0 +1,62 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2;
+
+class 'Main' (specialized 'File'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	set_string("12345"),
+	open('reading'),
+	test2,
+	test1,
+	test2,
+	test0,
+	test2,
+	test1,
+	test2,
+	test1,
+	test2,
+	test1,
+	test2,
+	test1,
+	test2,
+	close.
+--
+test0:-
+	con ? writeln("Test 0"),
+	con ? writeln("\tI will try to read a byte from the file."),
+	?read_byte(),!,
+	con ? writeln("\tDone.").
+test0:-
+	con ? writeln("\tI cannot read it.").
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tI will try to read a byte from the file."),
+	Code== ?read_byte(),!,
+	con ? writeln("\tCode: ",Code).
+test1:-
+	con ? writeln("\tI cannot read it.").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tIs this the end of the file?"),
+	?eof(),!,
+	con ? writeln("\tYes, it is!").
+test2:-
+	con ? writeln("\tNo, it is not.").
+]

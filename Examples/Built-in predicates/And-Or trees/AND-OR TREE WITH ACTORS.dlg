@@ -1,0 +1,5 @@
+dialog "User Input" ("Input Data",
+		default,default,default,centered,centered,default)
+	"Please, enter any text:"
+	edittext(input,10,1,"")
+end_of_dialog

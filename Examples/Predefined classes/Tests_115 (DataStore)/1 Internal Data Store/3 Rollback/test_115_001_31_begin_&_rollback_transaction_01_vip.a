@@ -1,0 +1,341 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Warning: the VIP version does not support the rollback_transaction
+-- and the rollback_transaction_tree predicates of the Database and
+-- the DataStore classes. Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test10;
+test20;
+--
+test21_linked_hash_map_insert;
+--
+test30(INTEGER)				- (i);
+--
+test31_data_store_get_entry(INTEGER)	- (i);
+--
+test40;
+--
+test41_data_store_rename_entry;
+--
+test50;
+--
+test51_data_store_delete_entry;
+--
+test60;
+--
+write_tabulation(INTEGER)		- (i);
+--
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+store1	= ('DataStore',
+		name="MyDataStore1.dat",
+		access_mode='modifying');
+--
+base1a	= ('DatabaseTestbed',
+		database=('MyDatabase',
+			place=shared(store1,"MyTable1")));
+base2a	= ('DatabaseTestbed',
+		database=('MyHashSet',
+			place=shared(store1,"MyTable2")));
+base3a	= ('DatabaseTestbed',
+		database=('MyHashMap',
+			place=shared(store1,"MyTable3")));
+base4a	= ('DatabaseTestbed',
+		database=linked_hash_map_4a);
+--
+linked_hash_map_4a	= ('MyLinkedHashMap',
+				place=shared(store1,"MyTable4"));
+--
+base1b	= ('DatabaseTestbed',
+		database=('MyDatabase',
+			place=shared(store1,"MyTable1")));
+base2b	= ('DatabaseTestbed',
+		database=('MyHashSet',
+			place=shared(store1,"MyTable2")));
+base3b	= ('DatabaseTestbed',
+		database=('MyHashMap',
+			place=shared(store1,"MyTable3")));
+base4b	= ('DatabaseTestbed',
+		database=linked_hash_map_4b);
+--
+linked_hash_map_4b	= ('MyLinkedHashMap',
+				place=shared(store1,"MyTable4"));
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test10,
+	test20,
+	test30(0),
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test modifying data store."),
+	con ? set_color('DkGreen'),
+	con ? writeln("begin_transaction('modifying')"),
+	con ? set_color('default'),
+	store1 ? begin_transaction('modifying'),
+	test40,
+	test30(1),
+	test50,
+	test30(1),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tcollect_garbage"),
+	store1 ? collect_garbage,
+	con ? writeln("\trollback_transaction"),
+	store1 ? rollback_transaction,
+	con ? writeln("O.K."),
+	con ? set_color('default'),
+	test30(0),
+	test60.
+--
+test10:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store deletion."),
+	con ? set_color('default'),
+	store1 ? delete,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+test20:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store creation."),
+	con ? set_color('default'),
+	base1a ? test_database_insert,
+	base1a ? test_database_inspection(1),
+	base2a ? test_database_insert,
+	base2a ? test_database_inspection(1),
+	base3a ? test_database_insert,
+	base3a ? test_database_inspection(1),
+	base4a ? test_database_insert,
+	test21_linked_hash_map_insert,
+	base4a ? test_database_inspection(1),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+test21_linked_hash_map_insert:-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest insertion to a linked hash map."),
+	con ? set_color('default'),
+	linked_hash_map_4a ? begin_transaction('modifying'),
+	-- linked_hash_map_4a ? put(300,"Text5"),
+	linked_hash_map_4a ? retract_key(300),!,
+	linked_hash_map_4a ? end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test21_linked_hash_map_insert:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+test30(N):-
+	con ? set_color('RoyalBlue'),
+	write_tabulation(N),
+	con ? writeln("Test retrieving data store entries."),
+	con ? set_color('default'),
+	test31_data_store_get_entry(N),
+	con ? set_color('DkGreen'),
+	write_tabulation(N),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+test31_data_store_get_entry(N):-
+	write_tabulation(N),
+	con ? writeln("\tData store entries:"),
+	con ? set_color('Blue'),
+	store1 ? begin_transaction('reading'),
+	store1 ? get_entry(Name,Type),
+		write_tabulation(N),
+		con ? writeln("\t\t",Name," : ",Type),
+		fail.
+test31_data_store_get_entry(N):-
+	store1 ? end_transaction,
+	con ? set_color('default'),
+	write_tabulation(N),
+	con ? writeln("\tNo more items.").
+--
+test40:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("\tTest renaming data store entries."),
+	con ? set_color('default'),
+	test41_data_store_rename_entry,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+--
+test41_data_store_rename_entry:-
+	con ? writeln("\t\tRenaming data store entries:"),
+	con ? set_color('Blue'),
+	store1 ? begin_transaction('modifying'),
+	store1 ? get_entry(Name1,_),
+		con ? write("\t\t\tRenaming ",Name1," ... "),
+		store1 ? rename_entry(Name1,"New"+Name1),
+		con ? writeln("done."),
+		fail.
+test41_data_store_rename_entry:-
+	store1 ? end_transaction,
+	con ? set_color('default'),
+	con ? writeln("\t\tEnd of the renaming.").
+--
+test50:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("\tTest deletion of data store entries."),
+	con ? set_color('default'),
+	test51_data_store_delete_entry,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+--
+test51_data_store_delete_entry:-
+	con ? writeln("\t\tDelete data store entries:"),
+	con ? set_color('Blue'),
+	store1 ? begin_transaction('modifying'),
+	store1 ? get_entry(Name,_),
+		con ? write("\t\t\tDeleting ",Name," ... "),
+		store1 ? delete_entry(Name),
+		con ? writeln("done."),
+		fail.
+test51_data_store_delete_entry:-
+	store1 ? end_transaction,
+	con ? set_color('default'),
+	con ? writeln("\t\tEnd of the deletion.").
+--
+test60:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Inspect the entries of the data store."),
+	con ? set_color('default'),
+	base1b ? test_database_inspection(1),
+	base2b ? test_database_inspection(1),
+	base3b ? test_database_inspection(1),
+	base4b ? test_database_inspection(1),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+write_tabulation(N):-
+	N > 0,!,
+	con ? write("\t"),
+	write_tabulation(N-1).
+write_tabulation(_).
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= map(INTEGER,STRING).
+--
+]
+-----------------------------------------------------------------------
+class 'MyHashSet' (specialized 'HashSet'):
+[
+DOMAINS:
+--
+Target		= map(INTEGER,STRING).
+--
+]
+-----------------------------------------------------------------------
+class 'MyHashMap' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+TargetKey	= INTEGER.
+TargetValue	= STRING.
+--
+]
+-----------------------------------------------------------------------
+class 'MyLinkedHashMap' (specialized 'LinkedHashMap'):
+[
+DOMAINS:
+--
+TargetValue	= STRING.
+--
+]
+-----------------------------------------------------------------------
+class 'DatabaseTestbed' (specialized 'Console'):
+--
+internal:
+--
+database;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test_database_insert;
+test_database_inspection(INTEGER)	- (i);
+inspect_database(INTEGER)		- (i);
+--
+CLAUSES:
+--
+test_database_insert:-
+	set_color('Violet'),
+	writeln("\tTest insertion to a database."),
+	set_color('default'),
+	database ? begin_transaction('modifying'),!,
+	database ? insert(map(300,"Text3")),
+	database ? append(map(500,"Text1")),
+	database ? insert(map(100,"Text2")),
+	database ? append(map(300,"Text1")),
+	database ? append(map(300,"Text3")),
+	database ? end_transaction,
+	set_color('DkGreen'),
+	writeln("\tO.K."),
+	set_color('default').
+test_database_insert:-
+	set_color('Red'),
+	writeln("\tTransaction failed."),
+	set_color('default').
+--
+test_database_inspection(N):-
+	set_color('Violet'),
+	write_tabulation(N),
+	writeln("Test database inspection."),
+	set_color('default'),
+	database ? begin_transaction('reading'),!,
+	inspect_database(N+1),
+	set_color('DkGreen'),
+	database ? end_transaction,
+	write_tabulation(N),
+	writeln("O.K."),
+	set_color('default').
+test_database_inspection(N):-
+	set_color('Red'),
+	write_tabulation(N),
+	writeln("Transaction failed."),
+	set_color('default').
+--
+inspect_database(N):-
+	write_tabulation(N),
+	writeln("Database content:"),
+	set_color('Blue'),
+	database ? find(Item),
+		write_tabulation(N),
+		writeln("\t",Item),
+		fail.
+inspect_database(N):-
+	set_color('default'),
+	write_tabulation(N),
+	writeln("No more records.").
+--
+write_tabulation(N):-
+	N > 0,!,
+	write("\t"),
+	write_tabulation(N-1).
+write_tabulation(_).
+]
+-----------------------------------------------------------------------

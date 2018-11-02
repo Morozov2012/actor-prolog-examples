@@ -1,0 +1,293 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--              (c) 2011, IRE RAS, Alexei A. Morozov.                --
+--     An implementation of the Concurrent Sorting Algorithm.        --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+N		= INTEGER.
+--
+reference:
+--
+K		= INTEGER.
+--
+reference:
+--
+List		= Item*.
+Item		= REAL.
+--
+Sum, Product	= REAL.
+--
+R_STRING	= STRING.
+--
+DOMAINS:
+--
+reference:
+--
+RefTime			= time(RefHours,RefMinutes,RefSeconds,RefMilliseconds).
+RefHours		= [0..23].
+RefMinutes		= [0..59].
+RefSeconds		= [0..59].
+RefMilliseconds		= [0..999].
+--
+PREDICATES:
+--
+imperative:
+--
+form_output_list(List,Sum,Product)		- (i,i,i);
+create_list(N,List,Sum,Product,Sum,Product)	- (i,o,i,i,o,o);
+--
+report_result(List,K,Sum,Product)		- (i,i,i,i);
+--
+determ:
+--
+list_is_sorted(List,Sum,Product)		- (i,i,i);
+list_is_sorted
+	(Item,List,N,Sum,Product,Sum,Product)	- (i,i,i,i,i,o,o);
+--
+imperative:
+--
+distribute_if_necessary(List,List,List)		- (i,o,o);
+distribute(List,List,List)			- (i,o,o);
+--
+gather(List,List,List,List)			- (i,i,i,o);
+gather(List,List,List)				- (i,i,o);
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'MyTimer'):
+--
+constant:
+--
+	controller	: 'Controller';
+--
+	engine		: 'SortingEngine';
+--
+	total_number_of_iterations	: K;
+--
+variable:
+--
+	time1		: RefTime;
+--
+internal:
+--
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+report_end_of_iteration(K)	- (i);
+--
+imperative:
+--
+'+'(K,K) = K			- (i,i);
+'-'(RefTime,RefTime) = RefTime	- (i,i);
+'/'(RefTime,K) = RefTime	- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'MyTimer' (specialized 'Timer'):
+[
+PREDICATES:
+--
+imperative:
+--
+time() = RefTime;
+]
+-----------------------------------------------------------------------
+interface 'Controller' (specialized 'Alpha'):
+--
+--
+-- PROCESS INPUT:
+--
+variable:
+--
+	input		: List;		-- Sorted list (term)
+--
+constant:
+--
+	scheduler	: 'Main';
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output		: List;		-- User input (term)
+--
+-- AUXILIARY SLOTS:
+--
+constant:
+--
+	list_length	: N;
+--
+variable:
+--
+	sum		: Sum;
+	product		: Product;
+--
+variable:
+--
+	number_of_iteration	: K;
+--
+internal:
+--
+	accumulator	: 'Accumulator';
+	receiver	: 'Receiver';
+--
+--	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+implement_one_iteration(K)	- (i);
+--
+'+'(Sum,Item) = Sum		- (i,i);
+'*'(Product,Item) = Product	- (i,i);
+--
+determ:
+--
+string_to_term(R_STRING) = _	- (i);
+]
+-----------------------------------------------------------------------
+interface 'Accumulator' (specialized 'Alpha'):
+--
+variable:
+--
+	number_of_iteration	: K;
+	output			: List;
+	sum			: Sum;
+	product			: Product;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+accept_value(K,List,Sum,Product)	- (i,i,i,i);
+]
+-----------------------------------------------------------------------
+interface 'Receiver' (specialized 'Alpha'):
+--
+constant:
+--
+	list_length		: N;
+--
+variable:
+--
+	sum			: Sum;
+	product			: Product;
+--
+variable:
+--
+	input			: List;
+	number_of_iteration	: K;
+--
+constant:
+--
+	scheduler		: 'Main';
+--
+-- internal:
+--
+--	con			: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+'+'(Sum,Item) = Sum		- (i,i);
+'-'(Sum,Sum) = Sum		- (i,i);
+'-'(Product,Product) = Product	- (i,i);
+'*'(Product,Item) = Product	- (i,i);
+--
+determ:
+--
+'<='(Sum,Sum)			- (i,i);
+'<='(Product,Product)		- (i,i);
+'<='(Item,Item)			- (i,i);
+--
+imperative:
+--
+abs(Sum) = Sum			- (i);
+abs(Product) = Product		- (i);
+]
+-----------------------------------------------------------------------
+interface 'SortingEngine' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+suspending:
+--
+	input		: List;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output		: List;
+--
+-- AUXILIARY PROCESSES:
+--
+constant:
+--
+	left		: 'SortingEngine';
+	right		: 'SortingEngine';
+--
+-- AUXILIARY ACTORS:
+--
+internal:
+--
+	receiver	: 'Distributor';
+	sender		: 'Gatherer';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Distributor' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+variable:
+--
+	input		: List;
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	output1		: List;
+	output2		: List;
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Gatherer' (specialized 'Alpha'):
+--
+-- PROCESS INPUTS:
+--
+variable:
+--
+	input0		: List;
+	input1		: List;
+	input2		: List;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output		: List;
+--
+[
+PREDICATES:
+--
+determ:
+--
+'<'(Item,Item)		- (i,i);
+--
+]
+-----------------------------------------------------------------------

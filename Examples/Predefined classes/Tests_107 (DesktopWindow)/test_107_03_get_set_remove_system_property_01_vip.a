@@ -1,0 +1,76 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+-- Sorry, the VIP version does not support these operations.
+
+PREDICATES:
+
+imperative:
+
+test1(Color,Color)	- (i,i);
+test2(Color,Color)	- (i,i);
+test3;
+test4;
+
+class 'Main' (specialized 'Console'):
+--
+constant:
+--
+	name	= "my.property";
+--
+internal:
+--
+	env	= ('DesktopWindow');
+--
+[
+goal:-!,
+	test1('Red','DkGreen'),
+	test2('Red','DkGreen'),
+	test3,
+	test1('Red','DkGreen'),
+	test2('Red','DkGreen'),
+	test4,
+	test1('DkGreen','Red'),
+	test2('DkGreen','Red'),
+	test3,
+	test1('Red','DkGreen'),
+	test2('Red','DkGreen').
+--
+test1(Color,_):-
+	writeln("Test 1"),
+	writeln("\tDoes the property exist?"),
+	env ? get_system_property(name),!,
+	set_color(Color),
+	writeln("\tYes, it does!"),
+	set_color('default').
+test1(_,Color):-
+	set_color(Color),
+	writeln("\tNo, it doesn't."),
+	set_color('default').
+--
+test2(Color,_):-
+	writeln("Test 1"),
+	writeln("\tI will try to get property."),
+	Value== env?get_system_property(name),!,
+	set_color(Color),
+	writeln("\tValue: ",Value),
+	set_color('default').
+test2(_,Color):-
+	set_color(Color),
+	writeln("\tThe property does not exist!"),
+	set_color('default').
+--
+test3:-
+	writeln("Test 3"),
+	writeln("\tI will try to remove property."),
+	env ? remove_system_property(name),
+	writeln("\tThe property was remover successfully.").
+--
+test4:-
+	writeln("Test 4"),
+	writeln("\tI will try to set property."),
+	env ? set_system_property(name,"MY VALUE"),
+	writeln("\tDone!").
+]

@@ -1,0 +1,63 @@
+mesh(80,25)
+padding(1,1)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',10)
+
+dialog 'MyDialog'("HBox & VBox Alignment Demo",default,default,default,5,1,default)
+hbox(justify)
+	vbox
+	groupbox
+	vbox
+	vbox(right)
+		button("action11","&First (A1)")
+		button("action12","&First (B1)<1234567890>")
+		button("action13","&First (C1)")
+		scaling(1.5,3.5)
+			button("action14","&First (D1)")
+		end_of_scaling
+		hbox(up)
+			button("action151","&Left1")
+			button("action152","&Right1")
+		end_of_hbox
+	end_of_vbox
+	end_of_vbox
+	end_of_groupbox
+	end_of_vbox
+	vbox(left)
+		button("action21","&Second (A2)")
+		button("action22","&Second (B2)<1234567890>")
+		button("action23","&Second (C2)")
+		scaling(1.5,7.5)
+			button("action24","&Second (D2)")
+		end_of_scaling
+		hbox(down)
+			button("action251","&Left2")
+			button("action252","&Right2")
+		end_of_hbox
+	end_of_vbox
+	vbox(center)
+		button("action31","&Third (A3)")
+		button("action32","&Third (B3)<1234567890>")
+		button("action33","&Third (C3)")
+		scaling(2.5,3.5)
+			button("action34","&Third (D3)")
+		end_of_scaling
+		hbox(center)
+			button("action351","&Left3")
+			button("action352","&Right3")
+		end_of_hbox
+	end_of_vbox
+	vbox(justify)
+		button("action41","&Fourth (A4)")
+		button("action42","&Fourth (B4)<1234567890>")
+		button("action43","&Fourth (C4)")
+		scaling(2.5,3.5)
+			button("action44","&Third (D4)")
+		end_of_scaling
+		hbox(center)
+			button("action451","&Left4")
+			button("action452","&Right4")
+		end_of_hbox
+	end_of_vbox
+end_of_hbox
+end_of_dialog

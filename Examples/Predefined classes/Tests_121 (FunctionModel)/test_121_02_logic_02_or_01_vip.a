@@ -1,0 +1,28 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--              This is an example of SADT model.                    --
+--              The color of root block depends on                   --
+--              the state of its sub-blocks                          --
+--              according to the OR rule.                            --
+--                                                                   --
+-----------------------------------------------------------------------
+class '_Subgoal_1' (specialized 'Subgoal'):
+[
+CLAUSES:
+]
+-----------------------------------------------------------------------
+class '_Subgoal_2' (specialized 'Subgoal'):
+[
+CLAUSES:
+]
+-----------------------------------------------------------------------
+class '_Subgoal_3' (specialized 'Subgoal'):
+[
+CLAUSES:
+]
+-----------------------------------------------------------------------
+class 'Subgoal' (specialized 'Dialog'):
+[
+CLAUSES:
+]
+-----------------------------------------------------------------------

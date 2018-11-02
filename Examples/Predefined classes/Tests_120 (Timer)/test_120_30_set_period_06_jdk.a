@@ -1,0 +1,22 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	Time== ?time(),
+	con ? writeln("Program has started at: ",Time),
+	activate,
+	set_period(3.0,1.0).
+--
+tick:-!,
+	Time== ?time(),
+	con ? writeln("Current time: ",Time).
+]
+-----------------------------------------------------------------------

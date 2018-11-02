@@ -1,0 +1,487 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java3D";
+--
+-----------------------------------------------------------------------
+DOMAINS:
+--
+reference:
+--
+RefYesNoUnknown	= 'yes'; 'no'; 'unknown'.
+--
+ground:
+--
+Counter		= INTEGER.
+--
+-----------------------------------------------------------------------
+PREDICATES:
+--
+imperative:
+--
+crystal_lattice(
+	Counter,
+	Counter,
+	RefYesNoUnknown) = NodeList	- (i,i,i);
+--
+random_coordinate(INTEGER,Numerical)	- (i,o);
+random_angle(Angle)			- (o);
+--
+crystal(Radius,
+	Numerical,
+	Numerical,
+	RefYesNoUnknown) = Node		- (i,i,i,i);
+--
+billboard(
+	STRING,
+	Numerical,
+	RefYesNoUnknown) = Node		- (i,i,i);
+--
+select_node(RefYesNoUnknown,Node,Node)	- (i,i,o);
+--
+crystal_ends(
+	Radius,
+	Numerical,
+	Numerical,
+	Appearance) = Shape3D		- (i,i,i,i);
+--
+bottom_fan_coordinates(
+	Angle,
+	Angle,
+	Radius,
+	StripCount,
+	Vertices,
+	Vertices)			- (i,i,i,i,i,o);
+top_fan_coordinates(
+	Angle,
+	Angle,
+	Radius,
+	Numerical,
+	StripCount,
+	Vertices,
+	Vertices)			- (i,i,i,i,i,i,o);
+--
+crystal_thunk(
+	Radius,
+	Numerical,
+	Appearance) = Shape3D		- (i,i,i);
+--
+thunk_coordinates(
+	Angle,
+	Angle,
+	Radius,
+	Numerical,
+	Numerical,
+	Numerical,
+	Numerical,
+	Vertices)			- (i,i,i,i,i,i,i,o);
+--
+point_light(
+	Angle,
+	TimeInterval,
+	Color,
+	Radius) = Node			- (i,i,i,i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Dialog'):
+--
+internal:
+--
+	main_slot		= ('Test3D',
+					show_billboards);
+--
+variable:
+--
+	show_billboards		: RefYesNoUnknown;
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+goal:-!,
+	maximize.
+--
+action("remake"):-!,
+	main_slot ? create_scene(show_billboards).
+--
+modified_control('show_billboards'):-!,
+	main_slot ? modify_scene(show_billboards).
+]
+-----------------------------------------------------------------------
+class 'Test3D' (specialized 'Canvas3D'):
+--
+constant:
+--
+	crystal_radius			= 0.45;
+	crystal_total_height		= 5;
+--
+	fontName	: FontName		= 'helvetica';
+	tessellationTolerance
+			: TessellationTolerance	= 0.1;
+--
+	bold_font	: Font3D
+			= 'Font3D'({
+				fontName,
+				fontSize: 32,
+				fontStyle: ['bold'],
+				extrudePath: 'FontExtrusion'({
+					depth: 0
+					}),
+				tessellationTolerance
+				});
+--
+	enable_scene_antialiasing	= 'yes';
+--
+variable:
+--
+	show_billboards	: RefYesNoUnknown;
+--
+internal:
+--
+	database		= ('Store');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+create_scene(RefYesNoUnknown)		- (i);
+modify_scene(RefYesNoUnknown)		- (i);
+--
+imperative:
+--
+'-'(Angle,Angle) = Angle		- (i,i);
+'-'(Numerical,Numerical) = Numerical	- (i,i);
+'-'(Numerical) = Numerical		- (i);
+'+'(Angle,Angle) = Angle		- (i,i);
+'+'(Numerical,Numerical) = Numerical	- (i,i);
+'*'(Radius,REAL) = REAL			- (i,i);
+'/'(Numerical,Numerical) = Numerical	- (i,i);
+--
+sin(Angle) = REAL			- (i);
+cos(Angle) = REAL			- (i);
+--
+CLAUSES:
+--
+goal:-!.	
+--
+initialize:-!,
+	create_scene(show_billboards).
+--
+create_scene(ShowBillboards):-
+	database ? retract_all(),
+	show([
+		'TransformGroup'({
+			transform3D: 'Transform3D'({
+				scale: 0.7,
+				rotX: ?pi()/3
+				}),
+			branches: ?crystal_lattice(1,15,ShowBillboards)
+			}),
+		'OrbitBehavior'({
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: 'BoundingSphere'({})
+			})
+		]).
+--
+crystal_lattice(N,Limit,ShowBillboards) = [Cell|Rest] :-
+	N <= Limit,!,
+	Height==
+		?random() * crystal_total_height
+		+ crystal_radius * 2,
+	random_coordinate(7,X),
+	random_coordinate(4,Z),
+	Cell== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [X*0.1,0.0,Z*0.1]
+			}),
+		branches: [
+			?crystal(
+				crystal_radius,
+				Height,
+				-(crystal_total_height/2),
+				ShowBillboards)
+			]}),
+	Rest== ?crystal_lattice(N+1,Limit,ShowBillboards).
+crystal_lattice(_,_,_) = [].
+--
+random_coordinate(Width,Z):-
+	Z== ?random(Width*2+1) - Width.
+--
+random_angle(A):-
+	A== (?random()-0.5)*?pi().
+--
+crystal(Radius,TotalHeight,Y0,ShowBillboards) = 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			scale: 0.2
+			}),
+		branches: [
+			'TransformGroup'({
+				transform3D: 'Transform3D'({
+					translation: [0.0,Y0,0.0]
+					}),
+				branches: [
+					?billboard(Text,TotalHeight+Radius,ShowBillboards),
+					?crystal_ends(Radius,ThunkHeight,ConeHeight,Appearance),
+					?crystal_thunk(Radius,ThunkHeight,Appearance)
+					]
+				}),
+			'TransformGroup'({
+				transform3D: 'Transform3D'({
+					translation: [0.0,HalfHeight,0.0]
+					}),
+				branches: [
+					?point_light(A1,10200,color3(0.5,0.0,0.0),HalfHeight),
+					?point_light(A2,67000,color3(0.0,0.5,0.0),HalfHeight),
+					?point_light(A3,42000,color3(0.0,0.0,0.5),HalfHeight),
+					?point_light(A4,18000,color3(0.5,0.0,0.5),HalfHeight),
+					?point_light(A5,25000,color3(0.5,0.5,0.0),HalfHeight),
+					?point_light(A6,30000,color3(0.0,0.5,0.5),HalfHeight),
+					?point_light(A7,70000,color3(0.1,0.1,0.1),HalfHeight)
+					]
+				})
+			]
+		}) :-
+	ConeHeight== Radius,
+	ThunkHeight== TotalHeight - ConeHeight,
+	Text== ?convert_to_string(TotalHeight),
+	Appearance== 'Appearance'({
+		material: 'Material'({
+			diffuseColor: color3(0.7,0.7,0.7),
+			emissiveColor: 'Black',
+			ambientColor: 'White',
+			specularColor: 'White',
+			shininess: 179
+			}),
+		transparencyAttributes: 'TransparencyAttributes'({
+			transparency: 0.3,
+			transparencyMode: 'NICEST'
+			}),
+		polygonAttributes: 'PolygonAttributes'({
+			cullFace: 'CULL_NONE'
+			})
+		}),
+	random_angle(A1),
+	random_angle(A2),
+	random_angle(A3),
+	random_angle(A4),
+	random_angle(A5),
+	random_angle(A6),
+	random_angle(A7),
+	HalfHeight== TotalHeight / 2.
+--
+billboard(Text,Height,ShowBillboards)
+	= 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			scale: 0.01,
+			translation: [0,Height,0]
+			}),
+		allowChildrenRead: 'yes',
+		allowChildrenWrite: 'yes',
+		branches: [
+			InnerGroup
+			]}):-
+	database ? get_new_label(Label),
+	Billboard== 'Billboard'({
+		mode: 'ROTATE_ABOUT_POINT',
+		point: p(0,0,0),
+		geometry: 'Text3D'({
+			string: Text,
+			font3D: bold_font,
+			horizontalAlignment: 'ALIGN_CENTER',
+			verticalAlignment: 'ALIGN_CENTER'
+			}),
+		appearance: 'Appearance'({})
+		}),
+	select_node(ShowBillboards,Billboard,Node),
+	InnerGroup== 'BranchGroup'({
+		label: Label,
+		allowDetach: 'yes',
+		compile: 'yes',
+		branches: [
+			Node
+			]
+		}),
+	database ? save_billboard(Label,Billboard).
+--
+select_node('yes',Billboard,Billboard):-!.
+select_node(_,_,'Sphere'({radius: 0.0})).
+--
+crystal_ends(Radius,ThunkHeight,ConeHeight,Appearance)
+	= 'Shape3D'({	geometry: geometryArray(
+				'GeometryInfo'({
+					primitive: 'TRIANGLE_FAN_ARRAY',
+					stripCounts: [VertexCount,VertexCount],
+					coordinates: Coordinates,
+					generateNormals: 'yes',
+					creaseAngle: 0
+					})),
+			appearance: Appearance
+		}) :-
+	VertexCount== 10,
+	AngleStep== 2 * ?pi() / 8,
+	CurrentAngle== AngleStep * 0.5,
+	List1== [],
+	bottom_fan_coordinates(
+		CurrentAngle,AngleStep,Radius,
+		VertexCount,List1,List2),
+	List3== [p(0,0,0)|List2],
+	top_fan_coordinates(
+		CurrentAngle,AngleStep,Radius,ThunkHeight,
+		VertexCount,List3,List4),
+	Coordinates== [p(0,ThunkHeight+ConeHeight,0)|List4].
+--
+bottom_fan_coordinates(Angle,Step,Radius,Counter,Rest1,[C|Rest2]):-
+	Counter > 1,!,
+	X== Radius * ?sin(Angle),
+	Y== Radius * ?cos(Angle),
+	C== p(X,0,Y),
+	bottom_fan_coordinates(
+		Angle-Step,Step,Radius,Counter-1,Rest1,Rest2).
+bottom_fan_coordinates(_,_,_,_,Rest,Rest).
+--
+top_fan_coordinates(
+		Angle,Step,Radius,ThunkHeight,
+		Counter,Rest1,[C|Rest2]):-
+	Counter > 1,!,
+	X== Radius * ?sin(Angle),
+	Y== Radius * ?cos(Angle),
+	C== p(X,ThunkHeight,Y),
+	top_fan_coordinates(
+		Angle+Step,Step,Radius,ThunkHeight,
+		Counter-1,Rest1,Rest2).
+top_fan_coordinates(_,_,_,_,_,Rest,Rest).
+--
+crystal_thunk(Radius,ThunkHeight,Appearance)
+	= 'Shape3D'({	geometry: geometryArray(
+				'GeometryInfo'({
+					primitive: 'QUAD_ARRAY',
+					coordinates: Coordinates,
+					generateNormals: 'yes',
+					creaseAngle: 0
+					})),
+			appearance: Appearance
+		}) :-
+	FacetCount== 8,
+	AngleStep== 2 * ?pi() / 8,
+	Angle0== AngleStep * 0.5,
+	X0== Radius * ?sin(Angle0),
+	Y0== Radius * ?cos(Angle0),
+	Angle1== Angle0 - AngleStep,
+	thunk_coordinates(
+		Angle1,AngleStep,Radius,ThunkHeight,
+		FacetCount,X0,Y0,Coordinates).
+--
+thunk_coordinates(
+		Angle,Step,Radius,ThunkHeight,Counter,
+		X1,Y1,[C1,C2,C3,C4|Rest]):-
+	Counter > 0,!,
+	X2== Radius * ?sin(Angle),
+	Y2== Radius * ?cos(Angle),
+	C1== p(X1,0,Y1),
+	C2== p(X1,ThunkHeight,Y1),
+	C3== p(X2,ThunkHeight,Y2),
+	C4== p(X2,0,Y2),
+	thunk_coordinates(
+		Angle-Step,Step,Radius,ThunkHeight,Counter-1,
+		X2,Y2,Rest).
+thunk_coordinates(_,_,_,_,_,_,_,[]).
+--
+point_light(RotZ,Increasing,C,Radius) =
+	'TransformGroup'({
+		allowTransformRead: 'yes',
+		allowTransformWrite: 'yes',
+		branches: [
+			'TransformGroup'({
+				transform3D: 'Transform3D'({
+					translation: [0.0,0.0,Z]
+					}),
+				branches: [
+					'Sphere'({radius: 0.1}),
+					'PointLight'({
+						color: C,
+						influencingBounds: Bounds
+						})
+					]}),
+			'RotationInterpolator'({
+				alpha: 'Alpha3D'({
+					increasingAlphaDuration: Increasing
+					}),
+				transformAxis: 'Transform3D'({
+					rotZ: RotZ
+					}),
+				schedulingBounds: Bounds
+				})
+			]
+		}) :-
+	Z== Radius * 1.5,
+	Bounds == 'BoundingSphere'({radius: Radius}).
+--
+modify_scene('yes'):-
+	LN== database?match(labeled_node(_,_)),
+		LN == labeled_node(Label,Billboard),
+		set_node(Label,
+			'BranchGroup'({
+				label: Label,
+				allowDetach: 'yes',
+				compile: 'yes',
+				branches: [
+					Billboard
+					]
+				})),
+		fail.
+modify_scene('no'):-
+	LN== database?match(labeled_node(_,_)),
+		LN == labeled_node(Label,_),
+		set_node(Label,
+			'BranchGroup'({
+				label: Label,
+				allowDetach: 'yes',
+				compile: 'yes',
+				branches: [
+					'Sphere'({radius: 0.0})
+					]
+				})),
+		fail.
+modify_scene(_).
+]
+-----------------------------------------------------------------------
+class 'Store' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		=
+		recent_label(INTEGER);
+		labeled_node(NodeLabel,Node).
+--
+PREDICATES:
+--
+imperative:
+--
+get_new_label(NodeLabel)		- (o);
+--
+save_billboard(NodeLabel,Node)		- (i,i);
+--
+CLAUSES:
+--
+get_new_label(S):-
+	RV== ?match(recent_label(_)),
+	RV == recent_label(N1),!,
+	retract_all(recent_label(N1)),
+	N2== N1 + 1,
+	insert(recent_label(N2)),
+	S== ?convert_to_string(N2).
+get_new_label(S):-
+	N1== 1,
+	insert(recent_label(N1)),
+	S== ?convert_to_string(N1).
+--
+save_billboard(Label,Node):-
+	append(labeled_node(Label,Node)).
+]
+-----------------------------------------------------------------------

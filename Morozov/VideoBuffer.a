@@ -1,0 +1,279 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/VideoBuffer":
+
+--------------------------------------------------------------------
+-- The 'VideoBuffer' class is                                     --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+class 'VideoBuffer' (specialized 'DataAbstraction'):
+--
+constant:
+--
+operating_mode				= 'LISTENING';
+--
+description				= 'default';
+copyright				= 'default';
+registration_date			= 'default';
+registration_time			= 'default';
+--
+zoom_image				= 'no';
+zooming_coefficient			= 5.0;
+use_recorded_zooming_commands		= 'no';
+--
+opening_attempt_period			= 'default';
+write_buffer_size			= 50;
+read_buffer_size			= 0;
+slow_motion_coefficient			= 1;
+maximal_frame_delay			= 'default';
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+image_encoding_attributes	= {};
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+maximal_waiting_time		= 'default';
+--
+-- The implementation of the 'OperatingSystemResource' interface:
+--
+name				= "a-prolog.ap2j";
+extension			= ".ap2j";
+--
+-- The implementation of the 'AccessibleDataResource' interface:
+--
+character_set			= 'none';
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+backslash_always_is_separator			= 'yes';
+accept_only_uniform_resource_identifiers	= 'no';
+--
+[
+SOURCE:
+	"morozov.built_in.VideoBuffer";
+
+MODEL:
+
+?frame_obtained().
+?data_transfer_completion().
+?buffer_overflow().
+?buffer_deallocation().
+?data_transfer_error(ExceptionName).
+
+CLAUSES:
+--
+start:
+	[external "start"].
+pause:
+	[external "pause"].
+stop:
+	[external "stop"].
+--
+is_active:
+	[external "isActive"].
+is_suspended:
+	[external "isSuspended"].
+is_committed:
+	[external "isCommitted"].
+contains_new_frame:
+	[external "containsNewFrame"].
+--
+retrieve_buffered_frame(NumberOfFrameInTheBuffer):
+	[external "retrieveBufferedFrame"].
+retrieve_timed_frame(TimeInMilliseconds):
+	[external "retrieveTimedFrame"].
+--
+eof:
+	[external "eof"].
+--
+commit:
+	[external "commit"].
+--
+get_delivered_description(Text):
+	[external "getDeliveredDescription"].
+get_delivered_copyright(Text):
+	[external "getDeliveredCopyright"].
+get_delivered_registration_date(Text):
+	[external "getDeliveredRegistrationDate"].
+get_delivered_registration_time(Text):
+	[external "getDeliveredRegistrationTime"].
+--
+recent_reading_error(NumberOfFrameToBeRead,ExceptionName):
+	[external "recentReadingError"].
+recent_data_acquisition_error(ExceptionName):
+	[external "recentDataAcquisitionError"].
+--
+set_operating_mode(VideoBufferOperatingMode):
+	[external "setOperatingMode"].
+get_operating_mode() = VideoBufferOperatingMode:
+	[external "getOperatingMode"].
+--
+set_description(TextAttribute):
+	[external "setDescription"].
+get_description() = TextAttribute:
+	[external "getDescription"].
+--
+set_copyright(TextAttribute):
+	[external "setCopyright"].
+get_copyright() = TextAttribute:
+	[external "getCopyright"].
+--
+set_registration_date(TextAttribute):
+	[external "setRegistrationDate"].
+get_registration_date() = TextAttribute:
+	[external "getRegistrationDate"].
+--
+set_registration_time(TextAttribute):
+	[external "setRegistrationTime"].
+get_registration_time() = TextAttribute:
+	[external "getRegistrationTime"].
+--
+set_zoom_image(YesNo):
+	[external "setZoomImage"].
+get_zoom_image() = YesNo:
+	[external "getZoomImage"].
+--
+set_zooming_coefficient(YesNo):
+	[external "setZoomingCoefficient"].
+get_zooming_coefficient() = YesNo:
+	[external "getZoomingCoefficient"].
+--
+set_use_recorded_zooming_commands(YesNo):
+	[external "setUseRecordedZoomingCommands"].
+get_use_recorded_zooming_commands() = YesNo:
+	[external "getUseRecordedZoomingCommands"].
+--
+set_opening_attempt_period(ActionPeriod):
+	[external "setOpeningAttemptPeriod"].
+get_opening_attempt_period() = ActionPeriod:
+	[external "getOpeningAttemptPeriod"].
+--
+set_write_buffer_size(Size):
+	[external "setWriteBufferSize"].
+get_write_buffer_size() = Size:
+	[external "getWriteBufferSize"].
+--
+set_read_buffer_size(Size):
+	[external "setReadBufferSize"].
+get_read_buffer_size() = Size:
+	[external "getReadBufferSize"].
+--
+set_slow_motion_coefficient(Coefficient):
+	[external "setSlowMotionCoefficient"].
+get_slow_motion_coefficient() = Coefficient:
+	[external "getSlowMotionCoefficient"].
+--
+set_maximal_frame_delay(Milliseconds):
+	[external "setMaximalFrameDelay"].
+get_maximal_frame_delay() = Milliseconds:
+	[external "getMaximalFrameDelay"].
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+set_image_encoding_attributes(ImageAttributes):
+	[external "setImageEncodingAttributes"].
+get_image_encoding_attributes() = ImageAttributes:
+	[external "getImageEncodingAttributes"].
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+set_maximal_waiting_time(TimeInterval):
+	[external "setMaximalWaitingTime"].
+get_maximal_waiting_time() = TimeInterval:
+	[external "getMaximalWaitingTime"].
+--
+-- The implementation of the 'OperatingSystemResource' interface:
+--
+delete:
+	[external "delete"].
+delete(FileName):
+	[external "delete"].
+rename(NewName):
+	[external "rename"].
+rename(OldName,NewName):
+	[external "rename"].
+copy(Destination):
+	[external "copy"].
+copy(Origin,Destination):
+	[external "copy"].
+is_standard_file:
+	[external "isStandardFile"].
+is_standard_file(FileName):
+	[external "isStandardFile"].
+set_current_directory(Path):
+	[external "setCurrentDirectory"].
+get_current_directory() = Path:
+	[external "getCurrentDirectory"].
+extract_path(Path,FileName):
+	[external "extractPath"].
+extract_path(OldFileName,Path,NewFileName):
+	[external "extractPath"].
+extract_extension(Name,Extension):
+	[external "extractExtension"].
+extract_extension(FileName,Name,Extension):
+	[external "extractExtension"].
+replace_extension(Extension) = NewFileName:
+	[external "replaceExtension"].
+replace_extension(OldFileName,Extension) = NewFileName:
+	[external "replaceExtension"].
+set_name(Name):
+	[external "setName"].
+get_name() = Name:
+	[external "getName"].
+set_extension(Extension):
+	[external "setExtension"].
+get_extension() = Extension:
+	[external "getExtension"].
+--
+-- The implementation of the 'AccessibleDataResource' interface:
+--
+does_exist:
+	[external "doesExist"].
+does_exist(FileName):
+	[external "doesExist"].
+is_local_resource:
+	[external "isLocalResource"].
+is_local_resource(FileName):
+	[external "isLocalResource"].
+get_full_name = FullName:
+	[external "getFullName"].
+get_full_name(ShortName) = FullName:
+	[external "getFullName"].
+get_URL = FileName:
+	[external "getURL"].
+get_URL(ShortName) = FullName:
+	[external "getURL"].
+set_character_set(CharacterSet):
+	[external "setCharacterSet"].
+get_character_set() = CharacterSet:
+	[external "getCharacterSet"].
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+set_backslash_always_is_separator(YesNo):
+	[external "setBackslashAlwaysIsSeparator"].
+get_backslash_always_is_separator() = YesNo:
+	[external "getBackslashAlwaysIsSeparator"].
+set_accept_only_uniform_resource_identifiers(YesNo):
+	[external "setAcceptOnlyUniformResourceIdentifiers"].
+get_accept_only_uniform_resource_identifiers() = YesNo:
+	[external "getAcceptOnlyUniformResourceIdentifiers"].
+--
+-- The default implementation of programmer-defined clauses:
+--
+frame_obtained:
+	[external "frameObtained"].
+data_transfer_completion:
+	[external "dataTransferCompletion"].
+buffer_overflow:
+	[external "bufferOverflow"].
+buffer_deallocation:
+	[external "bufferDeallocation"].
+data_transfer_error(ExceptionName):
+	[external "dataTransferError"].
+]

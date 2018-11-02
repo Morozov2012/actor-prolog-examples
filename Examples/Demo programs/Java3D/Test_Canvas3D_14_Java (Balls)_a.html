@@ -1,0 +1,240 @@
+<html>
+<head>
+<title>Actor Prolog. Example &quot;D:\MOROZOV\Z\Z-DJ\DEMO\EXE\EXAMPLES\DEMO PROGRAMS\JAVA3D\TEST_CANVAS3D_14_JAVA (BALLS).A&quot;</title>
+</head>
+<body bgcolor="#F0F0F0">
+<table align="center" bgcolor="#FFFFFF" cellpadding=30>
+<tr>
+<td>
+<pre>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+<font color="0000FF"><i>-- An example of Actor Prolog program.                               --</i></font>
+<font color="0000FF"><i>-- (c) 2013 IRE RAS Alexei A. Morozov                                --</i></font>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+
+<font color="7F7F00"><u>import</u></font> .. <font color="7F7F00"><u>from</u></font> <font color="0000FF">&quot;morozov/Java3D&quot;</font>;
+
+<font color="7F7F00"><u>DOMAINS</u></font>:
+
+<font color="#008000">Balls</font>           = <font color="#008000">Ball</font>*.
+<font color="#008000">Ball</font>            = ball<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Position</font>,<font color="#008000">Velocity</font><font color="#993300">)</font>.
+<font color="#008000">Position</font>        = <font color="#008000">Translation</font>.
+<font color="#008000">Velocity</font>        = <font color="#008000">Numerical</font>*.
+
+<font color="7F7F00"><u>class</u></font> 'Main' <font color="#993300">(</font><font color="7F7F00"><u>specialized</u></font> 'Timer'<font color="#993300">)</font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>constant</u></font>:
+<font color="0000FF"><i>--</i></font>
+        scene_halfwidth                 = <font color="FF00FF">0.5</font>;
+        ball_radius     : <font color="#008000">Radius</font>        = <font color="FF00FF">0.03</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>internal</u></font>:
+<font color="0000FF"><i>--</i></font>
+        object_store    = <font color="#993300">(</font>'ObjectStore',
+                                scene_halfwidth<font color="#993300">)</font>;
+        canvas          = <font color="#993300">(</font>'TargetCanvas',
+                                scene= object_store,
+                                ball_radius<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="#800080">[</font>
+goal:-!,
+        set_period<font color="#993300">(</font><font color="FF00FF">0.030</font>,<font color="FF00FF">0.0</font><font color="#993300">)</font>,
+        activate.
+<font color="0000FF"><i>--</i></font>
+tick:-!,
+        object_store <font color="#993300">?</font> modify<font color="#993300">(</font><font color="#993300">?</font>time<font color="#993300">())</font>,
+        canvas <font color="#993300">?</font> update.
+<font color="#800080">]</font>
+
+<font color="7F7F00"><u>class</u></font> 'ObjectStore' <font color="#993300">(</font><font color="7F7F00"><u>specialized</u></font> 'Database'<font color="#993300">)</font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>constant</u></font>:
+<font color="0000FF"><i>--</i></font>
+        scene_halfwidth = <font color="0000FF">1</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="#800080">[</font>
+<font color="7F7F00"><u>DOMAINS</u></font>:
+<font color="0000FF"><i>--</i></font>
+<font color="#008000">Target</font>          = <font color="#008000">Ball</font>; <font color="#008000">Time</font>.
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>PREDICATES</u></font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>imperative</u></font>:
+<font color="0000FF"><i>--</i></font>
+modify<font color="#993300">(</font><font color="#008000">Time</font><font color="#993300">)</font>                            - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+calculate_new_position<font color="#993300">(</font>
+        <font color="#008000">Position</font>,
+        <font color="#008000">Velocity</font>,
+        <font color="#008000">Time</font>,
+        <font color="#008000">Time</font><font color="#993300">)</font> = <font color="#008000">Position</font>        - <font color="#993300">(</font>i,i,i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+correct_velosity<font color="#993300">(</font>
+        <font color="#008000">Position</font>,
+        <font color="#008000">Position</font>,
+        <font color="#008000">Position</font>,
+        <font color="#008000">Velocity</font>,
+        <font color="#008000">Velocity</font><font color="#993300">)</font>               - <font color="#993300">(</font>i,i,o,i,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+correct_V_and_P<font color="#993300">(</font>
+        <font color="#008000">Numerical</font>,
+        <font color="#008000">Numerical</font>,
+        <font color="#008000">Numerical</font>,
+        <font color="#008000">Numerical</font>,
+        <font color="#008000">Numerical</font><font color="#993300">)</font>              - <font color="#993300">(</font>i,i,o,i,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+'+'<font color="#993300">(</font><font color="#008000">Position</font>,<font color="#008000">Position</font><font color="#993300">)</font>  = <font color="#008000">Position</font>      - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+'*'<font color="#993300">(</font><font color="#008000">Velocity</font>,<font color="#008000">REAL</font><font color="#993300">)</font>      = <font color="#008000">Position</font>      - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+'-'<font color="#993300">(</font><font color="#008000">Numerical</font><font color="#993300">)</font>          = <font color="#008000">Numerical</font>     - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>CLAUSES</u></font>:
+<font color="0000FF"><i>--</i></font>
+modify<font color="#993300">(</font><font color="#008000">T2</font><font color="#993300">)</font>:-
+        <font color="#008000">Item1</font>== <font color="#993300">?</font>match<font color="#993300">(</font>time<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">T1</font>== <font color="#993300">?</font>val<font color="#993300">(</font><font color="0000FF">&quot;Time&quot;</font>,<font color="#008000">Item1</font><font color="#993300">)</font>,
+        <font color="#008000">B1</font>== <font color="#993300">?</font>match<font color="#993300">(</font>ball<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+                <font color="#008000">B1</font> == ball<font color="#993300">(</font><font color="#008000">Label</font>,<font color="#008000">P1</font>,<font color="#008000">V1</font><font color="#993300">)</font>,
+                <font color="#008000">P2</font>== <font color="#993300">?</font>calculate_new_position<font color="#993300">(</font><font color="#008000">P1</font>,<font color="#008000">V1</font>,<font color="#008000">T1</font>,<font color="#008000">T2</font><font color="#993300">)</font>,
+                correct_velosity<font color="#993300">(</font><font color="#008000">P1</font>,<font color="#008000">P2</font>,<font color="#008000">P3</font>,<font color="#008000">V1</font>,<font color="#008000">V2</font><font color="#993300">)</font>,
+                retract_all<font color="#993300">(</font><font color="#008000">B1</font><font color="#993300">)</font>,
+                insert<font color="#993300">(</font>ball<font color="#993300">(</font><font color="#008000">Label</font>,<font color="#008000">P3</font>,<font color="#008000">V2</font><font color="#993300">))</font>,
+                fail.
+modify<font color="#993300">(</font><font color="#008000">T2</font><font color="#993300">)</font>:-
+        retract_all<font color="#993300">(</font>time<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font><font color="#008000">T2</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+calculate_new_position<font color="#993300">(</font><font color="#008000">P1</font>,<font color="#008000">V1</font>,<font color="#008000">T1</font>,<font color="#008000">T2</font><font color="#993300">)</font> = <font color="#008000">P2</font> :-
+        <font color="#008000">Interval</font>== <font color="#993300">(</font><font color="#008000">T2</font> - <font color="#008000">T1</font><font color="#993300">)</font> / <font color="FF00FF">1000.0</font>,
+        <font color="#008000">P2</font>== <font color="#008000">P1</font> + <font color="#008000">V1</font> * <font color="#008000">Interval</font>.
+<font color="0000FF"><i>--</i></font>
+correct_velosity<font color="#993300">(</font><font color="#800080">[</font><font color="#008000">P1</font>|<font color="#008000">R1</font><font color="#800080">]</font>,<font color="#800080">[</font><font color="#008000">P2</font>|<font color="#008000">R2</font><font color="#800080">]</font>,<font color="#800080">[</font><font color="#008000">P3</font>|<font color="#008000">R3</font><font color="#800080">]</font>,<font color="#800080">[</font><font color="#008000">V1</font>|<font color="#008000">R4</font><font color="#800080">]</font>,<font color="#800080">[</font><font color="#008000">V2</font>|<font color="#008000">R5</font><font color="#800080">]</font><font color="#993300">)</font>:-!,
+        correct_V_and_P<font color="#993300">(</font><font color="#008000">P1</font>,<font color="#008000">P2</font>,<font color="#008000">P3</font>,<font color="#008000">V1</font>,<font color="#008000">V2</font><font color="#993300">)</font>,
+        correct_velosity<font color="#993300">(</font><font color="#008000">R1</font>,<font color="#008000">R2</font>,<font color="#008000">R3</font>,<font color="#008000">R4</font>,<font color="#008000">R5</font><font color="#993300">)</font>.
+correct_velosity<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#800080">[]</font>,<font color="#008000">_</font>,<font color="#800080">[]</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+correct_V_and_P<font color="#993300">(</font><font color="#008000">P1</font>,<font color="#008000">P2</font>,<font color="#008000">P1</font>,<font color="#008000">V1</font>,<font color="#008000">V2</font><font color="#993300">)</font>:-
+        <font color="#008000">P2</font> &gt;= scene_halfwidth,!,
+        <font color="#008000">V2</font>== -<font color="#993300">(</font><font color="#008000">V1</font><font color="#993300">)</font>.
+correct_V_and_P<font color="#993300">(</font><font color="#008000">P1</font>,<font color="#008000">P2</font>,<font color="#008000">P1</font>,<font color="#008000">V1</font>,<font color="#008000">V2</font><font color="#993300">)</font>:-
+        <font color="#008000">P2</font> &lt;= -<font color="#993300">(</font>scene_halfwidth<font color="#993300">)</font>,!,
+        <font color="#008000">V2</font>== -<font color="#993300">(</font><font color="#008000">V1</font><font color="#993300">)</font>.
+correct_V_and_P<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">P2</font>,<font color="#008000">P2</font>,<font color="#008000">V1</font>,<font color="#008000">V1</font><font color="#993300">)</font>.
+<font color="#800080">]</font>
+
+<font color="7F7F00"><u>class</u></font> 'TargetCanvas' <font color="#993300">(</font><font color="7F7F00"><u>specialized</u></font> 'Canvas3D'<font color="#993300">)</font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>internal</u></font>:
+<font color="0000FF"><i>--</i></font>
+        scene           : 'ObjectStore';
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>constant</u></font>:
+<font color="0000FF"><i>--</i></font>
+        ball_radius     : <font color="#008000">Radius</font>        = <font color="FF00FF">0.03</font>;
+<font color="0000FF"><i>--</i></font>
+        enable_scene_antialiasing       = 'yes';
+        background                      = 'Black';
+<font color="0000FF"><i>--</i></font>
+<font color="#800080">[</font>
+<font color="7F7F00"><u>PREDICATES</u></font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>imperative</u></font>:
+<font color="0000FF"><i>--</i></font>
+create_balls<font color="#993300">(</font><font color="#008000">INTEGER</font>,<font color="#008000">Balls</font><font color="#993300">)</font>             - <font color="#993300">(</font>i,o<font color="#993300">)</font>;
+insert_balls<font color="#993300">(</font><font color="#008000">Balls</font><font color="#993300">)</font>                     - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+create_spheres<font color="#993300">(</font><font color="#008000">Balls</font>,<font color="#008000">Radius</font>,<font color="#008000">NodeList</font><font color="#993300">)</font>   - <font color="#993300">(</font>i,i,o<font color="#993300">)</font>;
+create_sphere<font color="#993300">(</font><font color="#008000">Ball</font>,<font color="#008000">Radius</font>,<font color="#008000">Node</font><font color="#993300">)</font>         - <font color="#993300">(</font>i,i,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+update;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>CLAUSES</u></font>:
+<font color="0000FF"><i>--</i></font>
+goal:-!,
+        create_balls<font color="#993300">(</font><font color="0000FF">100</font>,<font color="#008000">Balls</font><font color="#993300">)</font>,
+        insert_balls<font color="#993300">(</font><font color="#008000">Balls</font><font color="#993300">)</font>,
+        create_spheres<font color="#993300">(</font><font color="#008000">Balls</font>,ball_radius,<font color="#008000">Spheres</font><font color="#993300">)</font>,
+        <font color="#008000">Bounds</font>== 'BoundingSphere'<font color="#993300">(</font><font color="FF00FF">{</font>
+                center: p<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font><font color="#993300">)</font>,
+                radius: <font color="FF00FF">100.0</font>
+                <font color="FF00FF">}</font><font color="#993300">)</font>,
+        show<font color="#993300">(</font><font color="#800080">[</font>  'Background'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        color: 'Black',
+                        scaleMode: 'SCALE_REPEAT',
+                        applicationBounds: <font color="#008000">Bounds</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                'OrbitBehavior'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        reverseAll: 'yes',
+                        stopZoom: 'yes',
+                        minRadius: <font color="FF00FF">1.5</font>,
+                        schedulingBounds: <font color="#008000">Bounds</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                | <font color="#008000">Spheres</font>
+                <font color="#800080">]</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+create_balls<font color="#993300">(</font><font color="#008000">N</font>,<font color="#800080">[</font>ball<font color="#993300">(</font><font color="#008000">N</font>,<font color="#800080">[</font><font color="0000FF">0</font>,<font color="0000FF">0</font>,<font color="0000FF">0</font><font color="#800080">]</font>,<font color="#800080">[</font><font color="#008000">Vx</font>,<font color="#008000">Vy</font>,<font color="#008000">Vz</font><font color="#800080">]</font><font color="#993300">)</font>|<font color="#008000">Rest</font><font color="#800080">]</font><font color="#993300">)</font>:-
+        <font color="#008000">N</font> &gt; <font color="0000FF">0</font>,!,
+        <font color="#008000">Vx</font>== <font color="#993300">?</font>random<font color="#993300">()</font> - <font color="FF00FF">0.5</font>,
+        <font color="#008000">Vy</font>== <font color="#993300">?</font>random<font color="#993300">()</font> - <font color="FF00FF">0.5</font>,
+        <font color="#008000">Vz</font>== <font color="#993300">?</font>random<font color="#993300">()</font> - <font color="FF00FF">0.5</font>,
+        create_balls<font color="#993300">(</font><font color="#008000">N</font>-<font color="0000FF">1</font>,<font color="#008000">Rest</font><font color="#993300">)</font>.
+create_balls<font color="#993300">(</font><font color="#008000">_</font>,<font color="#800080">[]</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+insert_balls<font color="#993300">(</font><font color="#800080">[</font><font color="#008000">Ball</font>|<font color="#008000">Rest</font><font color="#800080">]</font><font color="#993300">)</font>:-!,
+        scene <font color="#993300">?</font> insert<font color="#993300">(</font><font color="#008000">Ball</font><font color="#993300">)</font>,
+        insert_balls<font color="#993300">(</font><font color="#008000">Rest</font><font color="#993300">)</font>.
+insert_balls<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+create_spheres<font color="#993300">(</font><font color="#800080">[</font><font color="#008000">Ball</font>|<font color="#008000">Rest1</font><font color="#800080">]</font>,<font color="#008000">Radius</font>,<font color="#800080">[</font><font color="#008000">Sphere</font>|<font color="#008000">Rest2</font><font color="#800080">]</font><font color="#993300">)</font>:-!,
+        create_sphere<font color="#993300">(</font><font color="#008000">Ball</font>,<font color="#008000">Radius</font>,<font color="#008000">Sphere</font><font color="#993300">)</font>,
+        create_spheres<font color="#993300">(</font><font color="#008000">Rest1</font>,<font color="#008000">Radius</font>,<font color="#008000">Rest2</font><font color="#993300">)</font>.
+create_spheres<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#800080">[]</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+create_sphere<font color="#993300">(</font>ball<font color="#993300">(</font><font color="#008000">Label</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font>,<font color="#008000">Radius</font>,<font color="#008000">Sphere</font><font color="#993300">)</font>:-
+        <font color="#008000">Red</font>== <font color="#993300">?</font>random<font color="#993300">()</font> / <font color="FF00FF">1.5</font>,
+        <font color="#008000">Green</font>== <font color="#993300">?</font>random<font color="#993300">()</font> / <font color="FF00FF">1.5</font>,
+        <font color="#008000">Blue</font>== <font color="#993300">?</font>random<font color="#993300">()</font> / <font color="FF00FF">1.5</font>,
+        <font color="#008000">Sphere</font> ==
+                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        label: <font color="#008000">Label</font>,
+                        allowTransformWrite: 'yes',
+                        allowTransformRead: 'yes',
+                        branches: <font color="#800080">[</font>
+                                'Sphere'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        radius: <font color="#008000">Radius</font>,
+                                        generateNormals: 'yes',
+                                        divisions: <font color="0000FF">100</font>,
+                                        appearance: 'Appearance'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                material: 'Material'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        ambientColor: color3<font color="#993300">(</font><font color="#008000">Red</font>,<font color="#008000">Green</font>,<font color="#008000">Blue</font><font color="#993300">)</font>,
+                                                        diffuseColor: 'Black',
+                                                        specularColor: color3<font color="#993300">(</font><font color="FF00FF">0.8</font>,<font color="FF00FF">0.8</font>,<font color="FF00FF">0.8</font><font color="#993300">)</font>,
+                                                        emissiveColor: color3<font color="#993300">(</font><font color="#008000">Red</font>,<font color="#008000">Green</font>,<font color="#008000">Blue</font><font color="#993300">)</font>,
+                                                        shininess: <font color="0000FF">70</font>
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                'PointLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        color: color3<font color="#993300">(</font><font color="#008000">Red</font>,<font color="#008000">Green</font>,<font color="#008000">Blue</font><font color="#993300">)</font>,
+                                        position: p<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font><font color="#993300">)</font>,
+                                        attenuation: a<font color="#993300">(</font><font color="0000FF">1</font>,<font color="0000FF">0</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                                        influencingBounds: 'BoundingSphere'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                center: p<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font><font color="#993300">)</font>,
+                                                radius: <font color="FF00FF">100.0</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                <font color="#800080">]</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+update:-
+        <font color="#008000">B</font>== scene<font color="#993300">?</font>match<font color="#993300">(</font>ball<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+                <font color="#008000">B</font> == ball<font color="#993300">(</font><font color="#008000">Label</font>,<font color="#008000">Position</font>,<font color="#008000">_</font><font color="#993300">)</font>,
+                set_translation<font color="#993300">(</font><font color="#008000">Label</font>,<font color="#008000">Position</font><font color="#993300">)</font>,
+                fail.
+update.
+<font color="#800080">]</font>
+</pre>
+</td>
+</tr>
+</table>
+</body>
+</html>

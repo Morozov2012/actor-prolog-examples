@@ -1,0 +1,76 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+IMPERATIVES:
+--
+change_font;
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= ('MyWindow',
+		new_font_name= 'fixed',
+		new_font_size= 24,
+		x= 0,
+		y= 0);
+w2	= ('MyWindow',
+		font_name= 'default',
+		font_size= 'default',
+		new_font_name= 'fixed',
+		new_font_size= 24,
+		x= 0,
+		y= 1);
+w3	= ('MyWindow',
+		font_name= 'default',
+		font_size= 'default',
+		new_font_name= 'default',
+		new_font_size= 'default',
+		x= 0,
+		y= 2);
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	font_name;
+	font_size;
+--
+	new_font_name	: FontName;
+	new_font_size	: FontSize;
+--
+	width			= 1;
+	height			= 1;
+--
+	maximal_line_number	= 'window_height';
+--
+[
+goal:-!,
+	set_title(?format(
+		"Font: %s, %s",
+		new_font_name,
+		new_font_size)),
+	-- change_font,
+	write("++++++++"),
+	write(	" Initial font: ",
+		font_name,"; ",
+		font_size),nl,
+	write("+ Test +"),
+	write(	" New font: ",
+		new_font_name,"; ",
+		new_font_size),nl,
+	write("++++++++"),nl,
+	change_font.
+--
+change_font:-
+	set_font(new_font_name,new_font_size).
+]
+-----------------------------------------------------------------------

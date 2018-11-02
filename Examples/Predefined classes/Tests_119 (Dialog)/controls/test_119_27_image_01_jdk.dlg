@@ -1,0 +1,47 @@
+resource("images/*.bmp")
+
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',18)
+-- padding(0,0)
+-- draft('on')
+
+dialog 'MyDialog'("Image Demo",default,default,default,centered,centered,default)
+vbox(center)
+	groupbox("Image")
+		image['KeepProportions'](1010,15,15,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		-- image(1010,15,15,"images/dsc_0798_l2_72ppi_24bit.bmp")
+	end_of_groupbox
+	grid
+		row
+			column
+				button("action11","Put: Cherry tree")
+			end_of_column
+			column
+				button("action12","Put: Forget-me-not")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action21","Put: Peony")
+			end_of_column
+			column
+				button("action22","Put \"\"")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action41","Put #")
+			end_of_column
+			column
+				button("action42","Put _")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action5","Get value")
+			end_of_column
+		end_of_row
+	end_of_grid
+end_of_vbox
+end_of_dialog

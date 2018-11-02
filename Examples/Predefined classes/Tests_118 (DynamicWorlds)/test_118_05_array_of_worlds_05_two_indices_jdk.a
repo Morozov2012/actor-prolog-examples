@@ -1,0 +1,26 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+
+import 'WorldArray' as 'WindowArray'
+	from "Arrays"('TargetClass':='Report');
+
+class 'Main' (specialized 'Console'):
+--
+constant:
+--
+left	: ArrayIndexBound	= 0;
+right	: ArrayIndexBound	= 1;
+--
+w	= 'WindowArray'[left .. right,2 .. 3] of ('Report');
+--
+[
+goal:-
+	writeln("INDEX TABLE:"),
+	w[Index1,Index2] ? writeln(
+		"Index1= ",Index1,", Index2= ",Index2),
+	writeln("Index1= ",Index1,", Index2= ",Index2),
+	fail.
+goal:-!.
+]

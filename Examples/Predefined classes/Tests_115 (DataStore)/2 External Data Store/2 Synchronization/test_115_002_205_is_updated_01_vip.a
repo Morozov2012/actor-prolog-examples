@@ -1,0 +1,250 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Warning: the VIP version does not support the is_updated
+-- predicate of the DataStore class. Please translate this
+-- example to Java.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	p1	= (('ProcessA',
+			data_store=store,
+			period=7.0,
+			delay=5.0));
+	p2	= (('ProcessB',
+			data_store=store,
+			period=3.0,
+			delay=3.0));
+--
+internal:
+--
+	store	= ('DataStore',
+			access_mode='modifying');
+--
+	con	= ('Report',
+			title="DATA STORE",
+			x=0,
+			y=15);
+--
+[
+IMPERATIVES:
+--
+report_whether_datastore_is_updated;
+implement_datastore_transaction;
+--
+CLAUSES:
+--
+goal:-!,
+	con ? set_color('Fuchsia'),
+	con ? writeln("===== ROOT PROCESS ====="),
+	store ? delete,
+	con ? set_color('Orange'),
+	con ? write("OPENING DATA STORE... "),
+	store ? open,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	set_period(1.0,1.5),
+	activate.
+--
+tick:-!,
+	report_whether_datastore_is_updated.
+--
+report_whether_datastore_is_updated:-
+	store ? is_updated,!,
+	con ? set_color('White','Magenta'),
+	con ? writeln("Data store is updated!"),
+	con ? set_color('default','default'),
+	implement_datastore_transaction.
+report_whether_datastore_is_updated:-
+	con ? set_color('Navy','default'),
+	con ? writeln("Data store is NOT updated!"),
+	con ? set_color('default','default').
+--
+implement_datastore_transaction:-
+	con ? set_color('Violet'),
+	con ? writeln("Test data store reading."),
+	con ? set_color('default'),
+	store ? begin_transaction('reading'),!,
+	store ? end_transaction.
+implement_datastore_transaction:-
+	con ? set_color('Red'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'ProcessA' (specialized 'Timer'):
+--
+constant:
+--
+	data_store	: 'DataStore';
+	period		: TimeInterval;
+	delay		: TimeInterval;
+--
+internal:
+--
+	data_base	= ('MyDatabase',
+				place=shared(data_store,"MyTable"));
+--
+	con		= ('Report',
+				title="PROCESS A",
+				x=0,
+				y=0,
+				width=25,
+				height=15);
+--
+[
+goal:-!,
+	set_period(period,delay),
+	activate.
+--
+tick:-!,
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store insertion."),
+	con ? set_color('default'),
+	data_base ? test_database_updating,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'ProcessB' (specialized 'Timer'):
+--
+constant:
+--
+	data_store	: 'DataStore';
+	period		: TimeInterval;
+	delay		: TimeInterval;
+--
+internal:
+--
+	data_base	= ('MyDatabase',
+				place=shared(data_store,"MyTable"));
+--
+	con		= ('Report',
+				title="PROCESS B",
+				x=25,
+				y=0,
+				width=25,
+				height=15);
+--
+[
+goal:-!,
+	set_period(period,delay),
+	activate.
+--
+tick:-!,
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store inspection."),
+	con ? set_color('default'),
+	data_base ? test_database_inspection,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	con	= ('Console',
+			title="COMMON DATABASE TABLE",
+			x=50,
+			y=0,
+			width=30,
+			height=15);
+--
+[
+DOMAINS:
+--
+Target		= my_data(REAL).
+--
+IMPERATIVES:
+--
+test_database_updating;
+test_database_inspection;
+--
+modify_database;
+modify_database(REAL)				- (i);
+--
+check_database(Color)				- (i);
+report_whether_database_is_updated(Color)	- (i);
+report_checksum(REAL,Color)			- (i,i);
+--
+CLAUSES:
+--
+test_database_updating:-
+	con ? set_color('Violet'),
+	con ? writeln("Test database updating."),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	modify_database,
+	end_transaction.
+test_database_updating:-
+	con ? set_color('Red'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default').
+--
+test_database_inspection:-
+	con ? set_color('Violet'),
+	con ? writeln("Test database reading."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	check_database('RoyalBlue'),
+	end_transaction.
+test_database_inspection:-
+	con ? set_color('Red'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default').
+--
+modify_database:-
+	check_database('DkGreen'),
+	fail.
+modify_database:-
+	Delta== ?random(101) - 50.0,
+	modify_database(Delta),
+	modify_database(-(Delta)).
+--
+modify_database(Delta):-
+	T1== ?match(_),
+	T1 == my_data(V1),
+	retract(T1),!,
+	insert(my_data(V1 + Delta)).
+modify_database(Delta):-
+	insert(my_data(Delta)).
+--
+check_database(Color):-
+	report_whether_database_is_updated(Color),
+	fail.
+check_database(Color):-
+	T1== ?match(_),
+	T1 == my_data(V1),!,
+	report_checksum(V1,Color).
+check_database(_).
+--
+report_whether_database_is_updated(Color):-
+	is_updated,!,
+	con ? set_color('White',Color),
+	con ? writeln("Database table is updated!"),
+	con ? set_color('default','default').
+report_whether_database_is_updated(Color):-
+	con ? set_color(Color,'default'),
+	con ? writeln("Database table is NOT updated!"),
+	con ? set_color('default','default').
+--
+report_checksum(V1,_):-
+	V1 <> 0.0,
+	con ? set_color('White','Red'),
+	con ? writeln("Illegal check sum value!"),
+	con ? set_color('default','default'),
+	fail.
+report_checksum(V1,Color):-
+	con ? set_color(Color,'default'),
+	con ? writeln("Check sum: ",V1),
+	con ? set_color('default','default').
+]
+-----------------------------------------------------------------------

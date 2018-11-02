@@ -1,0 +1,111 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'Clip' from "morozov/Sound";
+
+PREDICATES:
+--
+imperative:
+--
+check_resource_state;
+check_if_resource_is_open;
+check_if_resource_is_active;
+check_if_resource_is_running;
+--
+test0;
+test1;
+test2;
+
+class 'Main' (specialized 'Clip'):
+--
+constant:
+--
+name		= "jar:data/termin22";
+extension	= ".mid";
+--
+internal:
+--
+timer	= ('Timer');
+con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("Start the test..."),
+	check_resource_state,
+	con ? writeln("Open the resource..."),
+	open,
+	check_resource_state,
+	con ? writeln("Start the play..."),
+	start,
+	check_resource_state,
+	con ? writeln("Sleep..."),
+	timer ? sleep(7),
+	check_resource_state,
+	test0,
+	test1,
+	test2,
+	con ? writeln("Stop the play..."),
+	stop,
+	check_resource_state,
+	con ? writeln("Close the resource..."),
+	close,
+	check_resource_state,
+	con ? writeln("Done!").
+--
+check_resource_state:-
+	check_if_resource_is_open,
+	check_if_resource_is_active,
+	check_if_resource_is_running.
+--
+check_if_resource_is_open:-
+	is_open,!,
+	con ? writeln("\tThe clip is open.").
+check_if_resource_is_open:-
+	con ? writeln("\tThe clip is not open.").
+--
+check_if_resource_is_active:-
+	is_active,!,
+	con ? writeln("\tThe clip is active.").
+check_if_resource_is_active:-
+	con ? writeln("\tThe clip is not active.").
+--
+check_if_resource_is_running:-
+	is_running,!,
+	con ? writeln("\tThe clip is running.").
+check_if_resource_is_running:-
+	con ? writeln("\tThe clip is not running.").
+--
+test0:-
+	get_frame_length,
+	get_microsecond_length,
+	get_frame_position,
+	get_microsecond_position.
+--
+test1:-
+	FrameLength== ?get_frame_length(),
+	con ? writeln(
+		"\tThe length is ",
+		FrameLength,
+		" frames."),
+	--
+	Microseconds== ?get_microsecond_length(),
+	con ? writeln(
+		"\tThe length is ",
+		Microseconds,
+		" microseconds.").
+--
+test2:-
+	Frames== ?get_frame_position(),
+	con ? writeln(
+		"\tThe current position is ",
+		Frames,
+		" frames."),
+	--
+	Microseconds== ?get_microsecond_position(),
+	con ? writeln(
+		"\tThe current position is ",
+		Microseconds,
+		" microseconds.").
+]

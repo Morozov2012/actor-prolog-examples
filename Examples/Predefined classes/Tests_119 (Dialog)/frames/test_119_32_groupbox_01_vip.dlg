@@ -1,0 +1,11 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',24)
+
+dialog 'MyDialog'("Groupbox Demo",default,default,default,5,1,default)
+	groupbox
+		button("action11","&First")
+		button("action12","&Second")
+		button("action13","&Third")
+	end_of_groupbox
+end_of_dialog

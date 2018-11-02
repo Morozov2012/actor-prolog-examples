@@ -1,0 +1,160 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+D1	= STRING.
+--
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Report'):
+--
+protecting:
+--
+output		: D1;
+--
+constant:
+--
+x		= 35;
+width		= 20;
+y		= 0;
+height		= 5;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-
+	output == "Hello world!",
+	set_color('Fuchsia'),
+	writeln("Sender:"),
+	set_color('Violet'),
+	writeln(output),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Transmitter' (specialized 'Report'):
+--
+variable:
+--
+input		: D1;
+--
+protecting:
+--
+output		: D1;
+--
+constant:
+--
+height		= 5;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-
+	input == output,
+	set_color('SkyBlue'),
+	writeln("Transmitter:"),
+	set_color('Violet'),
+	writeln(input),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Report'):
+--
+name;
+--
+variable:
+--
+input		: D1;
+--
+constant:
+--
+width		= 30;
+y		= 20;
+height		= 5;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-
+	set_color('DkGreen'),
+	writeln("Receiver [",name,"]:"),
+	set_color('Violet'),
+	writeln(input),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Main':
+--
+wS	= (('Sender',
+		output=X1));
+w1	= (('Transmitter',
+		input=X1,
+		output=X2,
+		x=30,
+		width=30,
+		y=5));
+w2	= (('Transmitter',
+		input=X2,
+		output=X3,
+		x=20,
+		width=50,
+		y=10));
+w31	= (('Transmitter',
+		input=X3,
+		output=X4,
+		x=10,
+		width=20,
+		y=15));
+wR1	= (('Receiver',
+		name="Receiver 1",
+		input=X4,
+		x=0));
+w32	= (('Transmitter',
+		input=X3,
+		output=X5,
+		x=35,
+		width=20,
+		y=15));
+wR2	= (('Receiver',
+		name="Receiver 2",
+		input=X5,
+		x=30));
+w33	= (('Transmitter',
+		input=X3,
+		output=X6,
+		x=60,
+		width=20,
+		y=15));
+wR3	= (('Receiver',
+		name="Receiver 3",
+		input=X6,
+		x=60));
+--
+[
+goal.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,158 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+r1	= ('ExternalResource',
+		location=
+			"file:///"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_109%20(WebResource)/"
+			"file.operations/data.dir/report1.html");
+r2	= ('ExternalResource',
+		location=
+			"file://"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_109%20(WebResource)/"
+			"file.operations/data.dir/report1.html");
+r3	= ('ExternalResource',
+		location=
+			"file:///"
+			"../../"
+			"Tests_109%20(WebResource)/"
+			"file.operations/data.dir/report1.html");
+r4	= ('ExternalResource',
+		location=
+			"file://"
+			"../../"
+			"Tests_109%20(WebResource)/"
+			"file.operations/data.dir/report1.html");
+r5	= ('ExternalResource',
+		location=
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined classes/"
+			"Tests_109 (WebResource)/"
+			"file.operations/data.dir/report1.html");
+r6	= ('ExternalResource',
+		location=
+			"../../"
+			"Tests_109 (WebResource)/"
+			"file.operations/data.dir/report1.html");
+r7	= ('ExternalResource',
+		location=
+			"data.dir/report1.html");
+r8	= ('ExternalResource',
+		location="");
+r9	= ('ExternalResource',
+		location=
+			"../../"
+			"Tests_109 (WebResource)/file.operations/");
+r10	= ('ExternalResource',
+		location=
+			" \n\t../../"
+			"Tests_109 (WebResource)/file.operations\\"
+			" \t\n");
+r11	= ('ExternalResource',
+		location=
+			"../read.me");
+r12	= ('ExternalResource',
+		location=
+			"http://xxx.yyy.zzz"
+			"/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_109%20(WebResource)/"
+			"file.operations/data.dir/report1.html");
+r13	= ('ExternalResource',
+		location=
+			"ftp://xxx.yyy.zzz"
+			"/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_109%20(WebResource)/"
+			"file.operations/data.dir/report1.html");
+r14	= ('ExternalResource',
+		location=
+			"https://xxx.yyy.zzz"
+			"/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_109%20(WebResource)/"
+			"file.operations/data.dir/report1.html");
+--
+[
+goal:-
+	r1 ? test_1,
+	r2 ? test_1,
+	r3 ? test_1,
+	r4 ? test_1,
+	r5 ? test_1,
+	r6 ? test_1,
+	r7 ? test_1,
+	r8 ? test_2,
+	r9 ? test_2,
+	r10 ? test_2,
+	r11 ? test_3,
+	r12 ? test_1,
+	r13 ? test_1,
+	r14 ? test_1.
+]
+-----------------------------------------------------------------------
+class 'ExternalResource' (specialized 'WebResource'):
+--
+internal:
+--
+con			= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test_1;
+test_2;
+test_3;
+--
+check_if_resource_is_local_file(STRING,Color)	- (i,o);
+check_if_file_does_exist(STRING,Color)		- (i,o);
+--
+CLAUSES:
+--
+test_1:-
+	Text== ?get_full_name(
+			"../data.dir/report2.html"),
+	check_if_resource_is_local_file(Text,Color),
+	con ? set_color(Color),
+	con ? writeln("FullName: ",Text),
+	con ? set_color('Black').
+--
+test_2:-
+	Text== ?get_full_name(
+			"file://../../"
+			"tests_109%20(WebResource)/"
+			"file.operations/data.dir/report2.html"),
+	check_if_resource_is_local_file(Text,Color),
+	con ? set_color(Color),
+	con ? writeln("FullName: ",Text),
+	con ? set_color('Black').
+--
+test_3:-
+	Text== ?get_full_name(
+			"file.operations/data.dir/report2.html"),
+	check_if_resource_is_local_file(Text,Color),
+	con ? set_color(Color),
+	con ? writeln("FullName: ",Text),
+	con ? set_color('Black').
+--
+check_if_resource_is_local_file(Text,Color):-
+	?is_local_resource(Text),!,
+	check_if_file_does_exist(Text,Color).
+check_if_resource_is_local_file(_,'Cyan').
+--
+check_if_file_does_exist(Text,'DkGreen'):-
+	does_exist(Text),!.
+check_if_file_does_exist(_,'Magenta').
+]
+-----------------------------------------------------------------------

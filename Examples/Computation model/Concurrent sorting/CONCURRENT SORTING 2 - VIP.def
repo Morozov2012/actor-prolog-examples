@@ -1,0 +1,185 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--              (c) 2011, IRE RAS, Alexei A. Morozov.                --
+--     An implementation of the Concurrent Sorting Algorithm.        --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+List		= Item*.
+Item		= INTEGER.
+--
+R_STRING	= STRING.
+--
+DOMAINS:
+--
+reference:
+--
+RefTime			= time(RefHours,RefMinutes,RefSeconds,RefMilliseconds).
+RefHours		= [0..23].
+RefMinutes		= [0..59].
+RefSeconds		= [0..59].
+RefMilliseconds		= [0..999].
+--
+PREDICATES:
+--
+imperative:
+--
+form_output_list(List)			- (i);
+--
+report_time(List)			- (i);
+--
+distribute_if_necessary(List,List,List)	- (i,o,o);
+distribute(List,List,List)		- (i,o,o);
+--
+gather(List,List,List,List)		- (i,i,i,o);
+gather(List,List,List)			- (i,i,o);
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+user_interface	: 'UserInterface';
+--
+engine		: 'SortingEngine';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'UserInterface' (specialized 'MyTimer'):
+--
+--
+-- PROCESS INPUT:
+--
+variable:
+--
+	input		: List;		-- Sorted list (term)
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output		: List;		-- User input (term)
+--
+-- AUXILIARY SLOTS:
+--
+internal:
+--
+	receiver	: 'Receiver';
+--
+variable:
+--
+	time1		: RefTime;
+--
+[
+PREDICATES:
+--
+determ:
+--
+string_to_term(R_STRING) = _	- (i);
+]
+-----------------------------------------------------------------------
+interface 'MyTimer' (specialized 'Timer'):
+[
+PREDICATES:
+--
+imperative:
+--
+time() = RefTime;
+]
+-----------------------------------------------------------------------
+interface 'Receiver' (specialized 'Console'):
+--
+variable:
+--
+	input		: List;
+--
+	time1		: RefTime;
+--
+internal:
+--
+	timer		: 'MyTimer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+'-'(RefTime,RefTime) = INTEGER	- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'SortingEngine' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+suspending:
+--
+	input		: List;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output		: List;
+--
+-- AUXILIARY PROCESSES:
+--
+constant:
+--
+	left		: 'SortingEngine';
+	right		: 'SortingEngine';
+--
+-- AUXILIARY ACTORS:
+--
+internal:
+--
+	receiver	: 'Distributor';
+	sender		: 'Gatherer';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Distributor' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+variable:
+--
+	input		: List;
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	output1		: List;
+	output2		: List;
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Gatherer' (specialized 'Alpha'):
+--
+-- PROCESS INPUTS:
+--
+variable:
+--
+	input0		: List;
+	input1		: List;
+	input2		: List;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output		: List;
+--
+[
+PREDICATES:
+--
+determ:
+--
+'<'(Item,Item)		- (i,i);
+--
+]
+-----------------------------------------------------------------------

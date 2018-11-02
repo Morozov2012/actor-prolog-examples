@@ -1,0 +1,20 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-
+	con ? writeln("break('SpecialException')"),
+	break('SpecialException').
+--
+-- alarm(Name):-
+--	con ? writeln("Alarm: ",Name),
+--	fail.
+]
+-----------------------------------------------------------------------

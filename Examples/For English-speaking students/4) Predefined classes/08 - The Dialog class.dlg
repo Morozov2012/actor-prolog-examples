@@ -1,0 +1,12 @@
+
+dialog 'Main' ("Demo Dialog",'Red','White',20,10,4,'Green')
+
+radiobuttons(2010)
+	radiobutton("First")
+	radiobutton("Second")
+	radiobutton("Third")
+end_of_radiobuttons
+
+button(1,"&Close")
+
+end_of_dialog

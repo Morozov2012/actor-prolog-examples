@@ -1,0 +1,106 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+
+class 'Main':
+--
+internal:
+--
+	test1	= ('Test',
+			name= "demoPath1/subDir1\\test",
+			extension= ".asc");
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'File'):
+--
+constant:
+--
+	name	: FileName;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-
+	con ? writeln("=== File: ",name," ==="),
+	fail.
+goal:-
+	test5,
+	test1,
+	test2,
+	test3,
+	fail.
+goal:-
+	test4,
+	test1,
+	test2,
+	test3,
+	fail.
+goal:-
+	test5,
+	test1,
+	test2,
+	test3,
+	fail.
+goal:-!.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tDoes the file exist?"),
+	?does_exist(),!,
+	con ? writeln("\tYes, it does!").
+test1:-
+	con ? writeln("\tNo, it doesn't.").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tIs this file normal?"),
+	?is_normal(),!,
+	con ? writeln("\tYes, it is!").
+test2:-
+	con ? writeln("\tNo, it isn't.").
+--
+test3:-
+	con ? writeln("Test 3"),
+	con ? writeln("\tIs this file normal?"),
+	?is_normal(name),!,
+	con ? writeln("\tYes, it is!").
+test3:-
+	con ? writeln("\tNo, it isn't.").
+--
+test4:-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to delete the file."),
+	?delete(),!,
+	con ? writeln("\tThe file was deleted successfully.").
+test4:-
+	con ? writeln("\tI cannot delete it.").
+--
+test5:-
+	con ? writeln("Test 5"),
+	con ? writeln("\tI will try to create the file."),
+	?clear(),!,
+	con ? writeln("\tDone!").
+test5:-
+	con ? writeln("\tI cannot create it.").
+]

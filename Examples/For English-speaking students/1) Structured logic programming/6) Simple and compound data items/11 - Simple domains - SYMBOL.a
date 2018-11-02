@@ -1,0 +1,40 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- SYMBOL.                               --
+--                                       --
+-- Questions: What are symbols? When the --
+-- symbols are more appropriate than the --
+-- strings? How can the compiler         --
+-- distinguish a symbol from a string?   --
+-- Can one include spaces, tabulators,   --
+-- and other special characters in a     --
+-- symbol? How can one define an ASCII   --
+-- code in a symbol? Why is the          --
+-- comparison / unification of the       --
+-- symbols faster than the comparison /  --
+-- unification of the strings? Why are   --
+-- a lot of built-in operations defined  --
+-- for the strings, but not for the      --
+-- symbols?                              --
+--                                       --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	T1== 'Green',
+	writeln(T1),
+	--
+	T2== 'Special Symbol',
+	writeln(T2),
+	--
+	T3== 'Special\tSymbol',
+	writeln(T3),
+	--
+	T4== '\16#41#pril',
+	writeln(T4).

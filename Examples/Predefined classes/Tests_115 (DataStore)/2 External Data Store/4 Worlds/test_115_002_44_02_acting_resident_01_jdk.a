@@ -1,0 +1,202 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute the target_of_resident example in the first environment
+-- and this example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+MyDatabaseTargetB	= ('TargetClassB').
+--
+MyResidentTargetB	=
+			MyDatabaseTargetB;
+			r(R_STRING);
+			MyResidentTargetB*.
+--
+R_STRING		= STRING.
+MyMessageB		= STRING.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Report'):
+--
+internal:
+--
+	store2		= ('DataStore',
+				name="MyDataStore.dat",
+				access_mode='reading',
+				sharing_mode='shared_access');
+	base2		= ('MyDatabaseB',
+				constant:
+					place=shared(store2,"MyTable"),
+				internal:
+					con=self,
+				protecting:
+					target_of_resident=T);
+--
+constant:
+--
+	watcher		= (('MyWatcher',
+				suspending:
+					target_of_resident=T));
+--
+constant:
+--
+	x		= 0;
+	y		= 0;
+	width		= 80;
+	height		= 11;
+[
+PREDICATES:
+--
+imperative:
+--
+test03;
+--
+CLAUSES:
+--
+goal:-!,
+	test03.
+--
+test03:-
+	set_color('RoyalBlue'),
+	writeln("Test datastore inspection."),
+	set_color('Orange'),
+	write("OPENING DATA STORE... "),
+	store2 ? open,
+	writeln("DONE."),
+	set_color('default'),
+	base2 ? test_database_find,
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyDatabaseB' (specialized 'MyDatabase'):
+[
+DOMAINS:
+--
+reference:
+--
+Target		= MyDatabaseTargetB.
+--
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+variable:
+--
+	target_of_resident	: MyResidentTargetB;
+--
+internal:
+--
+	con;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test_database_find;
+inspect_database;
+set_target_world(MyDatabaseTargetB)		- (i);
+--
+CLAUSES:
+--
+test_database_find:-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest database inspection."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	inspect_database,
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test_database_find:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+inspect_database:-
+	con ? writeln("\tDatabase content:"),
+	con ? set_color('Blue'),
+	find(Item),
+		con ? writeln("\t\t",Item),
+		set_target_world(Item),!.
+inspect_database:-
+	con ? set_color('default'),
+	con ? writeln("\tNo more items.").
+--
+set_target_world(target_of_resident):-!,
+	con ? set_color('Violet'),
+	con ? writeln("\tI have assigned the target world."),
+	con ? set_color('default').
+set_target_world(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tI cannot set target world."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'TargetClassB' (specialized 'Alpha'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+my_function(MyMessageB) = MyResidentTargetB	- (i);
+--
+MODEL:
+--
+?my_function(Message) = Time.
+--
+CLAUSES:
+--
+my_function(Text) = # :-
+	con ? set_color('DkGreen'),
+	con ? write("\t\tTargetClassA: I have got a request: "),
+	con ? set_color('Violet'),
+	con ? writeln(Text),
+	con ? set_color('default').
+--
+goal:-!,
+	con ? writeln("Hello from TargetClassB!").
+]
+-----------------------------------------------------------------------
+class 'MyWatcher' (specialized 'Report'):
+--
+variable:
+--
+value	= target_of_resident ?? my_function("Client is O.K.");
+--
+target_of_resident	: MyResidentTargetB;
+--
+constant:
+--
+x	= 0;
+y	= 11;
+width	= 80;
+height	= 14;
+[
+goal:-!,
+	set_color('DkGreen'),
+	write("Resident value: "),
+	set_color('Violet'),
+	writeln(value),
+	set_color('default').
+]
+-----------------------------------------------------------------------

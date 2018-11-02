@@ -1,0 +1,77 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+
+class 'Main':
+--
+internal:
+--
+	test1	= ('Test',
+			name= "demoPath1/subDir1\\test",
+			extension= ".asc");
+	test2	= ('Test',
+			name= 'stdin');
+	test3	= ('Test',
+			name= 'stdout');
+	test4	= ('Test',
+			name= 'stderr');
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'File'):
+--
+constant:
+--
+	name	: FileName;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("=== File: ",name," ==="),
+	test1,
+	test2,
+	test3.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tDoes the file exist?"),
+	?does_exist(),!,
+	con ? writeln("\tYes, it does!").
+test1:-
+	con ? writeln("\tNo, it doesn't.").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tIs this file read only?"),
+	?is_read_only(),!,
+	con ? writeln("\tYes, it is!").
+test2:-
+	con ? writeln("\tNo, it isn't.").
+--
+test3:-
+	con ? writeln("Test 3"),
+	con ? writeln("\tIs this file read only?"),
+	?is_read_only(name),!,
+	con ? writeln("\tYes, it is!").
+test3:-
+	con ? writeln("\tNo, it isn't.").
+]

@@ -1,0 +1,16 @@
+padding(1.5,1.5)
+
+dialog 'ControlDialog' (
+	"Parameters of Search",default,default,default,
+	centered,centered,default)
+vbox(center)
+	hbox
+		checkbox(limit_number_of_pages,
+				" Do not exceed page number ",'yes')
+		editinteger(max_page,3,25)
+	end_of_hbox
+	hbox(center)
+		ok(close,"&O.K.")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

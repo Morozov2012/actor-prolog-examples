@@ -1,0 +1,88 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5.
+--
+test1:-
+	con ? writeln("Test 1:"),
+	A== "ABCDEFG",
+	B== "HIJKL",
+	con ? writeln("   A: ",A),
+	con ? writeln("   B: ",B),
+	concat(A,B,C),!,
+	con ? writeln("   C: ",C).
+test1:-
+	con ? writeln("Failure").
+--
+test2:-
+	con ? writeln("Test 2:"),
+	A== "ABCDEFG",
+	C== "ABCDEFGHIJKL",
+	con ? writeln("   A: ",A),
+	con ? writeln("   C: ",C),
+	concat(A,B,C),!,
+	con ? writeln("   B: ",B).
+test2:-
+	con ? writeln("Failure").
+--
+test3:-
+	con ? writeln("Test 3:"),
+	B== "HIJKL",
+	C== "ABCDEFGHIJKL",
+	con ? writeln("   B: ",B),
+	con ? writeln("   C: ",C),
+	concat(A,B,C),!,
+	con ? writeln("   A: ",A).
+test3:-
+	con ? writeln("Failure").
+--
+test4:-
+	con ? writeln("Test 4:"),
+	A== "ABCDEFG",
+	B== "HIJKL",
+	C== "ABCDEFGHIJKL",
+	con ? writeln("   A: ",A),
+	con ? writeln("   B: ",B),
+	con ? writeln("   C: ",C),
+	concat(A,B,C),!,
+	con ? writeln("   Success").
+test4:-
+	con ? writeln("Failure").
+--
+test5:-
+	con ? writeln("Test 5:"),
+	A== "ABCDEFG",
+	B== "XYZ",
+	C== "ABCDEFGHIJKL",
+	con ? writeln("   A: ",A),
+	con ? writeln("   B: ",B),
+	con ? writeln("   C: ",C),
+	concat(A,B,C),!,
+	con ? writeln("   Error: A || B = C").
+test5:-
+	con ? writeln("   Right answer: A || B <> C").
+]

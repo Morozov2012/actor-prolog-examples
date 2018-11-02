@@ -1,0 +1,194 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/IPCamera";
+--
+-----------------------------------------------------------------------
+interface 'VideoRecorder' (specialized 'Dialog'):
+--
+internal:
+--
+buffer			: 'VideoManager';
+main_window		: 'Canvas2D';
+ip_camera_error_handler	: 'IPCameraErrorHandler';
+data_are_to_be_saved	: 'Switch';
+file_operations		: 'File';
+con			: 'Console';
+--
+constant:
+--
+temporary_file_name	: FileName;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+complete_data_transfer;
+--
+load_temporary_file_if_possible;
+choose_file(STRING)					- (i);
+update_dialog_title(STRING)				- (i);
+start_reading;
+--
+determ:
+--
+check_whether_data_are_to_be_saved;
+--
+imperative:
+--
+park_scroll_control;
+set_read_buffer_size(INTEGER)				- (i);
+--
+redraw_recent_frame;
+scroll_video;
+--
+update_displaying_mode;
+--
+switch_buttons;
+switch_button_UseRecordedZoomingCommands;
+switch_button_ZoomImage;
+switch_text_area_ZoomingCoefficient;
+switch_button_Connect;
+switch_button_Choose;
+switch_button_Play;
+switch_button_Pause;
+switch_button_Record;
+switch_button_Stop;
+switch_button_Save;
+switch_button_Export;
+switch_text_area_Description;
+switch_auxiliary_controls;
+--
+determ:
+--
+ip_camera_is_connected(VideoBufferOperatingMode)	- (i);
+]
+-----------------------------------------------------------------------
+interface 'VideoManager' (specialized 'IPCamera'):
+--
+internal:
+--
+	main_window			: 'Canvas2D';
+	video_recorder			: 'VideoRecorder';
+	image				: 'BufferedImage';
+	directory_name			: 'DirectoryName';
+	stop_after_the_first_frame	: 'Switch';
+	file_operation_error_handler	: 'FileOperationErrorHandler';
+	file_operations			: 'File';
+	text_operations			: 'Text';
+	timer_operations		: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+report_time(FrameNumber,INTEGER,REAL)	- (i,i,i);
+--
+determ:
+--
+check_file_name;
+--
+imperative:
+--
+set_output_directory(STRING)		- (i);
+--
+determ:
+--
+create_directory_if_necessary(STRING)	- (i);
+--
+imperative:
+--
+delete_files(S_List)			- (i);
+--
+read_all_frames;
+read_only_the_first_frame;
+--
+save_frame_if_necessary(
+	VideoBufferOperatingMode,
+	FrameNumber)			- (i,i);
+--
+determ:
+--
+rename_temporary_file(STRING)		- (i);
+--
+imperative:
+--
+continue_exporting_if_necessary;
+--
+list_directory(STRING) = S_List		- (i);
+delete(FileName)			- (i);
+delete(STRING)				- (i);
+make_directory(FileName)		- (i);
+make_directory(STRING)			- (i);
+save(FileName,ImageEncodingAttributes)	- (i,i);
+save(STRING,ImageEncodingAttributes)	- (i,i);
+rename(FileName)			- (i);
+rename(STRING)				- (i);
+]
+-----------------------------------------------------------------------
+interface 'DirectoryName' (specialized 'Database'):
+[
+DOMAINS:
+Target	= STRING.
+]
+-----------------------------------------------------------------------
+interface 'Switch' (specialized 'Database'):
+[
+DOMAINS:
+Target	= YesNo.
+PREDICATES:
+imperative:
+assign(YesNo)			- (i);
+determ:
+is_true;
+]
+-----------------------------------------------------------------------
+interface 'IPCameraErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+world;
+handler;
+con		: 'Console';
+--
+[
+PREDICATES:
+determ:
+start;
+stop;
+imperative:
+alarm(ExceptionName,SYMBOL,_*)				- (i,i,i);
+]
+-----------------------------------------------------------------------
+interface 'FileOperationErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+world;
+handler;
+con		: 'Console';
+--
+[
+PREDICATES:
+determ:
+does_exist(FileName)					- (i);
+does_exist(STRING)					- (i);
+list_directory(STRING) = S_List				- (i);
+delete(FileName)					- (i);
+delete(STRING)						- (i);
+make_directory(FileName)				- (i);
+make_directory(STRING)					- (i);
+save(FileName,ImageEncodingAttributes)			- (i,i);
+save(STRING,ImageEncodingAttributes)			- (i,i);
+rename(FileName)					- (i);
+rename(STRING)						- (i);
+imperative:
+alarm(ExceptionName,SYMBOL,_*)				- (i,i,i);
+]
+-----------------------------------------------------------------------

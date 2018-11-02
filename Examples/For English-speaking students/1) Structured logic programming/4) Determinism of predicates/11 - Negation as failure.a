@@ -1,0 +1,49 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Deterministic,     --
+-- non-deterministic, and imperative     --
+-- predicates. Negation as failure.      --
+--                                       --
+-- Questions: How can one implement a    --
+-- negation with the help of a cut and   --
+-- backtracking? Let us assume that one  --
+-- uses the not_p predicate with the     --
+-- output argument. What will the p      --
+-- predicate output in this case? When   --
+-- is the behavior (the operational      --
+-- semantics) of the not_p predicate     --
+-- inconsistent with the mathematical    --
+-- semantics of the NOT logical          --
+-- operation?                            --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+determ:
+
+not_p(INTEGER)	- (i);
+p(INTEGER)	- (i);
+
+CLAUSES:
+
+goal:-
+	X== 5,
+	not_p(X),
+	writeln("The p(",X,") statement ",
+		"is true.").
+goal:-
+	writeln("The statement is false.").
+
+not_p(X):-
+	p(X),!,
+	fail.
+not_p(_).
+
+p(1).
+p(2).
+p(3).

@@ -1,0 +1,890 @@
+------------------------------------------------------------------------
+-- This visual expert system is written in Actor Prolog.              --
+-- (c) 2003-2010, Alexei A. Morozov, IRE RAS                          --
+-- The first version of the program was created on December 11, 1998. --
+------------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+OilfieldAttributes	= {	rock: Rock,
+				stratum: Stratum,
+				oil: Oil,
+				water: Water,
+				gas: Gas,
+				substances: Substances,
+				composition: MineralConstituents}.
+--
+Rock			= {	type_of_rock: TypeOfRock,
+				type_of_collector: TypeOfCollector,
+				penetrability: Permeability,
+				porosity: Porosity,
+				saturation: OilSaturation,
+				water: ImbibitionWater,
+				moist: AverageMoisteningAngle}.
+--
+TypeOfRock		= "terrigenous"; "carbonate".
+TypeOfCollector		= "porous"; "fractured"; "mixed".
+Permeability		= REAL; STRING.
+Porosity		= REAL; STRING.
+OilSaturation		= REAL; STRING.
+ImbibitionWater		= REAL; STRING.
+AverageMoisteningAngle	= NUMERICAL; STRING. -- [0 .. 180]
+--
+Stratum			= {	thickness: StratumThickness,
+				water_thickness: WaterBedThickness,
+				rock_thickness: BurdenThickness,
+				pressure: Pressure,
+				temperature: Temperature,
+				angle: Inclination,
+				depth: OccurrenceDepth}.
+--
+StratumThickness	= NUMERICAL; STRING.
+WaterBedThickness	= REAL; STRING.
+BurdenThickness		= REAL; STRING.
+Pressure		= REAL; STRING.
+Temperature		= NUMERICAL; STRING.
+Inclination		= NUMERICAL; STRING. -- [0 .. 90]
+OccurrenceDepth		= NUMERICAL; STRING.
+--
+Oil			= {	density: Density,
+				viscosity: Viscosity,
+				acid: AcidNumber}.
+--
+Density			= NUMERICAL; STRING.
+Viscosity		= REAL; STRING.
+AcidNumber		= REAL; STRING.
+--
+Water			= {	mineralization: Salinity,
+				pH: Acidity,
+				hardness: Hardness}.
+--
+Salinity		= REAL; STRING.
+Acidity			= REAL; STRING.
+Hardness		= REAL; STRING.
+--
+Gas			= {	nitrogen: NitrogenousCompounds,
+				free_gas: FreeGasPresence}.
+--
+NitrogenousCompounds	= REAL; STRING.
+FreeGasPresence		= 'yes'; 'no'; 'unknown'.
+--
+Substances		= {    	paraph: Wax,
+				asphalt: Asphaltenes,
+				resin: Gum,
+				sulphur: Sulfur,
+				t_paraph: SaturationTemperature}.
+--
+Wax			= REAL; STRING.
+Asphaltenes		= REAL; STRING.
+Gum			= REAL; STRING.
+Sulfur			= REAL; STRING.
+SaturationTemperature	= REAL; STRING.
+--
+MineralConstituents	= {	cement: Cement,
+				clay: Clay,
+				carbon: Carbonate}.
+--
+Cement			= REAL; STRING.
+Clay			= REAL; STRING.
+Carbonate		= REAL; STRING.
+--
+MethodNames		= MethodName*.
+MethodName		= STRING; MethodNames.
+--
+NUMERICAL		= REAL; INTEGER.
+--
+ground:
+--
+GroundNumber		= REAL; INTEGER.
+AttributeName		= STRING.
+Tabulation		= INTEGER.
+--
+------------------------------------------------------------------------
+--                                                                    --
+-- Description of Oil-Production methods.                             --
+--                                                                    --
+------------------------------------------------------------------------
+-- Artificial Waterflooding                                           --
+------------------------------------------------------------------------
+interface '_Artificial_waterflooding'
+(specialized 'Methods_of_influence','MinimalBurdenThickness'):
+[
+]
+------------------------------------------------------------------------
+-- Thermal Methods                                                    --
+------------------------------------------------------------------------
+interface 'General_properties_of_Thermal_Methods'
+(specialized 'Methods_of_influence'):
+[
+]
+------------------------------------------------------------------------
+interface '_Thermal_flooding'
+(specialized
+	'General_properties_of_Thermal_Methods',
+	'MinimalBurdenThickness'):
+[
+]
+------------------------------------------------------------------------
+interface '_Steam_flooding'
+(specialized 'General_properties_of_Thermal_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Fire_flooding'
+(specialized 'General_properties_of_Thermal_Methods'):
+[
+]
+------------------------------------------------------------------------
+-- Physicochemical Methods                                            --
+------------------------------------------------------------------------
+interface 'General_properties_of_Physical-Chemical_Methods'
+(specialized 'Methods_of_influence'):
+[
+]
+------------------------------------------------------------------------
+interface '_Surfactant_waterflooding'
+(specialized 'General_properties_of_Physical-Chemical_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Polymer_flooding'
+(specialized 'General_properties_of_Physical-Chemical_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Alkaline_waterflooding'
+(specialized 'General_properties_of_Physical-Chemical_Methods'):
+[
+PREDICATES:
+--
+private:
+--
+imperative:
+--
+min_penetrability(Permeability)	- (o);
+]
+------------------------------------------------------------------------
+interface '_Sulphuric_acid_flooding'
+(specialized 'General_properties_of_Physical-Chemical_Methods'):
+[
+]
+------------------------------------------------------------------------
+-- Microbiological Methods                                            --
+------------------------------------------------------------------------
+interface '_Micellar-polymer_flooding'
+(specialized 'General_properties_of_Physical-Chemical_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Carbonated_waterflooding'
+(specialized 'General_properties_of_Physical-Chemical_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Micellar_flooding'
+(specialized 'General_properties_of_Physical-Chemical_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Spirituous_waterflooding'
+(specialized 'General_properties_of_Physical-Chemical_Methods'):
+[
+]
+------------------------------------------------------------------------
+-- Gas Methods                                                        --
+------------------------------------------------------------------------
+interface 'General_properties_of_Gas_Methods'
+(specialized 'Methods_of_influence'):
+[
+]
+------------------------------------------------------------------------
+interface '_Miscible_nitrogen'
+(specialized 'General_properties_of_Gas_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Immiscible_nitrogen'
+(specialized 'General_properties_of_Gas_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Miscible_CO2'
+(specialized 'General_properties_of_Gas_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Immiscible_CO2'
+(specialized 'General_properties_of_Gas_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Hydrocarbon_solvent_injection'
+(specialized 'General_properties_of_Gas_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_High_pressure_gas_injection'
+(specialized 'General_properties_of_Gas_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Enriched-gas_injection'
+(specialized 'General_properties_of_Gas_Methods'):
+[
+]
+------------------------------------------------------------------------
+-- Microbiological Methods                                            --
+------------------------------------------------------------------------
+interface 'General_properties_of_Microbiological_Methods'
+(specialized 'Methods_of_influence','MinimalBurdenThickness'):
+[
+]
+------------------------------------------------------------------------
+interface '_Bio-surfactant_waterflooding'
+(specialized 'General_properties_of_Microbiological_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Xanthane'
+(specialized 'General_properties_of_Microbiological_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Glucan'
+(specialized 'General_properties_of_Microbiological_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Polysacharide'
+(specialized 'General_properties_of_Microbiological_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Activation_of_natural_microflora'
+(specialized 'General_properties_of_Microbiological_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Microbe_(molasses)_waterflooding'
+(specialized 'General_properties_of_Microbiological_Methods'):
+[
+]
+------------------------------------------------------------------------
+interface '_Bacterium_injection'
+(specialized 'General_properties_of_Microbiological_Methods'):
+[
+]
+------------------------------------------------------------------------
+-- Interface 'Minimal burden thickness'                               --
+------------------------------------------------------------------------
+interface 'MinimalBurdenThickness':
+[
+PREDICATES:
+--
+private:
+--
+imperative:
+--
+min_rock_thickness(BurdenThickness)	- (o);
+]
+------------------------------------------------------------------------
+-- Interface 'Methods_of_influence'                                   --
+------------------------------------------------------------------------
+interface 'Methods_of_influence'
+(specialized 'Explanation_of_solutions'):
+[
+PREDICATES:
+--
+private:
+--
+determ:
+--
+check_parameters(OilfieldAttributes)		- (i);
+check_rock(Rock)				- (i);
+--
+check_type_of_rock(TypeOfRock)			- (i);
+check_type_of_collector(TypeOfCollector)	- (i);
+check_penetrability(Permeability)		- (i);
+check_porosity(Porosity)			- (i);
+check_saturation(OilSaturation)			- (i);
+check_collected_water(ImbibitionWater)		- (i);
+check_moist(AverageMoisteningAngle)		- (i);
+--
+check_stratum(Stratum)				- (i);
+--
+check_thickness(StratumThickness)		- (i);
+check_water_thickness(WaterBedThickness)	- (i);
+check_rock_thickness(BurdenThickness)		- (i);
+check_pressure(Pressure)			- (i);
+check_temperature(Temperature)			- (i);
+check_angle(Inclination)			- (i);
+check_depth(OccurrenceDepth)			- (i);
+--
+check_oil(Oil)					- (i);
+--
+check_density(Density)				- (i);
+check_viscosity(Viscosity)			- (i);
+check_acid(AcidNumber)				- (i);
+--
+check_water(Water)				- (i);
+--
+check_mineralization(Salinity)			- (i);
+check_pH(Acidity)				- (i);
+check_hardness(Hardness)			- (i);
+--
+check_gas(Gas)					- (i);
+--
+check_nitrogen(NitrogenousCompounds)		- (i);
+check_free_gas(FreeGasPresence)			- (i);
+--
+check_substances(Substances,Stratum)		- (i,i);
+--
+check_paraph(Wax)				- (i);
+check_asphalt(Asphaltenes)			- (i);
+check_resin(Gum)				- (i);
+check_sulphur(Sulfur)				- (i);
+check_T_paraph(
+	SaturationTemperature,
+	Temperature)				- (i,i);
+--
+check_composition(MineralConstituents)		- (i);
+--
+check_cement(Cement)				- (i);
+check_clay(Clay)				- (i);
+check_carbon(Carbonate)				- (i);
+--
+determ:
+--
+type_of_rock(TypeOfRock)			- (i);
+type_of_collector(TypeOfCollector)		- (i);
+penetrability(Permeability,Permeability)	- (o,o);
+porosity(Porosity,Porosity)			- (o,o);
+saturation(OilSaturation,OilSaturation)		- (o,o);
+collected_water(
+	ImbibitionWater,
+	ImbibitionWater)			- (o,o);
+moist(	AverageMoisteningAngle,
+	AverageMoisteningAngle)			- (o,o);
+--
+thickness(StratumThickness,StratumThickness)	- (o,o);
+water_thickness(
+	WaterBedThickness,
+	WaterBedThickness)			- (o,o);
+rock_thickness(
+	BurdenThickness,
+	BurdenThickness)			- (o,o);
+pressure(Pressure,Pressure)			- (o,o);
+temperature(Temperature,Temperature)		- (o,o);
+angle(Inclination,Inclination)			- (o,o);
+depth(OccurrenceDepth,OccurrenceDepth)		- (o,o);
+--
+density(Density,Density)			- (o,o);
+viscosity(Viscosity,Viscosity)			- (o,o);
+acid(AcidNumber,AcidNumber)			- (o,o);
+--
+mineralization(Salinity,Salinity)		- (o,o);
+pH(Acidity,Acidity)				- (o,o);
+hardness(Hardness,Hardness)			- (o,o);
+--
+nitrogen(
+	NitrogenousCompounds,
+	NitrogenousCompounds)			- (o,o);
+free_gas(FreeGasPresence)			- (i);
+--
+paraph(Wax,Wax)					- (o,o);
+asphalt(Asphaltenes,Asphaltenes)		- (o,o);
+resin(Gum,Gum)					- (o,o);
+sulphur(Sulfur,Sulfur)				- (o,o);
+--
+cement(Cement,Cement)				- (o,o);
+clay(Clay,Clay)					- (o,o);
+carbon(Carbonate,Carbonate)			- (o,o);
+]
+------------------------------------------------------------------------
+-- Interface 'Explanation_of_solutions'                               --
+------------------------------------------------------------------------
+interface 'Explanation_of_solutions'
+(specialized 'Check_of_parameters'):
+--
+internal:
+--
+	con	: 'Report';
+--
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+verify_parameters(OilfieldAttributes)		- (i);
+--
+private:
+--
+verify_rock(Rock,AttributeName)			- (i,i);
+--
+imperative:
+--
+verify_type_of_rock(TypeOfRock,AttributeName)		- (i,i);
+verify_type_of_reservoir(TypeOfCollector,AttributeName)	- (i,i);
+verify_permeability(Permeability,AttributeName)		- (i,i);
+verify_porosity(Porosity,AttributeName)			- (i,i);
+verify_saturation(OilSaturation,AttributeName)		- (i,i);
+verify_collected_water(ImbibitionWater,AttributeName)	- (i,i);
+verify_moist(AverageMoisteningAngle,AttributeName)	- (i,i);
+--
+imperative:
+--
+verify_stratum(Stratum,AttributeName)			- (i,i);
+--
+imperative:
+--
+verify_thickness(StratumThickness,AttributeName)	- (i,i);
+verify_water_thickness(
+	WaterBedThickness,
+	AttributeName)					- (i,i);
+verify_burden_thickness(
+	BurdenThickness,
+	AttributeName)					- (i,i);
+verify_pressure(Pressure,AttributeName)			- (i,i);
+verify_temperature(Temperature,AttributeName)		- (i,i);
+verify_angle(Inclination,AttributeName)			- (i,i);
+verify_depth(OccurrenceDepth,AttributeName)		- (i,i);
+--
+imperative:
+--
+verify_oil(Oil,AttributeName)			- (i,i);
+--
+imperative:
+--
+verify_density(Density,AttributeName)		- (i,i);
+verify_viscosity(Viscosity,AttributeName)	- (i,i);
+verify_acid(AcidNumber,AttributeName)		- (i,i);
+--
+imperative:
+--
+verify_water(Water,AttributeName)		- (i,i);
+--
+imperative:
+--
+verify_mineralization(Salinity,AttributeName)	- (i,i);
+verify_pH(Acidity,AttributeName)		- (i,i);
+verify_hardness(Hardness,AttributeName)		- (i,i);
+--
+imperative:
+--
+verify_gas(Gas,AttributeName)			- (i,i);
+--
+imperative:
+--
+verify_nitrogen(NitrogenousCompounds,AttributeName)	- (i,i);
+verify_free_gas(FreeGasPresence,AttributeName)		- (i,i);
+--
+imperative:
+--
+verify_substances(Substances,Stratum,AttributeName)	- (i,i,i);
+--
+imperative:
+--
+verify_paraffin(Wax,AttributeName)			- (i,i);
+verify_asphalt(Asphaltenes,AttributeName)		- (i,i);
+verify_tar(Gum,AttributeName)				- (i,i);
+verify_sulfur(Sulfur,AttributeName)			- (i,i);
+verify_T_paraffin(
+	SaturationTemperature,
+	Temperature,
+	AttributeName)					- (i,i,i);
+--
+imperative:
+--
+verify_composition(MineralConstituents,AttributeName)	- (i,i);
+--
+imperative:
+--
+verify_cement(Cement,AttributeName)			- (i,i);
+verify_clay(Clay,AttributeName)				- (i,i);
+verify_carbon(Carbonate,AttributeName)			- (i,i);
+--
+imperative:
+--
+is_valid(STRING)				- (i);
+is_valid(Tabulation,STRING)			- (i,i);
+is_valid(Tabulation,STRING,STRING)		- (i,i,i);
+--
+is_not_valid(STRING)				- (i);
+is_not_valid(Tabulation,STRING)			- (i,i);
+is_not_valid(Tabulation,STRING,STRING)		- (i,i,i);
+--
+is_unused(STRING)				- (i);
+is_unused(Tabulation,STRING)			- (i,i);
+is_unused(Tabulation,STRING,STRING)		- (i,i,i);
+--
+write_tab(Tabulation)				- (i);
+--
+method_is_unknown;
+]
+------------------------------------------------------------------------
+-- Interface 'Check_of_parameters'                                    --
+------------------------------------------------------------------------
+interface 'Check_of_parameters'
+(specialized '_Block','MethodNameProducer'):
+--
+variable:
+--
+	value_i1	: OilfieldAttributes;
+--
+protecting:
+--
+	value_o1	: MethodName;
+--
+constant:
+--
+	name		: MethodName;
+--
+internal:
+--
+	dialog		: 'ParametersCheckDialog';
+	tools		: 'ArithmeticOperations';
+--
+constant:
+--
+	controller	: 'MethodNameSender';
+--
+[
+PREDICATES:
+--
+private:
+--
+determ:
+--
+parameters_are_not_valid;
+--
+visible:
+--
+imperative:
+--
+verify_parameters;
+--
+private:
+--
+determ:
+--
+'<'(Permeability,Permeability)				- (i,i);
+'<'(	BurdenThickness,
+	BurdenThickness)				- (i,i);
+'<'(	SaturationTemperature,
+	Temperature)					- (i,i);
+--
+'<='(Permeability,Permeability)				- (i,i);
+'<='(Porosity,Porosity)					- (i,i);
+'<='(OilSaturation,OilSaturation)			- (i,i);
+'<='(ImbibitionWater,ImbibitionWater)			- (i,i);
+'<='(	AverageMoisteningAngle,
+	AverageMoisteningAngle)				- (i,i);
+'<='(StratumThickness,StratumThickness)			- (i,i);
+'<='(	WaterBedThickness,
+	WaterBedThickness)				- (i,i);
+'<='(	BurdenThickness,
+	BurdenThickness)				- (i,i);
+'<='(Pressure,Pressure)					- (i,i);
+'<='(Temperature,Temperature)				- (i,i);
+'<='(Inclination,Inclination)				- (i,i);
+'<='(OccurrenceDepth,OccurrenceDepth)			- (i,i);
+'<='(Density,Density)					- (i,i);
+'<='(Viscosity,Viscosity)				- (i,i);
+'<='(AcidNumber,AcidNumber)				- (i,i);
+'<='(Salinity,Salinity)					- (i,i);
+'<='(Acidity,Acidity)					- (i,i);
+'<='(Hardness,Hardness)					- (i,i);
+'<='(NitrogenousCompounds,NitrogenousCompounds)		- (i,i);
+'<='(Wax,Wax)						- (i,i);
+'<='(Asphaltenes,Asphaltenes)				- (i,i);
+'<='(Gum,Gum)						- (i,i);
+'<='(Sulfur,Sulfur)					- (i,i);
+'<='(SaturationTemperature,SaturationTemperature)	- (i,i);
+'<='(Cement,Cement)					- (i,i);
+'<='(Clay,Clay)						- (i,i);
+'<='(Carbonate,Carbonate)				- (i,i);
+]
+------------------------------------------------------------------------
+interface 'ParametersCheckDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	owner	: 'Check_of_parameters';
+--
+[
+]
+------------------------------------------------------------------------
+--                                                                    --
+-- Description of Field Parameters                                    --
+--                                                                    --
+------------------------------------------------------------------------
+interface '_Rock' (specialized 'OilFieldAttributesDescription'):
+--
+variable:
+--
+	type_of_rock		: TypeOfRock;
+	type_of_collector	: TypeOfCollector;
+	penetrability		: Permeability;
+	porosity		: Porosity;
+	saturation		: OilSaturation;
+	water			: ImbibitionWater;
+	moist			: AverageMoisteningAngle;
+--
+protecting:
+--
+	value_o1		: Rock;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_Bed' (specialized 'OilFieldAttributesDescription'):
+--
+variable:
+--
+	thickness		: StratumThickness;
+	water_thickness		: WaterBedThickness;
+	rock_thickness		: BurdenThickness;
+	pressure		: Pressure;
+	temperature		: Temperature;
+	angle			: Inclination;
+	depth			: OccurrenceDepth;
+--
+protecting:
+--
+	value_o1		: Stratum;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_Base_oil' (specialized 'OilFieldAttributesDescription'):
+--
+variable:
+--
+	density			: Density;
+	viscosity		: Viscosity;
+	acid			: AcidNumber;
+--
+protecting:
+--
+	value_o1		: Oil;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_Stratal_water'
+(specialized 'OilFieldAttributesDescription'):
+--
+variable:
+--
+	mineralization		: Salinity;
+	pH			: Acidity;
+	hardness		: Hardness;
+--
+protecting:
+--
+	value_o1		: Water;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_Native_gas' (specialized 'OilFieldAttributesDescription'):
+--
+variable:
+--
+	nitrogen		: NitrogenousCompounds;
+	free_gas		: FreeGasPresence;
+--
+protecting:
+--
+	value_o1		: Gas;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_Bedded_substances'
+(specialized 'OilFieldAttributesDescription'):
+--
+variable:
+--
+	paraph			: Wax;
+	asphalt			: Asphaltenes;
+	resin			: Gum;
+	sulphur			: Sulfur;
+	t_paraph		: SaturationTemperature;
+--
+protecting:
+--
+	value_o1		: Substances;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_Mineral_constituents'
+(specialized 'OilFieldAttributesDescription'):
+--
+variable:
+--
+	cement			: Cement;
+	clay			: Clay;
+	carbon			: Carbonate;
+--
+protecting:
+--
+	value_o1		: MineralConstituents;
+--
+[
+]
+------------------------------------------------------------------------
+-- Interface 'OilFieldAttributesDescription'                          --
+------------------------------------------------------------------------
+interface 'OilFieldAttributesDescription' (specialized '_DialogBlock'):
+[
+]
+------------------------------------------------------------------------
+--                                                                    --
+-- Subsidiary Classes                                                 --
+--                                                                    --
+------------------------------------------------------------------------
+interface '_Display_solution' (specialized '_DialogBlock'):
+--
+variable:
+--
+	value_i1		: MethodName;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_Assemble_list' (specialized '_Block','MethodNameProducer'):
+--
+variable:
+--
+	value_i1		: MethodName;
+	value_i2		: MethodName;
+	value_i3		: MethodName;
+	value_i4		: MethodName;
+	value_i5		: MethodName;
+	value_i6		: MethodName;
+	value_i7		: MethodName;
+--
+protecting:
+--
+	value_o1		: MethodName;
+--
+constant:
+--
+	controller		: 'MethodNameSender';
+--
+[
+PREDICATES:
+--
+private:
+--
+imperative:
+--
+clear_list(MethodNames,MethodNames)	- (i,o);
+--
+determ:
+--
+list_is_not_empty(MethodName)		- (i);
+]
+------------------------------------------------------------------------
+interface '_Make_up_list_of_parameters' (specialized '_Block'):
+--
+variable:
+--
+	value_i1		: Rock;
+	value_i2		: Stratum;
+	value_i3		: Oil;
+	value_i4		: Water;
+	value_i5		: Gas;
+	value_i6		: Substances;
+	value_i7		: MineralConstituents;
+--
+protecting:
+--
+	value_o1		: OilfieldAttributes;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_DialogBlock' (specialized '_Block', 'Dialog'):
+[
+]
+------------------------------------------------------------------------
+interface '_Block' (specialized '_Empty_Protocol'):
+--
+total_model	: 'FunctionModel';
+--
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+show(ComponentIdentifier,ComponentTitle)	- (i,i);
+--
+nondeterm:
+--
+component('_Block')	- (o);
+]
+------------------------------------------------------------------------
+interface 'ArithmeticOperations' (specialized 'Alpha'):
+[
+PREDICATES:
+--
+visible:
+--
+determ:
+--
+bound(_*)				- (i);
+--
+'<'(GroundNumber,GroundNumber)		- (i,i);
+'<='(GroundNumber,GroundNumber)		- (i,i);
+'<='(Tabulation,Tabulation)		- (i,i);
+--
+imperative:
+--
+'-'(Tabulation,Tabulation) = Tabulation	- (i,i);
+--
+]
+------------------------------------------------------------------------
+interface 'MethodNameProducer':
+[
+PREDICATES:
+--
+visible:
+--
+determ:
+--
+get_result()= MethodName;
+]
+------------------------------------------------------------------------
+interface 'MethodNameSender':
+--
+constant:
+--
+	target	: 'MethodNameProducer';
+--
+protecting:
+--
+	output	: MethodName;
+--
+variable:
+--
+	result	: MethodName;
+--
+[
+PREDICATES:
+--
+visible:
+--
+determ:
+--
+send_value(MethodName,MethodName)	- (i,i);
+]
+------------------------------------------------------------------------

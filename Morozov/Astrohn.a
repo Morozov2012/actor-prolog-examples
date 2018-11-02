@@ -1,0 +1,141 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Astrohn":
+
+import 'ThermalVideoBuffer' from "Morozov/ThermalVideoBuffer";
+
+--------------------------------------------------------------------
+-- The 'Astrohn' class is specialized class 'ThermalVideoBuffer'. --
+--------------------------------------------------------------------
+
+class 'Astrohn' (specialized 'ThermalVideoBuffer'):
+
+constant:
+--
+terahertz_camera_address		= "192.168.10.227";
+terahertz_camera_port			= 41865;
+color_camera_url			= "http://192.168.10.230/mjpg/video.mjpg";
+--
+synchronize_terahertz_and_color_streams	= 'yes';
+--
+lower_temperature_bound				= 0.0;
+upper_temperature_bound				= 65536.0;
+lower_main_temperature_quantile			= 0.0;
+upper_main_temperature_quantile			= 65536.0;
+lower_auxiliary_temperature_quantile		= 0.0;
+upper_auxiliary_temperature_quantile		= 65536.0;
+
+[
+SOURCE:
+	"morozov.built_in.Astrohn";
+
+CLAUSES:
+--
+get_recent_terahertz_frame_number(
+		NumberOfRecentCommittedFrame):
+	[external "getRecentTerahertzFrameNumber"].
+get_recent_terahertz_frame_number(
+		NumberOfRecentCommittedFrame,
+		NumberOfRecentAcceptedFrame):
+	[external "getRecentTerahertzFrameNumber"].
+--
+get_recent_color_frame_number(
+		NumberOfRecentCommittedFrame):
+	[external "getRecentColorFrameNumber"].
+get_recent_color_frame_number(
+		NumberOfRecentCommittedFrame,
+		NumberOfRecentAcceptedFrame):
+	[external "getRecentColorFrameNumber"].
+--
+get_recent_terahertz_frame_time(
+		RecentCommittedFrameTimeInMilliseconds):
+	[external "getRecentTerahertzFrameTime"].
+get_recent_terahertz_frame_time(
+		RecentCommittedFrameTimeInMilliseconds,
+		RecentAcceptedFrameTimeInMilliseconds):
+	[external "getRecentTerahertzFrameTime"].
+--
+get_recent_color_frame_time(
+		RecentCommittedFrameTimeInMilliseconds):
+	[external "getRecentColorFrameTime"].
+get_recent_color_frame_time(
+		RecentCommittedFrameTimeInMilliseconds,
+		RecentAcceptedFrameTimeInMilliseconds):
+	[external "getRecentColorFrameTime"].
+--
+get_recent_terahertz_frame_relative_time(
+		RecentCommittedFrameTimeInMilliseconds):
+	[external "getRecentTerahertzFrameRelativeTime"].
+get_recent_terahertz_frame_relative_time(
+		RecentCommittedFrameTimeInMilliseconds,
+		RecentAcceptedFrameTimeInMilliseconds):
+	[external "getRecentTerahertzFrameRelativeTime"].
+--
+get_recent_color_frame_relative_time(
+		RecentCommittedFrameTimeInMilliseconds):
+	[external "getRecentColorFrameRelativeTime"].
+get_recent_color_frame_relative_time(
+		RecentCommittedFrameTimeInMilliseconds,
+		RecentAcceptedFrameTimeInMilliseconds):
+	[external "getRecentColorFrameRelativeTime"].
+--
+get_recent_terahertz_frame_rate(
+		FrameRateOfCommittedFrames):
+	[external "getRecentTerahertzFrameRate"].
+get_recent_terahertz_frame_rate(
+		FrameRateOfCommittedFrames,
+		FrameRateOfValidFrames):
+	[external "getRecentTerahertzFrameRate"].
+--
+get_recent_color_frame_rate(
+		FrameRateOfCommittedFrames):
+	[external "getRecentColorFrameRate"].
+get_recent_color_frame_rate(
+		FrameRateOfCommittedFrames,
+		FrameRateOfValidFrames):
+	[external "getRecentColorFrameRate"].
+--
+get_recent_terahertz_image(BufferedImage):
+	[external "getRecentTerahertzImage"].
+get_recent_color_image(BufferedImage):
+	[external "getRecentColorImage"].
+get_recent_combined_image(BufferedImage):
+	[external "getRecentCombinedImage"].
+get_recent_color_map(ColorMap):
+	[external "getRecentColorMap"].
+--
+get_temperature(X,Y) = Temperature:
+	[external "getTemperature"].
+get_minimal_temperature() = Temperature:
+	[external "getMinimalTemperature"].
+get_maximal_temperature() = Temperature:
+	[external "getMaximalTemperature"].
+--
+get_terahertz_image_size_in_pixels(Width,Height):
+	[external "getTerahertzImageSizeInPixels"].
+get_color_image_size_in_pixels(Width,Height):
+	[external "getColorImageSizeInPixels"].
+--
+set_terahertz_camera_address(InetAddress):
+	[external "setTerahertzCameraAddress"].
+get_terahertz_camera_address() = InetAddress:
+	[external "getTerahertzCameraAddress"].
+--
+set_terahertz_camera_port(PortNumber):
+	[external "setTerahertzCameraPort"].
+get_terahertz_camera_port() = PortNumber:
+	[external "getTerahertzCameraPort"].
+--
+set_color_camera_url(URL):
+	[external "setColorCameraURL"].
+get_color_camera_url() = URL:
+	[external "getColorCameraURL"].
+--
+set_synchronize_terahertz_and_color_streams(YesNo):
+	[external "setSynchronizeTerahertzAndColorStreams"].
+get_synchronize_terahertz_and_color_streams() = YesNo:
+	[external "getSynchronizeTerahertzAndColorStreams"].
+]

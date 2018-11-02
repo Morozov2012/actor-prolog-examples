@@ -1,0 +1,100 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+report_space_color_values;
+
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+w01	= ('DemoPanel',
+		x= 3,
+		y= 3);
+w02	= ('DemoPanel',
+		x= 27,
+		y= 7);
+--
+[
+goal:-!,
+	set_text_color('Blue'),
+	report_space_color_values,
+	Color== 'Green',
+	w01 ? set_control_space_color(8000,Color),
+	w01 ? set_control_space_color(1000,Color),
+	w01 ? set_control_space_color(1010,Color),
+	w01 ? set_control_space_color(1020,Color),
+	w01 ? set_control_space_color(1030,Color),
+	w01 ? set_control_space_color(1040,Color),
+	w01 ? set_control_space_color(1050,Color),
+	w01 ? set_control_space_color(1060,Color),
+	w01 ? set_control_space_color(2000,Color),
+	w01 ? set_control_space_color(2010,Color),
+	w01 ? set_control_space_color(2020,Color),
+	w01 ? set_control_space_color(2030,Color),
+	w01 ? set_control_space_color(3000,Color),
+	w01 ? set_control_space_color(3010,Color),
+	w01 ? set_control_space_color(3020,Color),
+	w01 ? set_control_space_color(4000,Color),
+	w01 ? set_control_space_color(4011,Color),
+	w01 ? set_control_space_color(4012,Color),
+	w01 ? set_control_space_color(4021,Color),
+	w01 ? set_control_space_color(4022,Color),
+	w01 ? set_control_space_color(4031,Color),
+	w01 ? set_control_space_color(4032,Color),
+	w01 ? set_control_space_color(5011,Color),
+	w01 ? set_control_space_color(5012,Color),
+	w01 ? set_control_space_color(5021,Color),
+	w01 ? set_control_space_color(5022,Color),
+	w01 ? set_control_space_color("action",Color),
+	w01 ? set_control_space_color('verify',Color),
+	w01 ? set_control_space_color('reset',Color),
+	w01 ? set_control_space_color('close',Color),
+	set_text_color('DkGreen'),
+	report_space_color_values.
+--
+report_space_color_values:-
+	writeln(w01?get_control_space_color(8000)),
+	writeln(w01?get_control_space_color(1000)),
+	writeln(w01?get_control_space_color(1010)),
+	writeln(w01?get_control_space_color(1020)),
+	writeln(w01?get_control_space_color(1030)),
+	writeln(w01?get_control_space_color(1040)),
+	writeln(w01?get_control_space_color(1050)),
+	writeln(w01?get_control_space_color(1060)),
+	writeln(w01?get_control_space_color(2000)),
+	writeln(w01?get_control_space_color(2010)),
+	writeln(w01?get_control_space_color(2020)),
+	writeln(w01?get_control_space_color(2030)),
+	writeln(w01?get_control_space_color(3000)),
+	writeln(w01?get_control_space_color(3010)),
+	writeln(w01?get_control_space_color(3020)),
+	writeln(w01?get_control_space_color(4000)),
+	writeln(w01?get_control_space_color(4011)),
+	writeln(w01?get_control_space_color(4012)),
+	writeln(w01?get_control_space_color(4021)),
+	writeln(w01?get_control_space_color(4022)),
+	writeln(w01?get_control_space_color(4031)),
+	writeln(w01?get_control_space_color(4032)),
+	writeln(w01?get_control_space_color(5011)),
+	writeln(w01?get_control_space_color(5012)),
+	writeln(w01?get_control_space_color(5021)),
+	writeln(w01?get_control_space_color(5022)),
+	writeln(w01?get_control_space_color("action")),
+	writeln(w01?get_control_space_color('verify')),
+	writeln(w01?get_control_space_color('reset')),
+	writeln(w01?get_control_space_color('close')).
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+[
+goal:-!,
+	show.
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,104 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+R	= REAL.
+S	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'MyHashMap' (specialized 'LinkedHashMap'):
+[
+DOMAINS:
+--
+TargetValue	= f(R,S).
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyHashMap');
+--
+[
+goal:-!,
+	test1,
+	test3,
+	test4,
+	test3,
+	test2,
+	test3.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test1. I will store data items."),
+	set_color('Orange'),
+	store ? append(map(10000,f(3.14,"Test1:One"))),
+	store ? append(map(20000,f(7.00,"Test1:Two"))),
+	store ? append(f(12.00,"Test1:Three:Key"),Key1),
+	writeln("\tKey one: ",Key1),
+	store ? append(f(3.14,"Test1:Four:Key"),Key2),
+	writeln("\tKey two: ",Key2),
+	store ? append(f(3.14,"Test1:Five:Key"),Key3),
+	writeln("\tKey three: ",Key3),
+	store ? append(map(10000,f(3.14,"Test1:Six"))),
+	store ? append(map(30000,f(3.14,"Test1:Seven"))),
+	store ? append(map(40000,f(9.00,"Test1:Eight"))),
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("Test 2. I will store data items."),
+	set_color('Orange'),
+	store ? append(map(50000,f(3.14,"Test2:One"))),
+	store ? append(map(30000,f(7.00,"Test2:Two"))),
+	store ? append(f(12.00,"Test2:Three:Key"),Key1),
+	writeln("\tKey one: ",Key1),
+	store ? append(f(3.14,"Test2:Four:Key"),Key2),
+	writeln("\tKey two: ",Key2),
+	store ? append(f(3.14,"Test2:Five:Key"),Key3),
+	writeln("\tKey three: ",Key3),
+	store ? append(f(3.14,"Test2:Six:Key"),Key4),
+	writeln("\tKey four: ",Key4),
+	store ? append(map(50000,f(3.14,"Test2:Seven"))),
+	store ? append(map(70000,f(3.14,"Test2:Eight"))),
+	store ? append(map(80000,f(9.00,"Test2:Nine"))),
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("Test 3. I will retrieve data items:"),
+	set_color('Blue'),
+	store ? find(Item),
+		writeln("\t",Item),
+		fail.
+test3:-
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+--
+test4:-
+	set_color('RoyalBlue'),
+	writeln("Test 4. I will delete data items: map(_,f(3.14,_))"),
+	set_color('default'),
+	store ? retract_all(map(_,f(3.14,_))),
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+]
+-----------------------------------------------------------------------

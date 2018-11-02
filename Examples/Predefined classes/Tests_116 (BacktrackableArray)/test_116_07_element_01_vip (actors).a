@@ -1,0 +1,115 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'Dialog'):
+
+variable:
+
+	i;
+	j;
+	value;
+
+internal:
+
+	link	= ('Link');
+
+	w1	= ('TextPage',
+			link,
+			text_color='White',
+			background_color='Red',
+			x=9,
+			y=4);
+	w2	= ('TextPage',
+			link,
+			text_color='White',
+			background_color='Orange',
+			x=27,
+			y=1);
+	w3	= ('TextPage',
+			link,
+			text_color='Black',
+			background_color='Yellow',
+			x=45,
+			y=4);
+	w4	= ('TextPage',
+			link,
+			text_color='Black',
+			background_color='Green',
+			x=47,
+			y=9);
+	w5	= ('TextPage',
+			link,
+			text_color='Black',
+			background_color='Cyan',
+			x=41,
+			y=12);
+	w6	= ('TextPage',
+			link,
+			text_color='White',
+			background_color='Blue',
+			x=13,
+			y=12);
+	w7	= ('TextPage',
+			link,
+			text_color='White',
+			background_color='Violet',
+			x=7,
+			y=9);
+
+constant:
+
+	x		= 25;
+	y		= 8;
+
+[
+goal:-
+	show,
+	send_value(i,j,value).
+--
+send_value(#,#,_):-!.
+send_value(I,J,Value):-
+	Value== link[I,J],!.
+send_value(_,_,_).
+]
+
+-----------------------------------------------------------------------
+
+class 'TextPage' (specialized 'Report'):
+
+internal:
+
+	link;
+
+constant:
+
+	x;
+	y;
+	width	= 27;
+	height	= 10;
+
+protecting:
+
+	title	= _;
+
+[
+goal:-
+	title== ?format("i=%d j=%d",x,y),
+	show,
+	write_value(link[x,y]).
+--
+write_value(#).
+write_value(V):-
+	writeln(V).
+]
+
+-----------------------------------------------------------------------
+
+class 'Link' (specialized 'BacktrackableArray'):
+indices_range	= [[1,100],[1,100]];
+index_checking	= 'off';
+[
+]
+
+-----------------------------------------------------------------------

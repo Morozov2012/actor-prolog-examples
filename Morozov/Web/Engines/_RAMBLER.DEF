@@ -1,0 +1,40 @@
+package "Morozov/Web/Engines/_Rambler"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--            The "RAMBLER" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package is an interface of the RAMBLER search        --
+-- engine. You can freely use it to collect information of   --
+-- any kind in the World Wide Web.                           --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import 'SearchEngine' from "Morozov/Web/Engines/Core";
+import 'Rambler' from "Morozov/Web/Engines/Rambler";
+import '_EngineControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+import '_EngineInput'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+---------------------------------------------------------------
+interface '_Consult_Rambler'
+(specialized '_Block', '_EngineControl', '_EngineInput'):
+--
+internal:
+--
+	entry_c1		: '_EngineControl';
+--
+variable:
+--
+	value_o1		: WebAddressList;
+--
+internal:
+--
+	world			: 'SearchEngine';
+--
+variable:
+--
+	list_of_resources	: WebAddressList;
+--
+[
+]
+---------------------------------------------------------------

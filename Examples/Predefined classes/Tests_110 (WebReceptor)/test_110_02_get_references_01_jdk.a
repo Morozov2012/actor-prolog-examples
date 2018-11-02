@@ -1,0 +1,224 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+RefSTRING	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test2(URL);
+test3;
+test4;
+test4(URL);
+test5;
+test5(URL);
+--
+loop(INTEGER,ReferenceList)	- (i,i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+r1	= ('ExternalResource',
+		location=
+			"file:///"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_110%20(WebReceptor)/"
+			"data/report1.html",
+		x=0,
+		y=0);
+r2	= ('ExternalResource',
+		location=
+			"file:///"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_110%20(WebReceptor)/",
+		x=1,
+		y=1);
+r3	= ('ExternalResource',
+		location=
+			"data/report1.html",
+		x=2,
+		y=2);
+r4	= ('ExternalResource',
+		location="",
+		x=3,
+		y=3);
+r5	= ('ExternalResource',
+		location=
+			"D:\\Morozov\\z\\z-dj\\DEMO\\EXE\\"
+			"EXAMPLES\\Predefined classes\\"
+			"Tests_110 (WebReceptor)\\"
+			"data\\report1.html",
+		x=4,
+		y=4);
+r6	= ('ExternalResource',
+		location=
+			"D:\\Morozov\\z\\z-dj\\DEMO\\EXE\\"
+			"EXAMPLES\\Predefined classes\\"
+			"Tests_110 (WebReceptor)\\",
+		x=5,
+		y=5);
+r7	= ('ExternalResource',
+		location=
+			"D:\\Morozov\\z\\z-dj\\DEMO\\EXE\\"
+			"EXAMPLES\\Predefined classes\\"
+			"Tests_110 (WebReceptor)",
+		x=6,
+		y=6);
+r8	= ('ExternalResource',
+		location=
+			"http://www.cplire.ru/Lab144/"
+			"index.html",
+		x=7,
+		y=7);
+--
+[
+goal:-
+	r1 ? test_resource,
+	r2 ? test_resource,
+	r3 ? test_local_resource,
+	r4 ? test_local_resource("data/report1.html"),
+	r5 ? test_resource,
+	r6 ? test_resource,
+	r7 ? test_resource,
+	r8 ? test_resource.
+]
+-----------------------------------------------------------------------
+class 'ExternalResource' (specialized 'WebReceptor'):
+--
+internal:
+--
+	con		= ('MyReport',title,x,y);
+--
+constant:
+--
+	location	: RefSTRING;
+	x		: X;
+	y		: Y;
+--
+variable:
+--
+	title		: RefSTRING;
+--
+[
+IMPERATIVES:
+--
+test_resource;
+test_local_resource;
+test_local_resource(URL);
+--
+get_references(RefSTRING) = ReferenceList;
+get_references(RefSTRING,FileMask) = ReferenceList;
+--
+CLAUSES:
+--
+goal:-!,
+	title== location.
+--
+test_resource:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5.
+--
+test_local_resource:-!,
+	test1,
+	test3.
+test_local_resource(URL):-!,
+	test2(URL),
+	test4(URL),
+	test5(URL).
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1"),
+	con ? set_color('Green'),
+	?get_references().
+--
+test2:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2"),
+	con ? set_color('Green'),
+	?get_references(location).
+test2(URL):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2"),
+	con ? set_color('Green'),
+	?get_references(URL).
+--
+test3:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 3"),
+	con ? set_color('Green'),
+	Content== ?get_references(),
+	loop(1,Content).
+--
+test4:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 4"),
+	con ? set_color('Green'),
+	Content== ?get_references(location),
+	loop(1,Content).
+test4(URL):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 4"),
+	con ? set_color('Green'),
+	Content== ?get_references(URL),
+	loop(1,Content).
+--
+test5:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 5"),
+	con ? set_color('Green'),
+	Content== ?get_references(location,"*.a"),
+	loop(1,Content).
+test5(URL):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 5"),
+	con ? set_color('Green'),
+	Content== ?get_references(URL,"*.a"),
+	loop(1,Content).
+--
+loop(_,[]):-!,
+	con ? set_color('RoyalBlue'),
+	con ? writeln("=== End of list ==="),
+	con ? set_color('default').
+loop(N,[H|R]):-!,
+	con ? set_color('RoyalBlue'),
+	con ? write(N,") "),
+	con ? set_color('Green'),
+	con ? writeln(H),
+	con ? set_color('default'),
+	loop(N+1,R).
+loop(_,R):-
+	con ? set_color('Red'),
+	con ? writeln(R),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyReport' (specialized 'Report'):
+--
+constant:
+--
+	width	= 73;
+	height	= 20;
+--
+variable:
+--
+	title	: RefSTRING;
+--
+[]
+-----------------------------------------------------------------------

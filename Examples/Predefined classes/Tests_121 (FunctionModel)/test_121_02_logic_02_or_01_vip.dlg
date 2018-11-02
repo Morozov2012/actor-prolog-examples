@@ -1,0 +1,17 @@
+dialog_font('times',18)
+diagram_font('helvetica',24)
+success_color('Green','White')
+success_text_color('Black','Green')
+failure_color('Red','White')
+failure_text_color('Yellow','Red')
+
+dialog 'Subgoal' ("Sub-goal state",default,default,default,centered,centered,'DkGreen')
+vbox(center)
+	statictext("Control panel")
+	hbox(center)
+		ok(verify,"&Verify")
+		button(reset,"&Reset")
+		button(close,"&Close")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

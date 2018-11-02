@@ -1,0 +1,61 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, Alexei A. Morozov, IRE RAS. --
+-- Transmission of direct message.       --
+-------------------------------------------
+project: (('Direct1'))
+-------------------------------------------
+class 'Direct1':
+--
+p1	= (('Receiver'));
+p2	= (('Sender',
+		target=p1));
+--
+[
+goal.
+alarm(_).
+]
+-------------------------------------------
+class 'Receiver':
+--
+con	= ('Report');
+--
+[
+goal.
+alarm(_).
+--
+p(A,B,C):-
+	con ? show,
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"I have received "
+		"a message:"),
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"p(",A,",",B,",",C,")"),
+	con ? set_color('default').
+--
+q(A,B,C):-
+	con ? show,
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"I have received "
+		"a message:"),
+	con ? set_color('Orange'),
+	con ? writeln(
+		"q(",A,",",B,",",C,")"),
+	con ? set_color('default').
+]
+-------------------------------------------
+class 'Sender':
+--
+target;
+--
+[
+goal:-
+	target << p(1,2,3),
+	target <- q(7,8,9).
+--
+alarm(_).
+]
+-------------------------------------------

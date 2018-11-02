@@ -1,0 +1,38 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	env	= ('DesktopWindow');
+--
+	con	= ('Console',
+			x= 15,
+			y= 5,
+			width= 50,
+			height= 15,
+			maximal_line_number= 'no_limit');
+--
+[
+goal:-!,
+	set_period(1.5),
+	activate.
+--
+tick:-
+	env ? is_minimized(),!,
+	con ? writeln("I will maximize the top-level window."),
+	env ? maximize.
+tick:-
+	env ? is_maximized(),!,
+	con ? writeln("I will restore the top-level window."),
+	env ? restore.
+tick:-
+	env ? is_restored(),!,
+	con ? writeln("I will minimize the top-level window."),
+	env ? minimize.
+tick:-!,
+	con ? writeln("The top-level window is created.").
+]
+-----------------------------------------------------------------------

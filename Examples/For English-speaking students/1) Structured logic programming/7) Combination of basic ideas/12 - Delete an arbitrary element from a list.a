@@ -1,0 +1,42 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: delete an arbitrary element --
+-- from a list.                          --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Disassembling of a list.           --
+-- 2) An output argument.                --
+-- 3) Output assembling of a list.       --
+-- 4) Backtracking.                      --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+nondeterm:
+
+p(List,INTEGER,List)	- (i,o,o);
+
+CLAUSES:
+
+goal:-
+	L1== [1,2,3,4,5,6,7],
+	writeln("L1=",L1),nl,
+	p(L1,X,L2),
+		writeln("X=",X,", L2=",L2),
+		fail.
+
+p([Head|Rest],Head,Rest).
+p([Head|Rest1],H,[Head|Rest2]):-
+	p(Rest1,H,Rest2).

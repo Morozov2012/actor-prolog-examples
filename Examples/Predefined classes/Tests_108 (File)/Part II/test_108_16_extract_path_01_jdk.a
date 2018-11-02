@@ -1,0 +1,162 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+test9;
+test10;
+test11;
+test12;
+test13;
+test14;
+
+class 'Main' (specialized 'File'):
+--
+constant:
+--
+	name	= "xxx\\yyy/name";
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6,
+	test7,
+	test8,
+	test9,
+	test10,
+	test11,
+	test12,
+	test13,
+	test14.
+--
+test1:-
+	con ? writeln("Test 1"),
+	FullName== "g:\\xxx\\yyy\\name.ext.v1",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test2:-
+	con ? writeln("Test 2"),
+	FullName== "g:/xxx/yyy/name.ext.v1",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test3:-
+	con ? writeln("Test 3"),
+	FullName== "g:name.ext.v1",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test4:-
+	con ? writeln("Test 4"),
+	FullName== "\\xxx\\yyy\\name.ext.v1",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test5:-
+	con ? writeln("Test 5"),
+	FullName== "/xxx/yyy/name.ext.v1",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test6:-
+	con ? writeln("Test 6"),
+	FullName== "xxx\\yyy\\name.ext.v1",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test7:-
+	con ? writeln("Test 7"),
+	FullName== "xxx/yyy/name.ext.v1",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test8:-
+	con ? writeln("Test 8"),
+	FullName== "name.ext",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test9:-
+	con ? writeln("Test 9"),
+	FullName== "name.",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test10:-
+	con ? writeln("Test 10"),
+	FullName== "/xxx/yyy/",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test11:-
+	con ? writeln("Test 11"),
+	FullName== "name",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test12:-
+	con ? writeln("Test 12"),
+	FullName== "",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(FullName,Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test13:-
+	con ? writeln("Test 13"),
+	FullName== "http://a.b.c/d.html",
+	con ? writeln("\tFull name:  >>>",FullName,"<<<"),
+	extract_path(Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+--
+test14:-
+	con ? writeln("Test 14"),
+	con ? writeln("\tFull name:  >>>",name,"<<< (slot)"),
+	extract_path(Path1,Name1),
+	con ? writeln("\tPath:       >>>",Path1,"<<<"),
+	con ? writeln("\tShort name: >>>",Name1,"<<<").
+]

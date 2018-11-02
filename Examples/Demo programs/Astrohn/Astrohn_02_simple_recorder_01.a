@@ -1,0 +1,659 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Please set the following network attributes:
+-- IP address: 192.168.11.1
+-- Mask: 225.225.225.0
+-- Probably you should switch off the firewall.
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Astrohn";
+import .. from "morozov/ColorMap";
+import .. from "morozov/FFmpeg";
+-----------------------------------------------------------------------
+project: (('Viewer'))
+-----------------------------------------------------------------------
+class 'Viewer' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer		= ('CameraControl',
+				viewer=self,
+				main_window);
+	main_window	= ('Canvas2D',
+				background_color='SystemControl');
+	writer		= ('FFmpeg',
+				operating_mode='WRITING',
+				extension=".avi");
+	inspector	= ('VideoFileInspector',
+				viewer=self);
+	text_operations	= ('Text');
+	timer		= ('Timer');
+	image		= ('BufferedImage');
+	file_operations	= ('File',
+				extension=".ap2j");
+	con		= ('Console');
+	color_maps	= ('ColorMap');
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+	exit_on_close		= 'yes';
+--
+constant:
+--
+	dlg_ctrl_list_frame_type		= 1010;
+	dlg_ctrl_togglebutton_average		= 1020;
+	dlg_ctrl_togglebutton_zoom		= 1030;
+	--
+	dlg_ctrl_editname_frame_number		= 1050;
+	dlg_ctrl_list_color_map			= 1060;
+	--
+	dlg_ctrl_togglebutton_connect		= 2010;
+	dlg_ctrl_scrollbar_frame_number_range	= 2021;
+	dlg_ctrl_scrollbar_frame_number_value	= 2022;
+--
+[
+goal:-!,
+	update_displaying_mode,
+	switch_controls,
+	show.
+--
+action("Load"):-
+	FileName== con?input_file_name(
+		"Please select data file",
+		"*.ap2j",
+		[
+		"*.ap2j","Data Files",
+		"*.*","All Files"
+		]),!,
+	buffer ? set_name(FileName),
+	put('title',"Thermal Video Recorder ["+FileName+"]"),
+	buffer ? set_operating_mode('PLAYING'),
+	play_video_if_possible,
+	switch_controls.
+action("Play"):-!,
+	buffer ? set_operating_mode('PLAYING'),
+	play_video_if_possible,
+	switch_controls.
+action("Pause"):-!,
+	buffer ? pause,
+	switch_controls.
+action("Record"):-!,
+	record_data.
+action("Export"):-!,
+	export_data(".avi").
+action("GIF"):-!,
+	export_data(".gif").
+action("Stop"):-
+	is_recording_mode,!,
+	buffer ? stop,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? start,
+	switch_controls.
+action("Stop"):-!,
+	complete_data_transfer.
+action("Save"):-
+	NewName== con?input_new_file_name(
+		"Please enter the file name",
+		"*.ap2j",
+		[
+		"*.ap2j","Data Files",
+		"*.*","All Files"
+		]),!,
+	CurrentName== buffer?get_full_name(),
+	file_operations ? copy(CurrentName,NewName),
+	buffer ? set_name(NewName),
+	put('title',"Thermal Video Recorder ["+NewName+"]"),
+	switch_controls.
+action("Photo"):-!,
+	FileName== ?create_new_file_name(),
+	buffer ? take_photo(FileName+".png").
+--
+modified_control(dlg_ctrl_list_frame_type):-!,
+	buffer ? frame_obtained.
+modified_control(dlg_ctrl_togglebutton_average):-
+	Mode== ?on_off(?val("YesNo",
+		?get(dlg_ctrl_togglebutton_average))),!,
+	buffer ? set_averaging_mode(Mode),
+	switch_controls,
+	buffer ? frame_obtained.
+modified_control(dlg_ctrl_togglebutton_zoom):-
+	Mode== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_zoom)),!,
+	buffer ? set_zoom_image(Mode),
+	switch_controls,
+	buffer ? frame_obtained.
+modified_control(dlg_ctrl_list_color_map):-!,
+	update_displaying_mode,
+	buffer ? frame_obtained.
+modified_control(dlg_ctrl_togglebutton_connect):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_connect)),!,
+	set_Connect_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_scrollbar_frame_number_value):-
+	Position== ?cast("INTEGER",
+		?get(dlg_ctrl_scrollbar_frame_number_value)),
+	buffer ? retrieve_buffered_frame(Position),!.
+-----------------------------------------------------------------------
+play_video_if_possible:-
+	check_file_name,!,
+	park_scroll_control,
+	buffer ? start.
+play_video_if_possible.
+--
+check_file_name:-
+	is_loaded,!.
+check_file_name:-
+	FileName== buffer?get_name(),
+	con ? error(
+		"Illegal File name",
+		text_operations?format(
+			"The '%s' file does not exist.",FileName)),
+	fail.
+--
+set_read_buffer_size(Size):-
+	put(dlg_ctrl_scrollbar_frame_number_range,[1,Size]).
+--
+park_scroll_control:-
+	Range== ?val("I_List",
+		?get(dlg_ctrl_scrollbar_frame_number_range)),
+	Range == [_,Right],!,
+	put(dlg_ctrl_scrollbar_frame_number_value,Right).
+park_scroll_control.
+--
+complete_data_transfer:-
+	writer ? is_open,
+	writer ? close,
+	fail.
+complete_data_transfer:-
+	is_recording_mode,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? stop,
+	fail.
+complete_data_transfer:-
+	is_disconnected,
+	buffer ? set_operating_mode('PLAYING'),
+	buffer ? stop,
+	fail.
+complete_data_transfer:-
+	switch_controls.
+-----------------------------------------------------------------------
+get_frame_type() =
+	?cast("STRING",?get(dlg_ctrl_list_frame_type)).
+--
+update_displaying_mode:-
+	ZoomImage== ?val("YesNo",?get(dlg_ctrl_togglebutton_zoom)),
+	TextCM== ?val("STRING",?get(dlg_ctrl_list_color_map)),!,
+	ColorMap== color_maps?string_to_color_map_name(TextCM),
+	buffer ? set_zoom_image(ZoomImage),
+	buffer ? set_main_color_map(ColorMap).
+update_displaying_mode.
+--
+set_Connect_mode('yes'):-!,
+	buffer ? stop,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? start.
+set_Connect_mode('no'):-!,
+	buffer ? stop,
+	buffer ? set_operating_mode('PLAYING').
+set_Connect_mode(_).
+--
+is_connected:-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_connect)),
+	Mode == 'yes'.
+--
+is_disconnected:-
+	is_connected,!,
+	fail.
+is_disconnected.
+--
+is_loaded:-
+	buffer ? does_exist().
+--
+is_reading_mode:-
+	Mode== ?val("VideoBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'READING'.
+--
+is_recording_mode:-
+	Mode== ?val("VideoBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'RECORDING'.
+-----------------------------------------------------------------------
+switch_controls:-
+	switch_frame_number_scroller,
+	switch_buttons.
+--
+switch_frame_number_scroller:-
+	is_connected,!,
+	disable(dlg_ctrl_scrollbar_frame_number_range).
+switch_frame_number_scroller:-
+	enable(dlg_ctrl_scrollbar_frame_number_range).
+--
+switch_buttons:-
+	switch_load_button,
+	switch_play_button,
+	switch_pause_button,
+	switch_record_button,
+	switch_export_button,
+	switch_GIF_button,
+	switch_stop_button,
+	switch_save_button.
+--
+switch_load_button:-
+	is_connected,!,
+	disable("Load").
+switch_load_button:-
+	is_disconnected,
+	buffer ? is_active,!,
+	disable("Load").
+switch_load_button:-
+	enable("Load").
+--
+switch_play_button:-
+	is_connected,!,
+	disable("Play").
+switch_play_button:-
+	is_disconnected,
+	is_loaded,
+	buffer ? is_active,!,
+	disable("Play").
+switch_play_button:-
+	is_disconnected,
+	is_loaded,!,
+	enable("Play").
+switch_play_button:-
+	disable("Play").
+--
+switch_pause_button:-
+	is_connected,!,
+	disable("Pause").
+switch_pause_button:-
+	is_disconnected,
+	is_loaded,
+	buffer ? is_active,!,
+	enable("Pause").
+switch_pause_button:-
+	disable("Pause").
+--
+switch_record_button:-
+	is_connected,
+	is_recording_mode,!,
+	disable("Record").
+switch_record_button:-
+	is_connected,
+	writer ? is_open,!,
+	disable("Record").
+switch_record_button:-
+	is_connected,!,
+	enable("Record").
+switch_record_button:-
+	disable("Record").
+--
+switch_export_button:-
+	is_connected,
+	is_recording_mode,!,
+	disable("Export").
+switch_export_button:-
+	is_connected,
+	writer ? is_open,!,
+	disable("Export").
+switch_export_button:-
+	is_connected,!,
+	enable("Export").
+switch_export_button:-
+	is_disconnected,
+	is_loaded,
+	buffer ? is_active,!,
+	disable("Export").
+switch_export_button:-
+	is_disconnected,
+	is_loaded,!,
+	enable("Export").
+switch_export_button:-
+	disable("Export").
+--
+switch_GIF_button:-
+	is_connected,
+	is_recording_mode,!,
+	disable("GIF").
+switch_GIF_button:-
+	is_connected,
+	writer ? is_open,!,
+	disable("GIF").
+switch_GIF_button:-
+	is_connected,!,
+	enable("GIF").
+switch_GIF_button:-
+	is_disconnected,
+	is_loaded,
+	buffer ? is_active,!,
+	disable("GIF").
+switch_GIF_button:-
+	is_disconnected,
+	is_loaded,!,
+	enable("GIF").
+switch_GIF_button:-
+	disable("GIF").
+--
+switch_stop_button:-
+	is_connected,
+	is_recording_mode,!,
+	enable("Stop").
+switch_stop_button:-
+	is_connected,
+	writer ? is_open,!,
+	enable("Stop").
+switch_stop_button:-
+	is_connected,!,
+	disable("Stop").
+switch_stop_button:-
+	is_disconnected,
+	is_loaded,
+	buffer ? is_active,!,
+	enable("Stop").
+switch_stop_button:-
+	is_disconnected,
+	is_loaded,
+	buffer ? is_suspended,!,
+	enable("Stop").
+switch_stop_button:-
+	disable("Stop").
+--
+switch_save_button:-
+	is_connected,!,
+	disable("Save").
+switch_save_button:-
+	is_disconnected,
+	is_loaded,
+	buffer ? is_active,!,
+	disable("Save").
+switch_save_button:-
+	is_disconnected,
+	is_loaded,!,
+	enable("Save").
+switch_save_button:-
+	disable("Save").
+-----------------------------------------------------------------------
+record_data:-
+	buffer ? stop,
+	FileName== ?create_new_file_name(),
+	buffer ? set_name(FileName),
+	buffer ? set_operating_mode('RECORDING'),
+	buffer ? reset_frame_rate,
+	put(dlg_ctrl_editname_frame_number,""),
+	buffer ? start,
+	switch_controls.
+--
+export_data(Extension):-
+	writer ? set_extension(Extension),
+	fail.
+export_data(_):-
+	is_connected,!,
+	DestinationFileName== ?create_new_file_name(),
+	FT== ?get_frame_type(),
+	get_buffer_image_size_and_frame_rate(FT,W,H,FrameRate),
+	writer ? open(DestinationFileName,{
+		codec_type: 'AVMEDIA_TYPE_VIDEO',
+		destination_image_width: W,
+		destination_image_height: H,
+		time_base: 1/FrameRate,
+		bit_rate: 5_000_000
+		}),
+	buffer ? stop,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? reset_frame_rate,
+	put(dlg_ctrl_editname_frame_number,""),
+	buffer ? start,
+	switch_controls.
+export_data(_):-
+	is_disconnected,!,
+	buffer ? stop,
+	SourceFileName== buffer?get_full_name(),
+	inspector ? inspect_file(SourceFileName).
+export_data(_).
+--
+continue_export:-
+	SourceFileName== buffer?get_full_name(),
+	Extension== writer?get_extension(),
+	DestinationFileName== file_operations
+		?replace_extension(SourceFileName,Extension),
+	FT== ?get_frame_type(),
+	get_inspector_image_size_and_frame_rate(FT,W,H,FrameRate),
+	writer ? open(DestinationFileName,{
+		codec_type: 'AVMEDIA_TYPE_VIDEO',
+		destination_image_width: W,
+		destination_image_height: H,
+		time_base: 1/FrameRate,
+		bit_rate: 5_000_000
+		}),
+	buffer ? set_operating_mode('READING'),
+	buffer ? reset_frame_rate,
+	put(dlg_ctrl_editname_frame_number,""),
+	buffer ? start,
+	switch_controls.
+--
+export_image_if_necessary(FrameNumber,Canvas2D):-
+	writer ? is_open,
+	Canvas2D ? get_image(image),
+	writer ? write_image(image),
+	put(dlg_ctrl_editname_frame_number,FrameNumber),
+	fail.
+export_image_if_necessary(FrameNumber,_):-
+	is_recording_mode,
+	put(dlg_ctrl_editname_frame_number,FrameNumber),
+	fail.
+export_image_if_necessary(_,_):-
+	is_reading_mode,
+	buffer ? start,
+	fail.
+export_image_if_necessary(_,_).
+--
+continue_reading_if_necessary:-
+	is_reading_mode,
+	buffer ? start,
+	fail.
+continue_reading_if_necessary.
+--
+get_buffer_image_size_and_frame_rate(
+		"Terahertz Image",Width,Height,FR):-!,
+	buffer ? get_terahertz_image_size_in_pixels(Width,Height),
+	buffer ? get_recent_terahertz_frame_rate(FR).
+get_buffer_image_size_and_frame_rate(_,Width,Height,FR):-
+	buffer ? get_color_image_size_in_pixels(Width,Height),
+	buffer ? get_recent_color_frame_rate(FR).
+--
+get_inspector_image_size_and_frame_rate(
+		"Terahertz Image",Width,Height,FR):-!,
+	inspector ? get_terahertz_image_size_in_pixels(Width,Height),
+	inspector ? get_recent_terahertz_frame_rate(FR).
+get_inspector_image_size_and_frame_rate(_,Width,Height,FR):-
+	inspector ? get_color_image_size_in_pixels(Width,Height),
+	inspector ? get_recent_color_frame_rate(FR).
+-----------------------------------------------------------------------
+on_off('yes') = 'on' :-!.
+on_off(_) = 'off'.
+--
+create_new_file_name() = FileName :-
+	timer ? date(Year,Month,Day),
+	timer ? time(Hour,Minute,Second),
+	FileName== text_operations?format(
+		"%04d-%02d-%02d-%02d-%02d-%02d",
+		Year,Month,Day,
+		Hour,Minute,Second).
+]
+-----------------------------------------------------------------------
+class 'CameraControl' (specialized 'Astrohn'):
+--
+constant:
+--
+	operating_mode			= 'LISTENING';
+	read_buffer_size		= 30;
+	zooming_coefficient		= 2.1;
+--
+internal:
+--
+	viewer;
+	main_window;
+--
+	image1				= ('BufferedImage');
+	image2				= ('BufferedImage');
+	text_operations			= ('Text');
+	timer				= ('Timer');
+	con				= ('Console');
+--
+[
+goal:-!,
+	viewer ? set_read_buffer_size(read_buffer_size).
+--
+take_photo(FileName):-
+	main_window ? get_image(image2),
+	image2 ? save(FileName).
+--
+frame_obtained:-
+	commit,
+	FrameType== ?cast("STRING",viewer?get_frame_type()),
+	get_image(FrameType,IW,IH,FN,FT,FrameRate,FontSize),
+	FN > 0,!,
+	resize_main_window(IW,IH),
+	main_window ? suspend_redrawing,
+	main_window ? clear,
+	main_window ? draw_image(image1,0,0,1,1),
+	main_window ? set_rendering_mode({
+		colorRendering:'QUALITY',
+		antialiasing:'on',
+		textAntialiasing:'on'
+		}),
+	report_time(FN,FT,FrameRate,FontSize),
+	report_copyright(FontSize),
+	main_window ? draw_now,
+	viewer ? export_image_if_necessary(FN,main_window).
+frame_obtained:-!,
+	viewer ? continue_reading_if_necessary.
+--
+get_image("Terahertz Image",IW,IH,Number,Time,FrameRate,18):-!,
+	get_recent_terahertz_image(image1),
+	get_terahertz_image_size_in_pixels(IW,IH),
+	get_recent_terahertz_frame_number(Number),
+	get_recent_terahertz_frame_time(Time),
+	get_recent_terahertz_frame_rate(FrameRate).
+get_image("Color Image",IW,IH,Number,Time,FrameRate,18):-!,
+	get_recent_color_image(image1),
+	get_color_image_size_in_pixels(IW,IH),
+	get_recent_color_frame_number(Number),
+	get_recent_color_frame_time(Time),
+	get_recent_color_frame_rate(FrameRate).
+get_image(_,IW,IH,Number,Time,FrameRate,18):-
+	get_recent_combined_image(image1),
+	get_color_image_size_in_pixels(IW,IH),
+	get_recent_terahertz_frame_number(Number),
+	get_recent_terahertz_frame_time(Time),
+	get_recent_terahertz_frame_rate(FrameRate).
+--
+resize_main_window(IW,IH):-
+	IW > 0,
+	IH > 0,!,
+	main_window ? refine_width(IW/IH).
+resize_main_window(_,_).
+--
+data_transfer_completion:-!,
+	viewer ? complete_data_transfer.
+--
+data_transfer_error(ErrorName):-!,
+	con ? error("Data Transfer Error",ErrorName).
+--
+report_time(_,_,_,FontSize):-
+	main_window ? set_brush('Green'),
+	main_window ? set_font({size:FontSize}),
+	fail.
+report_time(FrameNumber,FrameTime,_,_):-
+	FrameNumber >= 0,
+	Time== timer?convert_to_time(FrameTime),
+	Time == time(Hours,Minutes,Seconds,Milliseconds),
+	main_window ? set_text_alignment('LEFT','TOP'),
+	main_window ? draw_text(
+		0.02, 0.02,
+		text_operations?format(
+			"T: %02d:%02d:%02d.%03d; F: %d",
+			Hours,Minutes,Seconds,Milliseconds,
+			FrameNumber)),
+	fail.
+report_time(_,_,FrameRate,_):-
+	FrameRate >= 0,
+	main_window ? set_text_alignment('RIGHT','TOP'),
+	main_window ? draw_text(
+		0.95, 0.02,
+		text_operations?format(
+			"FR: %2.1f",FrameRate)),
+	fail.
+report_time(_,_,_,_).
+--
+report_copyright(FontSize):-
+	main_window ? set_font({
+		name:'SANS_SERIF',
+		weight:'WEIGHT_REGULAR',
+		width:'WIDTH_EXTENDED',
+		posture:'POSTURE_REGULAR',
+		size:FontSize,
+		tracking:'TRACKING_LOOSE',
+		kerning:'on',
+		foreground:'White'
+		}),
+	main_window ? set_text_alignment('LEFT','BOTTOM'),
+	main_window ? draw_text(0.02,0.98,"www.fullvision.ru").
+]
+-----------------------------------------------------------------------
+class 'VideoFileInspector' (specialized 'Astrohn'):
+--
+internal:
+--
+	viewer;
+--
+	dialog	= ('FileInspection',
+			inspector= self);
+--
+constant:
+--
+	operating_mode			= 'READING';
+	read_buffer_size		= 0;
+--
+[
+inspect_file(FileName):-
+	set_name(FileName),
+	dialog ? show,
+	start.
+--
+frame_obtained:-
+	commit,!,
+	get_recent_terahertz_frame_number(FrameNumber),
+	dialog ? put(1010,FrameNumber),
+	start.
+--
+data_transfer_completion:-
+	dialog ? is_visible,!,
+	dialog ? hide,
+	viewer ? continue_export.
+data_transfer_completion:-!.
+--
+cancel_inspection:-
+	dialog ? hide,
+	stop.
+]
+-----------------------------------------------------------------------
+class 'FileInspection' (specialized 'Dialog'):
+--
+internal:
+--
+	inspector;
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+action("Cancel"):-!,
+	inspector ? cancel_inspection.
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,259 @@
+-------------------------------------------------------------------
+--              An example of Actor Prolog program.              --
+--          (c) 2002-2011, IRE RAS, Alexei A. Morozov.           --
+-------------------------------------------------------------------
+-- This is an auxiliary utility that processes data collected    --
+-- by the ScanWeb program. Execute it after the Step3 program.   --
+-------------------------------------------------------------------
+import 'TableOfResults'	from "Morozov/Web/Scanning/Tables";
+import 'ShortName'	from "Morozov/VRML/Names";
+import 'ColorDatabase'	from "Morozov/VRML/Colors";
+import 'Color_Table'	from "Morozov/VRML/Colors";
+-------------------------------------------------------------------
+project: (('Step4'))
+-------------------------------------------------------------------
+class 'Step4' (specialized 'Console'):
+--
+internal:
+--
+	input		= ('TableOfResults',
+				name="Results.db");
+--
+	output		= ('File');
+--
+	color_table	= ('ColorDatabase',
+				name="Colors.db");
+--
+	names		= ('ShortName');
+	colors		= ('Color_Table');
+--
+constant:
+--
+	size_of_letters	= 5;
+--
+internal:
+--
+	sorting		= ('PairSet',
+				world=self);
+--
+[
+goal:-
+	write("Loading the data ... "),
+	input ? load,
+	color_table ? load,
+	writeln("O.K."),
+	fail.
+goal:-
+	get_list_of_keywords(Keywords),
+	input ? find(Item),
+	create_intermediate_file(Item,Keywords),
+	fail.
+goal:-!,
+	writeln("Good luck!").
+--
+create_intermediate_file({list_of_keywords:_|_},_):-!.
+create_intermediate_file({name:Name|_},_):-
+	names ? make_short_name(6,?cast("STRING",Name),FN),
+	FileName== "space/i_" + names?lower(FN) + ".html",
+	writeln(FileName),
+	output ? open(FileName,'writing'),
+	fail.
+create_intermediate_file({name:Name|_},_):-
+	output ? writeln("<html>"),
+	output ? writeln("<head>"),
+	output ? writeln(
+		"<title>"
+		"Actor Prolog. An Example of a Web Agent Report. "
+		"Item: ",Name,
+		"</title>"),
+	output ? writeln("</head>"),
+	output ? writeln(
+		"<body "
+		"text=\"#FFFFFF\" "
+		"bgcolor=\"#000000\" "
+		"link=\"#90EE90\" "
+		"vlink=\"#90EE90\" "
+		"alink=\"#FFFF00\">"),
+	fail.
+create_intermediate_file({name:Name|_},_):-
+	output ? writeln(
+		"<h1><font color=\"#FFFF00\">"
+		"Attributes of the Web resource"
+		"</font></h1>"),
+	output ? writeln(
+		"<h1><font color=\"#FFFF00\">"
+		"&quot;",Name,"&quot;"
+		"</font></h1>"),
+	output ? writeln(
+		"<table width=\"100%\" "
+		"border=1 "
+		"cellpadding=5 "
+		"cellspacing=0>"),
+	fail.
+create_intermediate_file(Item,_):-
+	Item == {
+		name:Name,
+		address:Address,
+		updated:PreviousUpdate,
+		inspected:PreviousInspection,
+		items:Pages,
+		size:Size,
+		hyper_links:HyperLinks,
+		pictures:Pictures,
+		other_links:OtherLinks,
+		error_links:ErrorLinks|_},
+	--
+	write_row("Alias",Name),
+	write_row("Address",
+		"<a href=\"",Address,
+		"\" target=\"_blank\">",
+		Address,
+		"</a"),
+	write_row("Previous update",
+		?date_to_string(PreviousUpdate)),
+	write_row(
+		"<a href=\"pages.html\" target=\"_top\">"
+		"Number of pages</a>",
+		Pages),
+	write_row(
+		"<a href=\"all.html\" target=\"_top\">"
+		"Total size of text</a>",
+		Size," [bytes]"),
+	write_row(
+		"<a href=\"links.html\" target=\"_top\">"
+		"Number of outer links</a>",
+		HyperLinks),
+	write_row(
+		"<a href=\"pictures.html\" target=\"_top\">"
+		"Number of pictures</a>",
+		Pictures),
+	write_row(
+		"<a href=\"binaries.html\" target=\"_top\">"
+		"Number of other binary files</a>",
+		OtherLinks),
+	write_row(
+		"<a href=\"errors.html\" target=\"_top\">"
+		"Number of error links</a>",
+		ErrorLinks),
+	--
+	write_row("Previous inspection",
+		?date_to_string(PreviousInspection),
+		"<br>\n",
+		"Warning: the information may be out of date!"),
+	--
+	fail.
+create_intermediate_file(_,_):-
+	output ? writeln("</table>"),
+	fail.
+create_intermediate_file({name:Name|_},_):-
+	output ? writeln(
+		"<h1></h1>"),
+	output ? writeln(
+		"<h1><font color=\"#FFFF00\">"
+		"Frequency dictionary of the Web resource"
+		"</font></h1>"),
+	output ? writeln(
+		"<h1><font color=\"#FFFF00\">"
+		"&quot;",Name,"&quot;"
+		"</font></h1>"),
+	output ? writeln(
+		"<table width=\"100%\" "
+		"border=1 "
+		"cellpadding=5 "
+		"cellspacing=0>"),
+	fail.
+create_intermediate_file({keywords:IList|_},NList):-
+	Pairs== sorting ? get_pair(NList,IList),
+	write_dictionary(Pairs),
+	fail.
+create_intermediate_file(_,_):-
+	output ? writeln("</table>"),
+	fail.
+create_intermediate_file(_,_):-
+	output ? writeln("</body>"),
+	output ? writeln("</html>"),
+	fail.
+create_intermediate_file(_,_):-!,
+	output ? close.
+--
+get_list_of_keywords(List):-
+	input ? find(Record),
+	Record == {list_of_keywords:List|_},!.
+get_list_of_keywords(_):-
+	break('Error in get_list_of_keywords.').
+get_list_of_keywords(_).
+--
+get_pair([N|_],[I|_])= pair(N,I).
+get_pair([_|NList],[_|IList])= ?get_pair(NList,IList).
+--
+write_row(Name,Value*):-!,
+	output ? writeln("<tr>"),
+	output ? writeln(
+		"<td><font size=",
+		size_of_letters,
+		">",
+		Name,
+		"</font></td>"),
+	output ? write("<td><font size=",
+			size_of_letters,">"),
+	output ? write(Value*),
+	output ? writeln("</font></td>"),
+	output ? writeln("</tr>").
+--
+date_to_string(date(Year,Month,Day))= Text :-!,
+	Text== ?convert_to_string(Year,"-",Month,"-",Day).
+date_to_string(_)= "Unknown date" :-!.
+--
+write_dictionary([pair(Name,I)|Rest]):-
+	color_table ? find(Record),
+	Record == keyword_color(Name,Hue),
+	colors ? make_color(Hue,1.0,0.7,Color1),
+	Color1 == c(R,G,B),
+	Color2== names ? format("\"#%02x%02x%02x\"",
+		?convert_to_integer(R),
+		?convert_to_integer(G),
+		?convert_to_integer(B)),!,
+	write_color_row(Color2,Name,I),
+	write_dictionary(Rest).
+write_dictionary([pair(Name,I)|Rest]):-!,
+	write_row(Name,I),
+	write_dictionary(Rest).
+write_dictionary(_):-!.
+--
+write_color_row(Color,Name,Value*):-!,
+	names ? make_short_name(6,?cast("STRING",Name),FN),
+	VRML_File== "fly/k_" + names?lower(FN) + ".wrl",
+	output ? writeln("<tr>"),
+	output ? writeln(
+		"<td>"
+		"<a href=",VRML_File,">"
+		"<font size=",
+		size_of_letters,
+		" ",
+		"color=",Color,
+		">",
+		Name,
+		"</font></a></td>"),
+	output ? write(
+		"<td align=\"center\"><font size=",
+		size_of_letters,
+		" ",
+		"color=",Color,
+		">"),
+	write_value_or_spase(Value*),
+	output ? writeln("</font></td>"),
+	output ? writeln("</tr>").
+--
+write_value_or_spase(0):-!,
+	output ? write("&nbsp;").
+write_value_or_spase(Value*):-
+	output ? write(Value*).
+]
+-------------------------------------------------------------------
+class 'PairSet' (specialized 'FindAll'):
+--
+mode	= 'set';
+--
+[
+]
+-------------------------------------------------------------------

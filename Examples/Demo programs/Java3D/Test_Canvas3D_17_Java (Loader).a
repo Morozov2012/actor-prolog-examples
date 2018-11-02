@@ -1,0 +1,140 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java3D";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Dialog'):
+--
+internal:
+--
+	canvas			= ('Test3D',
+					branch_group_label);
+	buffer			= ('BufferedScene');
+	con			= ('Console');
+--
+constant:
+--
+	branch_group_label	= "BranchGroup";
+	is_top_level_window	= 'yes';
+--
+[
+goal:-!,
+	maximize,
+	canvas ? initialize_scene().
+--
+action("load"):-
+	FileName== con?input_file_name(
+		"Please select data file",
+		"*.obj",
+		[
+		"*.obj","Wavefront",
+		"*.lws","Lightwave Scene Format",
+		"*.*","All Files"
+		]),!,
+	buffer ? load(FileName),
+	canvas ? set_node(
+		branch_group_label,
+		'BranchGroup'({
+			label: branch_group_label,
+			allowDetach: 'yes',
+			compile: 'yes',
+			branches: [buffer]
+		})).
+]
+-----------------------------------------------------------------------
+class 'Test3D' (specialized 'Canvas3D'):
+--
+constant:
+--
+	branch_group_label;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+initialize_scene;
+--
+CLAUSES:
+--
+goal:-!.
+--
+initialize_scene:-
+	Bounds== 'BoundingSphere'({}),
+	Attenuation== a(2,1,0),
+	show([
+		'TransformGroup'({
+			transform3D: 'Transform3D'({
+				scale: 0.01
+				}),
+			allowChildrenRead: 'yes',
+			allowChildrenWrite: 'yes',
+			branches: [
+				'BranchGroup'({
+					label: branch_group_label,
+					allowDetach: 'yes',
+					compile: 'yes',
+					branches: []
+					}),
+				'OrbitBehavior'({
+					reverseAll: 'yes',
+					stopZoom: 'yes',
+					minRadius: 1.5,
+					schedulingBounds: Bounds
+					})
+				]
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(-3,3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(-3,3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(-3,-3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(-3,-3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(3,3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(3,3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(3,-3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(3,-3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			})
+		]).
+]
+-----------------------------------------------------------------------

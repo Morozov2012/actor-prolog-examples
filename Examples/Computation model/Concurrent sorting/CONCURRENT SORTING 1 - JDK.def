@@ -1,0 +1,139 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--              (c) 2011, IRE RAS, Alexei A. Morozov.                --
+--     An implementation of the Concurrent Sorting Algorithm.        --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+List		= Item*.
+Item		= INTEGER.
+--
+R_STRING	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+convert_input_list(List,R_STRING)	- (i,i);
+convert_output_list(R_STRING,List)	- (i,i);
+--
+distribute_if_necessary(List,List,List)	- (i,o,o);
+distribute(List,List,List)		- (i,o,o);
+--
+gather(List,List,List,List)		- (i,i,i,o);
+gather(List,List,List)			- (i,i,o);
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+user_interface	: 'UserInterface';
+--
+engine		: 'SortingEngine';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'UserInterface' (specialized 'Dialog'):
+--
+--
+-- PROCESS INPUTS:
+--
+variable:
+--
+	input_list	: R_STRING;	-- User input (text)
+--
+	input		: List;		-- Sorted list (term)
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	output		: List;		-- User input (term)
+--
+	sorted_list	: R_STRING;	-- Sorted list (text)
+--
+[
+PREDICATES:
+--
+determ:
+--
+string_to_term(R_STRING) = _	- (i);
+]
+-----------------------------------------------------------------------
+interface 'SortingEngine' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+suspending:
+--
+	input		: List;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output		: List;
+--
+-- AUXILIARY PROCESSES:
+--
+constant:
+--
+	left		: 'SortingEngine';
+	right		: 'SortingEngine';
+--
+-- AUXILIARY ACTORS:
+--
+internal:
+--
+	receiver	: 'Distributor';
+	sender		: 'Gatherer';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Distributor' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+variable:
+--
+	input		: List;
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	output1		: List;
+	output2		: List;
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Gatherer' (specialized 'Alpha'):
+--
+-- PROCESS INPUTS:
+--
+variable:
+--
+	input0		: List;
+	input1		: List;
+	input2		: List;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output		: List;
+--
+[
+PREDICATES:
+--
+determ:
+--
+'<'(Item,Item)		- (i,i);
+--
+]
+-----------------------------------------------------------------------

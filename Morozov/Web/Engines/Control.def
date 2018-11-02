@@ -1,0 +1,85 @@
+package "Morozov/Web/Engines/Control":
+---------------------------------------------------------------
+--            The "CONTROL" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package is intended for control of search engines.   --
+---------------------------------------------------------------
+import "Morozov/Web/Scanning/Counter";
+---------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+SearchPattern		= STRING.
+--
+LimitNumberOfPages	= 'yes'; 'no'; 'unknown'.
+PageNumber		= INTEGER; STRING; 'no_page'.
+--
+---------------------------------------------------------------
+interface  'ControlDialog' (specialized 'Dialog'):
+--
+variable:
+--
+	limit_number_of_pages	: LimitNumberOfPages;
+	max_page		: PageNumber;
+--
+constant:
+--
+	engine			: 'EngineControl';
+--
+internal:
+--
+	switch			: 'Switch';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_engine_mode(LimitNumberOfPages,PageNumber)	- (i,i);
+]
+---------------------------------------------------------------
+interface  'Switch':
+--
+variable:
+--
+	limit_number_of_pages	: LimitNumberOfPages;
+	max_page		: PageNumber;
+--
+constant:
+--
+	engine			: 'EngineControl';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+check(LimitNumberOfPages,PageNumber)		- (i,i);
+]
+---------------------------------------------------------------
+interface 'EngineControl':
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+set_engine_mode(LimitNumberOfPages,PageNumber)	- (i,i);
+]
+---------------------------------------------------------------
+interface 'EngineInput':
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+search(SearchPattern)				- (i);
+--
+]
+---------------------------------------------------------------

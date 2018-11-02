@@ -1,0 +1,813 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support custom controls.
+--
+-----------------------------------------------------------------------
+import 'ColoredReport' from "report_toolbox";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+w	= ('MyDialog');
+--
+[
+goal:-
+	w ? test2,
+	w ? show.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	report1		= ('ColoredReport',
+				title= "Tests",
+				x= 0,
+				y= 0,
+				height= 17,
+				width= 80);
+	report2		= ('ColoredReport',
+				title= "Creation & Update Events",
+				y= 17);
+	con		= ('Console');
+--
+constant:
+--
+	main_slot	= slot1;
+	slot1		= ('FirstTest2D');
+	slot2		= ('SecondTest2D');
+	slot3		= ('ThirdTest2D');
+--
+[
+DOMAINS:
+--
+reference:
+--
+CustomValue	= ('Canvas2D'); #.
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1(CustomValue)		- (i);
+test2;
+create_term(CustomValue)	- (o);
+--
+CLAUSES:
+--
+action("action11"):-!,
+	test1(slot2).
+action("action12"):-!,
+	test1(slot3).
+action("action21"):-!,
+	test1(#).
+action("action22"):-!,
+	create_term(FreeVariable),
+	test1(FreeVariable).
+action("action3"):-!,
+	test2.
+action(Name):-!,
+	con ? note(Name).
+--
+created_control(Address):-!,
+	Value== ?get(Address),
+	report2 ? write("The "),
+	report2 ? write_colored_term(Address),
+	report2 ? write(
+		" control is created ",
+		"with initial value: "),
+	report2 ? write_colored_term(Value),
+	report2 ? nl.
+--
+modified_control(Address):-!,
+	Value== ?get(Address),
+	report2 ? write("The "),
+	report2 ? write_colored_term(Address),
+	report2 ? write(" control has a new value: "),
+	report2 ? write_colored_term(Value),
+	report2 ? nl.
+--
+goal:-!,
+	test0.
+--
+test0:-
+	report1 ? writeln("Test 0:"),
+	report1 ? writeln("\tI will get value."),
+	?get('main_slot'),!,
+	report1 ? writeln("\tDone.").
+test0:-
+	report1 ? write_error_message("\tFailure!").
+--
+test1(Value):-
+	report1 ? writeln("Test 1:"),
+	report1 ? writeln("\tI will put value:"),
+	report1 ? write_value("\t",Value),
+	put('main_slot',Value),!,
+	report1 ? writeln("\tDone.").
+test1(_):-
+	report1 ? write_error_message("\tFailure!").
+--
+test2:-
+	report1 ? writeln("Test 2:"),
+	report1 ? writeln("\tI will get values:"),
+	report1 ? write_value("\tValue: ",?get('main_slot')),!.
+test2:-
+	report1 ? write_error_message("\tFailure!").
+--
+create_term(_).
+]
+-----------------------------------------------------------------------
+class 'FirstTest2D' (specialized 'Canvas2D'):
+--
+constant:
+--
+	background_color		= 'White';
+	scaling_factor			= 'MAX';
+	enable_scene_antialiasing	= 'yes';
+--
+	r1				= 60;
+	r2				= 50;
+	p				= 70;
+	s				= 400;
+	n_points			= 1000;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+drawing_loop(
+	INTEGER,INTEGER,
+	PointX,PointY)		- (i,i,i,i);
+--
+CLAUSES:
+--
+goal:-!.
+--
+start:-!,
+	translate(0.5,0.5),
+	set_scaling_factor('MIN'),
+	X1== (r1+r2-p)/s,
+	Y1== 0.0,
+	drawing_loop(0,n_points,X1,Y1),
+	show.
+--
+drawing_loop(N,MaxN,X1,Y1):-
+	N < MaxN,!,
+	T== N*?pi()/90,
+	X2== ((r1+r2)*?cos(T)-p*?cos((r1+r2)*T/r2))/s,
+	Y2== ((r1+r2)*?sin(T)-p*?sin((r1+r2)*T/r2))/s,
+	draw_line(X1,Y1,X2,Y2),
+	drawing_loop(N+1,MaxN,X2,Y2).
+drawing_loop(_,_,_,_).
+]
+-----------------------------------------------------------------------
+class 'SecondTest2D' (specialized 'Canvas2D'):
+--
+constant:
+--
+	background_color		= 'White';
+	scaling_factor			= 'MAX';
+	enable_scene_antialiasing	= 'yes';
+--
+	image_width			= 250;
+	image_height			= 250;
+	x_min				= -1.5;
+	y_min				= -1.0;
+	max_count			= 512;
+--
+internal:
+--
+	image		= ('BufferedImage',
+				image_type= 'TYPE_INT_RGB');
+--
+[
+DOMAINS:
+--
+Count		= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+loop1(INTEGER,INTEGER,INTEGER,REAL,REAL);
+loop2(INTEGER,INTEGER,INTEGER,INTEGER,REAL,REAL);
+--
+iter_count(REAL,REAL) = Count		- (i,i);
+loop3(REAL,REAL,Count,REAL,REAL,Count)	- (i,i,i,i,i,o);
+--
+CLAUSES:
+--
+goal:-!.
+--
+initialize:-!,
+	show,
+	set_font({size:10}),
+	set_text_alignment('CENTER','CENTER'),
+	draw_text(0.5,0.5,"Wait a moment, please..."),
+	draw_now,
+	image ? create(image_width,image_height),
+	XScale== 1 / image_width,
+	YScale== 1 / image_height,
+	loop1(0,image_width,image_height,XScale,YScale),
+	draw_image(image,0,0,1,1).
+--
+loop1(I,Width,Height,XScale,YScale):-
+	I < Height,!,
+	loop2(I,0,Width,Height,XScale,YScale),
+	loop1(I+1,Width,Height,XScale,YScale).
+loop1(_,_,_,_,_).
+--
+loop2(I,J,Width,Height,XScale,YScale):-
+	J < Width,!,
+	Cr== x_min + J * XScale,
+	Ci== y_min + I * YScale,
+	Count== ?iter_count(Cr,Ci),
+	R== ?bitleft(?bitand(Count,16#07#),5),
+	G== ?bitleft(?bitand(?bitright(Count,3),16#07#),5),
+	B== ?bitleft(?bitand(?bitright(Count,6),16#07#),5),
+	image?set_pixel(J,I,R,G,B),
+	loop2(I,J+1,Width,Height,XScale,YScale).
+loop2(_,_,_,_,_,_).
+--
+iter_count(Cr,Ci)= max_count - Count :-
+	loop3(0.0,0.0,0,Cr,Ci,Count).
+--
+loop3(Zr1,Zi1,Count,Cr,Ci,Result):-
+	Count < max_count,
+	Zr1Sq== ?power(Zr1,2),
+	Zi1Sq== ?power(Zi1,2),
+	LengthSq== Zr1Sq + Zi1Sq,
+	LengthSq < 4.0,!,
+	Zr2== Zr1Sq - Zi1Sq + Cr,
+	Zi2== 2 * Zr1 * Zi1 + Ci,
+	loop3(Zr2,Zi2,Count+1,Cr,Ci,Result).
+loop3(_,_,Count,_,_,Count).
+]
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ObjectType	= 'POINT'; 'RECTANGLE'; 'ROUNDRECTANGLE2D';
+		  'ELLIPSE2D'; 'ARC2D';
+		  'LINE2D'; 'QUADCURVE2D'; 'CUBICCURVE2D';
+		  'POLYGON'.
+--
+-----------------------------------------------------------------------
+class 'ThirdTest2D' (specialized 'Toolbox2D'):
+--
+constant:
+--
+--	title		= "Drawing Geometric Shapes";
+--
+	background_color		= 'White';
+	enable_scene_antialiasing	= 'yes';
+--
+--	scaling_factor			= 'MIN';
+--
+	round_rectangle_arc_width	= 0.1;
+	round_rectangle_arc_height	= 0.1;
+	arc_starting_angle		= 30;
+	arc_angular_extent		= 120;
+--
+internal:
+--
+	mode;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+draw_object_preview(
+	ObjectType,
+	PointX,
+	PointY)			- (i,i,i);
+--
+determ:
+--
+draw_object_or_Fail(
+	ObjectType,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	MouseEvent,
+	DrawingMarker)		- (i,i,i,i,i,i,i);
+--
+imperative:
+--
+append_polygon_point(PointX,PointY)		- (i,i);
+--
+drag_object(
+	ObjectType,
+	PointX,
+	PointY,
+	PointX,
+	PointY)			- (i,i,i,i,i);
+--
+CLAUSES:
+--
+goal:-!,
+	mode ? set_object_type("Point").
+--
+initialize:-!,
+	enable_mouse_events(
+		'MOUSE_PRESSED',
+		'MOUSE_RELEASED',
+		'MOUSE_DRAGGED'),
+	initiate_graphics,
+	Marker== ?mark_drawing(),
+	mode ? remember_drawing_marker(Marker).
+--
+mouse_pressed({x:X0,y:Y0|_}):-!,
+	mode ? append_point(X0,Y0),
+	mode ? get_object_type(Type),
+	draw_object_preview(Type,X0,Y0).
+--
+mouse_released({x:X0,y:Y0|Rest}):-
+	mode ? get_previous_point(X1,Y1),
+	mode ? get_drawing_marker(Marker1),
+	mode ? get_object_type(Type),
+	draw_object_or_Fail(Type,X0,Y0,X1,Y1,Rest,Marker1),!,
+	mode ? clear_point_list,
+	Marker2== ?mark_drawing(),
+	mode ? remember_drawing_marker(Marker2).
+mouse_released(_):-!.
+--
+mouse_dragged({x:X0,y:Y0|_}):-
+	mode ? get_previous_point(X1,Y1),!,
+	mode ? get_object_type(Type),
+	drag_object(Type,X0,Y0,X1,Y1).
+mouse_dragged(_):-!.
+--
+draw_object_preview('POLYGON',X0,Y0):-
+	mode ? get_previous_points(List1),!,
+	reverse_points(List1,[p(X0,Y0)],List2),
+	set_preliminary_pen,
+	draw_lines_or_point(List2).
+draw_object_preview(_,_,_).
+--
+draw_object_or_Fail('POINT',X0,Y0,_,_,_,Marker1):-!,
+	retract_drawing(Marker1),
+	draw_point(X0,Y0),
+	mode ? set_object_type("Rectangle").
+draw_object_or_Fail('RECTANGLE',X0,Y0,X1,Y1,_,Marker1):-!,
+	retract_drawing(Marker1),
+	draw_rectangle(X1,Y1,X0-X1,Y0-Y1),
+	mode ? set_object_type("RoundRectangle").
+draw_object_or_Fail('ROUNDRECTANGLE2D',X0,Y0,X1,Y1,_,Marker1):-!,
+	retract_drawing(Marker1),
+	draw_round_rectangle(
+		X1,Y1,X0-X1,Y0-Y1,
+		round_rectangle_arc_width,
+		round_rectangle_arc_height),
+	mode ? set_object_type("Ellipse").
+draw_object_or_Fail('ELLIPSE2D',X0,Y0,X1,Y1,_,Marker1):-!,
+	retract_drawing(Marker1),
+	draw_ellipse(X1,Y1,X0-X1,Y0-Y1),
+	mode ? set_object_type("Arc").
+draw_object_or_Fail('ARC2D',X0,Y0,X1,Y1,_,Marker1):-!,
+	retract_drawing(Marker1),
+	draw_arc(
+		X1,Y1,X0-X1,Y0-Y1,
+		arc_starting_angle,
+		arc_angular_extent,
+		'OPEN'),
+	mode ? set_object_type("Line").
+draw_object_or_Fail('LINE2D',X0,Y0,X1,Y1,_,Marker1):-!,
+	retract_drawing(Marker1),
+	draw_line(X1,Y1,X0,Y0),
+	mode ? set_object_type("QuadCurve").
+draw_object_or_Fail('QUADCURVE2D',X0,Y0,_,_,_,Marker1):-
+	mode ? get_previous_points(X1,Y1,_,_,X3,Y3),!,
+	retract_drawing(Marker1),
+	draw_quad_curve(X3,Y3,X1,Y1,X0,Y0),
+	mode ? set_object_type("CubicCurve").
+draw_object_or_Fail('QUADCURVE2D',X0,Y0,_,_,_,_):-!,
+	mode ? append_point(X0,Y0),
+	fail.
+draw_object_or_Fail('CUBICCURVE2D',X0,Y0,_,_,_,Marker1):-
+	mode ? get_previous_points(X1,Y1,_,_,X3,Y3,_,_,X5,Y5),!,
+	retract_drawing(Marker1),
+	draw_cubic_curve(X5,Y5,X3,Y3,X1,Y1,X0,Y0),
+	mode ? set_object_type("Polygon").
+draw_object_or_Fail('CUBICCURVE2D',X0,Y0,_,_,_,_):-!,
+	mode ? append_point(X0,Y0),
+	fail.
+draw_object_or_Fail('POLYGON',X0,Y0,_,_,MouseEvent,Marker1):-
+	is_end_point(MouseEvent),
+	append_polygon_point(X0,Y0),
+	retract_drawing(Marker1),
+	mode ? get_previous_points(List1),!,
+	reverse_points(List1,[],List2),
+	draw_polygon(List2),
+	save_image,
+	clear,
+	mode ? reset_database,
+	initiate_graphics,
+	Marker== ?mark_drawing(),
+	mode ? remember_drawing_marker(Marker),
+	mode ? set_object_type("Point").
+draw_object_or_Fail('POLYGON',X0,Y0,_,_,_,Marker1):-
+	append_polygon_point(X0,Y0),
+	retract_drawing(Marker1),
+	mode ? get_previous_points(List1),
+	reverse_points(List1,[],List2),
+	set_preliminary_pen,
+	draw_lines_or_point(List2),
+	fail.
+--
+append_polygon_point(X0,Y0):-
+	mode ? get_previous_points(_,_,_,_),!,
+	mode ? replace_recent_point(X0,Y0).
+append_polygon_point(X0,Y0):-
+	mode ? append_point(X0,Y0).
+--
+drag_object(_,_,_,_,_):-
+	mode ? get_drawing_marker(Marker),
+	retract_drawing(Marker),
+	fail.
+drag_object('POINT',X0,Y0,_,_):-!,
+	set_preliminary_pen,
+	draw_point(X0,Y0).
+drag_object('RECTANGLE',X0,Y0,X1,Y1):-!,
+	set_preliminary_pen,
+	draw_rectangle(X1,Y1,X0-X1,Y0-Y1).
+drag_object('ROUNDRECTANGLE2D',X0,Y0,X1,Y1):-!,
+	draw_frame(X1,Y1,X0-X1,Y0-Y1),
+	set_preliminary_pen,
+	draw_round_rectangle(
+		X1,Y1,X0-X1,Y0-Y1,
+		round_rectangle_arc_width,
+		round_rectangle_arc_height).
+drag_object('ELLIPSE2D',X0,Y0,X1,Y1):-!,
+	draw_frame(X1,Y1,X0-X1,Y0-Y1),
+	set_preliminary_pen,
+	draw_ellipse(X1,Y1,X0-X1,Y0-Y1).
+drag_object('ARC2D',X0,Y0,X1,Y1):-!,
+	draw_frame(X1,Y1,X0-X1,Y0-Y1),
+	set_preliminary_pen,
+	draw_arc(
+		X1,Y1,X0-X1,Y0-Y1,
+		arc_starting_angle,
+		arc_angular_extent).
+drag_object('LINE2D',X0,Y0,X1,Y1):-!,
+	set_preliminary_pen,
+	draw_line(X1,Y1,X0,Y0).
+drag_object('POLYGON',X0,Y0,_,_):-
+	mode ? get_previous_points(_,_,_,_),
+	mode ? replace_recent_point(X0,Y0),
+	mode ? get_previous_points(List1),!,
+	reverse_points(List1,[p(X0,Y0)],List2),
+	set_preliminary_pen,
+	draw_lines_or_point(List2).
+drag_object('POLYGON',X0,Y0,_,_):-
+	mode ? get_previous_points(List1),!,
+	reverse_points(List1,[p(X0,Y0)],List2),
+	set_preliminary_pen,
+	draw_lines_or_point(List2).
+drag_object('POLYGON',_,_,_,_):-!.
+drag_object('QUADCURVE2D',X0,Y0,_,_):-
+	mode ? get_previous_points(X1,Y1,X2,Y2,X3,Y3),!,
+	set_auxiliary_pen,
+	draw_line(X3,Y3,X2,Y2),
+	draw_small_circle(X1,Y1),
+	set_preliminary_pen,
+	draw_quad_curve(X3,Y3,X1,Y1,X0,Y0).
+drag_object('QUADCURVE2D',X0,Y0,X1,Y1):-!,
+	set_auxiliary_pen,
+	draw_line(X1,Y1,X0,Y0).
+drag_object('CUBICCURVE2D',X0,Y0,_,_):-
+	mode ? get_previous_points(X1,Y1,X2,Y2,X3,Y3,X4,Y4,X5,Y5),!,
+	set_auxiliary_pen,
+	draw_line(X5,Y5,X4,Y4),
+	draw_quad_curve(X5,Y5,X3,Y3,X2,Y2),
+	draw_small_circle(X1,Y1),
+	draw_small_circle(X3,Y3),
+	set_preliminary_pen,
+	draw_cubic_curve(X5,Y5,X3,Y3,X1,Y1,X0,Y0).
+drag_object('CUBICCURVE2D',X0,Y0,_,_):-
+	mode ? get_previous_points(X1,Y1,X2,Y2,X3,Y3),!,
+	set_auxiliary_pen,
+	draw_line(X3,Y3,X2,Y2),
+	draw_small_circle(X1,Y1),
+	set_preliminary_pen,
+	draw_quad_curve(X3,Y3,X1,Y1,X0,Y0).
+drag_object('CUBICCURVE2D',X0,Y0,X1,Y1):-
+	set_auxiliary_pen,
+	draw_line(X1,Y1,X0,Y0).
+]
+-----------------------------------------------------------------------
+class 'Toolbox2D' (specialized 'Canvas2D'):
+--
+constant:
+--
+	small_rect_width	= 0.01;
+	small_rect_height	= 0.01;
+--
+internal:
+--
+	mode			= ('DrawerDatabase');
+--
+	con			= ('Console');
+--
+[
+PREDICATES:
+--
+determ:
+--
+is_end_point(MouseEvent)			- (i);
+--
+imperative:
+--
+reverse_points(
+	PointList,PointList,PointList)		- (i,i,o);
+--
+draw_frame(PointX,PointY,PointX,PointY)		- (i,i,i,i);
+draw_small_rectangle(PointX,PointY)		- (i,i);
+--
+draw_small_circle(PointX,PointY)		- (i,i);
+--
+draw_lines_or_point(PointList)			- (i);
+draw_lines(PointList)				- (i);
+--
+initiate_graphics;
+--
+set_main_pen;
+set_preliminary_pen;
+set_auxiliary_pen;
+--
+save_image;
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+--
+CLAUSES:
+--
+is_end_point({isShiftDown:'yes',clickCount:N|_}):-
+	N > 1,!,
+	fail.
+is_end_point({isShiftDown:'yes'|_}):-!.
+is_end_point({clickCount:N|_}):-
+	N > 1,!.
+--
+reverse_points([Point|Rest1],List2,List3):-!,
+	reverse_points(Rest1,[Point|List2],List3).
+reverse_points([],List,List).
+--
+initiate_graphics:-
+	set_rendering_mode({
+		antialiasing:'on',
+		rendering:'QUALITY',
+		alphaInterpolation:'QUALITY',
+		interpolation:'BICUBIC',
+		strokeControl:'NORMALIZE'}),
+	set_main_pen.
+--
+draw_frame(X1,Y1,Width,Height):-
+	set_auxiliary_pen,
+	draw_rectangle(X1,Y1,Width,Height),
+	set_pen({
+		color:'Black',
+		lineWidth:1}),
+	set_brush('Green'),
+	draw_small_rectangle(X1,Y1),
+	draw_small_rectangle(X1+Width,Y1),
+	draw_small_rectangle(X1,Y1+Height),
+	draw_small_rectangle(X1+Width,Y1+Height),
+	set_brush('off').
+--
+draw_small_rectangle(X0,Y0):-
+	X1== X0 - small_rect_width / 2,
+	Y1== Y0 - small_rect_height / 2,
+	set_brush('on'),
+	draw_rectangle(
+		X1,
+		Y1,
+		small_rect_width,
+		small_rect_height),
+	set_brush('off'),
+	draw_rectangle(
+		X1,
+		Y1,
+		small_rect_width,
+		small_rect_height).
+--
+draw_small_circle(X0,Y0):-
+	X1== X0 - small_rect_width / 2,
+	Y1== Y0 - small_rect_height / 2,
+	set_pen({
+		color:'Black',
+		lineWidth:1}),
+	set_brush('Red'),
+	draw_ellipse(
+		X1,
+		Y1,
+		small_rect_width,
+		small_rect_height),
+	set_brush('off'),
+	draw_ellipse(
+		X1,
+		Y1,
+		small_rect_width,
+		small_rect_height).
+--
+draw_lines_or_point([p(X1,Y1)]):-!,
+	draw_point(X1,Y1).
+draw_lines_or_point(List):-
+	draw_lines(List).
+--
+draw_lines([P1|Rest]):-
+	P1 == p(X1,Y1),
+	Rest == [P2|_],
+	P2 == p(X2,Y2),!,
+	draw_line(X2,Y2,X1,Y1),
+	draw_lines(Rest).
+draw_lines(_).
+--
+set_main_pen:-
+	set_pen({
+		color:'Navy',
+		lineWidth:10,
+		endCap:'CAP_ROUND'}).
+--
+set_preliminary_pen:-
+	set_pen({
+		color:'LtGray',
+		lineWidth:10,
+		endCap:'CAP_ROUND'}).
+--
+set_auxiliary_pen:-
+	set_pen({
+		color:'Blue',
+		lineWidth:1,
+		dashArray:[2.0]}).
+--
+save_image:-
+	FileName== con?input_new_file_name(
+		"Enter file name please",
+		"*.png",
+		[
+		"*.jpg","JPEG files",
+		"*.png","PNG files",
+		"*.gif","GIF files",
+		"*.bmp","BMP files"
+		]),!,
+	save(FileName,{
+		format:'default',
+		compressionQuality:0.95,
+		progressiveMode:'on',
+		interlacing:'on',
+		comment:"The Actor Prolog graphic art"
+		}).
+save_image.
+]
+-----------------------------------------------------------------------
+class 'DrawerDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= object_type(ObjectType);
+		  drawing_marker(DrawingMarker);
+		  point_list(PointList).
+--
+PREDICATES:
+--
+imperative:
+--
+reset_database;
+--
+set_object_type(STRING)			- (i);
+get_object_type(ObjectType)		- (o);
+--
+append_point(PointX,PointY)		- (i,i);
+replace_recent_point(PointX,PointY)	- (i,i);
+clear_point_list;
+--
+determ:
+--
+get_previous_point(PointX,PointY)	- (o,o);
+get_previous_points(PointList)		- (o);
+--
+get_previous_points(
+	PointX,PointY,
+	PointX,PointY)			- (o,o,o,o);
+get_previous_points(
+	PointX,PointY,
+	PointX,PointY,
+	PointX,PointY)			- (o,o,o,o,o,o);
+get_previous_points(
+	PointX,PointY,
+	PointX,PointY,
+	PointX,PointY,
+	PointX,PointY,
+	PointX,PointY)			- (o,o,o,o,o,o,o,o,o,o);
+--
+imperative:
+--
+remember_drawing_marker(DrawingMarker)	- (i);
+forget_drawing_marker;
+--
+determ:
+--
+get_drawing_marker(DrawingMarker)	- (o);
+--
+CLAUSES:
+--
+reset_database:-
+	get_object_type(Type),
+	retract_all,
+	insert(object_type(Type)).
+--
+set_object_type(_):-
+	retract_all(object_type(_)),
+	fail.
+set_object_type("Point"):-!,
+	insert(object_type('POINT')).
+set_object_type("Rectangle"):-!,
+	insert(object_type('RECTANGLE')).
+set_object_type("RoundRectangle"):-!,
+	insert(object_type('ROUNDRECTANGLE2D')).
+set_object_type("Ellipse"):-!,
+	insert(object_type('ELLIPSE2D')).
+set_object_type("Arc"):-!,
+	insert(object_type('ARC2D')).
+set_object_type("Line"):-!,
+	insert(object_type('LINE2D')).
+set_object_type("QuadCurve"):-!,
+	insert(object_type('QUADCURVE2D')).
+set_object_type("CubicCurve"):-!,
+	insert(object_type('CUBICCURVE2D')).
+set_object_type("Polygon"):-!,
+	insert(object_type('POLYGON')).
+set_object_type(_).
+--
+get_object_type(Type):-
+	Item== ?match(object_type(_)),
+	Item == object_type(Type),!.
+get_object_type('RECTANGLE').
+--
+append_point(X1,Y1):-
+	get_previous_point(X2,Y2),
+	X1 == X2,
+	Y1 == Y2,!.
+append_point(X,Y):-
+	Item== ?match(point_list(_)),
+	Item == point_list(List),!,
+	retract_all(Item),
+	insert(point_list([p(X,Y)|List])).
+append_point(X,Y):-
+	insert(point_list([p(X,Y)])).
+--
+replace_recent_point(X,Y):-
+	Item== ?match(point_list(_)),
+	Item == point_list([_|List]),!,
+	retract_all(Item),
+	insert(point_list([p(X,Y)|List])).
+replace_recent_point(_,_).
+--
+clear_point_list:-
+	retract_all(point_list(_)).
+--
+get_previous_point(X1,Y1):-
+	Item== ?match(point_list(_)),!,
+	Item == point_list([p(X1,Y1)|_]).
+--
+get_previous_points(List):-
+	Item== ?match(point_list(_)),!,
+	Item == point_list(List).
+get_previous_points(X1,Y1,X2,Y2):-
+	Item== ?match(point_list(_)),!,
+	Item == point_list([p(X1,Y1),p(X2,Y2)|_]).
+get_previous_points(X1,Y1,X2,Y2,X3,Y3):-
+	Item== ?match(point_list(_)),!,
+	Item == point_list([p(X1,Y1),p(X2,Y2),p(X3,Y3)|_]).
+get_previous_points(X1,Y1,X2,Y2,X3,Y3,X4,Y4,X5,Y5):-
+	Item== ?match(point_list(_)),!,
+	Item == point_list([
+			p(X1,Y1),p(X2,Y2),p(X3,Y3),
+			p(X4,Y4),p(X5,Y5)|_]).
+--
+remember_drawing_marker(_):-
+	retract_all(drawing_marker(_)),
+	fail.
+remember_drawing_marker(N):-
+	insert(drawing_marker(N)).
+--
+forget_drawing_marker:-
+	retract_all(drawing_marker(_)).
+--
+get_drawing_marker(N):-
+	Item== ?match(drawing_marker(_)),!,
+	Item == drawing_marker(N).
+]
+-----------------------------------------------------------------------

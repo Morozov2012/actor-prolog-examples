@@ -1,0 +1,182 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+N	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+test0;
+test11;
+test12;
+test13;
+test14;
+test21;
+test22;
+test23;
+test24;
+--
+write_tokens(S_List,N)		- (i,i);
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test11,
+	test12,
+	test13,
+	test14,
+	test21,
+	test22,
+	test23,
+	test24.
+--
+test0:-
+	con ? set_color('Black'),
+	con ? writeln("Test 0"),
+	Text== "123",
+	?extract_tokens(Text),
+	set_string(Text),
+	?extract_tokens(),
+	fail.
+test0.
+--
+test11:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.1"),
+	Text== " 10#100.0#e-2@ ",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Tokens== ?extract_tokens(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test11.
+--
+test12:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.2"),
+	Text== "\b\t\n\v\f\r 10#100.0#e-2@ ",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Tokens== ?extract_tokens(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test12.
+--
+test13:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.3"),
+	Text== "/*/ /* Comment */ 'name' /*/ -- Comment\n ",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Tokens== ?extract_tokens(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test13.
+--
+test14:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.4"),
+	Text== "/*/ /* Comment */ 'name' -- Illegal comment",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Tokens== ?extract_tokens(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test14.
+--
+test21:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.1"),
+	Text== " 10#100.0#e-2@ ",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Tokens== ?extract_tokens(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test21.
+--
+test22:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.2"),
+	Text== "\b\t\n\v\f\r 10#100.0#e-2@ ",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Tokens== ?extract_tokens(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test22.
+--
+test23:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.3"),
+	Text== "/*/ /* Comment */ 'name' /*/ -- Comment\n ",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Tokens== ?extract_tokens(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test23.
+--
+test24:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.4"),
+	Text== "/*/ /* Comment */ 'name' -- Illegal comment",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Tokens== ?extract_tokens(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test24.
+--
+write_tokens([Token|Rest],N):-!,
+	con ? writeln("\tToken ",N,": >>>",Token,"<<<"),
+	write_tokens(Rest,N+1).
+write_tokens(_,_).
+]

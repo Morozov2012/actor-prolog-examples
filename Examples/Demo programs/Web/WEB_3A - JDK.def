@@ -1,0 +1,28 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving information from several          --
+--       Web resources.                               --
+--------------------------------------------------------
+interface 'Main':
+--
+actor1	: 'MyReceptor';
+actor2	: 'MyReceptor';
+actor3	: 'MyReceptor';
+--
+[
+]
+--------------------------------------------------------
+interface 'MyReceptor' (specialized 'WebReceptor'):
+--
+x	: X;
+y	: Y;
+--
+con	: 'Report';
+--
+[
+write_parameters(ContentParameters);
+write_date(ResourceDate);
+write_time(ResourceTime);
+]
+--------------------------------------------------------

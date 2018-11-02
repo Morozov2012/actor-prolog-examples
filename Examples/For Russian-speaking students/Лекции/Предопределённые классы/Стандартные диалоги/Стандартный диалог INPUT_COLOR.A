@@ -1,0 +1,15 @@
+
+CLAUSES:
+
+goal:-
+	Color1== ?input_color('Red'),
+	
+	writeln(Color1),
+	
+	Color2== ?input_color(Color1),
+	
+	writeln(Color2),
+	
+	Color3== ?input_color(Color2),
+	
+	writeln(Color3).

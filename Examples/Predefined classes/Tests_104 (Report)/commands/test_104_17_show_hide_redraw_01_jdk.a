@@ -1,0 +1,195 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+RefSTRING		= STRING.
+RefColor		= 'Red'; 'Green'; 'DkGreen'; 'Blue'; 'Cyan';
+			  'Magenta'; 'Yellow';
+			  'Black'; 'DkGray'; 'Gray'; 'LtGray'; 'White';
+			  'Orange'; 'Pink'; 'Violet'; 'Brown';
+			  'Silver'; 'Maroon'; 'Purple';
+			  'Fuchsia'; 'Lime'; 'Olive';
+			  'Navy'; 'Teal'; 'Aqua';
+			  'Terracotta'; 'Lilac'; 'Gold'; 'Indigo';
+			  'RoyalBlue'; 'Lemon'; 'Emerald'; 'SkyBlue';
+			  'default'; STRING; INTEGER; REAL.
+RefFontName		= STRING;
+			  'system'; 'fixed'; 'times'; 'helvetica';
+			  'default'.
+RefFontSize		= INTEGER; 'default'.
+RefFontStyle		= 'default'; RefFontStyleItem;
+			  RefFontStyleItem*.
+RefFontStyleItem	= 'bold'; 'italic'; 'underlined'.
+RefX			= INTEGER; REAL; 'centered'; 'default'.
+RefY			= INTEGER; REAL; 'centered'; 'default'.
+RefWidth		= INTEGER; REAL; 'default'.
+RefHeight		= INTEGER; REAL; 'default'.
+RefMaximalLineNumber	= INTEGER; 'no_limit'; 'window_height'.
+RefAreaType		= 'separate'; 'common'.
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+w5	= ('Window5');
+w4	= ('Window4',
+		title= "Window 4",
+		x= 30);
+w3	= ('Window3',
+		title= "Window 3",
+		x= 20);
+w2	= ('Window2',
+		title= "Window 2",
+		x= 10);
+w1	= ('Window1',
+		title= "Window 1",
+		x= 0);
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Window1' (specialized 'MyWindow'):
+--
+con;
+--
+[
+goal:-!,
+	con ? writeln("Window1: I will call show/0 ."),
+	show,
+	con ? writeln("Window1: Done.").
+]
+-----------------------------------------------------------------------
+class 'Window2' (specialized 'MyWindow'):
+--
+con;
+--
+[
+goal:-!,
+	con ? writeln("Window2: I will call show/2 ."),
+	show("ComponentIdentifier","ComponentTitle"),
+	con ? writeln("Window2: Done.").
+]
+-----------------------------------------------------------------------
+class 'Window3' (specialized 'MyWindow'):
+--
+con;
+--
+[
+goal:-!,
+	con ? writeln("Window3: I will call show/0 ."),
+	show,
+	con ? writeln("Window3: I will call hide."),
+	hide,
+	con ? writeln("Window3: Done.").
+]
+-----------------------------------------------------------------------
+class 'Window4' (specialized 'MyWindow'):
+--
+con;
+--
+[
+goal:-!,
+	con ? writeln("Window4: I will call redraw ."),
+	redraw,
+	con ? writeln("Window4: Done.").
+]
+-----------------------------------------------------------------------
+class 'Window5' (specialized 'MyWindow'):
+--
+variable:
+--
+title			: RefSTRING		= _;
+text_color		: RefColor		= _;
+space_color		: RefColor		= _;
+font_name		: RefFontName		= _;
+font_size		: RefFontSize		= _;
+font_style		: RefFontStyle		= _;
+x			: RefX			= _;
+y			: RefY			= _;
+width			: RefWidth		= _;
+height			: RefHeight		= _;
+background_color	: RefColor		= _;
+maximal_line_number	: RefMaximalLineNumber	= _;
+area_type		: RefAreaType		= _;
+--
+internal:
+--
+con;
+--
+[
+goal:-
+	title== "Initial title (window 5)",
+	text_color== 'Yellow',
+	space_color== 'Emerald',
+	font_name== 'fixed',
+	font_size== 24,
+	font_style== 'italic',
+	x== 20,
+	y== 0,
+	width== 10,
+	height== 10,
+	background_color== 'Orange',
+	maximal_line_number== 5,
+	area_type== 'separate',
+	con ? writeln("Window5: I will call show/0 ."),
+	show,
+	con ? writeln("Window5: I will call writeln ."),
+	writeln("Hello world!\n"
+		"<line 2>\n"
+		"<line 3>\n"
+		"<line 4>\n"
+		"<line 5>"),
+		
+	fail.
+goal:-
+	-- fail,
+	title== "New title (window 5)",
+	text_color== 'Fuchsia',
+	space_color== 'Silver',
+	font_name== 'times',
+	font_size== 72,
+	font_style== 'bold',
+	x== 'centered',
+	y== 'centered',
+	width== 35,
+	height== 5,
+	background_color== 'RoyalBlue',
+	maximal_line_number== 3,
+	area_type== 'common',
+	con ? writeln("Window5: I will call redraw ."),
+	redraw,
+	con ? writeln("Window5: I will call writeln ."),
+	write("New line"),
+	fail.
+goal:-!,
+	con ? writeln("Window5: Done.").
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	y		= 0;
+	width		= 10;
+	height		= 10;
+--
+	font_name	= 'helvetica';
+	font_style	= 'bold';
+	font_size	= 36;
+--
+internal:
+--
+	con		= ('Console',
+				y= 3);
+--
+[
+]
+-----------------------------------------------------------------------

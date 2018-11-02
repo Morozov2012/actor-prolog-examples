@@ -1,0 +1,134 @@
+---------------------------------------------------------------------
+--               An example of Actor Prolog program.               --
+--            (c) 2002-2011, IRE RAS, Alexei A. Morozov.           --
+---------------------------------------------------------------------
+-- The ScanWeb program.                                            --
+-- This is an example of a logical agent that analyses the World   --
+-- Wide Web. The program analyses some Web Sites and determines    --
+-- the following parameters of them:                               --
+-- 1) The time of the recent update of the Web Site.               --
+--    The agent looks for the most recent HTML page of the Site.   --
+-- 2) The number of pages published in the Web Site.               --
+-- 3) The total size of the HTML text published in the Web Site.   --
+-- 4) The number of references to outside HTML files.              --
+-- 5) The number of pictures in the Web Site.                      --
+--    The agent looks for files with extensions .gif, .jpg, .png.  --
+-- 6) The number of other data files in the Web Site               --
+--    (the number of files of other types).                        --
+-- 7) The number of bad links in the Web Site.                     --
+--    The agent treats a link as a bad one if it cannot access     --
+--    the resource because of a syntactic error in the URL or a    --
+--    run-time error.                                              --
+-- 8) The quantity of given keywords in the Web Site.              --
+--    The agent creates a list of numbers corresponding to         --
+--    the list of keywords for every Web Site.                     --
+---------------------------------------------------------------------
+import 'AddressTable'	from "Morozov/Web/Scanning/Tables";
+import 'SpecialScanner'	from "Morozov/Web/Scanning/Analyser";
+import 'Statistics'	from "Morozov/Web/Scanning/Counter";
+import 'LogicProgrammingKeywords'
+			from "Morozov/Web/Data/Keywords";
+---------------------------------------------------------------------
+project: (('ScanWeb'))
+---------------------------------------------------------------------
+class 'ScanWeb' (specialized 'Timer'):
+--
+variable:
+--
+	keywords	= Names;
+--
+constant:
+--
+	control		= (('LogicProgrammingKeywords',
+				protecting: output=Names));
+--
+internal:
+--
+	resource_table	= ('AddressTable',
+				variable: keywords);
+--
+	main_engine	= ('SpecialScanner',
+				variable:
+					keywords,
+				constant:
+					/*
+					maximal_waiting_time= 7.0, -- 100.0
+					use_max_depth= 'yes',
+					max_depth= 3,
+					*/
+					maximal_waiting_time= 7.0, -- 100.0
+					use_max_depth= 'yes',
+					max_depth= 5,
+					/**/
+					/*
+					maximal_waiting_time= 17.0, -- 100.0
+					use_max_depth= 'yes',
+					max_depth= 10,
+					*/
+					/*
+					maximal_waiting_time= 17.0,
+					use_max_depth= 'no',
+					max_depth= 5,
+					*/
+					--
+					virtual_resources= [],
+				internal:
+					site_statistics);
+--
+	site_statistics	= ('Statistics');
+--
+variable:
+--
+	results		= main_engine ?? get_results;
+--
+internal:
+--
+	special_actor	= ('Acceptor',
+				variable:
+					results,
+				internal:
+					resource_table);
+--
+-- internal:
+--
+--	con		= ('Console');
+--
+[
+goal:-!,
+	set_period(1.0),
+	activate.
+--
+tick:-
+	-- con ? writeln("Tick!"),
+	ResourceDescription== resource_table ? get_some_file,!,
+	-- con ? writeln("Inspect ",ResourceDescription),
+	main_engine << inspect(ResourceDescription).
+--
+alarm(_):-
+	fail.
+]
+---------------------------------------------------------------------
+class 'Acceptor':
+--
+variable:
+--
+	results;
+--
+internal:
+--
+	resource_table;
+--
+[
+goal:-
+	save_results(results).
+--
+save_results(#):-!.
+save_results([UpdatedDescription|Rest]):-!,
+	resource_table ? save_results(UpdatedDescription),
+	save_results(Rest).
+save_results(_).
+--
+alarm(_):-
+	fail.
+]
+---------------------------------------------------------------------

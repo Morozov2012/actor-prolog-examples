@@ -1,0 +1,46 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Recursion.         --
+--                                       --
+-- Questions: What is a recursion with   --
+-- the output argument? How can one      --
+-- implement assembling of a list        --
+-- with the help of the recursion with   --
+-- the output argument? Please explain   --
+-- why does the recursion with the       --
+-- output argument assemble the elements --
+-- of the list in the direct order? Why  --
+-- does the compiler classify the p      --
+-- predicate as a non-deterministic one? --
+-- (The latter question is to be         --
+-- discussed after the study of the      --
+-- problem of determinism of predicates  --
+-- in Actor Prolog.)                     --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+nondeterm:
+
+p(List)		- (o);
+
+CLAUSES:
+
+goal:-
+	p(X),
+	writeln(X).
+
+p([Head|Tail]):-
+	Head== ?input_integer(
+		"Input a number please",0),
+	p(Tail).
+p([]).

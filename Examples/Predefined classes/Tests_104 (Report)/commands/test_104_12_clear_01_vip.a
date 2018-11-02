@@ -1,0 +1,40 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'Report'):
+--
+constant:
+--
+	x	= 'centered';
+	y	= 'centered';
+	height	= 5;
+	width	= 40;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("I will set a string of the report."),
+	set_string("ABCDEFGHIJ"),
+	con ? writeln("I will get the string of the report:"),
+	Text1== ?get_string(),
+	con ? write(">>>"),
+	con ? set_color('Blue'),
+	con ? write(Text1),
+	con ? set_color('Black'),
+	con ? writeln("<<<"),
+	con ? writeln("I will clear the report."),
+	clear,
+	con ? writeln("I will get the string of the report:"),
+	Text2== ?get_string(),
+	con ? write(">>>"),
+	con ? set_color('Blue'),
+	con ? write(Text2),
+	con ? set_color('Black'),
+	con ? writeln("<<<"),
+	con ? writeln("Done.").
+]

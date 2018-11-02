@@ -1,0 +1,95 @@
+package "Morozov/Web/Browsing/List":
+---------------------------------------------------------------
+--             The "LIST" Actor Prolog package.              --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package implements a dialog box for examination of   --
+-- a list of Web resources. One can call an external Web     --
+-- browser to examine the content of given resources.        --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import 'AnalyserControl' from "Morozov/Web/Scanning/Control";
+import 'EngineControl' from "Morozov/Web/Engines/Control";
+import 'ExternalBrowser' from "Morozov/Web/Browsing/Browser";
+---------------------------------------------------------------
+interface 'List' (specialized 'Dialog'):
+--
+variable:
+--
+	list_of_resources	: WebAddressList;
+	arguments		: WebAddressList;
+--
+internal:
+--
+	browser			: 'ExternalBrowser';
+--
+	check			: 'CheckItem';
+--
+[
+]
+---------------------------------------------------------------
+-- This package implements a dialog box for selecting        --
+-- the Web resource from the list.                           --
+---------------------------------------------------------------
+interface 'Selector' (specialized 'Dialog'):
+--
+constant:
+--
+	list_of_resources	: WebAddressList;
+	-- item			: WebAddress;
+	item			: WebAddressList;
+--
+internal:
+--
+	handler			: 'EngineControl';
+--
+	check			: 'CheckItem';
+--
+[
+]
+---------------------------------------------------------------
+-- This package implements a dialog box for editing address  --
+-- of the Web resource. User can select the address from     --
+-- the list.                                                 --
+---------------------------------------------------------------
+interface 'Edit' (specialized 'Dialog'):
+--
+variable:
+--
+	list_of_resources	: WebAddressList;
+	item			: WebAddressList;
+--
+internal:
+--
+	handler			: 'AnalyserControl';
+--
+	check			: 'CheckItem';
+--
+	con			: 'Console';
+--
+[
+/*
+PREDICATES:
+--
+imperative:
+--
+test(WebAddressList,WebAddressList)	- (i,i);
+*/
+]
+---------------------------------------------------------------
+-- An auxiliary class                                        --
+---------------------------------------------------------------
+interface 'CheckItem':
+--
+internal:
+--
+	con			: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_item(WebAddressList,WebAddressList)	- (i,i);
+]
+---------------------------------------------------------------

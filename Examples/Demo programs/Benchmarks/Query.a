@@ -1,0 +1,142 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  QUERY                                                            --
+--                                                                   --
+--  David H.D. Warren                                                --
+--                                                                   --
+--  Query population and area database to find countries             --
+--  of approximately equal population density                        --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  2015.06.28 02:32                                                 --
+--  Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB         --
+--  Windows7 - PM.64 (RUS)                                           --
+--  ========================================================         --
+--  AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                           --
+--                                                                   --
+--  g:\temp1\jv>java -version                                        --
+--  java version "1.7.0_80"                                          --
+--  Java(TM) SE Runtime Environment (build 1.7.0_80-b15)             --
+--  Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)  --
+--                                                                   --
+--  java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation            --
+--  -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch       --
+--                                                                   --
+--  10000 iterations take 31353 msec                                 --
+--  3.135300 milliseconds per iteration                              --
+--                                                                   --
+--  EXE file:                                                        --
+--                                                                   --
+--  10000 iterations take 2460 msec                                  --
+--  0.246 milliseconds per iteration                                 --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities' from "HARNESS"(Result:=Pair);
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+Pair		= quad(Country,Density,Country,Density).
+--
+Country		= SYMBOL.
+Density		= INTEGER.
+Population	= INTEGER.
+Area		= INTEGER.
+--
+PREDICATES:
+--
+nondeterm:
+--
+query(Pair)			- (o);
+density(Country,Density)	- (o,o);
+pop(Country,Population)		- (o,o);
+area(Country,Area)		- (i,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+[
+--
+DOMAINS:
+--
+-- Result	= Pair.
+--
+CLAUSES:
+--
+benchmark(_,Out):-
+	query(Out).
+--
+data([]).
+--
+query(quad(C1,D1,C2,D2)):-
+	density(C1,D1),
+	density(C2,D2),
+	D1 > D2,
+	T1== 20 * D1,
+	T2== 21 * D2,
+	T1 < T2.
+--
+density(C,D):-
+	pop(C,P),
+	area(C,A),
+	D== ?div(P*100,A).
+--
+-- Populations in 100000s:
+--
+pop('china',		8250).
+pop('india',		5863).
+pop('ussr',		2521).
+pop('usa',		2119).
+pop('indonesia',	1276).
+pop('japan',		1097).
+pop('brazil',		1042).
+pop('bangladesh',	750).
+pop('pakistan',		682).
+pop('w_germany',	620).
+pop('nigeria',		613).
+pop('mexico',		581).
+pop('uk',		559).
+pop('italy',		554).
+pop('france',		525).
+pop('philippines',	415).
+pop('thailand',		410).
+pop('turkey',		383).
+pop('egypt',		364).
+pop('spain',		352).
+pop('poland',		337).
+pop('s_korea',		335).
+pop('iran',		320).
+pop('ethiopia',		272).
+pop('argentina',	251).
+--
+-- Areas in 1000s of square miles:
+--
+area('china',		3380).
+area('india',		1139).
+area('ussr',		8708).
+area('usa',		3609).
+area('indonesia',	570).
+area('japan',		148).
+area('brazil',		3288).
+area('bangladesh',	55).
+area('pakistan',	311).
+area('w_germany',	96).
+area('nigeria',		373).
+area('mexico',		764).
+area('uk',		86).
+area('italy',		116).
+area('france',		213).
+area('philippines',	90).
+area('thailand',	200).
+area('turkey',		296).
+area('egypt',		386).
+area('spain',		190).
+area('poland',		121).
+area('s_korea',		37).
+area('iran',		628).
+area('ethiopia',	350).
+area('argentina',	1080).
+]
+-----------------------------------------------------------------------

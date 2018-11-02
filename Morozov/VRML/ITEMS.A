@@ -1,0 +1,14 @@
+package "Morozov/VRML/Items":
+-----------------------------------------------------------------------
+--                                                                   --
+--              The "VRML/ITEMS" Actor Prolog package.               --
+--            (c) 2002-2007, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This is dummy package that contains definition of table format    --
+-- for storing results of analysis of given Web Sites.               --
+-----------------------------------------------------------------------
+class 'ResultTable' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,59 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, Alexei A. Morozov, IRE RAS. --
+-- Transmitting of flow messages between --
+-- blocks of SADT model.                 --
+-------------------------------------------
+class '_Sender' (specialized 'Dialog'):
+--
+constant:
+--
+	entry_o1;
+--
+variable:
+--
+	value_o1;
+--
+[
+goal:-!.
+]
+-------------------------------------------
+class '_Receiver' (specialized 'Alpha'):
+--
+constant:
+--
+	entry_c1;
+--
+variable:
+--
+	value_c1;
+--
+internal:
+--
+	con;
+--
+[
+goal:-!,
+	con ? clear,
+	con ? show,
+	con ? writeln(
+		"I have received "
+		"a value:"),
+	con ? set_color('Blue'),
+	con ? writeln(value_c1),
+	con ? set_color('Black'),
+	--
+	check(value_c1).
+--
+check(#):-!.
+check(Value):-
+	concat(	"Output value ",
+		TN,
+		Value),
+	IN== ?convert_to_integer(TN),
+	even(IN).
+--
+show(_,_):-!,
+	con ? show.
+]
+-------------------------------------------

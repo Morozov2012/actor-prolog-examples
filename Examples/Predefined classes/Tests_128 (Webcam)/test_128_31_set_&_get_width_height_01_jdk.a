@@ -1,0 +1,80 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2(Width,Height)		- (i,i);
+
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2(47,12),
+	test1,
+	test2(-17.9,-9.3),
+	test1,
+	test2(0,0),
+	test1,
+	test2('default','default'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_width(),
+	?get_height(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	W== ?get_width(),
+	H== ?get_height(),!,
+	con ? write("Width: "),
+	con ? set_color('Violet'),
+	con ? write(W),
+	con ? set_color('default'),
+	con ? write(", Height: "),
+	con ? set_color('Violet'),
+	con ? writeln(H),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test2(W,H):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	con ? writeln("I will set: Width= ",W,", Height= ",H),
+	set_width(W),
+	set_height(H),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]

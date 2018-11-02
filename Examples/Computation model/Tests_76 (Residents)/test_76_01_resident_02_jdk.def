@@ -1,0 +1,47 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N	= INTEGER.
+--
+reference:
+--
+Target	= INTEGER; ('Target'); #; Target*.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+p1	: 'Target';
+p2	: 'Observer';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Target' (specialized 'Alpha'):
+[
+PREDICATES:
+--
+nondeterm:
+--
+f(N,N,N,N) = Target	- (i,i,i,i);
+--
+imperative:
+--
+'+'(N,N) = N		- (i,i);
+'+'(N,N) = Target	- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'Observer' (specialized 'Report'):
+--
+variable:
+--
+	data	: Target;
+--
+[
+]
+-----------------------------------------------------------------------

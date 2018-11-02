@@ -1,0 +1,164 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'Alpha'):
+
+internal:
+
+	link	= ('Link');
+
+constant:
+
+	p1	= (('Control',
+			link,
+			x= 5,
+			y= 5));
+	p2	= (('Control',
+			link,
+			x= 45,
+			y= 5));
+	p3	= (('Control',
+			link,
+			x= 5,
+			y= 14));
+	p4	= (('IllegalControl',
+			link,
+			x= 45,
+			y= 14));
+[
+goal:-!,
+	p1 <- show,
+	p2 <- show,
+	p3 <- show,
+	p4 <- show.
+]
+
+-----------------------------------------------------------------------
+
+class 'Control' (specialized 'Dialog'):
+
+constant:
+
+	link;
+
+internal:
+
+	proxy1	= ('Link',
+			content= link);
+
+constant:
+
+	con	= ('Console');
+
+[
+goal:-!,
+	initiate_value(proxy1[10]),
+	put(1002,proxy1[10]),!,
+	check_port.
+--
+initiate_value(""):-!.
+initiate_value(_).
+--
+action("text"):-!,
+	enter_text.
+action("plain"):-!,
+	proxy1 ? define_plain_port(10),
+	check_port.
+action("protecting"):-!,
+	proxy1 ? define_protecting_port(10),
+	check_port.
+action("suspending"):-!,
+	proxy1 ? define_suspending_port(10),
+	check_port.
+--
+enter_text:-
+	Text== ?cast("MessageString",
+		con?input_string("Please enter the text","")),
+	proxy1[10]== Text,!,
+	check_port.
+enter_text.
+--
+check_port:-
+	proxy1 ? is_plain_port(10),!,
+	put(1001,"PLAIN").
+check_port:-
+	proxy1 ? is_protecting_port(10),!,
+	put(1001,"PROTECTING").
+check_port:-
+	proxy1 ? is_suspending_port(10),!,
+	put(1001,"SUSPENDING").
+check_port.
+]
+
+-----------------------------------------------------------------------
+
+class 'IllegalControl' (specialized 'Control'):
+
+constant:
+
+	title			= "Illegal control";
+	background_color	= 'Magenta';
+
+	link;
+
+internal:
+
+	proxy1	= ('Link',
+			content= link);
+	proxy2	= ('Link',
+			content= proxy1);
+
+constant:
+
+	con	= ('Console');
+
+[
+goal:-!,
+	initiate_value(proxy2[10]),
+	put(1002,proxy2[10]),!,
+	check_port.
+--
+action("plain"):-!,
+	proxy1 ? define_plain_port(10),
+	check_port.
+action("protecting"):-!,
+	proxy1 ? define_protecting_port(10),
+	check_port.
+action("suspending"):-!,
+	proxy1 ? define_suspending_port(10),
+	check_port.
+--
+enter_text:-
+	Text== ?cast("MessageString",
+		con?input_string("Please enter the text","")),
+	proxy1[10]== Text,!,
+	check_port.
+enter_text:-!.
+--
+check_port:-
+	proxy2 ? is_plain_port(10),!,
+	put(1001,"PLAIN").
+check_port:-
+	proxy2 ? is_protecting_port(10),!,
+	put(1001,"PROTECTING").
+check_port:-
+	proxy2 ? is_suspending_port(10),!,
+	put(1001,"SUSPENDING").
+check_port:-!.
+]
+
+-----------------------------------------------------------------------
+
+class 'Link' (specialized 'SynchronizedArray'):
+--
+indices_range		= [[1,100]];
+index_checking		= 'off';
+--
+implement_protecting_ports	= 'no';
+implement_suspending_ports	= 'no';
+[
+]
+
+-----------------------------------------------------------------------

@@ -1,0 +1,169 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving and output of information from    --
+--       arbitrary number of Web resources by         --
+--       concurrent processes.                        --
+--------------------------------------------------------
+DOMAINS:
+--
+reference:
+--
+Target	= ('CheckPage'); Target*; STRING.
+--
+DOMAINS:
+--
+reference:
+--
+RefContentParameters	= entry(RefURL,
+				RefResourceDate,
+				RefResourceTime,
+				RefResourceSize);
+			  catalog(
+				RefURL,
+				RefResourceDate,
+				RefResourceTime,
+				RefResourceSize);
+			  RefAccessError.
+--
+RefAccessError		= failure(REF_INTEGER);
+			  'lateness';
+			  error(RefAccessErrorCode).
+--
+RefAccessErrorCode	= INTEGER;
+			  STRING;
+			  'unknown';
+			  'unreadable_answer'.
+--
+RefURL			= STRING.
+RefResourceDate		= RefDate; #.
+RefResourceTime		= RefTime; #.
+RefResourceSize		= INTEGER.
+--
+REF_INTEGER		= INTEGER.
+REF_REAL		= REAL.
+--
+RefDate			= date(RefYear,RefMonth,RefDay).
+RefYear			= INTEGER.
+RefMonth		= [1..12].
+RefDay			= [1..31].
+--
+RefTime			= time(	RefHours,
+				RefMinutes,
+				RefSeconds,
+				RefHundredths).
+--
+RefHours		= [0..23].
+RefMinutes		= [0..59].
+RefSeconds		= [0..59].
+RefHundredths		= [0..99].
+--
+--------------------------------------------------------
+interface 'Main' (specialized 'WebReceptor'):
+--
+variable:
+--
+	target_list	: ReferenceList;
+--
+constant:
+--
+	chain		: 'ReceptorChain';
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_list(ReferenceList);
+]
+--------------------------------------------------------
+interface 'ReceptorChain':
+--
+suspending:
+--
+	target_list		: ReferenceList;
+--
+variable:
+--
+	rest_of_list		: ReferenceList;
+--
+constant:
+--
+	chain			: 'ReceptorChain';
+--
+suspending:
+--
+	previous_receptors	: Target;
+--
+variable:
+--
+	location		: STRING;
+--
+constant:
+--
+	receiver		: Target;
+--
+variable:
+--
+	all_receptors		: Target;
+--
+constant:
+--
+	out			: 'Output';
+--
+internal:
+--
+	con			: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_list(ReferenceList,Target);
+]
+--------------------------------------------------------
+interface 'CheckPage' (specialized 'WebReceptor'):
+--
+suspending:
+--
+	location	: STRING;
+--
+variable:
+--
+	parameters	: RefContentParameters;
+--
+internal:
+--
+	con			: 'Console';
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+get_data= Target;
+--
+imperative:
+--
+date_to_string(RefDate) = STRING;
+--
+imperative:
+--
+get_parameters = RefContentParameters;
+]
+--------------------------------------------------------
+interface 'Output' (specialized 'Dialog'):
+--
+variable:
+--
+	all_receptors	: Target;
+	results		: Target;
+--
+internal:
+--
+	con			: 'Console';
+--
+[
+]
+--------------------------------------------------------

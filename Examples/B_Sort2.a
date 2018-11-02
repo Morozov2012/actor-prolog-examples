@@ -1,0 +1,45 @@
+----------------------------------------------------------
+-- An example of Actor Prolog program.                  --
+-- (c) 2007, IRE RAS, Alexei A. Morozov.                --
+-- Implementing the Binary Tree Sorting with the help   --
+-- of the 'B_Sort2' generic package.                    --
+----------------------------------------------------------
+import 'B-Sorting'
+	from "MOROZOV/TOOLS/B_SORT2" (Item:=MyDomain);
+----------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+MyDomain	= INTEGER.
+--
+----------------------------------------------------------
+class 'MySorting'
+(specialized 'B-Sorting'):
+--
+comparator	= ('Alpha');
+--
+[
+T1 < T2 :-
+	comparator ? '<' (
+		?val("INTEGER",T1),
+		?val("INTEGER",T2) ).
+--
+-- can_be_refined(_):-!.
+can_be_refined(T):-
+	comparator ? free(T).
+]
+----------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+tool	= ('MySorting');
+--
+[
+goal:-!,
+	L1== [1,3,1,8,6,5,4,7,3,2,8,9],
+	writeln("L1= ",L1),
+	tool ? sort_list(L1,L2),
+	writeln("L2= ",L2).
+]
+----------------------------------------------------------

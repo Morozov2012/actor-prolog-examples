@@ -1,0 +1,110 @@
+mesh(80,25)
+padding(1,1)
+-- draft
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',8)
+
+dialog 'MyDialog'("Grid demo",default,default,default,centered,centered,default)
+grid
+	row
+		column
+		end_of_column
+		column
+			"left"
+		end_of_column
+		column
+			"right"
+		end_of_column
+		column
+			"center"
+		end_of_column
+		column
+			"justify"
+		end_of_column
+	end_of_row
+	row(up)
+		column
+			"up"
+		end_of_column
+		column(left)
+			-- scaling(2,2)
+			button("action11","&Action 1,1")
+			-- end_of_scaling
+		end_of_column
+		column(right)
+			scaling(2,2)
+			button("action12","&Action 1,2")
+			end_of_scaling
+		end_of_column
+		column(center)
+			button("action13","&Action 1,3")
+		end_of_column
+		column(justify)
+			button("action14","&Action 1,4")
+		end_of_column
+	end_of_row
+	row(down)
+		column
+			"down"
+		end_of_column
+		column(left)
+			button("action21","&Action 2,1")
+		end_of_column
+		column(right)
+			-- scaling(2,2)
+			button("action22","&Action 2,2")
+			-- end_of_scaling
+		end_of_column
+		column(center)
+			scaling(2,2)
+			button("action23","&Action 2,3")
+			end_of_scaling
+		end_of_column
+		column(justify)
+			button("action24","&Action 2,4")
+		end_of_column
+	end_of_row
+	row(center)
+		column
+			"center"
+		end_of_column
+		column(left)
+			button("action31","&Action 3,1")
+		end_of_column
+		column(right)
+			button("action32","&Action 3,2")
+		end_of_column
+		column(center)
+			-- scaling(2,2)
+			button("action33","&Action 3,3")
+			-- end_of_scaling
+		end_of_column
+		column(justify)
+			scaling(2,2)
+			button("action34","&Action 3,4")
+			end_of_scaling
+		end_of_column
+	end_of_row
+	row(justify)
+		column
+			"justify"
+		end_of_column
+		column(left)
+			scaling(2,2)
+			button("action41","&Action 4,1")
+			end_of_scaling
+		end_of_column
+		column(right)
+			button("action42","&Action 4,2")
+		end_of_column
+		column(center)
+			button("action43","&Action 4,3")
+		end_of_column
+		column(justify)
+			-- scaling(2,2)
+			button("action44","&Action 4,4")
+			-- end_of_scaling
+		end_of_column
+	end_of_row
+end_of_grid
+end_of_dialog

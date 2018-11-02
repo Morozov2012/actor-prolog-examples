@@ -1,0 +1,209 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	data_directory		= "data";
+	target_directory	= "Fight_RunAway1";
+	sampling_rate		= 25;
+	circle_radius		= 0.01;
+--
+internal:
+--
+	subtractor	= ('ImageSubtractor',
+				extract_blobs= 'yes',
+				track_blobs= 'yes',
+				use_grayscale_colors= 'yes',
+				make_rectangular_blobs_in_synthesized_image= 'no');
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	prompt_window	= ('Report',
+				y= 22,
+				height= 3);
+	text		= ('Text');
+	image		= ('BufferedImage');
+	state		= ('ProgramState');
+--
+[
+goal:-!,
+	graphic_window ? show,
+	prompt_window ? write(
+		"The data are coming from the EC Funded CAVIAR ",
+		"project / IST 2001 37540,\n",
+		"found at URL: ",
+		"http://homepages.inf.ed.ac.uk/rbf/CAVIAR/."),
+	Time0== ?milliseconds(),
+	state ? set_beginning_time(Time0),
+	set_period((1/sampling_rate/2),0),
+	activate.
+--
+tick:-
+	T2== ?milliseconds(),
+	state ? get_beginning_time(T1),
+	Delta== (T2 - T1) / 1000.0 * sampling_rate,
+	N== ?convert_to_integer(?round(Delta)),!,
+	load_figure(N,T2).
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	state ? set_current_frame(N),
+	ImageToBeLoaded==
+		"jar:" + data_directory + "/" +
+		target_directory + "_jpg" + "/JPEGS/" +
+		target_directory +
+		text?format("%03d",N) + ".jpg",
+	image ? does_exist(ImageToBeLoaded),!,
+	image ? load(ImageToBeLoaded),
+	subtractor ? subtract(N,image),
+	draw_scene.
+load_figure(_,T2):-
+	state ? set_beginning_time(T2),
+	subtractor ? reset_results.
+--
+draw_scene:-
+	subtractor ? commit,
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	subtractor ? get_background_image(image),
+	graphic_window ? draw_image(image,0,0,1,1),
+	subtractor ? get_synthesized_image(image),
+	graphic_window ? draw_image(image,0,0,1,1),
+	subtractor ? get_connected_graphs(Graphs),
+	image ? get_size_in_pixels(IW,IH),
+	draw_graphs(1,IW,IH,Graphs),
+	graphic_window ? draw_now.
+--
+draw_graphs(N,IW,IH,[Graph|Rest]):-!,
+	draw_graph(N,IW,IH,Graph,Graph),
+	draw_graphs(N+1,IW,IH,Rest).
+draw_graphs(_,_,_,_).
+--
+draw_graph(N,IW,IH,[Edge|Rest],Graph):-!,
+	draw_edge(N,IW,IH,Edge,Graph),
+	draw_graph(N,IW,IH,Rest,Graph).
+draw_graph(_,_,_,_,_).
+--
+draw_edge(	N,IW,IH,
+		{	x1:X1a,y1:Y1a,x2:X2a,y2:Y2a,
+			inputs: Origins,
+			coordinates: TrackOfBlobs|_},
+		Graph):-
+	X1r== X1a / IW,
+	Y1r== Y1a / IH,
+	X2r== X2a / IW,
+	Y2r== Y2a / IH,
+	graphic_window ? set_brush('Blue'),
+	draw_origins(X1a,Y1a,IW,IH,Origins,Graph),
+	graphic_window ? set_pen({color:'Magenta',lineWidth:2}),
+	draw_track_of_blobs(IW,IH,TrackOfBlobs),
+	graphic_window ? set_pen({color:'Green',lineWidth:1}),
+	graphic_window ? draw_line(X1r,Y1r,X2r,Y2r),
+	draw_circle(X1r,Y1r),
+	draw_circle(X2r,Y2r),
+	draw_blob_identifier(X1r,Y1r,X2r,Y2r,N),
+	fail.
+draw_edge(_,_,_,_,_).
+--
+draw_origins(Sx,Sy,IW,IH,[Origin|Rest],Graph):-!,
+	draw_origin(Sx,Sy,IW,IH,Origin,Graph),
+	draw_origins(Sx,Sy,IW,IH,Rest,Graph).
+draw_origins(_,_,_,_,_,_).
+--
+draw_origin(SxA,SyA,IW,IH,N,Graph):-
+	get_edge(N,Graph,Edge),
+	Edge == {x2:Nx2a,y2:Ny2a|_},!,
+	draw_origin_arrow(SxA,SyA,Nx2a,Ny2a,IW,IH).
+draw_origin(_,_,_,_,_,_).
+--
+draw_origin_arrow(X,Y,X,Y,_,_):-!.
+draw_origin_arrow(SxA,SyA,Nx2a,Ny2a,IW,IH):-
+	SxR== SxA / IW,
+	SyR== SyA / IH,
+	Nx2r== Nx2a / IW,
+	Ny2r== Ny2a / IH,
+	graphic_window ? draw_line(SxR,SyR,Nx2r,Ny2r).
+--
+draw_branches(Sx,Sy,IW,IH,[Origin|Rest],Graph):-!,
+	draw_branch(Sx,Sy,IW,IH,Origin,Graph),
+	draw_branches(Sx,Sy,IW,IH,Rest,Graph).
+draw_branches(_,_,_,_,_,_).
+--
+draw_branch(SxA,SyA,IW,IH,N,Graph):-
+	get_edge(N,Graph,Edge),
+	Edge == {x1:Nx1a,y1:Ny1a|_},!,
+	draw_origin_arrow(SxA,SyA,Nx1a,Ny1a,IW,IH).
+draw_branch(_,_,_,_,_,_).
+--
+draw_branch_arrow(X,Y,X,Y,_,_):-!.
+draw_branch_arrow(SxA,SyA,Nx2a,Ny2a,IW,IH):-
+	SxR== SxA / IW,
+	SyR== SyA / IH,
+	Nx2r== Nx2a / IW,
+	Ny2r== Ny2a / IH,
+	graphic_window ? draw_line(SxR,SyR,Nx2r,Ny2r).
+--
+get_edge(1,[Edge|_],Edge):-!.
+get_edge(N,[_|Rest],Edge):-
+	N > 0,
+	get_edge(N-1,Rest,Edge).
+--
+draw_track_of_blobs(IW,IH,[Blob|Rest]):-
+	Blob== {x:Xa,y:Ya|_},!,
+	Xr== Xa / IW,
+	Yr== Ya / IH,
+	draw_track_of_blobs(IW,IH,Xr,Yr,Rest).
+draw_track_of_blobs(_,_,_).
+--
+draw_track_of_blobs(IW,IH,X1,Y1,[Blob|Rest]):-
+	Blob== {x:Xa,y:Ya|_},!,
+	X2== Xa / IW,
+	Y2== Ya / IH,
+	graphic_window ? draw_line(X1,Y1,X2,Y2),
+	draw_track_of_blobs(IW,IH,X2,Y2,Rest).
+draw_track_of_blobs(_,_,_,_,_).
+--
+draw_circle(X0,Y0):-
+	X1== X0 - circle_radius,
+	Y1== Y0 - circle_radius,
+	Width== circle_radius * 2,
+	Height== circle_radius * 2,
+	graphic_window ? draw_ellipse(X1,Y1,Width,Height).
+--
+draw_blob_identifier(X1,Y1,X2,Y2,Id):-!,
+	Text== text?format("%d",Id),
+	graphic_window ? draw_text((X1+X2)/2,(Y1+Y2)/2,Text).
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+[
+CLAUSES:
+--
+get_beginning_time(T):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(T),!.
+--
+set_beginning_time(T):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(T)).
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)).
+]
+-----------------------------------------------------------------------

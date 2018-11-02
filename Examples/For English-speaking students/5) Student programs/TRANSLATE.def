@@ -1,0 +1,89 @@
+-------------------------------------------------------------
+--           An example of Actor Prolog program.           --
+--          (c) 2005, IRE RAS, Alexei A. Morozov.          --
+-------------------------------------------------------------
+--
+DOMAINS:
+--
+Formula		= '~'(Formula);
+		  '#'(Formula,Formula);
+		  '&'(Formula,Formula);
+		  '->'(Formula,Formula);
+		  '<->'(Formula,Formula);
+		  all(Variable,Formula);
+		  exists(Variable,Formula);
+		  --
+		  'goal';
+		  eq(Variable,Variable);
+		  p(Variable);
+		  s(Variable);
+		  man(Variable);
+		  respect(Variable,Variable);
+		  king(Variable).
+--
+ClauseList	= Clause*.
+Clause		= cl(Literals,Literals).
+--
+Literals	= Formula*.
+--
+Variable	= 'x'; 'y'; 'z'; 'f';
+		  structure(STRING,Variables).
+Variables	= Variable*.
+--
+-------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+translate(Formula)			- (i);
+--
+implout(Formula,Formula)		- (i,o);
+--
+negin(Formula,Formula)			- (i,o);
+neg(Formula,Formula)			- (i,o);
+--
+skolem(Formula,Formula,Variables)	- (i,o,i);
+gensym(STRING,STRING)			- (i,o);
+subst(	Variable,Variable,
+	Formula,Formula)		- (i,i,i,o);
+--
+univout(Formula,Formula)		- (i,o);
+--
+conjn(Formula,Formula)			- (i,o);
+conj2(Formula,Formula)			- (i,o);
+--
+clausify(Formula,ClauseList,ClauseList)	- (i,i,o);
+--
+determ:
+--
+inclause(
+	Formula,
+	Literals,Literals,
+	Literals,Literals)		- (i,i,o,i,o);
+notin(Formula,Literals)			- (i,i);
+putin(Formula,Literals,Literals)	- (i,i,o);
+--
+imperative:
+--
+reverse(ClauseList,
+	ClauseList,
+	ClauseList)			- (i,i,o);
+--
+pclauses(ClauseList)			- (i);
+pclause(Literals,Literals)		- (i,i);
+pdisj(Literals)				- (i);
+pconj(Literals)				- (i);
+write_literal(Formula)			- (i);
+write_variable(Variable)		- (i);
+write_variables(Variables)		- (i);
+--
+-------------------------------------------------------------
+interface 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	= INTEGER.
+--
+]
+-------------------------------------------------------------

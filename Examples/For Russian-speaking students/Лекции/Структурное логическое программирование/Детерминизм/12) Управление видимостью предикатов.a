@@ -1,0 +1,30 @@
+-------------------------------------------
+--                                       --
+--  ак сделать предикат невидимым из     --
+-- других классов?                       --
+--                                       --
+-------------------------------------------
+
+class 'Main' (specialized 'Alpha'):
+--
+w	= ('A');
+--
+[
+goal:-!,
+	w ? p("Hi!").
+]
+
+class 'A' (specialized 'Console'):
+[
+PREDICATES:
+--
+visible:
+-- private:
+--
+p(STRING)	- (i);
+--
+CLAUSES:
+--
+p(Text):-
+	writeln("p: ",Text).
+]

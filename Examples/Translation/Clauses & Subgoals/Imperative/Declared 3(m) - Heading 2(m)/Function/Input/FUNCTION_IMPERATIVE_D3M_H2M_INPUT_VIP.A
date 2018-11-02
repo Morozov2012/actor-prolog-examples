@@ -1,0 +1,467 @@
+-----------------------------------------------------------------------
+--                                                                   --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+--                                                                   --
+-- Predicate calls testing.                                          --
+--                                                                   --
+-- Requested: 3 arguments, asterisk.                                 --
+-- Exists:    2 arguments, asterisk.                                 --
+-- Flow direction: input.                                            --
+--                                                                   --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+D1		= INTEGER.
+--
+reference:
+--
+D2		= INTEGER; REAL; SYMBOL; STRING.
+--
+R_STRING	= STRING.
+--
+lazy:
+--
+D3		= ('Testbed'); #.
+D4		= ('Testbed'); INTEGER; #.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+world1		= ('Test1');
+world2		= ('Test2',
+			first_test= world1);
+world3		= ('Test3',
+			second_test= world2);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Test1' (specialized 'Testbed'):
+--
+internal:
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 1"),
+	fail.
+--
+p(N,Tail*) = con?format("Test1 (1.1): p/2*, N=%s",N) :-
+	con ? (N > 10),!,
+	con ? writeln("Test1 (1.1): p/2*, N=",N,", Tail=",Tail),
+	-- p(Tail*),
+	p(1,Tail*),
+	p(2,3,Tail*).
+p(N,Tail*) = con?format("Test1 (1.2): p/2*, N=%s",N) :-!,
+	con ? writeln("Test1 (1.2): p/2*, N=",N,", Tail=",Tail).
+p(_*) = con?format("Test1 (1.3): p/0") :-
+	con ? writeln("Test1 (1.3): p/0").
+/*
+p(A,N*):-!,
+	con ? writeln("Test1 (1.1): p/1, A=",A,", N=",N).
+p(N*):-
+	con ? writeln("Test1 (1.2): p/1, N=",N).
+*/
+--
+q(N,Tail*) = con?format("Test1 (2.1): q/2*, N=%s",N) :-
+	con ? (?val("INTEGER",N) > 10),!,
+	con ? writeln("Test1 (2.1): q/2*, N=",N,", Tail=",Tail),
+	-- q(Tail*),
+	q(1,Tail*),
+	q(2,3,Tail*).
+q(N,Tail*) = con?format("Test1 (2.2): q/2*, N=%s",N) :-!,
+	con ? writeln("Test1 (2.2): q/2*, N=",N,", Tail=",Tail).
+q(_*) = con?format("Test1 (2.3): q/0") :-
+	con ? writeln("Test1 (2.3): q/0").
+/*
+q(A,N*):-!,
+	con ? writeln("Test1 (2.1): q/1, A=",A,", N=",N).
+q(N*):-
+	con ? writeln("Test1 (2.2): q/1, N=",N).
+*/
+--
+r(N,Tail*) = con?format("Test1 (3.1): r/2*, N=%s",N) :-
+	con ? (?val("INTEGER",N) > 10),!,
+	con ? writeln("Test1 (3.1): r/2*, N=",N,", Tail=",Tail),
+	-- r(Tail*),
+	r(1,Tail*),
+	r(2,3,Tail*).
+r(N,Tail*) = con?format("Test1 (3.2): r/2*, N=%s",N) :-!,
+	con ? writeln("Test1 (3.2): r/2*, N=",N,", Tail=",Tail).
+r(_*) = con?format("Test1 (3.3): r/0") :-
+	con ? writeln("Test1 (3.3): r/0").
+/*
+r(A,N*):-!,
+	con ? writeln("Test1 (3.1): r/1, A=",A,", N=",N*).
+r(N*):-!,
+	con ? writeln("Test1 (3.2): r/1, N=",N*).
+--
+r(K,A,N*):-
+	con ? writeln("Test1 (4): r/2, K=",K,", A=",A,", N=",N).
+*/
+]
+-----------------------------------------------------------------------
+class 'Test2' (specialized 'Testbed'):
+--
+internal:
+--
+	first_test;
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 2"),
+	fail.
+--
+M(N,Tail*):-
+	con ? (?val("INTEGER",N) > 10),!,
+	con ? writeln("Test1 (2.1.1): M/2*, M= ",M,", N=",N,", Tail=",Tail),
+	-- M(Tail*),
+	M(1,Tail*),
+	M(2,3,Tail*).
+M(N,Tail*):-!,
+	con ? writeln("Test1 (2.1.2): M/2*, M= ",M,", N=",N,", Tail=",Tail).
+M(_*):-
+	con ? writeln("Test1 (2.1.3): M/0, M= ",M).
+--
+M(N,Tail*) = con?format("Test1 (2.2.1): M/2*, N=%s",N) :-
+	con ? (?val("INTEGER",N) > 10),!,
+	con ? writeln("Test1 (2.2.1): M/2*, M= ",M,", N=",N,", Tail=",Tail),
+	-- M(Tail*),
+	M(1,Tail*),
+	M(2,3,Tail*).
+M(N,Tail*) = con?format("Test1 (2.2.2): M/2*, N=%s",N) :-!,
+	con ? writeln("Test1 (2.2.2): M/2*, M= ",M,", N=",N,", Tail=",Tail).
+M(_*) = con?format("Test1 (2.2.3): M/0") :-
+	con ? writeln("Test1 (2.2.3): M/0, M= ",M).
+]
+-----------------------------------------------------------------------
+class 'Test3' (specialized 'Testbed'):
+--
+internal:
+--
+	second_test;
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 3"),
+	fail.
+--
+M(N*):-
+	con ? writeln("Test3 (1): M=",M),
+	second_test ? M(N*),
+	con ? writeln("Test3 (2): M=",M,", N=",N).
+--
+M(N*) = R :-
+	con ? writeln("Test3 (3): M=",M),
+	R== second_test ? M(N*),
+	con ? writeln("Test3 (4): M=",M,", N=",N,", R=",R).
+]
+-----------------------------------------------------------------------
+class 'Testbed':
+--
+internal:
+--
+	world1	: 'Testbed'	= self;
+--
+variable:
+--
+	world21	: D3		= self;
+	world22	: D3		= #;
+	world23	: D3		= _;
+	world24	: D3		= _;
+--
+	world31	: D4		= self;
+	world32	: D4		= #;
+	world33	: D4		= -100;
+	world34	: D4		= _;
+	world35	: D4		= _;
+	world36	: D4		= _;
+--
+internal:
+--
+	auxiliary_tools		= ('AuxiliaryTools',
+					world23,
+					world24,
+					world34,
+					world35,
+					world36);
+--
+	con			= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+p(D1,D1,D1*) = STRING		- (i,i,i);
+q(D2,D2,D2*) = STRING		- (i,i,i);
+--
+r(D2,D2,D2*) = R_STRING		- (i,i,i);
+r(D4,D2,D2,D2*) = R_STRING	- (i,i,i,i);
+--
+CLAUSES:
+--
+goal:-
+	--
+	con ? writeln("Test A"),
+	--
+	-- p(0101),
+	p(0101,0102),
+	p(0101,0102,0103),
+	--
+	-- q(0201),
+	q(0201,0202),
+	q(0201,0202,0203),
+	--
+	-- world1 ? p(1001),
+	world1 ? p(1001,1002),
+	world1 ? p(1001,1002,1003),
+	--
+	-- world1 ? q(1101),
+	world1 ? q(1101,1102),
+	world1 ? q(1101,1102,1103),
+	--
+	-- world21 ? r(2101),
+	world21 ? r(2101,2102),
+	world21 ? r(2101,2102,2103),
+	--
+	-- world22 ? r(2201),
+	world22 ? r(2201,2202),
+	world22 ? r(2201,2202,2203),
+	--
+	-- world23 ? r(2301),
+	world23 ? r(2301,2302),
+	world23 ? r(2301,2302,2303),
+	--
+	-- world24 ? r(2401),
+	world24 ? r(2401,2402),
+	world24 ? r(2401,2402,2403),
+	--
+	-- world31 ? r(3101),
+	world31 ? r(3101,3102),
+	world31 ? r(3101,3102,3103),
+	--
+	-- world32 ? r(3201),
+	world32 ? r(3201,3202),
+	world32 ? r(3201,3202,3203),
+	--
+	-- world33 ? r(3301),
+	world33 ? r(3301,3302),
+	world33 ? r(3301,3302,3303),
+	--
+	-- world34 ? r(3401),
+	world34 ? r(3401,3402),
+	world34 ? r(3401,3402,3403),
+	--
+	-- world35 ? r(3501),
+	world35 ? r(3501,3502),
+	world35 ? r(3501,3502,3503),
+	--
+	-- world36 ? r(3601),
+	world36 ? r(3601,3602),
+	world36 ? r(3601,3602,3603),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	--
+	fail.
+goal:-
+	--
+	con ? writeln("Test B"),
+	--
+	-- R0101== ?p(0101),
+	-- con ? writeln("R0101=",R0101),
+	R0102== ?p(0101,0102),
+	con ? writeln("R0102=",R0102),
+	R0103== ?p(0101,0102,0103),
+	con ? writeln("R0103=",R0103),
+	--
+	-- R0201== ?q(0201),
+	-- con ? writeln("R0201=",R0201),
+	R0202== ?q(0201,0202),
+	con ? writeln("R0201=",R0202),
+	R0203== ?q(0201,0202,0203),
+	con ? writeln("R0201=",R0203),
+	--
+	-- R1001== world1 ? p(1001),
+	-- con ? writeln("R1001=",R1001),
+	R1002== world1 ? p(1001,1002),
+	con ? writeln("R1002=",R1002),
+	R1003== world1 ? p(1001,1002,1003),
+	con ? writeln("R1003=",R1003),
+	--
+	-- R1101== world1 ? q(1101),
+	-- con ? writeln("R1101=",R1101),
+	R1102== world1 ? q(1101,1102),
+	con ? writeln("R1102=",R1102),
+	R1103== world1 ? q(1101,1102,1103),
+	con ? writeln("R1103=",R1103),
+	--
+	-- R2101== world21 ? r(2101),
+	-- con ? writeln("R2101=",R2101),
+	R2102== world21 ? r(2101,2102),
+	con ? writeln("R2102=",R2102),
+	R2103== world21 ? r(2101,2102,2103),
+	con ? writeln("R2103=",R2103),
+	--
+	-- R2201== world22 ? r(2201),
+	-- con ? writeln("R2201=",R2201," (FREE VARIABLE EXPECTED)"),
+	R2202== world22 ? r(2201,2202),
+	con ? writeln("R2202=",R2202," (FREE VARIABLE EXPECTED)"),
+	R2203== world22 ? r(2201,2202,2203),
+	con ? writeln("R2203=",R2203," (FREE VARIABLE EXPECTED)"),
+	--
+	-- R2301== world23 ? r(2301),
+	-- con ? writeln("R2301=",R2301," (FREE VARIABLE EXPECTED)"),
+	R2302== world23 ? r(2301,2302),
+	con ? writeln("R2302=",R2302," (FREE VARIABLE EXPECTED)"),
+	R2303== world23 ? r(2301,2302,2303),
+	con ? writeln("R2303=",R2303," (FREE VARIABLE EXPECTED)"),
+	--
+	-- R2401== world24 ? r(2401),
+	-- con ? writeln("R2401=",R2401," (FREE VARIABLE EXPECTED)"),
+	R2402== world24 ? r(2401,2402),
+	con ? writeln("R2402=",R2402," (FREE VARIABLE EXPECTED)"),
+	R2403== world24 ? r(2401,2402,2403),
+	con ? writeln("R2403=",R2403," (FREE VARIABLE EXPECTED)"),
+	--
+	-- R3101== world31 ? r(3101),
+	-- con ? writeln("R3101=",R3101),
+	R3102== world31 ? r(3101,3102),
+	con ? writeln("R3102=",R3102),
+	R3103== world31 ? r(3101,3102,3303),
+	con ? writeln("R3103=",R3103),
+	--
+	-- R3201== world32 ? r(3201),
+	-- con ? writeln("R3201=",R3201," (FREE VARIABLE EXPECTED)"),
+	R3202== world32 ? r(3201,3202),
+	con ? writeln("R3202=",R3202," (FREE VARIABLE EXPECTED)"),
+	R3203== world32 ? r(3201,3202,3203),
+	con ? writeln("R3203=",R3203," (FREE VARIABLE EXPECTED)"),
+	--
+	-- R3301== world33 ? r(3301),
+	-- con ? writeln("R3301=",R3301),
+	R3302== world33 ? r(3301,3302),
+	con ? writeln("R3302=",R3302),
+	R3303== world33 ? r(3301,3302,3303),
+	con ? writeln("R3303=",R3303),
+	--
+	-- R3401== world34 ? r(3401),
+	-- con ? writeln("R3401=",R3401," (FREE VARIABLE EXPECTED)"),
+	R3402== world34 ? r(3401,3402),
+	con ? writeln("R3402=",R3402," (FREE VARIABLE EXPECTED)"),
+	R3403== world34 ? r(3401,3402,3403),
+	con ? writeln("R3403=",R3403," (FREE VARIABLE EXPECTED)"),
+	--
+	-- R3501== world35 ? r(3501),
+	-- con ? writeln("R3501=",R3501," (FREE VARIABLE EXPECTED)"),
+	R3502== world35 ? r(3501,3502),
+	con ? writeln("R3502=",R3502," (FREE VARIABLE EXPECTED)"),
+	R3503== world35 ? r(3501,3502,3503),
+	con ? writeln("R3503=",R3503," (FREE VARIABLE EXPECTED)"),
+	--
+	-- R3601== world36 ? r(3601),
+	-- con ? writeln("R3601=",R3601," (FREE VARIABLE EXPECTED)"),
+	R3602== world36 ? r(3601,3602),
+	con ? writeln("R3602=",R3602," (FREE VARIABLE EXPECTED)"),
+	R3603== world36 ? r(3601,3602,3603),
+	con ? writeln("R3603=",R3603," (FREE VARIABLE EXPECTED)"),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	-- con ? writeln("R2301=",R2301),
+	con ? writeln("R2302=",R2302),
+	con ? writeln("R2303=",R2303),
+	--
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	-- con ? writeln("R2401=",R2401," (FREE VARIABLE EXPECTED)"),
+	con ? writeln("R2402=",R2402," (FREE VARIABLE EXPECTED)"),
+	con ? writeln("R2403=",R2403," (FREE VARIABLE EXPECTED)"),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	-- con ? writeln("R3401=",R3401),
+	con ? writeln("R3402=",R3402),
+	con ? writeln("R3403=",R3403),
+	--
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	-- con ? writeln("R3501=",R3501," (FREE VARIABLE EXPECTED)"),
+	con ? writeln("R3502=",R3502," (FREE VARIABLE EXPECTED)"),
+	con ? writeln("R3503=",R3503," (FREE VARIABLE EXPECTED)"),
+	--
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	-- con ? writeln("R3601=",R3601),
+	con ? writeln("R3602=",R3602),
+	con ? writeln("R3603=",R3603),
+	--
+	con ? writeln("O.K."),
+	fail.
+goal.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'AuxiliaryTools' (specialized 'Alpha'):
+--
+variable:
+--
+	world23	: D3;
+	world24	: D3;
+--
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_world23(D3)		- (i);
+set_world24(D3)		- (i);
+--
+set_world34(D4)		- (i);
+set_world35(D4)		- (i);
+set_world36(D4)		- (i);
+--
+CLAUSES:
+--
+set_world23(world23):-!.
+set_world23(_).
+--
+set_world24(world24):-!.
+set_world24(_).
+--
+set_world34(world34):-!.
+set_world34(_).
+--
+set_world35(world35):-!.
+set_world35(_).
+--
+set_world36(world36):-!.
+set_world36(_).
+]
+-----------------------------------------------------------------------

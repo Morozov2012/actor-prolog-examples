@@ -1,0 +1,70 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+class 'Main' (specialized 'Canvas3D'):
+--
+background_color		= 'Black';
+enable_scene_antialiasing	= 'yes';
+--
+[
+goal:-!,
+	MaximumAngle== ?pi()*2.0,
+	Bounds== 'BoundingSphere'({
+			center: p(0.0,0.0,0.0),
+			radius: 100.0
+			}),
+	show([
+		'TransformGroup'({
+			allowTransformWrite: 'yes',
+			allowTransformRead: 'yes',
+			branches: [
+				'Sphere'({
+					radius: 0.25,
+					generateNormals: 'yes',
+					divisions: 100,
+					generateTextureCoords: 'yes',
+					appearance: 'Appearance'({
+						texture: 'Texture2D'({
+							image: "jar:data/earth_2_512.gif",
+							format: 'RGBA',
+							enableTextureMapping: 'yes',
+							magnificationFilter: 'BASE_LEVEL_LINEAR',
+							minificationFilter: 'BASE_LEVEL_LINEAR'
+							})
+						})
+					}),
+				'RotationInterpolator'({
+					alpha: 'Alpha3D'({
+						loopCount: -1,
+						increasingEnable: 'yes',
+						increasingAlphaDuration: 4000
+						}),
+					transformAxis: 'Transform3D'({}),
+					minimumAngle: 0.0,
+					maximumAngle: MaximumAngle,
+					schedulingBounds: Bounds
+					})
+				]
+			}),
+		'Background'({
+			color: background_color,
+			image: "jar:data/space4.gif",
+			scaleMode: 'SCALE_REPEAT',
+			applicationBounds: Bounds
+			}),
+		'AmbientLight'({
+			color: 'White',
+			influencingBounds: Bounds
+			}),
+		'OrbitBehavior'({
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			})
+		]).
+]

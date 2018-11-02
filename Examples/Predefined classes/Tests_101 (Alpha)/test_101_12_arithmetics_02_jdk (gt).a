@@ -1,0 +1,256 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+RoundTime	= time(Hours,Minutes,Seconds).
+
+reference:
+
+List		= N*.
+N		= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+test9;
+test10;
+test11;
+test12;
+test13;
+test14;
+test15;
+test16;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+constant:
+--
+	list1	: List	= [1,2,3|list2];
+--
+variable:
+--
+	list2	: List;
+--
+[
+PREDICATES:
+
+determ:
+
+'>'(RoundTime,RoundTime)	- (i,i);
+'>'(Time,RoundTime)		- (i,i);
+'>'(RoundTime,Time)		- (i,i);
+'>'(List,List)			- (i,i);
+
+CLAUSES:
+
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6,
+	test7,
+	test8,
+	test9,
+	test10,
+	test11,
+	test12,
+	test13,
+	test14,
+	test15,
+	test16.
+--
+test1:-
+	con ? writeln("Test 1:"),
+	A== "abcdefg",
+	B== "hij",
+	con ? writeln("   A=",A," (a string)"),
+	con ? writeln("   B=",B," (a string)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test1:-
+	con ? writeln("Failure: B <= A").
+--
+test2:-
+	con ? writeln("Test 2:"),
+	A== 'abcdefg',
+	B== 'hij',
+	con ? writeln("   A=",A," (a symbol)"),
+	con ? writeln("   B=",B," (a symbol)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test2:-
+	con ? writeln("Failure: B <= A").
+--
+test3:-
+	con ? writeln("Test 3:"),
+	A== ~5982_4E00_89C1,
+	B== ~767E_95FB_4E0D,
+	con ? writeln("   A=",A," (a binary)"),
+	con ? writeln("   B=",B," (a binary)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test3:-
+	con ? writeln("Failure: B <= A").
+--
+test4:-
+	con ? writeln("Test 4:"),
+	A== [1,2,3],
+	B== [7,8,9],
+	con ? writeln("   A=",A," (a list)"),
+	con ? writeln("   B=",B," (a list)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test4:-
+	con ? writeln("Failure: B <= A").
+--
+test5:-
+	con ? writeln("Test 5:"),
+	A== 1,
+	B== [7,8,9],
+	con ? writeln("   A=",A," (an integer)"),
+	con ? writeln("   B=",B," (a list)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test5:-
+	con ? writeln("Failure: B <= A").
+--
+test6:-
+	con ? writeln("Test 6:"),
+	A== [1,2,3],
+	B== 7,
+	con ? writeln("   A=",A," (a list)"),
+	con ? writeln("   B=",B," (an integer)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test6:-
+	con ? writeln("Failure: B <= A").
+--
+test7:-
+	con ? writeln("Test 7:"),
+	A== date(2010,08,27),
+	B== date(2011,01,10),
+	con ? writeln("   A=",A," (a date)"),
+	con ? writeln("   B=",B," (a date)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test7:-
+	con ? writeln("Failure: B <= A").
+--
+test8:-
+	con ? writeln("Test 8:"),
+	A== time(16,47,01),
+	B== time(19,09,01),
+	con ? writeln("   A=",A," (a time)"),
+	con ? writeln("   B=",B," (a time)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test8:-
+	con ? writeln("Failure: B <= A").
+--
+test9:-
+	con ? writeln("Test 9:"),
+	A== time(16,47,01,100),
+	B== time(19,09,01,100),
+	con ? writeln("   A=",A," (a time)"),
+	con ? writeln("   B=",B," (a time)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test9:-
+	con ? writeln("Failure: B <= A").
+--
+test10:-
+	con ? writeln("Test 10:"),
+	A== time(16,47,01),
+	B== time(19,09,01,100),
+	con ? writeln("   A=",A," (a time)"),
+	con ? writeln("   B=",B," (a time)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test10:-
+	con ? writeln("Failure: B <= A").
+--
+test11:-
+	con ? writeln("Test 11:"),
+	A== time(16,47,01,100),
+	B== time(19,09,01),
+	con ? writeln("   A=",A," (a time)"),
+	con ? writeln("   B=",B," (a time)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test11:-
+	con ? writeln("Failure: B <= A").
+--
+test12:-
+	con ? writeln("Test 12:"),
+	A== 1,
+	B== 2,
+	con ? writeln("   A=",A," (an integer)"),
+	con ? writeln("   B=",B," (an integer)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test12:-
+	con ? writeln("Failure: B <= A").
+--
+test13:-
+	con ? writeln("Test 13:"),
+	A== 1,
+	B== 2.0,
+	con ? writeln("   A=",A," (an integer)"),
+	con ? writeln("   B=",B," (a real)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test13:-
+	con ? writeln("Failure: B <= A").
+--
+test14:-
+	con ? writeln("Test 14:"),
+	A== 1.0,
+	B== 2,
+	con ? writeln("   A=",A," (a real)"),
+	con ? writeln("   B=",B," (an integer)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test14:-
+	con ? writeln("Failure: B <= A").
+--
+test15:-
+	con ? writeln("Test 15:"),
+	A== 1.0,
+	B== 2.0,
+	con ? writeln("   A=",A," (a real)"),
+	con ? writeln("   B=",B," (a real)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test15:-
+	con ? writeln("Failure: B <= A").
+--
+test16:-
+	con ? writeln("Test 16:"),
+	A== [0,0,0,0,0,0,0,0,0],
+	list2== [4,5,6,7,8,9],
+	B== list1,
+	con ? writeln("   A=",A," (a list)"),
+	con ? writeln("   B=",B," (a list)"),
+	B > A,!,
+	con ? writeln("   O.K.: B > A").
+test16:-
+	con ? writeln("Failure: B <= A").
+]

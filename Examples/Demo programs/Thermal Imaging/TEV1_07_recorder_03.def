@@ -1,0 +1,210 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/TEV1";
+import .. from "morozov/ColorMap";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+interface 'Viewer' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer			: 'CameraControl';
+	main_window		: 'Canvas2D';
+	writer			: 'FFmpeg';
+	inspector		: 'VideoFileInspector';
+	text_operations		: 'Text';
+	timer			: 'Timer';
+	image			: 'BufferedImage';
+	file_operations		: 'File';
+	con			: 'Console';
+	color_maps		: 'ColorMap';
+--
+constant:
+--
+	dlg_ctrl_lower_bound			: DialogFieldName;
+	dlg_ctrl_lower_main_quantile		: DialogFieldName;
+	dlg_ctrl_lower_auxiliary_quantile	: DialogFieldName;
+	dlg_ctrl_lower_scrollbar_range		: DialogFieldName;
+	dlg_ctrl_lower_scrollbar_value		: DialogFieldName;
+	--
+	dlg_ctrl_upper_bound			: DialogFieldName;
+	dlg_ctrl_upper_main_quantile		: DialogFieldName;
+	dlg_ctrl_upper_auxiliary_quantile	: DialogFieldName;
+	dlg_ctrl_upper_scrollbar_range		: DialogFieldName;
+	dlg_ctrl_upper_scrollbar_value		: DialogFieldName;
+	--
+	dlg_ctrl_togglebutton_bounds		: DialogFieldName;
+	dlg_ctrl_togglebutton_q1		: DialogFieldName;
+	dlg_ctrl_togglebutton_q2		: DialogFieldName;
+	dlg_ctrl_togglebutton_autoranging	: DialogFieldName;
+	dlg_ctrl_togglebutton_average		: DialogFieldName;
+	dlg_ctrl_togglebutton_zoom		: DialogFieldName;
+	--
+	dlg_ctrl_togglebutton_double_color_map	: DialogFieldName;
+	dlg_ctrl_editname_frame_number		: DialogFieldName;
+	dlg_ctrl_togglebutton_color_map		: DialogFieldName;
+	--
+	dlg_ctrl_togglebutton_connect		: DialogFieldName;
+	dlg_ctrl_scrollbar_frame_number_range	: DialogFieldName;
+	dlg_ctrl_scrollbar_frame_number_value	: DialogFieldName;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+accept_lower_scrollbar_value;
+accept_upper_scrollbar_value;
+play_video_if_possible;
+--
+determ:
+--
+check_file_name;
+--
+imperative:
+--
+set_read_buffer_size(INTEGER)				- (i);
+park_scroll_control;
+complete_data_transfer;
+--
+update_displaying_mode;
+--
+set_Connect_mode(YesNo)					- (i);
+set_Bounds_mode(YesNo)					- (i);
+set_Q1_mode(YesNo)					- (i);
+set_Q2_mode(YesNo)					- (i);
+--
+determ:
+--
+is_connected;
+is_disconnected;
+is_loaded;
+is_reading_mode;
+is_recording_mode;
+--
+is_Bounds_mode;
+is_Q1_mode;
+is_Q2_mode;
+--
+imperative:
+--
+initialize_temperature_ranges;
+--
+determ:
+--
+update_lower_temperature_bound() = REAL;
+update_upper_temperature_bound() = REAL;
+update_lower_main_temperature_quantile() = REAL;
+update_upper_main_temperature_quantile() = REAL;
+update_lower_auxiliary_temperature_quantile() = REAL;
+update_upper_auxiliary_temperature_quantile() = REAL;
+--
+imperative:
+--
+check_lower_quantile1;
+check_upper_quantile1;
+check_lower_quantile2;
+check_upper_quantile2;
+--
+refine_lower_bound;
+refine_upper_bound;
+refine_lower_quantile1;
+refine_upper_quantile1;
+refine_lower_quantile2;
+refine_upper_quantile2;
+--
+initialize_lower_scroller;
+initialize_upper_scroller;
+set_lower_scroller(INTEGER)				- (i);
+set_upper_scroller(INTEGER)				- (i);
+--
+set_temperature_range(REAL,REAL)			- (i,i);
+--
+switch_controls;
+switch_lower_bound_editor;
+switch_upper_bound_editor;
+switch_lower_quantile1_editor;
+switch_upper_quantile1_editor;
+switch_lower_quantile2_editor;
+switch_upper_quantile2_editor;
+switch_lower_scale_scroller;
+switch_upper_scale_scroller;
+switch_scale_control_buttons;
+switch_quantile1_button;
+switch_quantile2_button;
+switch_double_color_map_button;
+switch_frame_number_scroller;
+--
+switch_buttons;
+switch_load_button;
+switch_play_button;
+switch_pause_button;
+switch_record_button;
+switch_export_button;
+switch_GIF_button;
+switch_stop_button;
+switch_save_button;
+--
+record_data;
+export_data(STRING)					- (i);
+continue_export;
+export_image_if_necessary(FrameNumber,'Canvas2D')	- (i,i);
+continue_reading_if_necessary;
+--
+on_off(YesNo) = OnOff					- (i);
+create_new_file_name() = STRING;
+]
+-----------------------------------------------------------------------
+interface 'CameraControl' (specialized 'TEV1'):
+--
+internal:
+--
+	viewer			: 'Viewer';
+	main_window		: 'Canvas2D';
+	image1			: 'BufferedImage';
+	image2			: 'BufferedImage';
+	text_operations		: 'Text';
+	timer			: 'Timer';
+	con			: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+take_photo(FileName)					- (i);
+resize_main_window(INTEGER,INTEGER)			- (i,i);
+report_time(INTEGER,INTEGER,REAL)			- (i,i,i);
+report_copyright;
+]
+-----------------------------------------------------------------------
+interface 'VideoFileInspector' (specialized 'TEV1'):
+--
+internal:
+--
+	viewer			: 'Viewer';
+	dialog			: 'FileInspection';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+inspect_file(FileName)					- (i);
+cancel_inspection;
+]
+-----------------------------------------------------------------------
+interface 'FileInspection' (specialized 'Dialog'):
+--
+internal:
+--
+	inspector	: 'VideoFileInspector';
+--
+[
+]
+-----------------------------------------------------------------------

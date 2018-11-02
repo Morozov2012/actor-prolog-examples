@@ -1,0 +1,24 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--              This is an example of SADT model.                    --
+--              The color of root block does NOT                     --
+--              depend on the state of its sub-blocks                --
+--              (The ATOM keyword is used.)                          --
+--                                                                   --
+-----------------------------------------------------------------------
+interface '_Subgoal_1' (specialized 'Subgoal'):
+[
+]
+-----------------------------------------------------------------------
+interface '_Subgoal_2' (specialized 'Subgoal'):
+[
+]
+-----------------------------------------------------------------------
+interface '_Subgoal_3' (specialized 'Subgoal'):
+[
+]
+-----------------------------------------------------------------------
+interface 'Subgoal' (specialized 'Dialog', '_Block'):
+[
+]
+-----------------------------------------------------------------------

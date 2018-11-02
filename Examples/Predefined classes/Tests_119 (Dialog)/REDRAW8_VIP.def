@@ -1,0 +1,88 @@
+------------------------------------------------------------------------
+--              An example of Actor Prolog program.                   --
+--              (c) 2007-2015, Alexei A. Morozov, IRE RAS.            --
+------------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+R_FontName	= STRING.
+R_FontSize	= INTEGER.
+--
+R_Boolean	= 'yes'; 'no'; 'unknown'.
+--
+ground:
+--
+D_Color		= STRING; #; D_Color*.
+--
+------------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+agent1	: 'ControlPanel';
+agent2	: 'DemoPanel';
+[
+]
+------------------------------------------------------------------------
+interface 'ControlPanel' (specialized 'Dialog'):
+--
+constant:
+--
+	agent2	: 'DemoPanel';
+--
+variable:
+--
+	target_title		: FrameTitle;
+	target_x		: X;
+	target_y		: Y;
+	target_text_color	: D_Color;
+	target_space_color	: D_Color;
+	target_background_color	: D_Color;
+	target_font_name	: R_FontName;
+	target_font_size	: R_FontSize;
+	target_bold		: R_Boolean;
+	target_italic		: R_Boolean;
+	target_underlined	: R_Boolean;
+--
+internal:
+--
+	con	: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+contains(FontStyle,FontStyleItem) = R_Boolean	- (i,i);
+are_equal_font_styles(FontStyle,FontStyle)	- (i,i);
+]
+------------------------------------------------------------------------
+interface 'DemoPanel' (specialized 'Dialog'):
+--
+variable:
+--
+	title			: FrameTitle;
+	x			: X;
+	y			: Y;
+	text_color		: D_Color;
+	space_color		: D_Color;
+	background_color	: D_Color;
+	font_name		: R_FontName;
+	font_size		: R_FontSize;
+	target_bold		: R_Boolean;
+	target_italic		: R_Boolean;
+	target_underlined	: R_Boolean;
+--
+internal:
+--
+	con		: 'Console';
+--
+[
+IMPERATIVES:
+--
+form_font_style
+	(FontStyle,R_Boolean,R_Boolean,R_Boolean)	- (o,i,i,i);
+insert_style_item
+	(FontStyle,FontStyle,R_Boolean,FontStyleItem)	- (i,o,i,i);
+--
+]
+------------------------------------------------------------------------

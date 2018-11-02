@@ -1,0 +1,134 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+constant:
+--
+	menu1	= [
+		submenu("&Flowers",[
+			item("&Bachelor's-button\tAlt-B","alt pressed B"),
+			item("&Ox-eye daisy\tCtrl-Alt-O","alt control pressed O"),
+			item("&Wild vetch\tAlt-Shift-W","alt shift pressed W"),
+			'separator',
+			item("&Sweet-william\tCtrl-Shift-S","shift control pressed S"),
+			item("Fo&rget-me-not\tCtrl-Alt-Shift-R","alt control shift pressed R")
+			]),
+		submenu("&Meal",[
+			item("Ju&icy apple\tShift-I","shift pressed I"),
+			item("Pl&um\tCtrl-U","control pressed U"),
+			'separator',
+			item("P&ear\tCtrl-Shift-E","control shift released E"),
+			item("&Grapes\tCtrl-Alt-G","control alt released G"),
+			item("B&lack-currant\tCtrl-Alt-Shift-L","control alt shift released L")
+			]),
+		'spacer',
+		submenu("&Help",[
+			item("E&xplanation\tF1","pressed F1"),
+			item("&Community\tC","released C"),
+			'separator',
+			item("Co&ntacts\tN","pressed N")
+			])
+		];
+--
+	menu2	= [
+		submenu("&File",[
+			item("Sa&ve","pressed F2")
+			]),
+		submenu("&Draw",[
+			item("Po&int","alt pressed I"),
+			item("Rec&tangle","alt pressed T"),
+			item("R&oundRectangle","alt pressed O"),
+			item("Ellip&se","alt pressed S"),
+			item("&Arc","alt pressed A"),
+			item("&Line","alt pressed L"),
+			item("&QuadCurve","alt pressed Q"),
+			item("Cu&bicCurve","alt pressed B"),
+			item("&Polygon","alt pressed P")
+			]),
+		submenu("&Edit",[
+			item("&Undo","alt control pressed Z"),
+			item("&Redo","shift control pressed Z"),
+			item("&Clear","alt pressed C")
+			])
+		];
+--
+	w1	= ('MyWindow',
+			menu=menu1);
+	w2	= ('MyWindow',
+			menu=menu2);
+	w3	= ('MyWindow',
+			menu=[]);
+--
+	dummy_timer	= ('Timer');
+--
+[
+goal:-!,
+	dummy_timer ? activate.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	width			= 70;
+	height			= 20;
+--
+	menu;
+--
+[
+IMPERATIVES:
+--
+write_menu(MenuDefinition,INTEGER)	- (i,i);
+write_menu_item(MenuItem,INTEGER)	- (i,i);
+write_tabulators(INTEGER)		- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	set_color('RoyalBlue'),
+	writeln("["),
+	write_menu(menu,1),
+	writeln("]"),
+	set_color('default'),
+	writeln("Please test menu controls: ").
+--
+write_menu([H],T):-!,
+	write_tabulators(T),
+	write_menu_item(H,T+1),
+	nl.
+write_menu([H|R],T):-!,
+	write_tabulators(T),
+	write_menu_item(H,T),
+	writeln(","),
+	write_menu(R,T).
+write_menu(_,_).
+--
+write_menu_item(submenu(ActionName,List),T):-!,
+	writeln("submenu(\"",ActionName,"\",["),
+	write_menu(List,T+1),
+	write_tabulators(T),
+	write("])").
+write_menu_item('separator',_):-!,
+	write("'separator'").
+write_menu_item('spacer',_):-!,
+	write("'spacer'").
+write_menu_item(H,_):-
+	write(H).
+--
+write_tabulators(0):-!.
+write_tabulators(T):-!,
+	write("   "),
+	write_tabulators(T-1).
+--
+action(Action):-!,
+	write("Selected menu item: "),
+	set_color('Violet'),
+	writeln(Action),
+	set_color('default').
+]
+-----------------------------------------------------------------------

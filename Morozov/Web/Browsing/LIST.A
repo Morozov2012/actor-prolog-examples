@@ -1,0 +1,145 @@
+package "Morozov/Web/Browsing/List":
+---------------------------------------------------------------
+--             The "LIST" Actor Prolog package.              --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package implements a dialog box for examination of   --
+-- a list of Web resources. One can call an external Web     --
+-- browser to examine the content of given resources.        --
+---------------------------------------------------------------
+import 'ExternalBrowser' from "Morozov/Web/Browsing/Browser";
+---------------------------------------------------------------
+class 'List' (specialized 'Dialog'):
+--
+-- constant:
+--
+--	identifier	= "List";
+--
+variable:
+--
+	list_of_resources;
+	arguments;
+--
+internal:
+--
+	browser		= ('ExternalBrowser',
+				variable:
+					arguments);
+--
+	check		= ('CheckItem');
+--
+--	con		= ('Console');
+--
+[
+goal:-!.
+	-- con ? writeln(arguments).
+--
+action("show_resource"):-
+	[list_of_resources],
+	-- con ? writeln(list_of_resources," ",arguments),
+	check ? check_item(list_of_resources,arguments),!,
+	browser ? activate.
+action(_):-!.
+]
+---------------------------------------------------------------
+-- This package implements a dialog box for selecting        --
+-- the Web resource from the list.                           --
+---------------------------------------------------------------
+class 'Selector' (specialized 'Dialog'):
+--
+-- constant:
+--
+--	identifier	= "Selector";
+--
+variable:
+--
+	list_of_resources;
+	item;
+--
+internal:
+--
+	handler;
+--
+	check		= ('CheckItem');
+--
+--	con		= ('Console');
+--
+[
+goal:-!.
+--
+action("process_resource"):-
+	[item],
+	-- con ? writeln(item),
+	check ? check_item(list_of_resources,item),!,
+	handler ? process(item),
+	hide.
+action(_):-!.
+]
+---------------------------------------------------------------
+-- This package implements a dialog box for editing address  --
+-- of the Web resource. User can select the address from     --
+-- the list.                                                 --
+---------------------------------------------------------------
+class 'Edit' (specialized 'Dialog'):
+--
+variable:
+--
+	list_of_resources;
+	item;
+--
+internal:
+--
+	handler;
+--
+	check		= ('CheckItem');
+--
+	con		= ('Console');
+--
+[
+goal:-!.
+--	test(item,list_of_resources).
+--
+-- test(A,B):-
+--	con ? writeln("goal:: ",A," ",B).
+--
+action("select_resource"):-
+	FN== con ? input_file_name(
+		"Select a file",
+		"*.htm*",
+		["*.HTM*","HTML Files"]),
+	put('item',FN),!.
+action("process_resource"):-
+	[item],
+	-- con ? writeln(list_of_resources," ",item),
+	check ? check_item(list_of_resources,item),!,
+	handler ? open(item),
+	hide.
+action(_):-!.
+]
+---------------------------------------------------------------
+-- An auxiliary class                                        --
+---------------------------------------------------------------
+class 'CheckItem':
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+check_item([],_):-!,
+	con ? note("List is empty!"),
+	fail.
+check_item(_,[]):-!,
+	con ? note("Select an item, please!"),
+	fail.
+check_item(_,#):-!,
+	con ? note("Select an item, please!"),
+	fail.
+check_item(_,_):-!.
+--
+alarm(_):-
+	fail.
+]
+---------------------------------------------------------------

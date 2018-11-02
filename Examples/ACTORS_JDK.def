@@ -1,0 +1,58 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+ExternalData	= STRING.
+--
+-----------------------------------------------------------------------
+interface 'TextPage' (specialized 'Report'):
+--
+variable:
+--
+	value_1		: ExternalData;
+	value_2		: ExternalData;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+write_value(STRING,ExternalData);
+--
+nondeterm:
+--
+goal;
+--
+]
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Dialog'):
+--
+variable:
+--
+	i	: ExternalData;
+	j	: ExternalData;
+--
+internal:
+--
+	w1	: 'TextPage';
+	w2	: 'TextPage';
+	w3	: 'TextPage';
+	w4	: 'TextPage';
+	w5	: 'TextPage';
+	w6	: 'TextPage';
+	w7	: 'TextPage';
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+--
+]
+-----------------------------------------------------------------------

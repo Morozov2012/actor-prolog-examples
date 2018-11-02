@@ -1,0 +1,62 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+
+PREDICATES:
+
+imperative:
+
+write_list(WebcamNameList)	- (i);
+--
+test_webcams(WebcamNameList)	- (i);
+test_webcam(WebcamName)		- (i);
+
+class 'Main' (specialized 'Canvas2D'):
+--
+internal:
+--
+	webcam	= ('Webcam');
+	buffer	= ('BufferedImage');
+	con	= ('Console');
+--
+[
+goal:-!,
+	List== webcam?get_webcam_list(1.0),
+	con ? set_color('RoyalBlue'),
+	con ? writeln("The following webcams are available:"),
+	con ? set_color('DkGreen'),
+	write_list(List),
+	con ? set_color('RoyalBlue'),
+	con ? writeln("End of list."),
+	con ? writeln("I will test webcams:"),
+	con ? set_color('default'),
+	test_webcams(List),
+	con ? set_color('RoyalBlue'),
+	con ? write("O.K."),
+	con ? set_color('default').
+--
+write_list([Name|Rest]):-!,
+	con ? writeln(Name),
+	write_list(Rest).
+write_list(_).
+--
+test_webcams([Name|Rest]):-!,
+	test_webcam(Name),
+	test_webcams(Rest).
+test_webcams(_).
+--
+test_webcam(Name):-
+	con ? set_color('RoyalBlue'),
+	con ? write("\tWebcam name: "),
+	con ? set_color('DkGreen'),
+	con ? writeln(Name),
+	webcam ? open(Name),
+	webcam ? get_image(buffer),
+	webcam ? close,
+	draw_image(buffer,0,0,1,1),
+	show.
+]

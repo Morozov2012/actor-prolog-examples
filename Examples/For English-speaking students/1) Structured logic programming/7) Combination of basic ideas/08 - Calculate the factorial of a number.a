@@ -1,0 +1,39 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: calculate the factorial of  --
+-- a number.                             --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Counter decrease.                  --
+-- 2) Calculation of an output argument. --
+-- 3) Imitation of functions.            --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+N	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+factorial(N) = N	- (i);
+
+CLAUSES:
+
+goal:-
+	X== 5,
+	R== ?factorial(X),
+	writeln("The factorial of ",X," ",
+		"is equal to ",R,".").
+
+factorial(0)= 1 :-!.
+factorial(N)= N * ?factorial(N-1).

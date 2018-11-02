@@ -1,0 +1,40 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Structures.                           --
+--                                       --
+-- Questions: What are structures? Can a --
+-- domain include several structures     --
+-- with different names (functors) and   --
+-- different numbers of arguments        --
+-- (arity)? Can the domain include       --
+-- two structures with the same functor? --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+Event	= lecture(Name,MyDate,MyTime);
+	  meeting(Name,MyDate,MyTime).
+--
+MyDate	= date(INTEGER,INTEGER,INTEGER).
+MyTime	= time(INTEGER,INTEGER,INTEGER).
+Name	= STRING.
+
+PREDICATES:
+
+p(Event)	- (i);
+
+CLAUSES:
+
+goal:-
+	T1== date(2015,04,25),
+	T2== time(14,30,0),
+	p(meeting("Meditation",T1,T2)).
+
+p(X):-
+	writeln(X).

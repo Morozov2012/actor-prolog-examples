@@ -1,0 +1,165 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	file_name_1	= "data_UTF_16.db";
+	file_name_2	= "data_default.db";
+--
+internal:
+--
+	data1	= ('MyDatabase',
+			name=file_name_1,
+			character_set='UTF_16',
+			con);
+	data2	= ('MyDatabase',
+			name=file_name_1,
+			character_set='none',
+			con);
+	data3	= ('MyDatabase',
+			name=file_name_2,
+			character_set='default',
+			con);
+	data4	= ('MyDatabase',
+			name=file_name_2,
+			character_set='none',
+			con);
+	con	= ('Console',
+			font_size=24);
+--
+[
+goal:-!,
+	con ? set_color('Magenta'),
+	con ? writeln("TEST 1"),
+	con ? set_color('default'),
+	--
+	data1 ? list,
+	data1 ? create,
+	--
+	data2 ? retract_all,
+	data2 ? consult,
+	data2 ? list,
+	--
+	con ? set_color('Magenta'),
+	con ? writeln("TEST 2"),
+	con ? set_color('default'),
+	--
+	data3 ? list,
+	data3 ? create,
+	--
+	data4 ? retract_all,
+	data4 ? consult,
+	data4 ? list.
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+constant:
+--
+name;
+character_set;
+--
+internal:
+--
+trap	: 'SpecialStoreTrap'	= ('Trap',
+					world=self,
+					handler=self);
+con;
+--
+[
+DOMAINS:
+--
+Target	= text(STRING,Color).
+--
+PREDICATES:
+--
+nondeterm:
+--
+initial_content(STRING,Color)	- (o,o);
+--
+imperative:
+--
+create;
+consult;
+list;
+--
+imperative:
+--
+alarm(_*)			- (i);
+--
+CLAUSES:
+--
+goal:-
+	initial_content(Text,Color),
+	append(text(Text,Color)),
+	fail.
+goal:-!.
+--
+initial_content(String,'Red'):-
+	String== ?codes_to_string([
+		16#767E#,16#95FB#,16#4E0D#,16#5982#,
+		16#4E00#,16#89C1#]).
+initial_content("Bai wen buru yi jian",'RoyalBlue').
+initial_content("Лучше один раз увидеть,",'RoyalBlue').
+initial_content("чем сто раз услышать",'RoyalBlue').
+--
+create:-
+	con ? set_color('DkGreen'),
+	con ? writeln("\tSaving the ",name," database..."),
+	con ? set_color('default'),
+	con ? writeln(
+		"\tCharacter set to be used: ",character_set),
+	save,
+	con ? writeln("\tDone.").
+--
+consult:-
+	con ? set_color('DkGreen'),
+	con ? writeln("\tLoading the ",name," database..."),
+	con ? set_color('default'),
+	con ? writeln(
+		"\tCharacter set to be used: ",character_set),
+	trap ? load,!,
+	con ? writeln("\tDone.").
+consult.
+--
+list:-
+	con ? writeln("\tThe ",name," database content:"),
+	Item== ?match(_),
+	Item == text(Text,Color),
+	con ? set_color(Color),
+	con ? writeln("\t",Text),
+	con ? set_color('default'),
+	fail.
+list:-
+	con ? writeln("\tEnd of database.").
+--
+alarm(_,_*):-
+	recent_loading_error(_,_,_,Message),!,
+	con ? set_color('Red'),
+	con ? writeln("\tI cannot load the ",name," database."),
+	con ? writeln("\tError: ",Message),
+	con ? set_color('default').
+alarm(Error,Arguments*):-!,
+	con ? set_color('Red'),
+	con ? writeln("\tI cannot load the ",name," database."),
+	con ? writeln("\tError: ",Error," ",Arguments),
+	con ? set_color('default').
+alarm(Arguments*):-!,
+	con ? writeln(Arguments).
+]
+-----------------------------------------------------------------------
+interface 'SpecialStoreTrap' (specialized 'Trap'):
+--
+[
+PREDICATES:
+--
+determ:
+--
+load;
+--
+]
+-----------------------------------------------------------------------

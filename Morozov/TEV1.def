@@ -1,0 +1,158 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/TEV1":
+
+import 'ThermalVideoBuffer' from "Morozov/ThermalVideoBuffer";
+import 'BufferedImage' from "Morozov/Java2D";
+import "Morozov/Vision";
+import "Morozov/ColorMap";
+
+DOMAINS:
+
+DeviceIdentifierList	= DeviceIdentifier*.
+DeviceIdentifier	= STRING; 'default'.
+--
+TemperatureScale	= 'CELSIUS'; 'FAHRENHEIT'.
+
+--------------------------------------------------------------------
+-- The 'TEV1' class is specialized class 'ThermalVideoBuffer'.    --
+--------------------------------------------------------------------
+
+interface 'TEV1' (specialized 'ThermalVideoBuffer'):
+
+default_identifier				: DeviceIdentifier;
+--
+temperature_scale				: TemperatureScale;
+--
+use_recorded_calibration_commands		: YesNo;
+--
+eliminate_anomalous_pixels			: YesNo;
+apply_anomalous_voltage_pixel_detector		: YesNo;
+anomalous_voltage_threshold			: Numerical;
+apply_anomalous_temperature_pixel_detector	: YesNo;
+anomalous_temperature_threshold			: Numerical;
+--
+do_not_suspend_USB_data_transfer		: YesNo;
+read_time_out					: INTEGER;
+write_time_out					: INTEGER;
+--
+output_debug_information			: INTEGER;
+--
+[
+PREDICATES:
+--
+determ:
+--
+open();
+open(DeviceIdentifier)					- (i);
+--
+imperative:
+--
+calibrate;
+annul_calibration;
+--
+save_sensor_attributes(FileName)			- (i);
+save_sensor_attributes(STRING)				- (i);
+--
+load_sensor_attributes(FileName)			- (i);
+load_sensor_attributes(STRING)				- (i);
+--
+close;
+--
+determ:
+--
+is_open;
+--
+imperative:
+--
+get_recent_frame_number(FrameNumber)			- (o);
+get_recent_frame_number(
+	FrameNumber,	-- Number of recent committed frame
+	FrameNumber,	-- Number of recent valid frame
+	FrameNumber)	-- Number of recent corrupted frame
+			- (o,o,o);
+--
+get_recent_frame_time(INTEGER)				- (o);
+get_recent_frame_time(
+	INTEGER,	-- Recent committed frame time in milliseconds
+	INTEGER,	-- Recent valid frame time in milliseconds
+	INTEGER)	-- Recent corrupted frame time in milliseconds
+			- (o,o,o);
+--
+get_recent_frame_relative_time(INTEGER)			- (o);
+get_recent_frame_relative_time(
+	INTEGER,	-- Recent committed frame relative time [ms]
+	INTEGER,	-- Recent valid frame relative time [ms]
+	INTEGER)	-- Recent corrupted frame relative time [ms]
+			- (o,o,o);
+--
+get_recent_frame_rate(REAL)				- (o);
+get_recent_frame_rate(
+	REAL,		-- Frame rate of committed frames
+	REAL,		-- Frame rate of valid frames
+	REAL)		-- Frame rate of corrupted frames
+			- (o,o,o);
+--
+imperative:
+--
+get_recent_image('BufferedImage')			- (i);
+--
+get_temperature(PointX,PointY) = REAL			- (i,i);
+get_minimal_temperature() = REAL;
+get_maximal_temperature() = REAL;
+--
+get_image_size_in_pixels(INTEGER,INTEGER)		- (o,o);
+get_actual_identifier() = STRING;
+--
+get_number_of_dead_pixels() = INTEGER;
+get_number_of_anomalous_voltage_pixels() = INTEGER;
+get_number_of_anomalous_temperature_pixels() = INTEGER;
+--
+-- Get list of thermal cameras to use.
+--
+get_device_list = DeviceIdentifierList;
+--
+set_default_identifier(DeviceIdentifier)		- (i);
+get_default_identifier() = DeviceIdentifier;
+--
+set_temperature_scale(TemperatureScale)			- (i);
+get_temperature_scale() = TemperatureScale;
+--
+set_use_recorded_calibration_commands(YesNo)		- (i);
+get_use_recorded_calibration_commands(YesNo)		- (i);
+--
+set_eliminate_anomalous_pixels(YesNo)			- (i);
+get_eliminate_anomalous_pixels() = YesNo;
+--
+set_apply_anomalous_voltage_pixel_detector(YesNo)	- (i);
+get_apply_anomalous_voltage_pixel_detector() = YesNo;
+--
+set_anomalous_voltage_threshold(Numerical)		- (i);
+get_anomalous_voltage_threshold() = Numerical;
+--
+set_apply_anomalous_temperature_pixel_detector(YesNo)	- (i);
+get_apply_anomalous_temperature_pixel_detector() = YesNo;
+--
+set_anomalous_temperature_threshold(Numerical)		- (i);
+get_anomalous_temperature_threshold() = Numerical;
+--
+set_do_not_suspend_USB_data_transfer(YesNo)		- (i);
+get_do_not_suspend_USB_data_transfer() = YesNo;
+--
+set_read_time_out(INTEGER)				- (i);
+get_read_time_out() = INTEGER;
+--
+set_write_time_out(INTEGER)				- (i);
+get_write_time_out() = INTEGER;
+--
+set_output_debug_information(INTEGER)			- (i);
+get_output_debug_information() = INTEGER;
+--
+-- These methods are to be implemented by the programmer:
+--
+complete_calibration;
+missed_frame(INTEGER)					- (i);
+]

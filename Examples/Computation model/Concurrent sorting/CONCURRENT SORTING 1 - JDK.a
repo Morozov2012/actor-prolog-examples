@@ -1,0 +1,175 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--              (c) 2011, IRE RAS, Alexei A. Morozov.                --
+--     An implementation of the Concurrent Sorting Algorithm.        --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+user_interface	= (('UserInterface',
+			protecting:
+				output=L1,
+			variable:
+				input=L2));
+--
+engine		= (('SortingEngine',
+			suspending:
+				input=L1,
+			protecting:
+				output=L2));
+--
+[
+goal:-!,
+	user_interface <- show.
+]
+-----------------------------------------------------------------------
+class 'UserInterface' (specialized 'Dialog'):
+--
+-- PROCESS INPUTS:
+--
+variable:
+--
+	input_list;	-- User input (text)
+--
+	input;		-- Sorted list (term)
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	output;		-- User input (term)
+--
+	sorted_list;	-- Sorted list (text)
+--
+[
+goal:-!,
+	convert_input_list(input,sorted_list),
+	convert_output_list(input_list,output).
+--
+convert_input_list(Input,SortedList):-
+	SortedList== ?convert_to_string(Input),!.
+convert_input_list(_,_).
+--
+convert_output_list(InputList,Output):-
+	bound(InputList),
+	Output== ?val("List",?string_to_term(InputList)),!.
+convert_output_list(_,_).
+]
+-----------------------------------------------------------------------
+class 'SortingEngine' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+suspending:
+--
+	input;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output;
+--
+-- AUXILIARY PROCESSES:
+--
+constant:
+--
+	left		= (('SortingEngine',
+				suspending:
+					input=A1,
+				protecting:
+					output=B1));
+--
+	right		= (('SortingEngine',
+				suspending:
+					input=A2,
+				protecting:
+					output=B2));
+--
+-- AUXILIARY ACTORS:
+--
+internal:
+--
+	receiver	= ('Distributor',
+				input,
+				output1=A1,
+				output2=A2);
+	sender		= ('Gatherer',
+				input0=input,
+				input1=B1,
+				input2=B2,
+				output);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Distributor' (specialized 'Alpha'):
+--
+-- PROCESS INPUT:
+--
+variable:
+--
+	input;
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	output1;
+	output2;
+--
+[
+goal:-!,
+	distribute_if_necessary(input,List1,List2),
+	output1== List1,
+	output2== List2.
+--
+distribute_if_necessary(#,#,#):-!.
+distribute_if_necessary([],#,#):-!.
+distribute_if_necessary([_],#,#):-!.
+distribute_if_necessary(List1,List2,List3):-
+	distribute(List1,List2,List3).
+--
+distribute([A,B|Rest1],[A|Rest2],[B|Rest3]):-!,
+	distribute(Rest1,Rest2,Rest3).
+distribute(List,List,[]).
+]
+-----------------------------------------------------------------------
+class 'Gatherer' (specialized 'Alpha'):
+--
+-- PROCESS INPUTS:
+--
+variable:
+--
+	input0;
+	input1;
+	input2;
+--
+-- PROCESS OUTPUT:
+--
+protecting:
+--
+	output;
+--
+[
+goal:-!,
+	gather(input0,input1,input2,List),
+	output== List.
+--
+gather(List,_,_,List):-
+	List == [],!.
+gather(List,_,_,List):-
+	List == [_],!.
+gather(_,#,List,List):-!.
+gather(_,List,#,List):-!.
+gather(_,List1,List2,List3):-
+	gather(List1,List2,List3).
+--
+gather([A|Rest1],List2,[A|Rest3]):-
+	List2 == [B|_],
+	A < B,!,
+	gather(Rest1,List2,Rest3).
+gather(List1,[B|Rest2],[B|Rest3]):-!,
+	gather(List1,Rest2,Rest3).
+gather(List,_,List).
+]
+-----------------------------------------------------------------------

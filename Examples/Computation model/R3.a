@@ -1,0 +1,48 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, Alexei A. Morozov, IRE RAS. --
+-- A resident inspecting a set of target --
+-- processes.                            --
+-------------------------------------------
+project: (('Observer'))
+-------------------------------------------
+class 'Observer' (specialized 'Report'):
+--
+constant:
+--
+	w1	= (('P1'));
+	w2	= (('P2'));
+	w3	= (('P3'));
+--
+variable:
+--
+	target	= [w1,w2,w3];
+	result	= target ?? function(1,2,3);
+--
+[
+goal:-!,
+	set_color('RoyalBlue'),
+	writeln("I have received data:"),
+	set_color('Violet'),
+	writeln(result),
+	set_color('default').
+]
+-------------------------------------------
+class 'P1' (specialized 'Alpha'):
+[
+function(_,_,_)= "From P1".
+function(A,_,_)= A * 100.
+]
+-------------------------------------------
+class 'P2' (specialized 'Alpha'):
+[
+function(_,_,_)= "From P2".
+function(_,B,_)= B * 200.
+]
+-------------------------------------------
+class 'P3' (specialized 'Alpha'):
+[
+function(_,_,_)= "From P3".
+function(_,_,C)= C * 300.
+]
+-------------------------------------------

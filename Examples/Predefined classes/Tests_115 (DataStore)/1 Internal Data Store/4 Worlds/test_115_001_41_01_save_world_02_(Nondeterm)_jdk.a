@@ -1,0 +1,164 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute this example in the first environment and
+-- the load_world example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+MyDomainA		= ('TargetClassA').
+--
+MyMessageA		= text(STRING).
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+store1		= ('DataStore',
+			name="MyDataStore.dat",
+			access_mode='modifying');
+base1		= ('MyDatabaseA',
+			place=shared(store1,"MyTable"));
+--
+target_world	= ('TargetClassA');
+--
+con		= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test01;
+test02;
+--
+CLAUSES:
+--
+goal:-!,
+	test01,
+	test02.
+--
+test01:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store creation."),
+	con ? set_color('default'),
+	base1 ? test_database_insert(target_world),
+	base1 ? test_database_find,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+test02:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store saving."),
+	con ? set_color('default'),
+	store1 ? begin_transaction('modifying'),!,
+	store1 ? save("File.dat"),
+	store1 ? end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test02:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyDatabaseA' (specialized 'MyDatabase'):
+[
+DOMAINS:
+--
+Target		= MyDomainA.
+--
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test_database_insert(Target)		- (i);
+test_database_find;
+inspect_database;
+communicate_with_the_world(Target)	- (i);
+--
+CLAUSES:
+--
+test_database_insert(MyWorld):-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest insertion to the database."),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	insert(MyWorld),
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test_database_insert(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+test_database_find:-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest database inspection."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	inspect_database,
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test_database_find:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+inspect_database:-
+	con ? writeln("\tDatabase content:"),
+	con ? set_color('Blue'),
+	find(Item),
+		con ? writeln("\t\t",Item),
+		communicate_with_the_world(Item),
+		fail.
+inspect_database:-
+	con ? set_color('default'),
+	con ? writeln("\tNo more items.").
+--
+communicate_with_the_world(W):-
+	[W] << message(text("The server is O.K.")).
+]
+-----------------------------------------------------------------------
+class 'TargetClassA' (specialized 'Console'):
+[
+PREDICATES:
+--
+nondeterm:
+--
+message(MyMessageA)		- (i);
+--
+CLAUSES:
+--
+message(Text):-
+	writeln("TargetClassA: I have got a message: ",Text),
+	fail.
+--
+goal:-!,
+	writeln("Hello from TargetClassA!").
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,51 @@
+/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+/*                                                                 */
+/*                         Pascal Triangle                         */
+/*                                                                 */
+/*                       (c) 2001 Written by                       */
+/*            Dmitri Protas 320, Alex Dolgov 327 (MSU).            */
+/*                                                                 */
+/* Программа вычисляет и выводит на экран строку треугольника      */
+/* Паскаля с заданным номером.                                     */
+/*                                                                 */
+/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+DOMAINS:
+
+List	= INTEGER*.	-- Список целых чисел
+N	= INTEGER.	-- Счётчик
+
+PREDICATES:
+
+imperative:
+
+copy_list(List,List,List)	- (i,i,o);
+add(List,List,List)		- (i,i,o);
+do(List,INTEGER,List)		- (i,i,o);
+
+CLAUSES:
+
+goal:-!,
+	L1== [1,1],		-- Начальное значение списка
+	N== 9,			-- Заданный номер строки треугольника
+	writeln("[1]"),		-- Напечатать вершину треугольника
+	do(L1,N,L),
+	write("N=",N),nl,
+	write("Result:\n",L).	-- Напечатать результат
+
+copy_list([H|Rest1],Rest2,[H|Rest3]):-
+	copy_list(Rest1,Rest2,Rest3).
+copy_list([],Rest,Rest).
+
+add([H1|Rest1],[H2|Rest2],[H1+H2|Rest3]):-!,
+	add(Rest1,Rest2,Rest3).
+add(_,Rest,Rest).
+
+do(Rest1,N,L):-
+	N > 1,!,
+	writeln(Rest1),
+	copy_list(Rest1,[0],Rest3),
+	copy_list([0],Rest1,Rest4),
+	add(Rest3,Rest4,Rest5),
+	do(Rest5, N-1, L).
+do(L,_,L).

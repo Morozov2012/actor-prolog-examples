@@ -1,0 +1,120 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+FrameRate	= REAL.
+--
+-----------------------------------------------------------------------
+interface 'VideoInput'
+(specialized 'Timer', 'CommunicationOperations'):
+--
+constant:
+--
+	data_directory			: STRING;
+	target_directory		: STRING;
+	sampling_rate			: FrameRate;
+--
+internal:
+--
+	datastore		: 'DataStore';
+	database		: 'VideoDataSources';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	state			: 'ProgramState';
+	con			: 'Console';
+--
+	trap			: 'CommunicationOperations';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+load_figure(FrameNumber,INTEGER)			- (i,i);
+--
+register_consumer('ImageConsumer')			- (i);
+forget_consumer('ImageConsumer')			- (i);
+--
+notify_all_customers(FrameNumber)			- (i);
+reset_all_customers;
+--
+determ:
+--
+alarm(
+	ExceptionName,
+	SYMBOL,
+	'ImageConsumer')	- (i,i,i);
+alarm(
+	ExceptionName,
+	SYMBOL,
+	'ImageConsumer',
+	FrameNumber)		- (i,i,i,i);
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(FrameNumber);
+		  customer('ImageConsumer').
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)				- (o);
+get_current_frame(FrameNumber)				- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)				- (i);
+set_current_frame(FrameNumber)				- (i);
+--
+register_consumer('ImageConsumer')			- (i);
+forget_consumer('ImageConsumer')			- (i);
+--
+nondeterm:
+--
+get_any_customer('ImageConsumer')			- (o);
+]
+-----------------------------------------------------------------------
+interface 'VideoDataSources' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= ('VideoInput').
+--
+]
+-----------------------------------------------------------------------
+interface 'ImageConsumer':
+[
+PREDICATES:
+--
+imperative:
+--
+new_frame(FrameNumber,BINARY,FrameRate)			- (i,i,i);
+reset();
+]
+-----------------------------------------------------------------------
+interface 'CommunicationOperations':
+[
+PREDICATES:
+--
+determ:
+--
+notify_customer('ImageConsumer',FrameNumber)		- (i,i);
+reset_customer('ImageConsumer')				- (i);
+]
+-----------------------------------------------------------------------

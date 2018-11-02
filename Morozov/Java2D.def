@@ -1,0 +1,884 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2013 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Java2D":
+
+DOMAINS:
+
+PenAttributes		= {
+			  color: Color,
+			  lineWidth: Numerical,
+			  endCap: EndCap,
+			  lineJoin: LineJoin,
+			  miterLimit: Numerical,
+			  dashArray: DashArray,
+			  dashPhase: Numerical
+			  };
+			  Color.
+--
+EndCap			= 'CAP_BUTT'; 'CAP_ROUND'; 'CAP_SQUARE'.
+LineJoin		= 'JOIN_BEVEL'; 'JOIN_MITER'; 'JOIN_ROUND'.
+--
+DashArray		= Numerical*.
+--
+BrushAttributes		= OnOff;
+			  Color;
+			  GradientPaint;
+			  LinearGradientPaint;
+			  RadialGradientPaint;
+			  TexturePaint.
+--
+GradientPaint		= 'GradientPaint'(GradientPaintAttributes).
+GradientPaintAttributes	= {
+			  point1: Point2D,
+			  color1: Color,
+			  point2: Point2D,
+			  color2: Color,
+			  isCyclic: YesNo
+			  }.
+--
+LinearGradientPaint	= 'LinearGradientPaint'
+				(LinearGradientPaintAttributes).
+LinearGradientPaintAttributes
+			= {
+			  point1: Point2D,
+			  point2: Point2D,
+			  fractions: MultipleGradientFractions,
+			  colors: Colors,
+			  cycleMethod: MultipleGradientCycleMethod,
+			  colorSpace: ColorSpaceType,
+			  gradientTransform: Transform2D
+			  }.
+--
+RadialGradientPaint	= 'RadialGradientPaint'
+				(RadialGradientPaintAttributes).
+RadialGradientPaintAttributes
+			= {
+			  center: Point2D,
+			  radius: Numerical,
+			  focus: Point2D,
+			  fractions: MultipleGradientFractions,
+			  colors: Colors,
+			  cycleMethod: MultipleGradientCycleMethod,
+			  colorSpace: ColorSpaceType,
+			  gradientTransform: Transform2D
+			  }.
+--
+TexturePaint		= 'TexturePaint'(TexturePaintAttributes).
+TexturePaintAttributes	= {
+			  image: STRING,
+			  anchor: Point2D,
+			  width: PointX,
+			  height: PointY
+			  }.
+--
+Colors				= Color*.
+ColorSpaceType			= 'LINEAR_RGB'; 'SRGB'.
+MultipleGradientFractions	= Numerical*.
+MultipleGradientCycleMethod	= 'NO_CYCLE'; 'REFLECT'; 'REPEAT'.
+--
+FontAttributes		= {
+			  name: FontName2D,
+			  size: FontSize,
+			  weight: FontWeight2D,
+			  width: FontWidth2D,
+			  posture: FontPosture2D,
+			  transform: Transform2D,
+			  superscript: FontSuperscript2D,
+			  foreground: BrushAttributes,
+			  background: BrushAttributes,
+			  underline: FontUnderline2D,
+			  strikethrough: OnOff,
+			  runDirection: FontRunDirection2D,
+			  bidiEmbedding: FontBidiEmbedding2D,
+			  justification: FontJustification2D,
+			  inputMethodUnderline: FontUnderline2D,
+			  swapColors: YesNo,
+			  kerning: FontKerning2D,
+			  ligatures: FontLigatures2D,
+			  tracking: FontTracking2D
+			  }.
+--
+-- The 'fontName' attribute defines the face name of a font.
+--
+FontName2D		= FontName;
+			  'DIALOG'; 'DIALOG_INPUT';
+			  'SANS_SERIF'; 'SERIF'; 'MONOSPACED'.
+--
+-- The 'weight' attribute defines the weight of a font. The value
+-- 'WEIGHT_BOLD' corresponds to the bold style of the font.
+--
+FontWeight2D		= 'WEIGHT_EXTRA_LIGHT'; 'WEIGHT_LIGHT';
+			  'WEIGHT_DEMILIGHT'; 'WEIGHT_REGULAR';
+			  'WEIGHT_SEMIBOLD'; 'WEIGHT_MEDIUM';
+			  'WEIGHT_DEMIBOLD'; 'WEIGHT_BOLD';
+			  'WEIGHT_HEAVY'; 'WEIGHT_EXTRABOLD';
+			  'WEIGHT_ULTRABOLD';
+			  Numerical.
+--
+-- The 'width' attribute defines the width of a font.
+--
+FontWidth2D		= 'WIDTH_CONDENSED'; 'WIDTH_SEMI_CONDENSED';
+			  'WIDTH_REGULAR'; 'WIDTH_SEMI_EXTENDED';
+			  'WIDTH_EXTENDED';
+			  Numerical.
+--
+-- The 'posture' attribute defines the posture of a font. The value
+-- 'POSTURE_OBLIQUE' corresponds to the italic style of the font.
+--
+FontPosture2D		= 'POSTURE_REGULAR'; 'POSTURE_OBLIQUE';
+			  Numerical.
+--
+-- The 'superscript' attribute controls superscripting and
+-- subscripting. The 'SUPERSCRIPT_SUPER' and 'SUPERSCRIPT_SUB'
+-- constants correspond to the values 1 and -1 respectively.
+-- Values of greater magnitude define greater levels of superscript
+-- or subscripting, for example, 2 corresponds to super-superscript,
+-- 3 to super-super-superscript, and similarly for negative values
+-- and subscript, up to a level of 7 (or -7). Values beyond this
+-- range are reserved; behavior is platform-dependent. This
+-- attribute can impact the ascent and descent of a font. The
+-- ascent and descent can never become negative, however.
+--
+FontSuperscript2D	= 'SUPERSCRIPT_SUPER'; 'SUPERSCRIPT_SUB';
+			  Numerical.
+--
+-- The 'underline' attribute controls underlines.
+-- The 'inputMethodUnderline' attribute controls input method
+-- underlines. This may be used in conjunction with 'underline' if
+-- desired. The primary purpose is for use by input methods. Other
+-- use of these underlines for simple ornamentation might confuse
+-- users.
+--
+FontUnderline2D		= OnOff;
+			  'ONE_PIXEL'; 'TWO_PIXEL'; 'DOTTED';
+			  'GRAY'; 'DASHED';
+			  Numerical.
+--
+-- The 'runDirection' attribute defines the run direction of
+-- the line.
+--
+FontRunDirection2D	= 'default';
+			  'RUN_DIRECTION_LTR'; 'RUN_DIRECTION_RTL'.
+--
+-- The 'bidiEmbedding' attribute means the embedding level of the
+-- text. The 'default' value indicates that the Bidirectional
+-- algorithm should run without explicit embeddings. Positive
+-- values 1 through 61 are embedding levels, negative values -1
+-- through -61 are override levels. The value 0 means that the
+-- base line direction is used.
+--
+FontBidiEmbedding2D	= 'default'; Numerical.
+--
+-- The 'justification' attribute controls the justification of a
+-- paragraph. The default value is 1, indicating that justification
+-- should use the full width provided. Values are pinned to the
+-- range [0..1]. The attribute specifies the fraction of the extra
+-- space to use when justification is requested. For example, if
+-- the line is 50 points wide and it is requested to justify to 70
+-- points, a value of 0.75 will pad to use three-quarters of the
+-- remaining space, or 15 points, so that the resulting line will
+-- be 65 points in length. Note: This should have the same value
+-- for all the text in a paragraph, otherwise the behavior is
+-- undetermined.
+--
+FontJustification2D	= 'JUSTIFICATION_FULL';
+			  'JUSTIFICATION_NONE';
+			  Numerical.
+--
+-- The 'kerning' attribute controls kerning. The default advances
+-- of single characters are not appropriate for some character
+-- sequences, for example "To" or "AWAY". Without kerning the
+-- adjacent characters appear to be separated by too much space.
+-- Kerning causes selected sequences of characters to be spaced
+-- differently for a more pleasing visual appearance.
+--
+FontKerning2D		= OnOff; Numerical.
+--
+-- The 'ligatures' attribute enables optional ligatures. Ligatures
+-- required by the writing system are always enabled.
+--
+FontLigatures2D		= OnOff; Numerical.
+--
+-- The 'tracking' attribute controls tracking. The tracking value
+-- is multiplied by the font point size and passed through the font
+-- transform to determine an additional amount to add to the advance
+-- of each glyph cluster. Positive tracking values will inhibit
+-- formation of optional ligatures. Tracking values are typically
+-- between -0.1 and 0.3; values outside this range are generally
+-- not desireable.
+--
+FontTracking2D		= OnOff;
+			  'TRACKING_TIGHT'; 'TRACKING_LOOSE';
+			  Numerical.
+--
+Transform2D		= rotation(Numerical);
+			  quadrantRotation(INTEGER);
+			  scale(Numerical,Numerical);
+			  shear(Numerical,Numerical);
+			  translation(Numerical,Numerical);
+			  Transform2D_Matrix.
+Transform2D_Matrix	= Transform2D_Row*.
+Transform2D_Row		= Numerical*.
+--
+HorizontalAlignment	= 'default'; 'LEFT'; 'RIGHT'; 'CENTER'.
+VerticalAlignment	= 'default'; 'BASELINE';
+			  'TOP'; 'BOTTOM'; 'CENTER'.
+--
+AlphaCompositingRule	= 'CLEAR'; 'SRC'; 'DST'; 'SRC_OVER';
+			  'DST_OVER'; 'SRC_IN'; 'DST_IN';
+			  'SRC_OUT'; 'DST_OUT'; 'SRC_ATOP';
+			  'DST_ATOP'; 'XOR'.
+--
+ImageToBeDrawn		= ('BufferedImage'); STRING.
+
+DOMAINS:
+
+ScalingFactor2D	= 'WIDTH'; 'HEIGHT'; 'MIN'; 'MAX'; 'INDEPENDENT'.
+--
+ArcClosureType	= 'OPEN'; 'CHORD'; 'PIE'.
+--
+DrawingMarker	= INTEGER.
+--
+PointX		= Numerical.
+PointY		= Numerical.
+--
+PointList	= Point2D*.
+Point2D		= p(PointX,PointY).
+
+DOMAINS:
+
+RenderingHints	= {
+		  antialiasing: OnOffDefault,
+		  rendering: RenderingStrategy,
+		  dithering: DitheringMode,
+		  textAntialiasing: TextAntialiasingMode,
+		  text_LCD_contrast: INTEGER,
+		  fractionalMetrics: OnOffDefault,
+		  interpolation: InterpolationMode,
+		  alphaInterpolation: AlphaInterpolationMode,
+		  colorRendering: ColorRenderingMode,
+		  strokeControl: StrokeControlMode
+		  }.
+--
+OnOffDefault		= 'on'; 'off'; 'default'.
+--
+-- The rendering hint is a general hint that provides a high level
+-- recommendation as to whether to bias algorithm choices more
+-- for speed or quality when evaluating tradeoffs.
+-- This hint could be consulted for any rendering or image
+-- manipulation operation, but decisions will usually honor other,
+-- more specific hints in preference to this hint.
+--
+RenderingStrategy	= 'SPEED'; 'QUALITY'; 'default'.
+--
+-- The dithering hint controls how closely to approximate a color
+-- when storing into a destination with limited color resolution.
+-- Some rendering destinations may support a limited number of
+-- color choices which may not be able to accurately represent
+-- the full spectrum of colors that can result during rendering
+-- operations. For such a destination the dithering hint controls
+-- whether rendering is done with a flat solid fill of a single
+-- pixel value which is the closest supported color to what was
+-- requested, or whether shapes will be filled with a pattern of
+-- colors which combine to better approximate that color.
+--
+DitheringMode		= 'DISABLE'; 'ENABLE'; 'default'.
+--
+-- The text antialiasing hint can control the use of antialiasing
+-- algorithms for text independently of the choice used for shape
+-- rendering. Often an application may want to use antialiasing
+-- for text only and not for other shapes. Additionally, the
+-- algorithms for reducing the aliasing artifacts for text are
+-- often more sophisticated than those that have been developed
+-- for general rendering so this hint key provides additional
+-- values which can control the choices of some of those
+-- text-specific algorithms.
+--
+TextAntialiasingMode	= 'on';
+			  -- Text rendering is done with some form
+			  -- of antialiasing.
+			  'off';
+			  -- Text rendering is done without any
+			  -- form of antialiasing.
+			  'default';
+			  -- Text rendering is done according to
+			  -- the antialiasing hint or a default
+			  -- chosen by the implementation.
+			  'GASP';
+			  -- Text rendering is requested to use
+			  -- information in the font resource which
+			  -- specifies for each point size whether
+			  -- to apply text antialiasing ON or
+			  -- text antialiasing OFF.
+			  -- TrueType fonts typically provide this
+			  -- information in the 'gasp' table.
+			  -- Note: The 'gasp' table will likely
+			  -- specify to use only hinting at the
+			  -- most common user interface point sizes
+			  -- and not "smoothing". So in many cases
+			  -- the resulting text display is
+			  -- equivalent to text antialiasing OFF.
+			  -- This may be unexpected but is correct.
+			  'LCD_HRGB';
+			  -- Request that text be displayed
+			  -- optimised for an LCD display with
+			  -- subpixels in order from display left
+			  -- to right of R,G,B such that the
+			  -- horizontal subpixel resolution is
+			  -- three times that of the full pixel
+			  -- horizontal resolution (HRGB). This is
+			  -- the most common configuration.
+			  -- Selecting this hint for displays
+			  -- with one of the other LCD subpixel
+			  -- configurations will likely result in
+			  -- unfocused text.
+			  'LCD_HBGR';
+			  -- Request that text be displayed
+			  -- optimised for an LCD display with
+			  -- subpixels in order from display left
+			  -- to right of B,G,R such that the
+			  -- horizontal subpixel resolution is
+			  -- three times that of the full pixel
+			  -- horizontal resolution (HBGR). This is
+			  -- a much less common configuration than
+			  -- HRGB. Selecting this hint for displays
+			  -- with one of the other LCD subpixel
+			  -- configurations will likely result in
+			  -- unfocused text.
+			  'LCD_VRGB';
+			  -- Request that text be displayed
+			  -- optimised for an LCD display with
+			  -- subpixel organisation from display top
+			  -- to bottom of R,G,B such that the
+			  -- vertical subpixel resolution is three
+			  -- times that of the full pixel vertical
+			  -- resolution (VRGB). Vertical orientation
+			  -- is very uncommon and probably mainly
+			  -- useful for a physically rotated
+			  -- display. Selecting this hint for
+			  -- displays with one of the other LCD
+			  -- subpixel configurations will likely
+			  -- result in unfocused text.
+			  'LCD_VBGR'.
+			  -- Request that text be displayed
+			  -- optimised for an LCD display with
+			  -- subpixel organisation from display top
+			  -- to bottom of B,G,R such that the
+			  -- vertical subpixel resolution is three
+			  -- times that of the full pixel vertical
+			  -- resolution (VBGR). Vertical orientation
+			  -- is very uncommon and probably mainly
+			  -- useful for a physically rotated
+			  -- display. Selecting this hint for
+			  -- displays with one of the other LCD
+			  -- subpixel configurations will likely
+			  -- result in unfocused text.
+--
+-- The interpolation hint controls how image pixels are filtered
+-- or resampled during an image rendering operation.
+-- When images are rendered in a scaled, rotated, or otherwise
+-- transformed coordinate system, then the mapping of device pixel
+-- coordinates back to the image can raise the question of what
+-- color sample to use for the continuous coordinates that lie
+-- between the integer locations of the provided image samples.
+-- Interpolation algorithms define functions which provide a color
+-- sample for any continuous coordinate in an image based on the
+-- color samples at the surrounding integer coordinates.
+--
+InterpolationMode	= 'NEAREST_NEIGHBOR'; 'BILINEAR'; 'BICUBIC'.
+--
+-- The Alpha interpolation hint is a general hint that provides a
+-- high level recommendation as to whether to bias alpha blending
+-- algorithm choices more for speed or quality when evaluating
+-- tradeoffs.
+--
+AlphaInterpolationMode	= 'SPEED'; 'QUALITY'; 'default'.
+--
+-- The color rendering hint controls the accuracy of approximation
+-- and conversion when storing colors into a destination image
+-- or surface.
+--
+ColorRenderingMode	= 'SPEED'; 'QUALITY'; 'default'.
+--
+-- The stroke normalization control hint controls whether a
+-- rendering implementation should or is allowed to modify the
+-- geometry of rendered shapes for various purposes.
+--
+StrokeControlMode	= 'NORMALIZE';
+			  -- Geometry should be normalized to
+			  -- improve uniformity or spacing of lines
+			  -- and overall aesthetics. Note that
+			  -- different normalization algorithms may
+			  -- be more successful than others for
+			  -- given input paths.
+			  'PURE';
+			  -- Geometry should be left unmodified and
+			  -- rendered with sub-pixel accuracy.
+			  'default'.
+			  -- Geometry may be modified or left pure
+			  -- depending on the tradeoffs in a given
+			  -- implementation. Typically this setting
+			  -- allows an implementation to use a fast
+			  -- integer coordinate based platform
+			  -- rendering library, but does not
+			  -- specifically request normalization
+			  -- for uniformity or aesthetics.
+
+DOMAINS:
+
+ImageEncodingAttributes	= {
+		  format: ImageFileFormat,
+		  compressionQuality: Numerical,
+		  -- This attribute sets the compression quality
+		  -- to a value between 0.0 and 1.0. A compression
+		  -- quality setting of 0.0 is most generically
+		  -- interpreted as "high compression is important,"
+		  -- while a setting of 1.0 is most generically
+		  -- interpreted as "high image quality is
+		  -- important."
+		  progressiveMode: OnOff,
+		  -- This attribute specifies if the program is to
+		  -- write the image out in a progressive mode such
+		  -- that the stream will contain a series of scans
+		  -- of increasing quality.
+		  interlacing: OnOff,
+		  -- This attribute specifies if the interlaced
+		  -- encoding of the image is enabled (this option
+		  -- is supported in the GIF format).
+		  comment: STRING
+		  -- This attribute specifies a text comment to
+		  -- be stored in the image file.
+		  }.
+--
+ImageFileFormat	= 'JPEG'; 'PNG'; 'GIF'; 'BMP'; 'WBMP'; 'default'.
+
+DOMAINS:
+
+MouseEvent		= MouseEventType {
+				button: MouseButton,
+				clickCount: MouseClickCount,
+				x: REAL,
+				y: REAL,
+				when: INTEGER,
+				isAltDown: YesNo,
+				isAltGraphDown: YesNo,
+				isControlDown: YesNo,
+				isMetaDown: YesNo,
+				isShiftDown: YesNo
+				}.
+--
+MouseEventType		= 'MOUSE_CLICKED';
+			  'MOUSE_ENTERED'; 'MOUSE_EXITED';
+			  'MOUSE_PRESSED'; 'MOUSE_RELEASED';
+			  'MOUSE_DRAGGED'; 'MOUSE_MOVED'.
+--
+MouseButton		= INTEGER.
+MouseClickCount		= INTEGER.
+
+--------------------------------------------------------------------
+-- The 'Canvas2D' class is specialized class 'DataAbstraction'.   --
+--------------------------------------------------------------------
+
+interface 'Canvas2D'
+
+(specialized
+	'DataAbstraction',
+	'DimensionedFrame',
+	'DataResourceConsumer',
+	'WritableImageProducer',
+	'CustomControl',
+	'MenuListener'):
+
+scaling_factor	: ScalingFactor2D;
+--
+enable_scene_antialiasing	: YesNo;
+
+[
+IMPERATIVES:
+--
+clear;
+clear(YesNo/* Repaint the image */)	- (i);
+--
+enable_mouse_events(MouseEventType*)	- (i);
+disable_mouse_events(MouseEventType*)	- (i);
+--
+set_mesh(Numerical,Numerical)		- (i,i);
+--
+set_transform(Transform2D)		- (i);
+translate(PointX,PointY)		- (i,i);
+--
+draw_line(PointX,PointY,PointX,PointY)	- (i,i,i,i);
+draw_polygon(PointList)			- (i);
+--
+draw_point(
+	PointX,		-- The X coordinate of this point.
+	PointY)		-- The Y coordinate of this point.
+			- (i,i);
+draw_rectangle(
+	PointX,		-- The X coordinate of the upper-left corner
+			-- of the rectangle.
+	PointY,		-- The Y coordinate of the upper-left corner
+			-- of the rectangle.
+	PointX,		-- The width of the rectangle.
+	PointY)		-- The height of the rectangle.
+			- (i,i,i,i);
+draw_round_rectangle(
+	PointX,		-- The X coordinate of the upper-left corner
+			-- of the rectangle.
+	PointY,		-- The Y coordinate of the upper-left corner
+			-- of the rectangle.
+	PointX,		-- The width of the rectangle.
+	PointY,		-- The height of the rectangle.
+	Numerical,	-- The width of the arc to use to round off
+			-- the corners of the round rectangle.
+	Numerical)	-- The height of the arc to use to round off
+			-- the corners of the round rectangle.
+			- (i,i,i,i,i,i);
+draw_ellipse(
+	PointX,		-- The X coordinate of the upper-left corner
+			-- of the framing rectangle.
+	PointY,		-- The Y coordinate of the upper-left corner
+			-- of the framing rectangle.
+	PointX,		-- The width of the framing rectangle.
+	PointY)		-- The height of the framing rectangle.
+			- (i,i,i,i);
+draw_arc(
+	PointX,		-- The X coordinate of the upper-left corner
+			-- of the arc's framing rectangle.
+	PointY,		-- The Y coordinate of the upper-left corner
+			-- of the arc's framing rectangle.
+	PointX,		-- The overall width of the full ellipse of
+			-- which this arc is a partial section.
+	PointY,		-- The overall height of the full ellipse of
+			-- which this arc is a partial section.
+	Numerical,	-- The starting angle of the arc in degrees.
+			-- the corners of the round rectangle.
+	Numerical)	-- The angular extent of the arc in degrees.
+			- (i,i,i,i,i,i);
+draw_arc(
+	PointX,		-- The X coordinate of the upper-left corner
+			-- of the arc's framing rectangle.
+	PointY,		-- The Y coordinate of the upper-left corner
+			-- of the arc's framing rectangle.
+	PointX,		-- The overall width of the full ellipse of
+			-- which this arc is a partial section.
+	PointY,		-- The overall height of the full ellipse of
+			-- which this arc is a partial section.
+	Numerical,	-- The starting angle of the arc in degrees.
+			-- the corners of the round rectangle.
+	Numerical,	-- The angular extent of the arc in degrees.
+	ArcClosureType)	-- The closure type for the arc.
+			- (i,i,i,i,i,i,i);
+draw_quad_curve(
+	PointX,		-- The X coordinate of the start point.
+	PointY,		-- The Y coordinate of the start point.
+	PointX,		-- The X coordinate of the control point.
+	PointY,		-- The Y coordinate of the control point.
+	PointX,		-- The X coordinate of the end point.
+	PointY)		-- The Y coordinate of the end point.
+			- (i,i,i,i,i,i);
+draw_cubic_curve(
+	PointX,		-- The X coordinate for the start point of
+			-- the resulting cubic curve.
+	PointY,		-- The Y coordinate for the start point of
+			-- the resulting cubic curve.
+	PointX,		-- The X coordinate for the first control
+			-- point of the resulting cubic curve.
+	PointY,		-- The Y coordinate for the first control
+			-- point of the resulting cubic curve.
+	PointX,		-- The X coordinate for the second control
+			-- point of the resulting cubic curve.
+	PointY,		-- The Y coordinate for the second control
+			-- point of the resulting cubic curve.
+	PointX,		-- The X coordinate for the end point of
+			-- the resulting cubic curve.
+	PointY)		-- The Y coordinate for the end point of
+			-- the resulting cubic curve.
+			- (i,i,i,i,i,i,i,i);
+--
+draw_text(PointX,PointY,STRING)		- (i,i,i);
+--
+draw_image(ImageToBeDrawn)		- (i);
+draw_image(
+	ImageToBeDrawn,
+	Color)		-- The background color to paint under the
+			-- non-opaque portions of the image.
+			- (i,i);
+draw_image(
+	ImageToBeDrawn,
+	PointX,		-- The x coordinate.
+	PointY)		-- The y coordinate.
+			- (i,i,i);
+draw_image(
+	ImageToBeDrawn,
+	PointX,		-- The x coordinate.
+	PointY,		-- The y coordinate.
+	Color)		- (i,i,i,i);
+draw_image(
+	ImageToBeDrawn,
+	PointX,		-- The x coordinate.
+	PointY,		-- The y coordinate.
+	PointX,		-- The width of the rectangle.
+	PointY)		-- The height of the rectangle.
+			- (i,i,i,i,i);
+draw_image(
+	ImageToBeDrawn,
+	PointX,		-- The x coordinate.
+	PointY,		-- The y coordinate.
+	PointX,		-- The width of the rectangle.
+	PointY,		-- The height of the rectangle.
+	Color)		- (i,i,i,i,i,i);
+draw_image(
+	ImageToBeDrawn,
+	PointX,		-- The x coordinate of the first corner
+			-- of the destination rectangle.
+	PointY,		-- The y coordinate of the first corner
+			-- of the destination rectangle.
+	PointX,		-- The x coordinate of the second corner
+			-- of the destination rectangle.
+	PointY,		-- The y coordinate of the second corner
+			-- of the destination rectangle.
+	PointX,		-- The x coordinate of the first corner
+			-- of the source rectangle.
+	PointY,		-- The y coordinate of the first corner
+			-- of the source rectangle.
+	PointX,		-- The x coordinate of the second corner
+			-- of the source rectangle.
+	PointY)		-- The y coordinate of the second corner
+			-- of the source rectangle.
+			- (i,i,i,i,i,i,i,i,i);
+draw_image(
+	ImageToBeDrawn,
+	PointX,		-- The x coordinate of the first corner
+			-- of the destination rectangle.
+	PointY,		-- The y coordinate of the first corner
+			-- of the destination rectangle.
+	PointX,		-- The x coordinate of the second corner
+			-- of the destination rectangle.
+	PointY,		-- The y coordinate of the second corner
+			-- of the destination rectangle.
+	PointX,		-- The x coordinate of the first corner
+			-- of the source rectangle.
+	PointY,		-- The y coordinate of the first corner
+			-- of the source rectangle.
+	PointX,		-- The x coordinate of the second corner
+			-- of the source rectangle.
+	PointY,		-- The y coordinate of the second corner
+			-- of the source rectangle.
+	Color)		- (i,i,i,i,i,i,i,i,i,i);
+--
+set_pen(PenAttributes)			- (i);
+set_brush(BrushAttributes)		- (i);
+--
+set_font(FontAttributes)		- (i);
+--
+set_text_alignment(
+	HorizontalAlignment,
+	VerticalAlignment)		- (i,i);
+--
+set_paint_mode;
+set_compositing_rule(
+	AlphaCompositingRule)		- (i);
+set_compositing_rule(
+	AlphaCompositingRule,Numerical)	- (i,i);
+set_XOR_mode(Color)			- (i);
+--
+set_rendering_mode(RenderingHints)	- (i);
+--
+mark_drawing() = DrawingMarker;
+retract_drawing(DrawingMarker)		- (i);
+undo_drawing;
+redo_drawing;
+--
+suspend_redrawing;
+draw_now;
+--
+get_image('BufferedImage')		- (i);
+--
+get_image(
+	'BufferedImage',
+	PointX,		-- The x coordinate of the upper-left corner
+			-- of the specified rectangular region.
+	PointY,		-- The y coordinate of the upper-left corner
+			-- of the specified rectangular region.
+	PointX,		-- The width of the specified region.
+	PointY)		-- The height of the specified region.
+			- (i,i,i,i,i);
+--
+save(FileName)					- (i);
+save(STRING)					- (i);
+save(FileName,ImageEncodingAttributes)		- (i,i);
+save(STRING,ImageEncodingAttributes)		- (i,i);
+--
+set_scaling_factor(ScalingFactor2D)		- (i);
+get_scaling_factor() = ScalingFactor2D;
+set_enable_scene_antialiasing(YesNo)		- (i);
+get_enable_scene_antialiasing() = YesNo;
+--
+-- These methods are to be implemented by the programmer:
+--
+mouse_clicked(MouseEvent)		- (i);
+mouse_entered(MouseEvent)		- (i);
+mouse_exited(MouseEvent)		- (i);
+mouse_pressed(MouseEvent)		- (i);
+mouse_released(MouseEvent)		- (i);
+mouse_dragged(MouseEvent)		- (i);
+mouse_moved(MouseEvent)			- (i);
+]
+--------------------------------------------------------------------
+
+DOMAINS:
+
+BufferedImageType	=
+			'default';
+			-- Represents an image that supports the
+			-- specified transparency and has a data
+			-- layout and color model compatible with
+			-- current graphics configuration.
+			-- The returned image has a layout and
+			-- color model that can be optimally blitted
+			-- to a device with this graphics
+			-- configuration.
+			'TYPE_3BYTE_BGR';
+			-- Represents an image with 8-bit RGB color
+			-- components, corresponding to a
+			-- Windows-style BGR color model, with the
+			-- colors Blue, Green, and Red stored in
+			-- 3 bytes.
+			'TYPE_4BYTE_ABGR';
+			-- Represents an image with 8-bit RGBA color
+			-- components with the colors Blue, Green,
+			-- and Red stored in 3 bytes and 1 byte of
+			-- alpha.
+			'TYPE_4BYTE_ABGR_PRE';
+			-- Represents an image with 8-bit RGBA color
+			-- components with the colors Blue, Green,
+			-- and Red stored in 3 bytes and 1 byte of
+			-- alpha.
+			'TYPE_BYTE_BINARY';
+			-- Represents an opaque byte-packed 1, 2, or
+			-- 4 bit image.
+			'TYPE_BYTE_GRAY';
+			-- Represents a unsigned byte grayscale
+			-- image, non-indexed.
+			'TYPE_BYTE_INDEXED';
+			-- Represents an indexed byte image.
+			'TYPE_INT_ARGB';
+			-- Represents an image with 8-bit RGBA color
+			-- components packed into integer pixels.
+			'TYPE_INT_ARGB_PRE';
+			-- Represents an image with 8-bit RGBA color
+			-- components packed into integer pixels.
+			'TYPE_INT_BGR';
+			-- Represents an image with 8-bit RGB color
+			-- components, corresponding to a Windows-
+			-- or Solaris- style BGR color model, with
+			-- the colors Blue, Green, and Red packed
+			-- into integer pixels.
+			'TYPE_INT_RGB';
+			-- Represents an image with 8-bit RGB color
+			-- components packed into integer pixels.
+			'TYPE_USHORT_555_RGB';
+			-- Represents an image with 5-5-5 RGB color
+			-- components (5-bits red, 5-bits green,
+			-- 5-bits blue) with no alpha.
+			'TYPE_USHORT_565_RGB';
+			-- Represents an image with 5-6-5 RGB color
+			-- components (5-bits red, 6-bits green,
+			-- 5-bits blue) with no alpha.
+			'TYPE_USHORT_GRAY'.
+			-- Represents an unsigned short grayscale
+			-- image, non-indexed).
+--
+ImageTransparency	= 'default';
+			  'OPAQUE'; 'BITMASK'; 'TRANSLUCENT'.
+
+--------------------------------------------------------------------
+-- The 'BufferedImage' class is                                   --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+interface 'BufferedImage'
+
+(specialized
+	'DataAbstraction',
+	'OperatingSystemResource',
+	'DataResourceConsumer',
+	'WritableImageProducer'):
+
+width				: Width;
+height				: Height;
+--
+image_type			: BufferedImageType;
+image_transparency		: ImageTransparency;
+
+[
+IMPERATIVES:
+--
+create;
+create(PointX,PointY)				- (i,i);
+create(PointX,PointY,BufferedImageType)		- (i,i,i);
+--
+set_pixel(
+	PointX,PointY,
+	Numerical,Numerical,Numerical)		- (i,i,i,i,i);
+set_pixel(PointX,PointY,Color)			- (i,i,i);
+--
+get_pixel(
+	PointX,PointY,
+	INTEGER,INTEGER,INTEGER)		- (i,i,o,o,o);
+get_pixel(PointX,PointY,Color)			- (i,i,o);
+--
+save;
+save(FileName)					- (i);
+save(STRING)					- (i);
+save(FileName,ImageEncodingAttributes)		- (i,i);
+save(STRING,ImageEncodingAttributes)		- (i,i);
+--
+load;
+load(FileName)					- (i);
+load(STRING)					- (i);
+load(FileName,INTEGER,INTEGER,INTEGER,INTEGER)	- (i,i,i,i,i);
+load(STRING,INTEGER,INTEGER,INTEGER,INTEGER)	- (i,i,i,i,i);
+--
+set_binary(BINARY)				- (i);
+get_binary() = BINARY;
+--
+set_width(Width)				- (i);
+get_width() = Width;
+--
+set_height(Height)				- (i);
+get_height() = Height;
+--
+set_default_size(Width,Height)			- (i,i);
+get_default_size(Width,Height)			- (o,o);
+set_actual_size(Width,Height)			- (i,i);
+get_actual_size(Width,Height)			- (o,o);
+get_size_in_pixels(INTEGER,INTEGER)		- (o,o);
+--
+set_image_type(BufferedImageType)		- (i);
+get_image_type() = BufferedImageType;
+--
+set_image_transparency(ImageTransparency)	- (i);
+get_image_transparency() = ImageTransparency;
+]
+
+--------------------------------------------------------------------
+-- The 'WritableImageProducer' interface.                         --
+--------------------------------------------------------------------
+
+interface 'WritableImageProducer':
+--
+image_encoding_attributes	: ImageEncodingAttributes;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_image_encoding_attributes(ImageEncodingAttributes)	- (i);
+get_image_encoding_attributes() = ImageEncodingAttributes;
+]

@@ -1,0 +1,659 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014-2017 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+DOMAINS:
+--
+reference:
+--
+ItemList		= STRING; ItemList*.
+YesNoUnknown		= 'yes'; 'no'; 'unknown'.
+--
+ground:
+--
+GraphAnalysisMethod	= 'off';
+			  'method_one';
+			  'method_two';
+			  'method_three';
+			  'method_four'.
+--
+IsAnomalous		= 'yes'; 'no'.
+--
+DepthOfSearch		= INTEGER.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	inverse_transformation_matrix	: TransformationMatrix;
+	sampling_rate			: REAL;
+--
+	stage_one		: 'ImagePreprocessor';
+	stage_two		: 'ImageAnalyzer';
+--
+internal:
+--
+	low_level_analyzer	: 'ExtendedImageSubtractor';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ImagePreprocessor' (specialized 'Timer'):
+--
+constant:
+--
+	sampling_rate		: REAL;
+--
+	low_level_analyzer	: 'VideoProcessingMachine';
+	stage_two		: 'ImageAnalyzer';
+--
+internal:
+--
+	subtractor		: 'SynchronizedVideoProcessingMachine';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	state			: 'ProgramState';
+	con			: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_target_data_directry(STRING,INTEGER)	- (i,i);
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ExtendedImageSubtractor'
+	(specialized 'VideoProcessingMachine'):
+--
+constant:
+--
+control_dialog		: 'ImageAnalyzer';
+--
+internal:
+--
+mode			: 'ExtendedImageSubtractorMode';
+--
+constant:
+--
+extract_blobs					: YesNo;
+track_blobs					: YesNo;
+use_grayscale_colors				: YesNo;
+apply_gaussian_filtering_to_background		: YesNo;
+background_gaussian_filter_radius		: INTEGER;
+apply_rank_filtering_to_background		: YesNo;
+background_rank_filter_threshold		: INTEGER;
+background_standard_deviation_factor		: REAL;
+contour_foreground				: YesNo;
+refuse_slow_tracks				: YesNo;
+fuzzy_velocity_threshold			: REAL;
+fuzzy_distance_threshold			: REAL;
+fuzzy_threshold_border				: REAL;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+store_VPM_program;
+apply_gaussian_filtering_if_necessary(YesNo)	- (i);
+apply_background_subtraction(YesNo)		- (i);
+apply_rank_filtering(YesNo)			- (i);
+apply_slow_track_deletion(YesNo)		- (i);
+--
+request_subtractor_mode;
+--
+set_blob_extraction_mode(YesNo)			- (i);
+set_blob_tracking_mode(YesNo)			- (i);
+set_grayscale_mode(YesNo)			- (i);
+set_background_gaussian_filtering_mode(YesNo)	- (i);
+set_background_gaussian_filter_radius(INTEGER)	- (i);
+set_background_rank_filtering_mode(YesNo)	- (i);
+set_background_rank_filter_threshold(INTEGER)	- (i);
+set_background_standard_deviation_factor(REAL)	- (i);
+set_velocity_median_filtering_mode(YesNo)	- (i);
+set_velocity_median_filter_halfwidth(INTEGER)	- (i);
+set_foreground_contouring_mode(YesNo)		- (i);
+set_slow_tracks_deletion_mode(YesNo)		- (i);
+set_fuzzy_velocity_threshold(REAL)		- (i);
+set_fuzzy_distance_threshold(REAL)		- (i);
+set_fuzzy_threshold_border(REAL)		- (i);
+]
+-----------------------------------------------------------------------
+interface 'ExtendedImageSubtractorMode' (specialized 'Database'):
+--
+constant:
+--
+extract_blobs					: YesNo;
+track_blobs					: YesNo;
+use_grayscale_colors				: YesNo;
+apply_gaussian_filtering_to_background		: YesNo;
+background_gaussian_filter_radius		: INTEGER;
+apply_rank_filtering_to_background		: YesNo;
+background_rank_filter_threshold		: INTEGER;
+background_standard_deviation_factor		: REAL;
+contour_foreground				: YesNo;
+refuse_slow_tracks				: YesNo;
+fuzzy_velocity_threshold			: REAL;
+fuzzy_distance_threshold			: REAL;
+fuzzy_threshold_border				: REAL;
+--
+[
+DOMAINS:
+--
+Target	=	blob_extraction_mode(YesNo);
+		blob_tracking_mode(YesNo);
+		grayscale_mode(YesNo);
+		background_gaussian_filtering_mode(YesNo);
+		background_gaussian_filter_radius(INTEGER);
+		background_rank_filtering_mode(YesNo);
+		background_rank_filter_threshold(INTEGER);
+		background_standard_deviation_factor(REAL);
+		foreground_contouring_mode(YesNo);
+		slow_tracks_deletion_mode(YesNo);
+		fuzzy_velocity_threshold(REAL);
+		fuzzy_distance_threshold(REAL);
+		fuzzy_threshold_border(REAL).
+--
+PREDICATES:
+--
+imperative:
+--
+get_blob_extraction_mode(YesNo)			- (o);
+set_blob_extraction_mode(YesNo)			- (i);
+--
+get_blob_tracking_mode(YesNo)			- (o);
+set_blob_tracking_mode(YesNo)			- (i);
+--
+get_grayscale_mode(YesNo)			- (o);
+set_grayscale_mode(YesNo)			- (i);
+--
+get_background_gaussian_filtering_mode(YesNo)	- (o);
+set_background_gaussian_filtering_mode(YesNo)	- (i);
+--
+get_background_gaussian_filter_radius(INTEGER)	- (o);
+set_background_gaussian_filter_radius(INTEGER)	- (i);
+--
+get_background_rank_filtering_mode(YesNo)	- (o);
+set_background_rank_filtering_mode(YesNo)	- (i);
+--
+get_background_rank_filter_threshold(INTEGER)	- (o);
+set_background_rank_filter_threshold(INTEGER)	- (i);
+--
+get_background_standard_deviation_factor(REAL)	- (o);
+set_background_standard_deviation_factor(REAL)	- (i);
+--
+get_foreground_contouring_mode(YesNo)		- (o);
+set_foreground_contouring_mode(YesNo)		- (i);
+--
+get_slow_tracks_deletion_mode(YesNo)		- (o);
+set_slow_tracks_deletion_mode(YesNo)		- (i);
+--
+get_fuzzy_velocity_threshold(REAL)		- (o);
+set_fuzzy_velocity_threshold(REAL)		- (i);
+--
+get_fuzzy_distance_threshold(REAL)		- (o);
+set_fuzzy_distance_threshold(REAL)		- (i);
+--
+get_fuzzy_threshold_border(REAL)		- (o);
+set_fuzzy_threshold_border(REAL)		- (i);
+]
+-----------------------------------------------------------------------
+interface 'ImageAnalyzer' (specialized 'Dialog'):
+--
+constant:
+--
+	low_level_analyzer	: 'ExtendedImageSubtractor';
+	preprocessor		: 'ImagePreprocessor';
+--
+	running_speed_threshold_value			: REAL;
+	running_speed_threshold_halfwidth		: REAL;
+	walking_speed_threshold_value			: REAL;
+	walking_speed_threshold_halfwidth		: REAL;
+	movement_duration_threshold_value		: REAL;
+	movement_duration_threshold_halfwidth		: REAL;
+	shape_coefficient_threshold_value		: REAL;
+	shape_coefficient_threshold_halfwidth		: REAL;
+	running_wr2_cardinality_threshold_value		: INTEGER;
+	running_wr2_cardinality_threshold_halfwidth	: INTEGER;
+	running_wr2_mean_threshold_value		: REAL;
+	running_wr2_mean_threshold_halfwidth		: REAL;
+	running_wr2_skewness_threshold_value		: REAL;
+	running_wr2_skewness_threshold_halfwidth	: REAL;
+--
+	velocity_bound_1			: REAL;
+	velocity_bound_2			: REAL;
+	velocity_bound_3			: REAL;
+	velocity_bound_4			: REAL;
+	velocity_bound_5			: REAL;
+	velocity_bound_6			: REAL;
+	velocity_bound_7			: REAL;
+	velocity_bound_8			: REAL;
+--
+	velocity_color_1			: Color;
+	velocity_color_2			: Color;
+	velocity_color_3			: Color;
+	velocity_color_4			: Color;
+	velocity_color_5			: Color;
+	velocity_color_6			: Color;
+	velocity_color_7			: Color;
+	velocity_color_8			: Color;
+	velocity_color_9			: Color;
+--
+	maximal_depth_of_search			: DepthOfSearch;
+--
+	sampling_rate		: REAL;
+	circle_radius		: REAL;
+
+--
+internal:
+--
+	subtractor		: 'SynchronizedVideoProcessingMachine';
+	graphic_window		: 'Canvas2D';
+	prompt_window		: 'Report';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	timer			: 'Timer';
+	con			: 'Console';
+	env			: 'DesktopWindow';
+	files			: 'File';
+--
+variable:
+--
+	target_image		: ItemList;
+	target_objects		: ItemList;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+draw_scene;
+draw_target_image(ItemList)			- (i);
+draw_target_objects(ItemList,FrameNumber)	- (i,i);
+--
+draw_blobs(PointX,PointY,BlobList)		- (i,i,i);
+draw_blob(PointX,PointY,Blob)			- (i,i,i);
+--
+draw_blob_identifier(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER)		- (i,i,i,i,i);
+--
+draw_tracks(PointX,PointY,TrackList)		- (i,i,i);
+draw_track(PointX,PointY,Track)			- (i,i,i);
+--
+draw_track_segments(
+	PointX,
+	PointY,
+	INTEGER,
+	TrackSegmentList)	- (i,i,i,i);
+draw_track_segment(
+	PointX,
+	PointY,
+	INTEGER,
+	TrackSegment)		- (i,i,i,i);
+--
+draw_circle(PointX,PointY)	- (i,i);
+--
+draw_track_identifier(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER)		- (i,i,i,i,i);
+--
+draw_graphs(
+	PointX,
+	PointY,
+	GraphList,
+	INTEGER,
+	GraphAnalysisMethod,
+	FrameNumber)		- (i,i,i,i,i,i);
+--
+determ:
+--
+do_analyse_graph(GraphAnalysisMethod)		- (i);
+--
+is_a_kind_of_a_running_away(
+	GraphAnalysisMethod,
+	ConnectedGraph,
+	INTEGER,
+	ConnectedGraph,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	ConnectedGraphEdge,
+	EdgeNumber)		- (i,i,i,i,o,o,o,o,o,o);
+contains_a_fast_object(
+	EdgeNumbers,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_fast_object(
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_fast_object(
+	FrameNumber,
+	FrameNumber,
+	REAL,
+	REAL,
+	REAL)			- (i,i,i,o,o);
+contains_a_running_person(
+	EdgeNumbers,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_running_person(
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+fast_object_is_a_runner(
+	REAL,
+	REAL,
+	REAL,
+	REAL,
+	INTEGER)		- (i,i,i,i,i);
+contains_a_slow_object(
+	EdgeNumbers,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_slow_object(
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	REAL,
+	REAL,
+	EdgeNumber,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,o,o,o,i,o,i);
+is_a_slow_object(
+	FrameNumber,
+	FrameNumber,
+	REAL,
+	REAL,
+	REAL)			- (i,i,i,o,o);
+is_a_meeting(
+	EdgeNumbers,
+	ConnectedGraph,
+	EdgeNumbers,
+	ConnectedGraphEdge,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	DepthOfSearch)		- (i,i,i,i,i,i,o,o,i);
+is_a_delay(
+	ConnectedGraphEdge,
+	ConnectedGraphEdge)	- (i,i);
+does_not_contain_person(
+	EdgeNumbers,
+	EdgeNumber,
+	ConnectedGraph,
+	EdgeNumbers)		- (i,i,i,i);
+--
+is_not_element(
+	EdgeNumber,
+	EdgeNumbers)		- (i,i);
+--
+imperative:
+--
+delete_element(
+	EdgeNumber,
+	EdgeNumbers,
+	EdgeNumbers)		- (i,i,o);
+--
+imperative:
+--
+fuzzy_metrics(REAL,REAL,REAL) = REAL		- (i,i,i);
+fuzzy_metrics(INTEGER,INTEGER,INTEGER) = REAL	- (i,i,i);
+--
+imperative:
+--
+draw_graph(
+	PointX,
+	PointY,
+	ConnectedGraph,
+	ConnectedGraph,
+	IsAnomalous,
+	GraphAnalysisMethod,
+	INTEGER,
+	FrameNumber)		- (i,i,i,i,i,i,i,i);
+--
+draw_edge(
+	PointX,
+	PointY,
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	IsAnomalous,
+	GraphAnalysisMethod,
+	INTEGER,
+	FrameNumber)		- (i,i,i,i,i,i,i,i);
+--
+recognize_object(
+	FrameNumber,
+	FrameNumber,
+	REAL,
+	REAL,
+	REAL,
+	REAL,
+	REAL,
+	INTEGER,
+	STRING)			- (i,i,i,i,i,i,i,i,o);
+recognize_fast_object(
+	REAL,
+	REAL,
+	REAL,
+	REAL,
+	INTEGER,
+	STRING)			- (i,i,i,i,i,o);
+--
+draw_graph_identifier(
+	GraphAnalysisMethod,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER)		- (i,i,i,i,i,i);
+--
+draw_origins(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	EdgeNumbers,
+	ConnectedGraph)		- (i,i,i,i,i,i);
+draw_origin(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	EdgeNumber,
+	ConnectedGraph)		- (i,i,i,i,i,i);
+draw_origin_arrow(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+--
+determ:
+--
+get_edge(
+	INTEGER,
+	ConnectedGraph,
+	ConnectedGraphEdge)	- (i,i,o);
+--
+imperative:
+--
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	TrackOfBlob,
+	IsAnomalous,
+	REAL)			- (i,i,i,i,i);
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	TrackOfBlob,
+	IsAnomalous,
+	REAL)			- (i,i,i,i,i,i,i);
+--
+select_line_color
+	(IsAnomalous,REAL,Color,INTEGER)	- (i,i,o,o);
+select_line_color(REAL,Color)			- (i,o);
+--
+draw_rectangle(
+	IsAnomalous,
+	EdgeNumbers,
+	TrackOfBlob,
+	PointX,
+	PointY,
+	FrameNumber,
+	STRING,
+	INTEGER,
+	FrameNumber,
+	FrameNumber)		- (i,i,i,i,i,i,i,i,i,i);
+draw_colored_rectangle(
+	TrackOfBlob,
+	PointX,
+	PointY,
+	FrameNumber,
+	Color,
+	INTEGER,
+	STRING,
+	INTEGER,
+	FrameNumber,
+	FrameNumber)		- (i,i,i,i,i,i,i,i,i,i);
+--
+restore_settings;
+--
+assign_mode(
+	YesNo,
+	YesNo,
+	INTEGER,
+	YesNo,
+	INTEGER,
+	REAL,
+	YesNo,
+	INTEGER,
+	YesNo,
+	REAL,
+	REAL,
+	REAL)			- (i,i,i,i,i,i,i,i,i,i,i,i);
+--
+ynu2yn(YesNoUnknown,YesNo)				- (i,o);
+--
+switch_background_gaussian_filter_radius(YesNo)		- (i);
+switch_background_rank_filter_threshold(YesNo)		- (i);
+switch_velocity_median_filter_halfwidth(YesNo)		- (i);
+switch_fuzzy_thresholds(YesNo)				- (i);
+--
+dump_graphs(ItemList,GraphList)				- (i,i);
+dump_graphs(GraphAnalysisMethod,GraphList,INTEGER)	- (i,i,i);
+--
+report_obtained_edges(
+	GraphAnalysisMethod,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	ConnectedGraphEdge,
+	EdgeNumber,
+	EdgeNumber)		- (i,i,i,i,i,i);
+report_delay_attributes(
+	ConnectedGraphEdge,
+	ConnectedGraphEdge)	- (i,i);
+--
+dump_graph(
+	ConnectedGraph,
+	ConnectedGraph,
+	INTEGER)		- (i,i,i);
+--
+check_edge(ConnectedGraphEdge,ConnectedGraph)	- (i,i);
+report_metrics_value(REAL,Color,Color)		- (i,i,i);
+dump_edge(ConnectedGraphEdge)			- (i);
+--
+draw_legend;
+--
+report_time(FrameNumber)			- (i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= current_directory(STRING,INTEGER);
+		  beginning_time(INTEGER);
+		  current_frame(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_target_directory(STRING,INTEGER)	- (o,o);
+get_beginning_time(INTEGER)		- (o);
+get_current_frame(INTEGER)		- (o);
+--
+imperative:
+--
+set_target_directory(STRING,INTEGER)	- (i,i);
+set_beginning_time(INTEGER)		- (i);
+set_current_frame(INTEGER)		- (i);
+]
+-----------------------------------------------------------------------

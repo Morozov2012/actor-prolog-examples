@@ -1,0 +1,89 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+write_character_set(CharacterSet)	- (i);
+test2(CharacterSet)			- (i);
+--
+class 'Main' (specialized 'File'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2('ISO_8859_1'),
+	test1,
+	test2('US_ASCII'),
+	test1,
+	test2('UTF_16'),
+	test1,
+	test2('UTF_16BE'),
+	test1,
+	test2('UTF_16LE'),
+	test1,
+	test2('UTF_8'),
+	test1,
+	test2('default'),
+	test1,
+	test2('none'),
+	test1,
+	test2("MyCharacterSet"),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_character_set(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	Name== ?get_character_set(),!,
+	con ? set_color('Black'),
+	con ? write("Character set: "),
+	con ? set_color('Violet'),
+	write_character_set(Name),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+write_character_set(Name):-
+	symbol(Name),!,
+	con ? writeln("'",Name,"'").
+write_character_set(Name):-
+	con ? writeln("\"",Name,"\"").
+--
+test2(Name):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_character_set(Name),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

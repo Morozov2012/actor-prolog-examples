@@ -1,0 +1,11 @@
+mesh(80,25)
+dialog_font("Times New Roman",14)
+dialog 'Output' (
+          "",default,default,default,
+          centered,centered,'Cyan')
+     vbox(center)
+          "Selected papers about Actor Prolog:"
+          listbox['UseTabStops'](results,0000,29,4,[],[])
+          button(close,"&Exit")
+     end_of_vbox
+end_of_dialog

@@ -1,0 +1,56 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+constant:
+--
+list	: S_List	= [	"one","two","three",
+				"four","five","six",
+				"seven","eight","nine",
+				"ten"];
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3.
+--
+test1:-
+	writeln("Test 1:"),
+	?select_item(list,3,Name,Number),!,
+	writeln("\t",Number," : ",Name).
+test1:-
+	writeln("\tThe input was canceled by the user.").
+--
+test2:-
+	writeln("Test 2:"),
+	?select_item(
+		"Select an item, please",
+		list,3,Name,Number),!,
+	writeln("\t",Number," : ",Name).
+test2:-
+	writeln("\tThe input was canceled by the user.").
+--
+test3:-
+	writeln("Test 3:"),
+	?select_item(
+		"Item selection",
+		"Select an item, please",
+		list,3,Name,Number),!,
+	writeln("\t",Number," : ",Name).
+test3:-
+	writeln("\tThe input was canceled by the user.").
+]
+-----------------------------------------------------------------------

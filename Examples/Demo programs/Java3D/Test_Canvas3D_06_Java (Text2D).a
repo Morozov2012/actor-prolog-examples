@@ -1,0 +1,94 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+class 'Main' (specialized 'Canvas3D'):
+[
+goal:-!,
+	YPos1== -0.5,
+	YPos2== YPos1 + 0.5,
+	YPos3== YPos2 + 0.5,
+	MaximumAngle== ?pi()*2.0,
+	show([
+		'TransformGroup'({
+			transform3D: 'Transform3D'({
+				scale: 0.4
+				}),
+			branches: [
+				'TransformGroup'({
+					transform3D: 'Transform3D'({
+						translation: [0,YPos1,0]
+						}),
+					branches: [
+						'TransformGroup'({
+							allowTransformWrite: 'yes',
+							branches: [
+								'Text2D'({
+									string: "Rotating Yellow Text",
+									color: color3(1,1,0),
+									fontName: "Serif",
+									fontSize: 60,
+									fontStyle: 'bold',
+									cullFace: 'CULL_NONE'
+									}),
+								'RotationInterpolator'({
+									alpha: 'Alpha3D'({
+										loopCount: -1,
+										increasingEnable: 'yes',
+										decreasingEnable: 'no',
+										triggerTime: 0,
+										phaseDelayDuration: 0,
+										increasingAlphaDuration: 4000,
+										increasingAlphaRampDuration: 0,
+										alphaAtOneDuration: 0,
+										decreasingAlphaDuration: 0,
+										decreasingAlphaRampDuration: 0,
+										alphaAtZeroDuration: 0
+										}),
+									transformAxis: 'Transform3D'({}),
+									minimumAngle: 0.0,
+									maximumAngle: MaximumAngle,
+									schedulingBounds: 'BoundingSphere'({
+										center: p(0.0,0.0,0.0),
+										radius: 100.0
+										})
+									})
+								]
+							})
+						]
+					}),
+				'TransformGroup'({
+					transform3D: 'Transform3D'({
+						translation: [0,YPos2,0]
+						}),
+					branches: [
+						'Text2D'({
+							string: "Blue 40point Text",
+							color: color3(0,0,1),
+							fontName: "Serif",
+							fontSize: 40,
+							fontStyle: 'bold'
+							})
+						]
+					}),
+				'TransformGroup'({
+					transform3D: 'Transform3D'({
+						translation: [0,YPos3,0]
+						}),
+					branches: [
+						'Text2D'({
+							string: "Green Italic Text",
+							color: color3(0,1,0),
+							fontName: "Serif",
+							fontSize: 70,
+							fontStyle: 'italic'
+							})
+						]
+					})
+				]
+			})
+		]).
+]

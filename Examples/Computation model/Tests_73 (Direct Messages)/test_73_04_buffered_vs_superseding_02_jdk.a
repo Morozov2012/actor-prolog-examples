@@ -1,0 +1,119 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+send_buffered_messages;
+loop1(INTEGER,INTEGER)				- (i,i);
+--
+send_superseding_messages;
+loop2(INTEGER,INTEGER)				- (i,i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+	p1	= (('Receiver'));
+--
+internal:
+--
+	env	= ('Timer');
+	con	= ('Report',
+			y= 0,
+			height= 10);
+--
+[
+goal:-!,
+	Time1== env?time(),
+	con ? writeln("Current time is: ",Time1),
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"Sender: ",
+		"I will send buffered messages."),
+	send_buffered_messages,
+	con ? set_color('default'),
+	Time2== env?time(),
+	con ? writeln("Current time is: ",Time2),
+	con ? set_color('Black','Pink'),
+	con ? writeln(
+		"Sender: ",
+		"I will send superseding messages."),
+	send_superseding_messages,
+	con ? set_color('default'),
+	Time3== env?time(),
+	con ? writeln("Current time is: ",Time3).
+--
+send_buffered_messages:-
+	p1 << message1("First message1"),
+	loop1(1,5),
+	p1 << message1("Last message1").
+--
+loop1(N,Max):-
+	N <= Max,!,
+	MessageA== "information message1 #" + ?convert_to_string(N),
+	p1 << message1(MessageA),
+	MessageB== "switching message1 #" + ?convert_to_string(N),
+	p1 <- message1(MessageB),
+	loop1(N+1,Max).
+loop1(_,_).
+--
+send_superseding_messages:-
+	p1 << message2("First message2"),
+	loop2(1,5),
+	p1 << message2("Last message2").
+--
+loop2(N,Max):-
+	N <= Max,!,
+	MessageA== "information message2 #" + ?convert_to_string(N),
+	p1 [<<] message2(MessageA),
+	MessageB== "switching message2 #" + ?convert_to_string(N),
+	p1 [<-] message2(MessageB),
+	loop2(N+1,Max).
+loop2(_,_).
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Alpha'):
+--
+internal:
+--
+	env	= ('Timer');
+	con	= ('Report',
+			y= 10,
+			height= 15);	
+--
+[
+PREDICATES:
+--
+imperative:
+--
+message1(STRING)		- (i);
+message2(STRING)		- (i);
+--
+CLAUSES:
+--
+goal:-!.
+--
+message1(Text):-
+	Time== env?time(),
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"Receiver: ",
+		"I have received message1: \"",
+		Text,"\" at ",Time),
+	con ? set_color('default'),
+	env ? sleep(0.5).
+--
+message2(Text):-
+	Time== env?time(),
+	con ? set_color('Black','Pink'),
+	con ? writeln(
+		"Receiver: ",
+		"I have received message2: \"",
+		Text,"\" at ",Time),
+	con ? set_color('default'),
+	env ? sleep(0.5).
+]
+-----------------------------------------------------------------------

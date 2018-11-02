@@ -1,0 +1,34 @@
+padding(1,1)
+-- draft('on')
+
+dialog 'Demo' ("Demo",default,default,default,centered,centered,default)
+grid
+row
+	column
+	end_of_column
+	column
+		"< --------------- Text position --------------- >"
+	end_of_column
+end_of_row
+row(justify)
+	column
+		text(1001,10,10,"Text2")
+	end_of_column
+	column(justify)
+		vbox
+		-- hbox
+		groupbox("Groupbox")
+		vbox
+		button("first","First")
+		button("second","Second")
+		button("third","Third")
+		-- button("fourth","Fourth")
+		-- button("fifth","Fifth")
+		end_of_vbox
+		end_of_groupbox
+		-- end_of_hbox
+		end_of_vbox
+	end_of_column
+end_of_row
+end_of_grid
+end_of_dialog

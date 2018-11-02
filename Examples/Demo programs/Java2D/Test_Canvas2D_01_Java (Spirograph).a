@@ -1,0 +1,51 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java2D";
+
+class 'Main' (specialized 'Canvas2D'):
+--
+constant:
+--
+	background_color		= 'White';
+	scaling_factor			= 'INDEPENDENT';
+	enable_scene_antialiasing	= 'yes';
+--
+constant:
+--
+	r1				= 60;
+	r2				= 50;
+	p				= 70;
+	s				= 400;
+	n_points			= 1000;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+drawing_loop(
+	INTEGER,INTEGER,
+	PointX,PointY)		- (i,i,i,i);
+--
+CLAUSES:
+--
+goal:-!,
+	translate(0.5,0.5),
+	set_scaling_factor('MIN'),
+	X1== (r1+r2-p)/s,
+	Y1== 0.0,
+	drawing_loop(0,n_points,X1,Y1),
+	show.
+--
+drawing_loop(N,MaxN,X1,Y1):-
+	N < MaxN,!,
+	T== N*?pi()/90,
+	X2== ((r1+r2)*?cos(T)-p*?cos((r1+r2)*T/r2))/s,
+	Y2== ((r1+r2)*?sin(T)-p*?sin((r1+r2)*T/r2))/s,
+	draw_line(X1,Y1,X2,Y2),
+	drawing_loop(N+1,MaxN,X2,Y2).
+drawing_loop(_,_,_,_).
+]

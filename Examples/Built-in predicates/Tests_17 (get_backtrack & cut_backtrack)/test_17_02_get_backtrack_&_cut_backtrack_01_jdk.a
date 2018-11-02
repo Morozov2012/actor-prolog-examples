@@ -1,0 +1,76 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N	= INTEGER; REAL.
+--
+PREDICATES:
+--
+nondeterm:
+--
+p1;
+p2(N)		- (i);
+p3(N)		- (i);
+p4;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+PREDICATES:
+
+imperative:
+
+cut_backtrack(N)	- (i);
+
+CLAUSES:
+
+goal:-
+	p1,
+	fail.
+--
+p1:-
+	con ? writeln("p1, clause 1."),
+	Top== ?get_backtrack(),
+	con ? writeln("Current choise point: ",Top),
+	p2(Top).
+p1:-
+	con ? writeln("p1, clause 2.").
+p1:-
+	con ? writeln("p1, clause 3.").
+--
+p2(Top):-
+	con ? writeln("p2, clause 1."),
+	p3(Top).
+p2(_):-
+	con ? writeln("p2, clause 2.").
+p2(_):-
+	con ? writeln("p2, clause 3.").
+--
+p3(Top):-
+	con ? writeln("p3, clause 1."),
+	cut_backtrack(Top),
+	con ? writeln("Disable choise points up to: ",Top),
+	p4.
+p3(_):-
+	con ? writeln("p3, clause 2.").
+p3(_):-
+	con ? writeln("p3, clause 3.").
+--
+p4:-
+	con ? writeln("p4, clause 1.").
+p4:-
+	con ? writeln("p4, clause 2.").
+p4:-
+	con ? writeln("p4, clause 3.").
+]
+-----------------------------------------------------------------------

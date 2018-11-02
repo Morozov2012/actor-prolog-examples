@@ -1,0 +1,62 @@
+----------------------------------------------------
+-- An example of Actor Prolog program.            --
+-- (c) 2002-2011, IRE RAS, Alexei A. Morozov.     --
+-- Retrieving Web information with the help       --
+-- of the Google search engine.                   --
+----------------------------------------------------
+import "Morozov/Web/Data/Address";
+import "Morozov/Web/Data/Keywords";
+import 'Rambler'  as 'Engine'
+		 from "Morozov/Web/Engines/Rambler";
+import 'SearchEngine'
+		 from "Morozov/Web/Engines/Core";
+import 'EngineInput'
+		 from "Morozov/Web/Engines/Control";
+import 'EngineOutput'
+		 from "Morozov/Web/Engines/Core";
+import 'TextWindow'
+		 from "Morozov/Web/Engines/Core";
+import 'Request' from "Morozov/Web/Engines/Request";
+import 'List'    from "Morozov/Web/Browsing/List";
+----------------------------------------------------
+interface 'Main'
+(specialized
+	'EngineInput',
+	'EngineOutput',
+	'TextWindow'):
+--
+internal:
+--
+	control	: 'Request';
+--
+	engine	: 'SearchEngine';
+--
+constant:
+--
+	demo	: 'Demonstrator';
+--
+protecting:
+--
+	results	: WebAddressList;
+--
+[
+]
+----------------------------------------------------
+interface 'Demonstrator':
+--
+variable:
+--
+	results	: WebAddressList;
+--
+internal:
+--
+	dialog	: 'Dialog';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+show;
+]
+----------------------------------------------------

@@ -1,0 +1,23 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+S1	= INTEGER; STRING.
+S2	= REAL.
+
+IMPERATIVES:
+
+p(S1)		- (i);
+
+CLAUSES:
+
+goal:-
+	p("Hello world!!!").
+--
+p(T):-
+	writeln(?cast("S2",T)),
+	set_color('Green'),
+	writeln("Test failed!").

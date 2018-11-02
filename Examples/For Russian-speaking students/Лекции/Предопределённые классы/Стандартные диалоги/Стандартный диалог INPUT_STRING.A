@@ -1,0 +1,11 @@
+
+CLAUSES:
+
+goal:-
+	S1== ?input_string("Как Вас зовут?",""),
+	
+	writeln(S1),
+	
+	S2== ?input_string("Ввод имени","Как Вас зовут?",""),
+	
+	writeln(S2).

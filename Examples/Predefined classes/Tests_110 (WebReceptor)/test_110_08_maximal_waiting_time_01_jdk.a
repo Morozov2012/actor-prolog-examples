@@ -1,0 +1,31 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+r	= ('WebReceptor',
+		-- maximal_waiting_time= 'default',
+		-- maximal_waiting_time= 'any',
+		-- maximal_waiting_time= seconds(1),
+		-- maximal_waiting_time= minutes(0.05),
+		-- maximal_waiting_time= hours(1),
+		-- maximal_waiting_time= days(1),
+		-- maximal_waiting_time= weeks(1),
+		-- maximal_waiting_time= months(0.1),
+		-- maximal_waiting_time= years(0.001),
+		maximal_waiting_time= 0.0001,
+		/*
+		location=
+			"data/report1.html");
+		*/
+		location=
+			"http://www.cplire.ru/Lab144/index.html");
+		/**/
+--
+[
+goal:-
+	Text== r ? get_content(),
+	writeln(Text).
+]
+-----------------------------------------------------------------------

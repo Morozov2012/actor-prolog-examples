@@ -1,0 +1,120 @@
+mesh(80,25)
+failure_color('Fuchsia')
+dialog_font(default,14)
+
+dialog 'DemoPanel' ("Demo Panel",default,default,default,centered,centered,default)
+vbox(center)
+	statictext("Example of dialog window")
+	statictext(7000,21,"Example of dialog window")
+	grid
+	row(center)
+	column(center)
+		vbox(center)
+			hbox
+				groupbox("Text Areas")
+					text(1010,7,2,"Text")
+					edittext(1020,7,2,"Text")
+					vbox
+						editname(1030,7,"Name")
+						editpassword(1040,7,"Name")
+					end_of_vbox
+					vbox
+						editinteger(1050,7,10000)
+						editreal(1060,7,9.10)
+					end_of_vbox
+				end_of_groupbox
+			end_of_hbox
+			hbox
+				radiobuttons(2010)
+					padding(4,1)
+						radiobutton("First")
+						radiobutton("Second")
+						radiobutton("Third")
+					end_of_padding
+				end_of_radiobuttons
+			end_of_hbox
+			hbox
+				vbox
+					groupbox("Checkboxes")
+						style(classic)
+							checkbox(3010,"Checkbox 1",'yes')
+						end_of_style
+						style(modern)
+							checkbox(3020,"Checkbox 2",'yes')
+						end_of_style
+					end_of_groupbox
+				end_of_vbox
+				groupbox("List Controls")
+					listbox['MultiSelect'](4011,4012,10,4,
+						[
+						"One",
+						"Two",
+						"Three",
+						"Four"
+						],
+						[
+						"One",
+						"Three"
+						]
+						)
+					vbox
+						listedit(4021,4022,10,7,
+							[
+							"One",
+							"Two",
+							"Three"
+							],
+							"One"
+							)
+						listbutton(4031,4032,10,7,
+							[
+							"One",
+							"Two",
+							"Three"
+							],
+							"One"
+							)
+					end_of_vbox
+				end_of_groupbox
+			end_of_hbox
+		end_of_vbox
+	end_of_column
+	column(center)
+		vscroll(5011,5012,15,[0,40],10)
+	end_of_column
+	end_of_row
+	row(justify)
+	column(center)
+		hscroll(5021,5022,40,[0,40],30)
+	end_of_column
+	column
+	end_of_column
+	end_of_row
+	end_of_grid
+		table(7010,7020,43,3,
+		[
+		title_color('Lemon','Maroon'),
+		background_color(default),
+		empty_cell_color('Gold'),
+		column("Name",10,center,'Emerald','Yellow'),
+		column("Sport",15,right,'Yellow','Navy'),
+		column("Age",5,center,default,default),
+		column("Vegan",7,left,'Orange','DkGreen')
+		],
+		[	["Kathy","Snowboarding",50,'no'],
+			["John","Rowing",30,'yes'],
+			["Sue","Knitting",20,'no'],
+			["Jane","Speed reading",20,'yes']
+		],
+		-- Initial set of selected rows:
+		[2,3])
+	hbox(center)
+		button("action","&Action")
+		scaling(1.2,1.3)
+			button("enable","&Enable")
+			button("disable","&Disable")
+		end_of_scaling
+		ok(close,"&Close")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

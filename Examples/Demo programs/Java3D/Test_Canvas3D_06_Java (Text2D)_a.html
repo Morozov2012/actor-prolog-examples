@@ -1,0 +1,109 @@
+<html>
+<head>
+<title>Actor Prolog. Example &quot;D:\MOROZOV\Z\Z-DJ\DEMO\EXE\EXAMPLES\DEMO PROGRAMS\JAVA3D\TEST_CANVAS3D_06_JAVA (TEXT2D).A&quot;</title>
+</head>
+<body bgcolor="#F0F0F0">
+<table align="center" bgcolor="#FFFFFF" cellpadding=30>
+<tr>
+<td>
+<pre>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+<font color="0000FF"><i>-- An example of Actor Prolog program.                               --</i></font>
+<font color="0000FF"><i>-- (c) 2012 IRE RAS Alexei A. Morozov                                --</i></font>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+
+<font color="7F7F00"><u>import</u></font> .. <font color="7F7F00"><u>from</u></font> <font color="0000FF">&quot;morozov/Java3D&quot;</font>;
+
+<font color="7F7F00"><u>class</u></font> 'Main' <font color="#993300">(</font><font color="7F7F00"><u>specialized</u></font> 'Canvas3D'<font color="#993300">)</font>:
+<font color="#800080">[</font>
+goal:-!,
+        <font color="#008000">YPos1</font>== -<font color="FF00FF">0.5</font>,
+        <font color="#008000">YPos2</font>== <font color="#008000">YPos1</font> + <font color="FF00FF">0.5</font>,
+        <font color="#008000">YPos3</font>== <font color="#008000">YPos2</font> + <font color="FF00FF">0.5</font>,
+        <font color="#008000">MaximumAngle</font>== <font color="#993300">?</font>pi<font color="#993300">()</font>*<font color="FF00FF">2.0</font>,
+        show<font color="#993300">(</font><font color="#800080">[</font>
+                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                scale: <font color="FF00FF">0.4</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                        branches: <font color="#800080">[</font>
+                                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                translation: <font color="#800080">[</font><font color="0000FF">0</font>,<font color="#008000">YPos1</font>,<font color="0000FF">0</font><font color="#800080">]</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                        branches: <font color="#800080">[</font>
+                                                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        allowTransformWrite: 'yes',
+                                                        branches: <font color="#800080">[</font>
+                                                                'Text2D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                                        string: <font color="0000FF">&quot;Rotating Yellow Text&quot;</font>,
+                                                                        color: c3<font color="#993300">(</font><font color="0000FF">1</font>,<font color="0000FF">1</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                                                                        fontName: <font color="0000FF">&quot;Serif&quot;</font>,
+                                                                        fontSize: <font color="0000FF">60</font>,
+                                                                        fontStyle: 'bold',
+                                                                        cullFace: 'CULL_NONE'
+                                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                                'RotationInterpolator'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                                        alpha: 'Alpha3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                                                loopCount: -<font color="0000FF">1</font>,
+                                                                                increasingEnable: 'yes',
+                                                                                decreasingEnable: 'no',
+                                                                                triggerTime: <font color="0000FF">0</font>,
+                                                                                phaseDelayDuration: <font color="0000FF">0</font>,
+                                                                                increasingAlphaDuration: <font color="0000FF">4000</font>,
+                                                                                increasingAlphaRampDuration: <font color="0000FF">0</font>,
+                                                                                alphaAtOneDuration: <font color="0000FF">0</font>,
+                                                                                decreasingAlphaDuration: <font color="0000FF">0</font>,
+                                                                                decreasingAlphaRampDuration: <font color="0000FF">0</font>,
+                                                                                alphaAtZeroDuration: <font color="0000FF">0</font>
+                                                                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                                        transformAxis: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{}</font><font color="#993300">)</font>,
+                                                                        minimumAngle: <font color="FF00FF">0.0</font>,
+                                                                        maximumAngle: <font color="#008000">MaximumAngle</font>,
+                                                                        schedulingBounds: 'BoundingSphere'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                                                center: p<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font><font color="#993300">)</font>,
+                                                                                radius: <font color="FF00FF">100.0</font>
+                                                                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                                <font color="#800080">]</font>
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                <font color="#800080">]</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                translation: <font color="#800080">[</font><font color="0000FF">0</font>,<font color="#008000">YPos2</font>,<font color="0000FF">0</font><font color="#800080">]</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                        branches: <font color="#800080">[</font>
+                                                'Text2D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        string: <font color="0000FF">&quot;Blue 40point Text&quot;</font>,
+                                                        color: c3<font color="#993300">(</font><font color="0000FF">0</font>,<font color="0000FF">0</font>,<font color="0000FF">1</font><font color="#993300">)</font>,
+                                                        fontName: <font color="0000FF">&quot;Serif&quot;</font>,
+                                                        fontSize: <font color="0000FF">40</font>,
+                                                        fontStyle: 'bold'
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                <font color="#800080">]</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                translation: <font color="#800080">[</font><font color="0000FF">0</font>,<font color="#008000">YPos3</font>,<font color="0000FF">0</font><font color="#800080">]</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                        branches: <font color="#800080">[</font>
+                                                'Text2D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        string: <font color="0000FF">&quot;Green Italic Text&quot;</font>,
+                                                        color: c3<font color="#993300">(</font><font color="0000FF">0</font>,<font color="0000FF">1</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                                                        fontName: <font color="0000FF">&quot;Serif&quot;</font>,
+                                                        fontSize: <font color="0000FF">70</font>,
+                                                        fontStyle: 'italic'
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                <font color="#800080">]</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                <font color="#800080">]</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                <font color="#800080">]</font><font color="#993300">)</font>.
+<font color="#800080">]</font>
+</pre>
+</td>
+</tr>
+</table>
+</body>
+</html>

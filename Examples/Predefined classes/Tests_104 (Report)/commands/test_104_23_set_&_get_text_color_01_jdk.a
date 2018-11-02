@@ -1,0 +1,58 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+Colors		= Color*.
+--
+PREDICATES:
+--
+imperative:
+--
+demo_colors(Colors)	- (i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Report'):
+--
+color_set	: Colors = [
+		  'Red', 'Green', 'DkGreen', 'Blue', 'Cyan',
+		  'Magenta', 'Yellow',
+		  'Black', 'DkGray', 'Gray', 'LtGray',
+		  'SystemControl', 'White',
+		  'Orange', 'Pink', 'Violet', 'Brown',
+		  'Silver', 'Maroon', 'Purple',
+		  'Fuchsia', 'Lime', 'Olive',
+		  'Navy', 'Teal', 'Aqua',
+		  'Terracotta', 'Lilac', 'Gold', 'Indigo',
+		  'RoyalBlue', 'Lemon', 'Emerald', 'SkyBlue',
+		  'default',
+		  "RED","GrEEn","blue",
+		  16#0000FF00#, 16#0000FF00.0#
+		  ];
+--
+font_name	= 'fixed';
+font_style	= 'bold';
+font_size	= 36;
+--
+[
+goal:-!,
+	Color0== ?get_text_color(),
+	writeln("Initial text color is ",Color0,"."),
+	demo_colors(color_set).
+--
+demo_colors([Color1|Rest]):-!,
+	set_text_color('default'),
+	writef("%15s ",?convert_to_string(Color1)),
+	set_color('White','SystemControl'),
+	write(" -> "),
+	set_color('default','default'),
+	set_text_color(Color1),
+	Color2== ?get_text_color(),
+	set_text_color(Color2),
+	writeln(" ",Color2),
+	demo_colors(Rest).
+demo_colors(_).
+]
+-----------------------------------------------------------------------

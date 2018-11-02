@@ -1,0 +1,103 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(X,Y)		- (i,i);
+--
+class 'Main' (specialized 'Report'):
+--
+internal:
+--
+	con		= ('Console');
+	timer		= ('Timer');
+--
+constant:
+--
+	width		= 10;
+	height		= 3;
+	time_delay	= 1.0;
+--
+[
+goal:-!,
+	test0,
+	show,
+	test1,
+	timer ? sleep(time_delay),
+	test2(57,15),
+	test1,
+	timer ? sleep(time_delay),
+	test2(-15.9,-11.3),
+	test1,
+	timer ? sleep(time_delay),
+	test2(0,0),
+	test1,
+	timer ? sleep(time_delay),
+	test2('centered','default'),
+	test1,
+	timer ? sleep(time_delay),
+	test2('default','centered'),
+	test1,
+	timer ? sleep(time_delay),
+	test2('centered','centered'),
+	test1,
+	timer ? sleep(time_delay),
+	hide.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	get_position_in_pixels(_,_),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default'),
+	con ? redraw.
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default'),
+	con ? redraw.
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	get_position_in_pixels(X,Y),!,
+	con ? write("X= "),
+	con ? set_color('Violet'),
+	con ? write(X),
+	con ? set_color('default'),
+	con ? write(" [pixels], Y= "),
+	con ? set_color('Violet'),
+	con ? write(Y),
+	con ? set_color('default'),
+	con ? writeln(" [pixels]"),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default'),
+	con ? redraw.
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default'),
+	con ? redraw.
+--
+test2(X,Y):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	con ? writeln("I will set: X= ",X,", Y= ",Y),
+	set_actual_position(X,Y),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default'),
+	con ? redraw.
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,56 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- REAL.                                 --
+--                                       --
+-- Questions: What is a real enumeration --
+-- type? How can one create a new domain --
+-- that is a kind of a real enumeration  --
+-- type? Does the compiler check whether --
+-- a number of this domain belongs to    --
+-- the enumeration during the            --
+-- translation of a program? Does the    --
+-- compiler check whether a number of    --
+-- this domain belongs to the            --
+-- enumeration during the execution of   --
+-- the program? How can one declare that --
+-- a built-in arithmetical operation is  --
+-- applicable for this domain? (The      --
+-- latter question is to be discussed    --
+-- after the study of arithmetical       --
+-- functions and the object-oriented     --
+-- syntax of Actor Prolog.               --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+Ratios	= 0.1; 0.25; 0.5; 0.75; 0.9.
+
+PREDICATES:
+
+p1(Ratios)		- (i);
+p2(Ratios)		- (i);
+
+class 'Main' (specialized 'DemoConsole'):
+[
+PREDICATES:
+
+'+'(Ratios,Ratios) = Ratios	- (i,i);
+
+CLAUSES:
+
+goal:-
+	-- p1(0.8).
+	p1(0.75).
+
+p1(X):-
+	p2(X+0.1).
+
+p2(X):-
+	writeln(X).
+]

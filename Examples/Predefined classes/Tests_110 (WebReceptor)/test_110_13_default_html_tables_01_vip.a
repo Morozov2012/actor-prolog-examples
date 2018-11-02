@@ -1,0 +1,55 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'WebReceptor'):
+--
+constant:
+--
+	location	= "";
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+PREDICATES:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-
+	con ? set_color('Navy'),
+	con ? writeln("Default unpaired tags table:"),
+	con ? set_color('DkGreen'),
+		unpaired_tags_table(Tag),
+		con ? writeln("\t",Tag),
+		fail.
+goal:-
+	con ? set_color('Navy'),
+	con ? writeln("Default flat tags table:"),
+	con ? set_color('DkGreen'),
+		flat_tags_table(Tag),
+		con ? writeln("\t",Tag),
+		fail.
+goal:-
+	con ? set_color('Navy'),
+	con ? writeln("Default reference containers table:"),
+	con ? set_color('DkGreen'),
+		reference_containers_table(Tag,AttributeName),
+		con ? writeln("\t",Tag," -> ",AttributeName),
+		fail.
+goal:-
+	con ? set_color('Navy'),
+	con ? writeln("Default special entities table:"),
+	con ? set_color('DkGreen'),
+		special_entities_table(EntityName,EntityValue),
+		con ? writeln(
+			"\t",EntityName," -> \"",
+			EntityValue,"\""),
+		fail.
+goal:-!.
+]
+-----------------------------------------------------------------------

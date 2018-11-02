@@ -1,0 +1,113 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+D1	= STRING.
+--
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Report'):
+--
+protecting:
+--
+output		: D1;
+--
+constant:
+--
+y		= 0;
+height		= 8;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-
+	output == "Hello world!",
+	set_color('Fuchsia'),
+	writeln("Sender: ",output),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Transmitter' (specialized 'Report'):
+--
+variable:
+--
+input		: D1;
+--
+protecting:
+--
+output		: D1;
+--
+constant:
+--
+y		= 8;
+height		= 8;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-
+	input == output,
+	set_color('SkyBlue'),
+	writeln("Transmitter: ",input),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Report'):
+--
+variable:
+--
+input		: D1;
+--
+constant:
+--
+y		= 16;
+height		= 9;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-
+	set_color('DkGreen'),
+	writeln("Receiver: ",input),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= (('Sender',
+		output=X1));
+w2	= (('Transmitter',
+		input=X1,
+		output=X2));
+w3	= (('Receiver',
+		input=X2));
+--
+[
+goal.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------

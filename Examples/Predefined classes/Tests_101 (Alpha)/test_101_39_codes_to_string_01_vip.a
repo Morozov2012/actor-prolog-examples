@@ -1,0 +1,37 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+-- Warning: Sorry, the VIP version does not support unicode.
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("Test 1"),
+	test1,
+	con ? writeln("Test 2"),
+	test2,
+	con ? writeln("O.K.").
+--
+test1:-
+	S1== ?codes_to_string([
+		16#767E#,16#95FB#,16#4E0D#,16#5982#,16#4E00#,
+		16#89C1#]),
+	con ? writeln(S1).
+--
+test2:-
+	?strings_to_text([]).
+]

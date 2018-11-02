@@ -1,0 +1,23 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	write("Hello World!\n"),
+	write(100),nl,
+	write(100.0),nl,
+	write('symbol'),nl,
+	write(structure(1,3.0,"string",'symbol')),nl,
+	write([1,3.0,"string",'symbol']),nl,
+	write({a:1,b:3.0,c:"string",d:'symbol'}),nl,
+	Text== ?get_string(),
+	con ? writeln(Text).
+]

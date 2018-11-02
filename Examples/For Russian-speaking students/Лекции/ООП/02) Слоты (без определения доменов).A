@@ -1,0 +1,15 @@
+
+class 'Main' (specialized 'DemoConsole'):
+
+a;
+
+[
+
+goal:-
+	a == 100,
+	p.
+
+p:-
+	writeln(a).
+
+]

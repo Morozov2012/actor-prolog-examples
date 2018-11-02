@@ -1,0 +1,11 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',14)
+
+dialog 'Main'("Actor Testbed",default,default,default,centered,centered,default)
+vbox('center')
+	button("action1","@1: X==f(100)")
+	button("action2","@2: X==f(_)")
+	button("action3","@3: X==f(300)")
+end_of_vbox
+end_of_dialog

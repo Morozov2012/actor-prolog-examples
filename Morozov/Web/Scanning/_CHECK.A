@@ -1,0 +1,44 @@
+package "Morozov/Web/Scanning/_Check"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--             The "CHECK" Actor Prolog package.             --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains an engine for analyzing Web Sites   --
+-- and discovering bad links.                                --
+---------------------------------------------------------------
+import 'Check'		from "Morozov/Web/Scanning/Check";
+import 'ControlDialog'	from "Morozov/Web/Scanning/Control";
+import 'Scanner'	from "Morozov/Web/Scanning/Core";
+import 'ErrorMessages'	from "Morozov/Web/Scanning/Messages";
+import 'WebResourceRegistry'
+			from "Morozov/Web/Scanning/Counter";
+---------------------------------------------------------------
+class '_Check' (specialized '_Block'):
+--
+internal:
+--
+	entry_c1;
+--
+	world	= ('Check',
+			location);
+--
+variable:
+--
+	location;
+	domain;
+--
+[
+goal:-!.
+--
+open(URL):-!,
+	world ? open(URL).
+open(_*).
+--
+start(P*):-
+	world ? start(P*).
+--
+show(_*):-!,
+	world ? show().
+]
+---------------------------------------------------------------

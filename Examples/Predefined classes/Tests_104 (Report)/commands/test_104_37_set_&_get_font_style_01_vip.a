@@ -1,0 +1,89 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+write_font_style(FontStyle)	- (i);
+test2(FontStyle)		- (i);
+--
+class 'Main' (specialized 'Report'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2('bold'),
+	test1,
+	test2('italic'),
+	test1,
+	test2('underlined'),
+	test1,
+	test2(['bold','italic']),
+	test1,
+	test2(['bold','underlined']),
+	test1,
+	test2(['italic','underlined']),
+	test1,
+	test2(['bold','italic','underlined']),
+	test1,
+	test2([]),
+	test1,
+	test2('default'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_font_style(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	Style== ?get_font_style(),!,
+	con ? set_color('Black'),
+	con ? write("Font style: "),
+	con ? set_color('Violet'),
+	write_font_style(Style),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+write_font_style(Style):-
+	symbol(Style),!,
+	con ? writeln("'",Style,"'").
+write_font_style(Style):-
+	con ? writeln(Style).
+--
+test2(Style):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_font_style(Style),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

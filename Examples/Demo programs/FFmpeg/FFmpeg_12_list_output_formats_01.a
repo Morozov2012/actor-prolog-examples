@@ -1,0 +1,238 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'FFmpeg'):
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	List== ?list_output_formats(),
+	write_format_list(List).
+--
+write_format_list([Head|Rest]):-!,
+	write_format(Head),
+	con ? writeln("--"),
+	write_format_list(Rest).
+write_format_list(_).
+--
+write_format(Format):-
+	write_format_name(Format),
+	write_format_long_name(Format),
+	write_format_mime_type(Format),
+	write_format_extensions(Format),
+	write_audio_codec(Format),
+	write_video_codec(Format),
+	write_subtitle_codec(Format),
+	write_format_flags(Format),
+	write_format_tags(Format).
+--
+write_format_name(Format):-
+	Format == {name:Text|_},!,
+	con ? writeln("name: ",Text).
+write_format_name(_):-
+	con ? set_color('Red'),
+	con ? writeln("No name"),
+	con ? set_color('default').
+--
+write_format_long_name(Format):-
+	Format == {long_name:Text|_},!,
+	con ? writeln("long name: ",Text).
+write_format_long_name(_):-
+	con ? set_color('Red'),
+	con ? writeln("No long name"),
+	con ? set_color('default').
+--
+write_format_mime_type(Format):-
+	Format == {mime_type:Text|_},!,
+	con ? writeln("mime type: ",Text).
+write_format_mime_type(_):-
+	con ? set_color('Red'),
+	con ? writeln("No mime type"),
+	con ? set_color('default').
+--
+write_format_extensions(Format):-
+	Format == {extensions:Text|_},!,
+	con ? writeln("extensions: ",Text).
+write_format_extensions(_):-
+	con ? set_color('Red'),
+	con ? writeln("No extensions"),
+	con ? set_color('default').
+--
+write_audio_codec(Format):-
+	Format == {audio_codec:Codec|_},!,
+	con ? writeln("audio codec:"),
+	write_codec(Codec).
+write_audio_codec(_):-
+	con ? set_color('Red'),
+	con ? writeln("No audio codec"),
+	con ? set_color('default').
+--
+write_video_codec(Format):-
+	Format == {video_codec:Codec|_},!,
+	con ? writeln("video codec:"),
+	write_codec(Codec).
+write_video_codec(_):-
+	con ? set_color('Red'),
+	con ? writeln("No video codec"),
+	con ? set_color('default').
+--
+write_subtitle_codec(Format):-
+	Format == {subtitle_codec:Codec|_},!,
+	con ? writeln("subtitle codec:"),
+	write_codec(Codec).
+write_subtitle_codec(_):-
+	con ? set_color('Red'),
+	con ? writeln("No subtitle codec"),
+	con ? set_color('default').	
+--
+write_format_flags(Format):-
+	Format == {flags:Flags|_},!,
+	write_format_flag_list(Flags).
+write_format_flags(_):-
+	con ? set_color('Red'),
+	con ? writeln("No flags"),
+	con ? set_color('default').
+--
+write_format_flag_list(Number):-
+	integer(Number),!,
+	con ? writeln("flags: ",Number).
+write_format_flag_list([Head|Rest]):-!,
+	con ? writeln("\tflag: ",Head),
+	write_format_flag_list(Rest).
+write_format_flag_list(_).
+--
+write_format_tags(Format):-
+	Format == {tags:Table|_},!,
+	write_format_tag_list(Table).
+write_format_tags(_):-
+	con ? set_color('Red'),
+	con ? writeln("No tags"),
+	con ? set_color('default').
+--
+write_format_tag_list([Head|Rest]):-!,
+	write_format_tag(Head),
+	write_format_tag_list(Rest).
+write_format_tag_list(_).
+--
+write_format_tag(tag(Identifier,Tag,Type)):-
+	con ? writeln(
+		"\tid: ",Identifier,
+		" -> tag: ",Tag,
+		" (",Type,")").
+--
+write_codec({}):-!,
+	con ? writeln("\tNo codec").
+write_codec(Codec):-
+	write_codec_name(Codec),
+	write_codec_long_name(Codec),
+	write_codec_type(Codec),
+	write_codec_id(Codec),
+	write_codec_pix_fmts(Codec),
+	write_codec_supported_samplerates(Codec),
+	write_codec_sample_fmts(Codec),
+	write_codec_channel_layouts(Codec).
+--
+write_codec_name(Codec):-
+	Codec == {name:Text|_},!,
+	con ? writeln("\tname: ",Text).
+write_codec_name(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tNo name"),
+	con ? set_color('default').
+--
+write_codec_long_name(Codec):-
+	Codec == {long_name:Text|_},!,
+	con ? writeln("\tlong name: ",Text).
+write_codec_long_name(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tNo long name"),
+	con ? set_color('default').
+--
+write_codec_type(Codec):-
+	Codec == {type:Type|_},!,
+	con ? writeln("\ttype: ",Type).
+write_codec_type(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tNo type"),
+	con ? set_color('default').
+--
+write_codec_id(Codec):-
+	Codec == {id:Identifier|_},!,
+	con ? writeln("\tid: ",Identifier).
+write_codec_id(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tNo id"),
+	con ? set_color('default').
+--
+write_codec_pix_fmts(Codec):-
+	Codec == {pix_fmts:List|_},!,
+	write_codec_pixel_format_list(List).
+write_codec_pix_fmts(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tNo pixel formats"),
+	con ? set_color('default').
+--
+write_codec_pixel_format_list(Number):-
+	integer(Number),!,
+	con ? writeln("\tpixel formats: ",Number).
+write_codec_pixel_format_list([Head|Rest]):-!,
+	con ? writeln("\t\tpixel format: ",Head),
+	write_codec_pixel_format_list(Rest).
+write_codec_pixel_format_list(_).
+--
+write_codec_supported_samplerates(Codec):-
+	Codec == {supported_samplerates:List|_},!,
+	write_codec_supported_samplerates_list(List).
+write_codec_supported_samplerates(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tNo supported samplerates"),
+	con ? set_color('default').
+--
+write_codec_supported_samplerates_list(Number):-
+	integer(Number),!,
+	con ? writeln("\tsupported samplerates: ",Number).
+write_codec_supported_samplerates_list([Head|Rest]):-!,
+	con ? writeln("\t\tsupported samplerate: ",Head),
+	write_codec_supported_samplerates_list(Rest).
+write_codec_supported_samplerates_list(_).
+--
+write_codec_sample_fmts(Codec):-
+	Codec == {sample_fmts:List|_},!,
+	write_codec_sample_format_list(List).
+write_codec_sample_fmts(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tNo sample formats"),
+	con ? set_color('default').
+--
+write_codec_sample_format_list(Number):-
+	integer(Number),!,
+	con ? writeln("\tsample formats: ",Number).
+write_codec_sample_format_list([Head|Rest]):-!,
+	con ? writeln("\t\tsample format: ",Head),
+	write_codec_sample_format_list(Rest).
+write_codec_sample_format_list(_).
+--
+write_codec_channel_layouts(Codec):-
+	Codec == {channel_layouts:List|_},!,
+	write_codec_channel_layout_list(List).
+write_codec_channel_layouts(_):-
+	con ? set_color('Red'),
+	con ? writeln("\tNo channel layouts"),
+	con ? set_color('default').
+--
+write_codec_channel_layout_list(Number):-
+	integer(Number),!,
+	con ? writeln("\tchannel layouts: ",Number).
+write_codec_channel_layout_list([Head|Rest]):-!,
+	con ? writeln("\t\tchannel_layout: ",Head),
+	write_codec_channel_layout_list(Rest).
+write_codec_channel_layout_list(_).
+]
+-----------------------------------------------------------------------

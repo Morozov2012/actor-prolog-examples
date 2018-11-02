@@ -1,0 +1,104 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+FileNameList	= FileName*.
+
+PREDICATES:
+
+imperative:
+
+test1(FileNameList)		- (i);
+test_file_name(FileName)	- (i);
+test2;
+test0;
+
+class 'Main' (specialized 'File'):
+--
+constant:
+--
+	name	= "xxx\\yyy/name.ext.v1";
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-
+	FileNameList== [
+		"g:\\x.xx\\yyy\\Name.ext.v1",
+		"g:/xx.x/yy.y/Name.ext.v1",
+		"http:\\x.xx\\yyy\\Name.ext.v1",
+		"http:/xx.x/yy.y/Name.ext.v1",
+		"\\xxx\\y.yy\\Name.ext.v1",
+		"/xx.x/yyy/Name.ext.v1",
+		"xx.x\\yyy\\Name.ext.v1",
+		"xxx/yy.y/Name.ext.v1",
+		-- 'stdin',
+		"Name.ext"
+		],
+	test1(FileNameList),
+	fail.
+goal:-
+	FileNameList== [
+		"g:\\x.xx\\yyy\\Name",
+		"g:/xx.x/yy.y/Name",
+		"http:\\x.xx\\yyy\\Name",
+		"http:/xx.x/yy.y/Name",
+		"\\xxx\\y.yy\\Name",
+		"/xx.x/yyy/Name",
+		"xx.x\\yyy\\Name",
+		"xxx/yy.y/Name",
+		-- 'stdin',
+		"Name"
+		],
+	test1(FileNameList),
+	fail.
+goal:-
+	FileNameList== [
+		"g:\\x.xx\\yyy\\Name.",
+		"g:/xx.x/yy.y/Name.",
+		"http:\\x.xx\\yyy\\Name.",
+		"http:/xx.x/yy.y/Name.",
+		"\\xxx\\y.yy\\Name.",
+		"/xx.x/yyy/Name.",
+		"xx.x\\yyy\\Name.",
+		"xxx/yy.y/Name.",
+		-- 'stdin',
+		"Name."
+		],
+	test1(FileNameList),
+	fail.
+goal:-
+	test2,
+	fail.
+goal:-
+	test0,
+	fail.
+--
+test1([FileName|Rest]):-!,
+	test_file_name(FileName),
+	test1(Rest).
+test1(_).
+--
+test_file_name(FileName):-
+	con ? writeln("---"),
+	NewName== ?replace_extension(FileName,".new"),
+	con ? writeln("Target Name: ",FileName),
+	con ? writeln("New name:    ",NewName).
+--
+test2:-
+	con ? writeln("---"),
+	NewName== ?replace_extension(".new"),
+	con ? writeln("Target Name: ",name),
+	con ? writeln("New name:    ",NewName).
+--
+test0:-
+	con ? writeln("---"),
+	?replace_extension(".new"),
+	?replace_extension("FileName",".new"),
+	con ? writeln("Test 0: Done").
+]

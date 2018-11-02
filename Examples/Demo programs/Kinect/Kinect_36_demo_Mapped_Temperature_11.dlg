@@ -1,0 +1,30 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',24,'bold')
+draft('off')
+
+dialog 'MainDialog'("Mapped Temperature Demo",default,default,default,centered,centered,default)
+vbox(left)
+	hbox(center)
+		custom['KeepProportions'](graphic_window,51,42,"Control2D")
+		vbox(left)
+			padding(0,1)
+			button("play","&Play")
+			button("pause","Pa&use")
+			button("save","&Save")
+			button(close,"&Exit")
+			end_of_padding
+		end_of_vbox
+	end_of_hbox
+	padding(0,0)
+	statictext(
+		"(c) 2018 www.fullvision.ru "
+		"The project is supported by RFBR, "
+		"No. 16-29-09626-ofi_m.")
+	end_of_padding
+end_of_vbox
+end_of_dialog

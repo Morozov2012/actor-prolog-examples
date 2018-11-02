@@ -1,0 +1,78 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(X,Y)		- (i,i);
+--
+class 'Main' (specialized 'Dialog'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2(57,15),
+	test1,
+	test2(-15.9,-11.3),
+	test1,
+	test2(0,0),
+	test1,
+	test2('centered','default'),
+	test1,
+	test2('default','centered'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	get_default_position(_,_),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	get_default_position(X,Y),!,
+	con ? write("X= "),
+	con ? set_color('Violet'),
+	con ? write(X),
+	con ? set_color('default'),
+	con ? write(", Y= "),
+	con ? set_color('Violet'),
+	con ? writeln(Y),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test2(X,Y):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	con ? writeln("I will set: X= ",X,", Y= ",Y),
+	set_default_position(X,Y),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

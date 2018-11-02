@@ -1,0 +1,106 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Output of information retrieved from         --
+--       several Web resources.                       --
+--------------------------------------------------------
+DOMAINS:
+--
+Target		= ('MyReceptor'); Target*; #; STRING.
+--
+--------------------------------------------------------
+interface 'Main' (specialized 'Dialog'):
+--
+internal:
+--
+	actor1		: Target;
+	actor2		: Target;
+	actor3		: Target;
+--
+variable:
+--
+	target_worlds	: Target;
+	results		: Target;
+--
+[
+]
+--------------------------------------------------------
+interface 'MyReceptor' (specialized 'WebReceptor'):
+--
+constant:
+--
+	x		: X;
+	y		: Y;
+--
+internal:
+--
+	con		: 'Report';
+--
+variable:
+--
+	parameters	: RefContentParameters;
+--
+[
+DOMAINS:
+--
+reference:
+--
+RefContentParameters	= entry(RefURL,
+				ResourceDate,
+				ResourceTime,
+				ResourceSize);
+			  catalog(
+				RefURL,
+				ResourceDate,
+				ResourceTime,
+				ResourceSize);
+			  AccessError.
+
+AccessError		= failure(REF_INTEGER);
+			  'lateness';
+			  error(AccessErrorCode).
+--
+AccessErrorCode		= INTEGER;
+			  STRING;
+			  'unknown';
+			  'unreadable_answer'.
+--
+RefURL			= STRING.
+ResourceDate		= RefDate; #.
+ResourceTime		= RefTime; #.
+ResourceSize		= INTEGER.
+--
+REF_INTEGER		= INTEGER.
+REF_REAL		= REAL.
+--
+RefDate			= date(RefYear,RefMonth,RefDay).
+RefYear			= INTEGER.
+RefMonth		= [1..12].
+RefDay			= [1..31].
+--
+RefTime			= time(	RefHours,
+				RefMinutes,
+				RefSeconds,
+				RefHundredths).
+--
+RefHours		= [0..23].
+RefMinutes		= [0..59].
+RefSeconds		= [0..59].
+RefHundredths		= [0..99].
+--
+PREDICATES:
+--
+nondeterm:
+--
+get_data = Target;
+--
+imperative:
+--
+date_to_string(ResourceDate) = STRING;
+time_to_string(ResourceTime) = STRING;
+--
+imperative:
+--
+get_parameters() = RefContentParameters;
+]
+--------------------------------------------------------

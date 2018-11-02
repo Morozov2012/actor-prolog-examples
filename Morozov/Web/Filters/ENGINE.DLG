@@ -1,0 +1,8 @@
+dialog 'Filter_List' (
+	"Control of Selection",'White','Blue',
+	default,centered,centered,default)
+vbox(center)
+	checkbox(switch," Filter list ",'no')
+	ok(close,"&O.K.")
+end_of_vbox
+end_of_dialog

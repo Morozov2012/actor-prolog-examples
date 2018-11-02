@@ -1,0 +1,367 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Note: one should start three instances of the Editor
+-- environment to study this example. Please compile and
+-- execute this example in the first environment,
+-- the agent_001_producer_** example in the second environment, and
+-- the agent_003_consumer_** (Detection of Abandoned Things) in the
+-- third environment. Please translate these examples to Java.
+--
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+-----------------------------------------------------------------------
+project: (('VideoProcessing'))
+-----------------------------------------------------------------------
+class 'VideoProcessing' (specialized 'Timer'):
+--
+constant:
+--
+-- Warning: This matrix corresponds to this data set only!
+--
+inverse_transformation_matrix	= [
+		[-0.0181,  0.0032, 0.0000],
+		[-0.0039,  0.0269,-0.0101],
+		[ 3.8896,-10.7187, 1.0000]];
+--
+sampling_rate		= 33.3;
+--
+internal:
+--
+	datastore	= ('DataStore',
+				name= "AgentBlackboard.db",
+				sharing_mode= 'shared_access',
+				access_mode= 'reading');
+	database	= ('VideoDataSources',
+				place= shared(
+					datastore,
+					"VideoDataSources"));
+--
+	subtractor	= ('ImageSubtractor',
+				extract_blobs= 'yes',
+				track_blobs= 'yes',
+				minimal_training_interval= -1,
+				maximal_training_interval= -1,
+				use_grayscale_colors= 'yes',
+				apply_gaussian_filtering_to_background= 'no',
+				apply_rank_filtering_to_background= 'yes',
+				background_rank_filter_threshold= 7,
+				background_standard_deviation_factor= 1.2,
+				horizontal_blob_border= 3,
+				vertical_blob_border= 3,
+				horizontal_extra_border_coefficient= -1.0,
+				vertical_extra_border_coefficient= -1.0,
+				minimal_blob_intersection_area= 1,
+				minimal_blob_size= 1000,
+				minimal_track_duration= 5,
+				maximal_blob_invisibility_interval= 3,
+				maximal_track_retention_interval= 10,
+				inverse_transformation_matrix,
+				sampling_rate,
+				apply_median_filtering_to_velocity= 'yes',
+				velocity_median_filter_halfwidth= 3,
+				refuse_slow_tracks= 'no',
+				synthesized_image_transparency= 64,
+				make_rectangular_blobs_in_synthesized_image= 'no');
+--
+	image		= ('BufferedImage');
+	con		= ('Console');
+--
+constant:
+--
+	analyzer	= (('ImageAnalyzer',
+				low_level_analyzer= subtractor));
+	trap		= ('Trap',
+				world= self,
+				handler= self);
+--
+[
+MODEL:
+--
+?new_frame(FrameNumber,BinaryData,FrameRate).
+?reset.
+--
+CLAUSES:
+--
+goal:-!,
+	set_period(3.0),
+	activate.
+--
+tick:-
+	con ? set_color('Orange'),
+	con ? write("OPENING THE DATA STORE... "),
+	datastore ? open,
+	con ? writeln("DONE."),
+	con ? set_color('Violet'),
+	con ? write("READING THE TABLE... "),
+	database ? begin_transaction('reading'),!,
+	read_table,
+	database ? end_transaction,
+	con ? writeln("DONE."),
+	con ? set_color('Orange'),
+	con ? write("CLOSING THE DATA STORE... "),
+	datastore ? close,
+	con ? writeln("DONE.").
+--
+read_table:-
+	database ? find(ExternalAgent),
+	trap ? register_oneself(ExternalAgent),!.
+read_table.
+--
+register_oneself(ExternalAgent):-
+	ExternalAgent << register_consumer(self).
+--
+new_frame(FrameNumber,BinaryData,FrameRate):-
+	image ? set_binary(BinaryData),
+	trap ? process_frame(FrameNumber,image,FrameRate),!,
+	delay(1.0).
+new_frame(_,_,_):-
+	activate.
+--
+process_frame(FrameNumber,Image,FrameRate):-
+	subtractor ? set_sampling_rate(FrameRate),
+	subtractor ? subtract(FrameNumber,Image),
+	analyzer [<<] draw_scene(FrameNumber,FrameRate).
+--
+reset:-
+	trap ? reset_subtractor,!,
+	delay(1.0).
+reset:-
+	activate.
+--
+reset_subtractor:-
+	subtractor ? reset_all.
+--
+alarm(_):-!,
+	activate.
+alarm(_,'register_oneself',_):-
+	activate.
+alarm(_,'new_frame',_,_,_):-
+	activate.
+alarm(_,'reset_subtractor'):-
+	activate.
+]
+-----------------------------------------------------------------------
+class 'ImageAnalyzer' (specialized 'Alpha'):
+--
+constant:
+--
+	low_level_analyzer;
+--
+internal:
+--
+	subtractor	= ('SynchronizedImageSubtractor',
+				image_subtractor= low_level_analyzer);
+	graphic_window	= ('Canvas2D');
+	image		= ('BufferedImage');
+	timer		= ('Timer');
+	text		= ('Text');
+--
+constant:
+--
+	velocity_bound_1	= 0.5;
+	velocity_bound_2	= 1.0;
+	velocity_bound_3	= 2.0;
+	velocity_bound_4	= 3.0;
+--
+	circle_radius		= 0.005;
+--
+[
+goal:-!,
+	timer ? set_priority('minimal'),
+	graphic_window ? show.
+--
+draw_scene(N,FrameRate):-
+	subtractor ? commit,
+	subtractor ? get_recent_image(image),
+	subtractor ? get_tracks(Tracks),
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	graphic_window ? draw_image(image,0,0,1,1),
+	image ? get_size_in_pixels(IW,IH),
+	report_time(N,FrameRate),
+	draw_tracks(IW,IH,Tracks,N,FrameRate),
+	draw_legend,
+	graphic_window ? draw_now.
+--
+draw_tracks(IW,IH,[{segments:TrackSegments|_}|R],N,FR):-!,
+	draw_track(IW,IH,TrackSegments,N,FR),
+	draw_tracks(IW,IH,R,N,FR).
+draw_tracks(_,_,_,_,_).
+--
+draw_track(IW,IH,[TrackSegment|Rest],N,FR):-!,
+	draw_track_segment(IW,IH,TrackSegment,N,FR),
+	draw_track(IW,IH,Rest,N,FR).
+draw_track(_,_,_,_,_).
+--
+draw_track_segment(IW,IH,TrackSegment,N,FrameRate):-
+	TrackSegment == {
+		x1:X1a,y1:Y1a,x2:X2a,y2:Y2a,
+		coordinates:TrackOfBlobs,
+		mean_velocity:Velocity
+		|_},
+	X1r== X1a / IW,
+	Y1r== Y1a / IH,
+	X2r== X2a / IW,
+	Y2r== Y2a / IH,
+	graphic_window ? set_brush('Blue'),
+	draw_track_of_blobs(IW,IH,TrackOfBlobs),
+	track_is_a_running_person(TrackSegment,FrameRate,YesNo),
+	draw_rectangle(YesNo,IW,IH,TrackOfBlobs,N),
+	graphic_window ? set_pen({color:'Green',lineWidth:1}),
+	graphic_window ? draw_line(X1r,Y1r,X2r,Y2r),
+	draw_circle(X1r,Y1r),
+	draw_circle(X2r,Y2r),
+	draw_blob_identifier(X1r,Y1r,X2r,Y2r,Velocity),
+	fail.
+draw_track_segment(_,_,_,_,_).
+--
+draw_track_of_blobs(IW,IH,[Blob|Rest]):-
+	Blob== {x:Xa,y:Ya|_},!,
+	Xr== Xa / IW,
+	Yr== Ya / IH,
+	draw_track_of_blobs(IW,IH,Xr,Yr,Rest).
+draw_track_of_blobs(_,_,_).
+--
+draw_track_of_blobs(IW,IH,X1,Y1,[Blob|Rest]):-
+	Blob== {x:Xa,y:Ya,velocity:Velocity|_},!,
+	X2== Xa / IW,
+	Y2== Ya / IH,
+	select_line_color(Velocity,Color),
+	graphic_window ? set_pen({color:Color,lineWidth:2}),
+	graphic_window ? draw_line(X1,Y1,X2,Y2),
+	draw_track_of_blobs(IW,IH,X2,Y2,Rest).
+draw_track_of_blobs(_,_,_,_,_).
+--
+select_line_color(Velocity,'Magenta'):-
+	Velocity <= velocity_bound_1,!.
+select_line_color(Velocity,'Cyan'):-
+	Velocity > velocity_bound_1,
+	Velocity <= velocity_bound_2,!.
+select_line_color(Velocity,'Yellow'):-
+	Velocity > velocity_bound_2,
+	Velocity <= velocity_bound_3,!.
+select_line_color(Velocity,'Orange'):-
+	Velocity > velocity_bound_3,
+	Velocity <= velocity_bound_4,!.
+select_line_color(_,'Red').
+--
+track_is_a_running_person(TrackSegment,FrameRate,'yes'):-
+	TrackSegment == {
+		mean_velocity:Velocity,
+		frame1:T1,
+		frame2:T2,
+		mean_foreground_area:Area,
+		mean_squared_characteristic_length:SCL|_},
+	M_Velocity== ?fuzzy_metrics(Velocity,1.0,0.5),
+	Duration== (T2 - T1) / FrameRate,
+	M_Duration== ?fuzzy_metrics(Duration,0.75,0.5),
+	Size== Area / SCL,
+	M_Size== ?fuzzy_metrics(Size,0.1,0.05),
+	M_Velocity * M_Duration * M_Size >= 0.125,!.
+track_is_a_running_person(_,_,'no').
+--
+fuzzy_metrics(X,T,H) = 1.0 :-
+	X >= T + H,!.
+fuzzy_metrics(X,T,H) = 0.0 :-
+	X <= T - H,!.
+fuzzy_metrics(X,T,H) = V :-
+	V== (X-T+H) * (1 / (2*H)).
+--
+draw_rectangle('yes',IW,IH,TrackOfBlobs,N):-!,
+	draw_rectangle(IW,IH,TrackOfBlobs,N).
+draw_rectangle(_,_,_,_,_).
+--
+draw_rectangle(IW,IH,[Blob],N):-
+	Blob == {frame:N,x:X0,y:Y0,width:W1,height:H1|_},!,
+	graphic_window ? set_brush('off'),
+	graphic_window ? set_pen({color:'Red',lineWidth:5}),
+	X2== (X0 - W1 / 2) / IW,
+	Y2== (Y0 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? set_font({size:28,weight:'WEIGHT_BOLD'}),
+	graphic_window ? set_pen({color:'Yellow'}),
+	graphic_window ? draw_text(
+		0.5,0.7,"A running person is detected!").
+draw_rectangle(IW,IH,[_|R],N):-!,
+	draw_rectangle(IW,IH,R,N).
+draw_rectangle(_,_,_,_).
+--
+draw_circle(X0,Y0):-
+	X1== X0 - circle_radius,
+	Y1== Y0 - circle_radius,
+	Width== circle_radius * 2,
+	Height== circle_radius * 2,
+	graphic_window ? draw_ellipse(X1,Y1,Width,Height).
+--
+draw_blob_identifier(X1,Y1,X2,Y2,Velocity):-
+	Distance== ?sqrt(?power(X2-X1,2) + ?power(Y2-Y1,2)),
+	Distance >= 0.10,!,
+	Text== text?format("%f",Velocity),
+	select_line_color(Velocity,Color),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? set_font({size:18,background:'Gray'}),
+	graphic_window ? set_pen(Color),
+	graphic_window ? draw_text((X1+X2)/2,(Y1+Y2)/2,Text).
+draw_blob_identifier(_,_,_,_,_).
+--
+report_time(_,_):-
+	graphic_window ? set_text_alignment('LEFT','TOP'),
+	graphic_window ? set_font({size:18,background:'Yellow'}),
+	graphic_window ? set_brush('Navy'),
+	fail.
+report_time(FrameN,FrameRate):-
+	FrameN >= 0,!,
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %3.2f [sec]; Frame: %s",
+			FrameN/FrameRate,FrameN)).
+report_time(_,_):-
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		"Training... Please wait a minute...").
+--
+draw_legend:-
+	graphic_window ? set_pen({color:'Green',lineWidth:1}),
+	graphic_window ? set_brush('Navy'),
+	X0r== 0.82,
+	Y0r== 0.05,
+	Wr== 0.17,
+	Hr== 0.18,
+	graphic_window ? draw_rectangle(X0r,Y0r,Wr,Hr),
+	graphic_window ? set_text_alignment('LEFT','CENTER'),
+	graphic_window ? set_font({size:9,weight:'WEIGHT_BOLD'}),
+	X1r== X0r + 0.02,
+	Y1r== Y0r + 0.03,
+	Y2r== Y1r + 0.03,
+	Y3r== Y2r + 0.03,
+	Y4r== Y3r + 0.03,
+	Y5r== Y4r + 0.03,
+	T1== text?format("Velocity <= %1.1f",velocity_bound_1),
+	T2== text?format("Velocity > %1.1f",velocity_bound_1),
+	T3== text?format("Velocity > %1.1f",velocity_bound_2),
+	T4== text?format("Velocity > %1.1f",velocity_bound_3),
+	T5== text?format("Velocity > %1.1f",velocity_bound_4),
+	graphic_window ? set_pen({color:'Magenta'}),
+	graphic_window ? draw_text(X1r,Y1r,T1),
+	graphic_window ? set_pen({color:'Cyan'}),
+	graphic_window ? draw_text(X1r,Y2r,T2),
+	graphic_window ? set_pen({color:'Yellow'}),
+	graphic_window ? draw_text(X1r,Y3r,T3),
+	graphic_window ? set_pen({color:'Orange'}),
+	graphic_window ? draw_text(X1r,Y4r,T4),
+	graphic_window ? set_pen({color:'Red'}),
+	graphic_window ? draw_text(X1r,Y5r,T5).
+]
+-----------------------------------------------------------------------
+class 'VideoDataSources' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------

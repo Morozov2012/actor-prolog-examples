@@ -1,0 +1,160 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  QSORT                                                            --
+--                                                                   --
+--  David H.D. Warren                                                --
+--                                                                   --
+--  Quicksort a list of 50 integers                                  --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--  (Warning: Program text is modified a bit!)                       --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+-- Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB          --
+-- Windows7 - PM.64 (RUS)                                            --
+-- ================================================================= --
+-- AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                            --
+--                                                                   --
+-- EXE file produced by the Actor Prolog system:                     --
+--                                                                   --
+-- list_length = 50;                                                 --
+-- 1000 iterations take 10 msec                                      --
+-- 0.01 milliseconds per iteration                                   --
+-- 100000 iterations take 1570 msec                                  --
+-- 0.0157 milliseconds per iteration                                 --
+-- list_length = 1000;                                               --
+-- 1000 iterations take 590 msec                                     --
+-- 0.59 milliseconds per iteration                                   --
+-- list_length = 10_000;                                             --
+-- 1000 iterations take 8130 msec                                    --
+-- 8.13 milliseconds per iteration                                   --
+-- list_length = 100_000;                                            --
+-- 1000 iterations take 103500 msec                                  --
+-- 103.5 milliseconds per iteration                                  --
+-- list_length = 200_000;                                            --
+-- 1000 iterations take 220500 msec                                  --
+-- 220.5 milliseconds per iteration                                  --
+--                                                                   --
+-- java version "1.7.0"                                              --
+-- Java(TM) SE Runtime Environment (build 1.7.0-b147)                --
+-- Java HotSpot(TM) 64-Bit Server VM (build 21.0-b17, mixed mode)    --
+--                                                                   --
+-- === BigInteger ===                                                --
+-- java -Xss10000k -Xms1000000k -Xmx1000000k -Xrs -XX:+UseNUMA       --
+-- -server -Xbatch -jar main.jar                                     --
+--                                                                   --
+-- list_length = 50;                                                 --
+-- 1000 iterations take 171 msec                                     --
+-- 0,171000 milliseconds per iteration                               --
+-- list_length = 1000;                                               --
+-- 1000 iterations take 8408 msec                                    --
+-- 8,408000 milliseconds per iteration                               --
+-- list_length = 10_000;                                             --
+-- 1000 iterations take 124723 msec                                  --
+-- 124,723000 milliseconds per iteration                             --
+-- list_length = 50_000;                                             --
+-- 1000 iterations take 754012 msec                                  --
+-- 754,012000 milliseconds per iteration                             --
+-- list_length = 100_000;                                            --
+-- 100 iterations take 166000 msec                                   --
+-- 1660,000000 milliseconds per iteration                            --
+-- list_length = 200_000;                                            --
+-- java -Xss100000k -Xms1000000k -Xmx1000000k -Xrs -XX:+UseNUMA      --
+-- -server -Xbatch -jar main.jar                                     --
+-- 100 iterations take 366305 msec                                   --
+-- 3663,050000 milliseconds per iteration                            --
+-- list_length = 250_000;                                            --
+-- 100 iterations take 467939 msec                                   --
+-- 4679,390000 milliseconds per iteration                            --
+-- list_length = 500_000;                                            --
+-- 50 iterations take 499919 msec                                    --
+-- 9998,380000 milliseconds per iteration                            --
+-- list_length = 1_000_000;                                          --
+-- 10 iterations take 226902 msec                                    --
+-- 22690,200000 milliseconds per iteration                           --
+-- java -Xss500000k -Xms2000000k -Xmx2000000k -Xrs -XX:+UseNUMA      --
+-- list_length = 5_000_000;                                          --
+-- -server -Xbatch -jar main.jar                                     --
+-- 1 iterations take 136781 msec                                     --
+-- 136781,000000 milliseconds per iteration                          --
+-- list_length = 7_000_000;                                          --
+-- java -Xss750000k -Xms2000000k -Xmx2000000k -Xrs -XX:+UseNUMA      --
+-- -server -Xbatch -jar main.jar                                     --
+-- 1 iterations take 901712 msec                                     --
+-- 901712,000000 milliseconds per iteration                          --
+-- 1 iterations take 1223667 msec                                    --
+-- 1223667,000000 milliseconds per iteration                         --
+-- list_length = 9_000_000;                                          --
+-- java -Xss750000k -Xms3000000k -Xmx3000000k -Xrs -XX:+UseNUMA      --
+-- -server -Xbatch -jar main.jar                                     --
+-- 1 iterations take 758910 msec                                     --
+-- 758910,000000 milliseconds per iteration                          --
+-- java -Xss750000k -Xms3000000k -Xrs -XX:+UseNUMA -server -Xbatch   --
+-- -jar main.jar                                                     --
+-- 1 iterations take 1344645 msec                                    --
+-- 1344645,000000 milliseconds per iteration                         --
+-- java -Xss750000k -Xms3000000k -Xmx3000000k -Xrs -XX:+UseNUMA      --
+-- -server -Xbatch -jar main.jar                                     --
+-- 1 iterations take 1066621 msec                                    --
+-- 1066621,000000 milliseconds per iteration                         --
+-- java -Xss750000k -Xms3000000k -Xrs -XX:+UseNUMA -server -Xbatch   --
+-- -jar main.jar                                                     --
+-- 1 iterations take 685730 msec                                     --
+-- 685730,000000 milliseconds per iteration                          --
+-- list_length = 500_000;                                            --
+-- java -Xss750000k -Xms3000000k -Xrs -XX:+UseNUMA -server -Xbatch   --
+-- -jar main.jar                                                     --
+-- 50 iterations take 505550 msec                                    --
+-- 10111,000000 milliseconds per iteration                           --
+-- list_length = 10_000;                                             --
+-- 1000 iterations take 129651 msec                                  --
+-- 129,651000 milliseconds per iteration                             --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities' from "HARNESS3";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+N	= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+create_list(N,TestData)				- (i,o);
+qsort(TestData,TestData,TestData)		- (i,o,i);
+partition(TestData,Number,TestData,TestData)	- (i,i,o,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+--
+list_length	= 10_000;
+--
+[
+benchmark(Data,Out):-
+	qsort(Data,Out,[]).
+--
+data(List):-
+	create_list(list_length,List).
+--
+create_list(N,[?random()|Rest]):-
+	N > 0,!,
+	create_list(N-1,Rest).
+create_list(_,[]).
+--
+qsort([X|L],R,R0):-!,
+	partition(L,X,L1,L2),
+	qsort(L2,R1,R0),
+	qsort(L1,R,[X|R1]).
+qsort(_,R,R).
+--
+partition([X|L],Y,[X|L1],L2):-
+	X <= Y,!,
+	partition(L,Y,L1,L2).
+partition([X|L],Y,L1,[X|L2]):-!,
+	partition(L,Y,L1,L2).
+partition(_,_,[],[]).
+]
+-----------------------------------------------------------------------

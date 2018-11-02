@@ -1,0 +1,286 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Warning: the VIP version of the program is unstable.
+-- Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	number_of_agents	= 250;
+--
+	writers	= 'WriterArray'[number_of_agents] of
+			(('MyWriter',
+				data_store=store));
+--
+	readers	= 'ReaderArray'[number_of_agents] of
+			(('MyReader',
+				data_store=store));
+--
+	loader	= ('MyLoader',
+			data_store=store);
+	saver	= ('MySaver',
+			data_store=store);
+--
+internal:
+--
+	store	= ('DataStore',
+			name="MyDataStore.dat",
+			access_mode='modifying',
+			transaction_sleep_period=0.1,
+			transaction_maximal_retry_number=100);
+--
+	con	= ('Console',
+			width=30);
+--
+[
+goal:-
+	con ? set_color('Fuchsia'),
+	con ? writeln("===== ROOT PROCESS ====="),
+	store ? delete,
+	con ? set_color('Orange'),
+	con ? write("OPENING DATA STORE... "),
+	store ? open,
+	con ? writeln("DONE."),
+	fail.
+goal:-
+	[writers[N]] << initiate(N,number_of_agents),
+		fail.
+goal:-
+	[readers[N]] << initiate(N,number_of_agents),
+		fail.
+]
+-----------------------------------------------------------------------
+class 'WriterArray' (specialized 'DynamicWorlds'):
+[
+]
+-----------------------------------------------------------------------
+class 'ReaderArray' (specialized 'DynamicWorlds'):
+[
+]
+-----------------------------------------------------------------------
+class 'MyWriter' (specialized 'Timer'):
+--
+constant:
+--
+	data_store;
+--
+internal:
+--
+	database	= ('MyDatabase',
+				place=shared(data_store,"MyTable"),
+				con);
+--
+	con		= ('Report',
+				width=target_width,
+				height=target_height);
+--
+constant:
+--
+	target_width	= 25;
+	target_height	= 7;
+--
+[
+goal:-!.
+--
+initiate(N,Max):-
+	X1== 30+?random(80-target_width+1-30),
+	Y1== ?random(12-target_height+1),
+	con ? set_x(X1),
+	con ? set_y(Y1),
+	R1== (128+?random(128))/255,
+	G1== (128+?random(128))/255,
+	B1== (128+?random(128))/255,
+	con ? set_background_color(color3(R1,G1,B1)),
+	con ? set_title(con?format("WRITER %d / %d",N,Max)),
+	con ? show,
+	Delay== ?random(1000)/100,
+	set_period(0.1,Delay),
+	activate.
+--
+tick:-!,
+	database ? update_database.
+]
+-----------------------------------------------------------------------
+class 'MyReader' (specialized 'Timer'):
+--
+constant:
+--
+	data_store;
+--
+internal:
+--
+	database	= ('MyDatabase',
+				place=shared(data_store,"MyTable"),
+				con);
+--
+	con		= ('Report',
+				width=target_width,
+				height=target_height);
+--
+constant:
+--
+	target_width	= 25;
+	target_height	= 7;
+--
+[
+goal:-!.
+--
+initiate(N,Max):-
+	X1== 30+?random(80-target_width+1-30),
+	Y1== 13+?random(12-target_height+1),
+	con ? set_x(X1),
+	con ? set_y(Y1),
+	R1== (?random(128))/255,
+	G1== (?random(128))/255,
+	B1== (?random(128))/255,
+	con ? set_background_color(color3(R1,G1,B1)),
+	con ? set_title(con?format("READER %d / %d",N,Max)),
+	con ? show,
+	Delay== ?random(1000)/100,
+	set_period(1.0,Delay),
+	activate.
+--
+tick:-!,
+	database ? inspect_database.
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	con;
+--
+[
+update_database:-
+	con ? set_color('Black'),
+	con ? writeln("Test database update."),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	modify_database,
+	end_transaction.
+update_database:-
+	con ? set_color('White','Violet'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default','default').
+--
+inspect_database:-
+	con ? set_color('White'),
+	con ? writeln("Test database reading."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	check_database('White'),
+	end_transaction.
+inspect_database:-
+	con ? set_color('White','Violet'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default','default').
+--
+modify_database:-
+	check_database('Black'),
+	fail.
+modify_database:-
+	Delta== ?random(101) - 50.0,
+	modify_database(Delta),
+	modify_database(-(Delta)).
+--
+modify_database(Delta):-
+	T1== ?match(_),
+	T1 == my_data(V1),
+	retract(T1),!,
+	insert(my_data(V1 + Delta)).
+modify_database(Delta):-
+	insert(my_data(Delta)).
+--
+check_database(Color):-
+	T1== ?match(_),
+	T1 == my_data(V1),!,
+	report_checksum(V1,Color).
+check_database(_).
+--
+report_checksum(V1,_):-
+	V1 <> 0.0,
+	con ? set_color('White','Red'),
+	con ? writeln("Illegal check sum value!"),
+	con ? set_color('default','default'),
+	fail.
+report_checksum(V1,Color):-
+	con ? set_color(Color,'default'),
+	con ? writeln("Check sum: ",V1),
+	con ? set_color('default','default').
+]
+-----------------------------------------------------------------------
+class 'MyLoader' (specialized 'Timer'):
+--
+internal:
+--
+	data_store;
+--
+	con		= ('Console',
+				width=30);
+--
+[
+-- goal:-!.
+goal:-!,
+	set_period(0.3,0.0),
+	activate.
+--
+tick:-
+	data_store ? does_exist,!,
+	test_database_loading.
+tick:-!.
+--	
+test_database_loading:-
+	con ? set_color('Violet'),
+	con ? writeln("Test data store loading."),
+	con ? set_color('default'),
+	data_store ? begin_transaction('modifying'),!,
+	data_store ? load("File.dat"),
+	data_store ? end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test_database_loading:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MySaver' (specialized 'Timer'):
+--
+internal:
+--
+	data_store;
+--
+	con		= ('Console',
+				width=30);
+--
+[
+goal:-
+	data_store ? does_exist,
+	data_store ? delete,
+	fail.
+goal:-!,
+	set_period(0.5,0.0),
+	activate.
+--
+tick:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store saving."),
+	con ? set_color('default'),
+	data_store ? begin_transaction('modifying'),!,
+	data_store ? save("File.dat"),
+	data_store ? end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+tick:-!,
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,421 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	data_directory		= "data";
+	target_directory	= "Fight_RunAway1";
+	sampling_rate		= 25;
+--
+	sender		= (('Sender',
+				target= receiver,
+				data_directory,
+				target_directory,
+				sampling_rate));
+--
+	receiver	= (('Receiver',
+				data_directory,
+				target_directory,
+				sampling_rate));
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Timer'):
+--
+constant:
+--
+	target;
+--
+constant:
+--
+	data_directory;
+	target_directory;
+	sampling_rate;
+--
+	target_CVML_description	= "fra1gt.xml";
+--
+internal:
+--
+	description	= ('CVML_Resource',
+				location= data_directory);
+	store		= ('CVML_Store');
+	state		= ('ProgramState');
+--
+	con		= ('Console',
+				x= 10,
+				y= 22,
+				height= 3);
+--
+[
+goal:-!,
+	Content== description?get_trees(
+		"jar:" + data_directory + "/" +
+		target_directory + "_jpg" + "/" +
+		target_CVML_description),
+	save_frames(Content),
+	Time0== ?milliseconds(),
+	state ? set_beginning_time(Time0),
+	set_period((1/sampling_rate/2),0),
+	activate.
+--
+save_frames([Frame|Rest]):-!,
+	save_frame(Frame),
+	save_frames(Rest).
+save_frames([]):-!.
+save_frames(ErrorMessage):-
+	con ? writeln(
+		"I cannot read the \"",
+		target_CVML_description,
+		"\" file: ",
+		ErrorMessage).
+--
+save_frame(block("FRAME",FrameContent)):-!,
+	save_frame_content(FrameContent,FrameContent).
+save_frame(_).
+--
+save_frame_content([attribute("NUMBER",T)|_],FrameContent):-!,
+	save_frame_number_and_content(T,FrameContent).
+save_frame_content([_|Rest],FrameContent):-!,
+	save_frame_content(Rest,FrameContent).
+save_frame_content(_,_).
+--
+save_frame_number_and_content(T,FrameContent):-
+	N== ?convert_to_integer(T),!,
+	store ? put(N,FrameContent).
+save_frame_number_and_content(_,_).
+--
+tick:-
+	T2== ?milliseconds(),
+	state ? get_beginning_time(T1),
+	Delta== (T2 - T1) / 1000.0 * sampling_rate,
+	N== ?convert_to_integer(?round(Delta)),!,
+	load_figure(N,T2).
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	FrameContent== store?get(N),!,
+	extract_object_list(FrameContent,Objects),
+	target [<<] process_frame(N,Objects).
+load_figure(_,T2):-
+	state ? set_beginning_time(T2),
+	target [<<] reset.
+--
+extract_object_list([block("OBJECTLIST",Objects)|_],Objects):-!.
+extract_object_list([_|Rest],Objects):-!,
+	extract_object_list(Rest,Objects).
+extract_object_list(_,[]).
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Alpha'):
+--
+constant:
+--
+	data_directory;
+	target_directory;
+	sampling_rate;
+--
+	history_length			= 50;
+	minimal_group_duration		= 5;
+	maximal_group_distance		= 30;
+	minimal_independence_distance	= 70;
+--
+internal:
+--
+	store		= ('RecentHistory');
+--
+	image		= ('BufferedImage');
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	prompt_window	= ('Report',
+				y= 22,
+				height= 3);
+	con		= ('Console',
+				x= 40,
+				y= 22,
+				height= 3);
+--
+[
+goal:-!,
+	graphic_window ? show,
+	prompt_window ? write(
+		"The data are coming from the EC Funded CAVIAR ",
+		"project / IST 2001 37540,\n",
+		"found at URL: ",
+		"http://homepages.inf.ed.ac.uk/rbf/CAVIAR/.").
+--
+process_frame(N,Objects):-
+	store ? store_object_list(Objects,N),
+	store ? shorten_history(N,history_length),
+	recognize_groups(N),
+	forget_groups(N),
+	draw_scene(N).
+--
+recognize_groups(N):-
+	Item== store?match(object(N,_,_,_,_,_)),
+		Item == object(_,Id1,X1,Y1,_,_),
+		object_has_pair(N,Id1,X1,Y1,Id2),
+		store ? is_unknown_group(Id1,Id2),
+		is_group(Id1,Id2,N,minimal_group_duration),
+		store ? register_group(Id1,Id2),
+		fail.
+recognize_groups(_).
+--
+object_has_pair(N,Id1,X1,Y1,Id2):-
+	Item== store?match(object(N,_,_,_,_,_)),
+		Item == object(_,Id2,X2,Y2,_,_),
+		Id1 <> Id2,
+		Delta== ?power(?power(X1-X2,2)+?power(Y1-Y2,2),0.5),
+		Delta <= maximal_group_distance,!.
+--
+is_group(Id1,Id2,N,L):-
+	L > 0,
+	store ? retrieve_coordinates(N,Id1,X1,Y1,_,_),
+	store ? retrieve_coordinates(N,Id2,X2,Y2,_,_),!,
+	Delta== ?power(?power(X1-X2,2)+?power(Y1-Y2,2),0.5),
+	Delta <= maximal_group_distance,
+	is_group(Id1,Id2,N-1,L-1).
+is_group(Id1,Id2,N,L):-
+	L > 0,!,
+	is_group(Id1,Id2,N-1,L-1).
+is_group(_,_,_,_).
+--
+forget_groups(N):-
+	Item== store?match(group(_,_)),
+		Item == group(Id1,Id2),
+		store ? retrieve_coordinates(N,Id1,X1,Y1,_,_),
+		store ? retrieve_coordinates(N,Id2,X2,Y2,_,_),
+		Delta== ?power(?power(X1-X2,2)+?power(Y1-Y2,2),0.5),
+		Delta > minimal_independence_distance,
+		store ? retract_all(group(Id1,Id2)),
+		fail.
+forget_groups(_).
+--
+draw_scene(N):-
+	ImageToBeDrawn==
+		"jar:" + data_directory + "/" +
+		target_directory + "_jpg" + "/JPEGS/" +
+		target_directory +
+		con?format("%03d",N) + ".jpg",
+	image ? load(ImageToBeDrawn),
+	image ? get_size_in_pixels(IW,IH),
+	graphic_window ? clear('no'),
+	graphic_window ? draw_image(image,0,0,1,1),
+	show_recent_history(N,IW,IH,'yes'),
+	show_groups(N,IW,IH),
+	graphic_window ? draw_now.
+--
+show_recent_history(N,IW,IH,Mode):-
+	N > 0,!,
+	select_line_attributes(Mode,PenAttributes),
+	show_object_list(N,IW,IH,Mode,PenAttributes),
+	show_recent_history(N-1,IW,IH,'no').
+show_recent_history(_,_,_,_).
+--
+select_line_attributes('yes',{color:'Yellow',lineWidth:3}):-!.
+select_line_attributes(_,{color:'Blue',lineWidth:1,dashArray:[2.0]}).
+--
+show_object_list(N,IW,IH,Mode,PenAttributes):-
+	graphic_window ? set_pen(PenAttributes),
+	graphic_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	Item== store?match(object(N,_,_,_,_,_)),
+		Item == object(_,Id,X1,Y1,W1,H1),
+		X2== (X1 - W1 / 2) / IW,
+		Y2== (Y1 - H1 / 2) / IH,
+		W2== W1 / IW,
+		H2== H1 / IH,
+		graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+		graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+		draw_object_name(Mode,X1,Y1,IW,IH,Id),
+		fail.
+show_object_list(_,_,_,_,_).
+--
+draw_object_name('yes',X1,Y1,IW,IH,Id):-!,
+	graphic_window ? draw_text(X1/IW,Y1/IH,Id).
+draw_object_name(_,_,_,_,_,_).
+--
+show_groups(N,IW,IH):-
+	graphic_window ? set_pen({color:'Green',lineWidth:3}),
+	graphic_window ? set_font({size:27,weight:'WEIGHT_BOLD'}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	Item== store?match(group(_,_)),
+		Item == group(Id1,Id2),
+		store ? retrieve_coordinates(N,Id1,X1,Y1,W1,H1),
+		store ? retrieve_coordinates(N,Id2,X2,Y2,W2,H2),
+		MinX== ?min(X1-W1/2,X2-W2/2),
+		MaxX== ?max(X1+W1/2,X2+W2/2),
+		MinY== ?min(Y1-H1/2,Y2-H2/2),
+		MaxY== ?max(Y1+H1/2,Y2+H2/2),
+		X3== MinX / IW,
+		Y3== MinY / IH,
+		W3== (MaxX - MinX) / IW,
+		H3== (MaxY - MinY) / IH,
+		graphic_window ? draw_rectangle(X3,Y3,W3,H3),
+		Text== con?format("%s & %s",Id1,Id2),
+		X4== (MinX + MaxX) / 2 / IW,
+		Y4== (MinY + MaxY) / 2 / IH,
+		graphic_window ? draw_text(X4,Y4,Text),
+		fail.
+show_groups(_,_,_).
+--
+reset:-
+	store ? retract_all.
+]
+-----------------------------------------------------------------------
+class 'CVML_Resource' (specialized 'WebReceptor'):
+--
+constant:
+--
+tags	= [	/*
+		"?xml",
+		"dataset",
+		*/
+		"frame",
+		"objectlist",
+		"object",
+		"grouplist",
+		"group",
+		/*
+		"orientation",
+		*/
+		"box",
+		/*
+		"context",
+		*/
+		"situation"
+		/*
+		"appearance",
+		"hypothesislist",
+		"hypothesis",
+		"movement",
+		"role",
+		"context",
+		"situation"
+		*/];
+--
+extract_attributes	= 'yes';
+--
+[
+unpaired_tags_table(_):-!,
+	fail.
+flat_tags_table(_):-!,
+	fail.
+reference_containers_table(_,_):-!,
+	fail.
+special_entities_table(_,_):-!,
+	fail.
+]
+-----------------------------------------------------------------------
+class 'CVML_Store' (specialized 'HashMap'):
+[
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+[
+CLAUSES:
+--
+get_beginning_time(T):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(T),!.
+--
+set_beginning_time(T):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(T)).
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)).
+]
+-----------------------------------------------------------------------
+class 'RecentHistory' (specialized 'HashSet'):
+[
+store_object_list([Object|Rest],N):-!,
+	store_object(Object,N),
+	store_object_list(Rest,N).
+store_object_list(_,_).
+--
+store_object(block("OBJECT",ObjectAttributes),N):-!,
+	store_object_attributes(ObjectAttributes,N,"").
+store_object(_,_).
+--
+store_object_attributes([attribute("ID",Id)|Rest],N,_):-!,
+	store_object_attributes(Rest,N,Id).
+store_object_attributes([Attribute|Rest],N,Id):-!,
+	store_object_attribute(Attribute,N,Id),
+	store_object_attributes(Rest,N,Id).
+store_object_attributes(_,_,_).
+--
+store_object_attribute(block("BOX",BoxAttributes),N,Id):-!,
+	store_box_attributes(BoxAttributes,N,Id,"","","","").
+store_object_attribute(_,_,_).
+--
+store_box_attributes(
+		[attribute("H",TH)|Rest],
+		N,Id,TX,TY,TW,_):-!,
+	store_box_attributes(Rest,N,Id,TX,TY,TW,TH).
+store_box_attributes(
+		[attribute("W",TW)|Rest],
+		N,Id,TX,TY,_,TH):-!,
+	store_box_attributes(Rest,N,Id,TX,TY,TW,TH).
+store_box_attributes(
+		[attribute("XC",TX)|Rest],
+		N,Id,_,TY,TW,TH):-!,
+	store_box_attributes(Rest,N,Id,TX,TY,TW,TH).
+store_box_attributes(
+		[attribute("YC",TY)|Rest],
+		N,Id,TX,_,TW,TH):-!,
+	store_box_attributes(Rest,N,Id,TX,TY,TW,TH).
+store_box_attributes([_|Rest],N,Id,TX,TY,TW,TH):-!,
+	store_box_attributes(Rest,N,Id,TX,TY,TW,TH).
+store_box_attributes(_,N,Id,TX,TY,TW,TH):-
+	X1== ?convert_to_numerical(TX),
+	Y1== ?convert_to_numerical(TY),
+	W1== ?convert_to_numerical(TW),
+	H1== ?convert_to_numerical(TH),!,
+	register_coordinates(N,Id,X1,Y1,W1,H1).
+store_box_attributes(_,_,_,_,_,_,_).
+--
+register_coordinates(N,Id,X,Y,W,H):-
+	append(object(N,Id,X,Y,W,H)).
+--
+is_unknown_group(Id1,Id2):-
+	?match(group(Id1,Id2)),!,
+	fail.
+is_unknown_group(Id1,Id2):-
+	?match(group(Id2,Id1)),!,
+	fail.
+is_unknown_group(_,_).
+--
+register_group(Id1,Id2):-
+	append(group(Id1,Id2)).
+--
+shorten_history(N,L):-
+	L > 0,!,
+	shorten_history(N-1,L-1).
+shorten_history(N,L):-
+	N > 0,!,
+	retract_all(object(N,_,_,_,_,_)),
+	shorten_history(N-1,L-1).
+shorten_history(_,_).
+--
+retrieve_coordinates(N,Id,X,Y,W,H):-
+	Item== ?match(object(N,Id,_,_,_,_)),!,
+	Item == object(N,Id,X,Y,W,H).
+]
+-----------------------------------------------------------------------

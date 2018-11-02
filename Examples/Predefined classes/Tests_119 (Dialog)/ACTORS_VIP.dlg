@@ -1,0 +1,38 @@
+mesh(80,25)
+window_font("Arial",17,[bold])
+dialog_font("Arial",24,[])
+
+dialog 'Main' (
+     "The Actor Prolog language",
+     default,default,default,
+     centered,centered,default)
+vbox(center)
+     "Please, enter any text:"
+     grid
+          row
+               column
+                    "I= "
+               end_of_column
+               column
+                    editname(i,10,"")
+               end_of_column
+               column
+                    statictext("     ")
+               end_of_column
+          end_of_row
+          row
+               column
+                    "J= "
+               end_of_column
+               column
+                    editname(j,10,"")
+               end_of_column
+               column
+                    statictext("     ")
+               end_of_column
+          end_of_row
+     end_of_grid
+     statictext("")
+     statictext("")
+end_of_vbox
+end_of_dialog

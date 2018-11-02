@@ -1,0 +1,29 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Flow patterns.     --
+--                                       --
+-- A question: What is an input argument --
+-- of a predicate?                       --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+p(INTEGER)	- (i);
+
+CLAUSES:
+
+goal:-
+	X == 100,
+	-- The X variable is an input
+	-- argument of the p predicate,
+	-- because it has a value in
+	-- this point of the program.
+	p(X).
+
+p(Y):-
+	writeln(Y).

@@ -1,0 +1,74 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  TAK                                                              --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  2015.06.28 02:32                                                 --
+--  Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB         --
+--  Windows7 - PM.64 (RUS)                                           --
+--  ========================================================         --
+--  AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                           --
+--                                                                   --
+--  g:\temp1\jv>java -version                                        --
+--  java version "1.7.0_80"                                          --
+--  Java(TM) SE Runtime Environment (build 1.7.0_80-b15)             --
+--  Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)  --
+--                                                                   --
+--  java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation            --
+--  -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch       --
+--                                                                   --
+--  10000 iterations take 39134 msec                                 --
+--  3.913400 milliseconds per iteration                              --
+--                                                                   --
+--  EXE file:                                                        --
+--                                                                   --
+--  10000 iterations take 11540 msec                                 --
+--  1.154 milliseconds per iteration                                 --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities'
+from "HARNESS"(TestData:=Triplet,Result:=INTEGER);
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+Triplet		= triple(INTEGER,INTEGER,INTEGER).
+--
+PREDICATES:
+--
+imperative:
+--
+tak(INTEGER,INTEGER,INTEGER,INTEGER)		- (i,i,i,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+[
+DOMAINS:
+--
+-- TestData	= Triplet.
+-- Result	= INTEGER.
+--
+CLAUSES:
+--
+data(triple(18,12,6)).
+--
+benchmark(triple(X,Y,Z),Out):-
+	tak(X,Y,Z,Out).
+--
+tak(X,Y,Z,A):-
+	X <= Y,!,
+	Z == A.
+tak(X1,Y1,Z1,A4):-
+	-- X1 > Y1,
+	X2== X1 - 1,
+	tak(X2,Y1,Z1,A1),
+	Y2== Y1 - 1,
+	tak(Y2,Z1,X1,A2),
+	Z2== Z1 - 1,
+	tak(Z2,X1,Y1,A3),
+	tak(A1,A2,A3,A4).
+]
+-----------------------------------------------------------------------

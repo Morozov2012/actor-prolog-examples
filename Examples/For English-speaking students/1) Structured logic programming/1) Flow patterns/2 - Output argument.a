@@ -1,0 +1,34 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Flow patterns.     --
+--                                       --
+-- A question: What is an output         --
+-- argument of a predicate?              --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+p(INTEGER)	- (o);
+
+CLAUSES:
+
+goal:-
+	-- The X variable is an output
+	-- argument of the p predicate,
+	-- because it has no value in
+	-- this point of the program.
+	p(X),
+	-- Now the X variable is an
+	-- input argument of the writeln
+	-- predicate, because it has a
+	-- value in this point of the
+	-- program.
+	writeln(X).
+
+p(Y):-
+	Y == 100.

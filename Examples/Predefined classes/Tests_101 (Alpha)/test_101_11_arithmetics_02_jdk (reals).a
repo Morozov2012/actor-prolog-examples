@@ -1,0 +1,153 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+Value	= REAL.
+
+PREDICATES:
+
+imperative:
+
+test0(Value)	- (i);
+test1(Value)	- (i);
+test2(Value)	- (i);
+test3(Value)	- (i);
+test4(Value)	- (i);
+test5(Value)	- (i);
+test6(Value)	- (i);
+test7(Value)	- (i);
+test8(Value)	- (i);
+test10(Value)	- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	X== 100.0,
+	con ? writeln("x=",X),
+	test0(X),
+	test1(X),
+	test2(X),
+	test3(X),
+	test4(X),
+	test5(X),
+	test6(X),
+	test7(X),
+	test8(X),
+	-- test9(X),
+	test10(X).
+--
+test0(X):-
+	con ? writeln("Test 0:"),
+	?sin(X),
+	?cos(X),
+	?tan(X),
+	?arctan(X),
+	?signum(X),
+	?pi,
+	?exp(X),
+	?ln(X),
+	?log10(X),
+	?sqrt(X),
+	?power(X,5),
+	?hypot(X,X),
+	?round(X),
+	?trunc(X),
+	?abs(X),
+	?random,
+	-- ?random(X),
+	-- ?inc(X),
+	-- ?dec(X),
+	-(X),
+	X+X,
+	X*X,
+	X-X,
+	X/X,
+	-- ?div(X,3),
+	-- ?mod(X,3),
+	con ? writeln("   O.K.").
+--
+test1(X):-
+	con ? writeln("Test 1:"),
+	A== ?sin(X) * ?sin(X),
+	B== ?cos(X) * ?cos(X),
+	con ? writeln("   sin(x)^2+cos(x)^2=",A+B),
+	C== ?hypot(?sin(X),?cos(X)),
+	con ? writeln("   hypot(sin(x),cos(x))=",C).
+--
+test2(X):-
+	con ? writeln("Test 2:"),
+	E== ?tan(?arctan(X)),
+	con ? writeln("   tan(arctan(x))=",E).
+--
+test3(_):-
+	con ? writeln("Test 3:"),
+	con ? writeln("   pi=",?pi).
+--
+test4(X):-
+	con ? writeln("Test 4:"),
+	C== ?exp(2*?ln(?sqrt(X))),
+	con ? writeln("   e^(2*ln(sqrt(x)))=",C),
+	D== ?exp(?log10(X)*?ln(10)),
+	con ? writeln("   e^(log10(x)*ln(10))=",D),
+	E== ?power(X,-2/3),
+	con ? writeln("   x^(-2/3)=",E),
+	F== ?exp((-2/3)*?ln(X)),
+	con ? writeln("   exp((-2/3)*ln(x))=",F).
+--
+test5(_):-
+	con ? writeln("Test 5:"),
+	Y== -1.8,
+	con ? writeln("   y=",Y),
+	F== ?round(Y),
+	con ? writeln("   round(y)=",F),
+	G== ?trunc(Y),
+	con ? writeln("   trunc(y)=",G),
+	H== ?abs(Y),
+	con ? writeln("   abs(y)=",H).
+--
+test6(_):-
+	con ? writeln("Test 6:"),
+	I== ?random(),
+	con ? writeln("   random()=",I),
+	Bound== 100,
+	con ? writeln("   bound=",Bound),
+	J== ?random(Bound),
+	con ? writeln("   random(x)=",J).
+--
+test7(X):-
+	con ? writeln("Test 7:"),
+	-- K== ?inc(X),
+	-- con ? writeln("   inc(x)=",K),
+	-- L== ?dec(X),
+	-- con ? writeln("   dec(x)=",L),
+	M== ?'-'(X),
+	con ? writeln("   -(x)=",M).
+--
+test8(X):-
+	con ? writeln("Test 8:"),
+	A== X * X,
+	con ? writeln("   x*x=",A),
+	B== A + X,
+	con ? writeln("   (x*x)+x=",B),
+	C== B / X,
+	con ? writeln("   ((x*x)+x)/x=",C),
+	D== C - X,
+	con ? writeln("   ((x*x)+x/x)-x=",D).
+--
+test10(X):-
+	con ? writeln("Test 10:"),
+	A== ?signum(X),
+	con ? writeln("   signum(x)=",A),
+	B== ?signum(-(X)),
+	con ? writeln("   signum(-x)=",B),
+	C== ?signum(0),
+	con ? writeln("   signum(x)=",C).
+]

@@ -1,0 +1,80 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',18)
+
+dialog 'MyDialog'("RadioButton Demo",default,default,default,centered,centered,default)
+vbox(center)
+	groupbox("Radiobuttons")
+		radiobuttons(output_slot_1,'unknown')
+			hbox(center)
+				radiobutton("&First")
+				radiobutton("&Second")
+				radiobutton("&Third")
+				radiobutton("F&ourth")
+				radiobutton("F&ifth")
+			end_of_hbox
+			hbox(center)
+				radiobutton("Si&xth")
+				radiobutton("S&eventh")
+				radiobutton("Eig&hth")
+				radiobutton("&Ninth")
+			end_of_hbox
+		end_of_radiobuttons
+	end_of_groupbox
+	grid
+		row
+			column
+				button("action11","Put 1")
+			end_of_column
+			column
+				button("action12","Put 17")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action21","Put 3.9")
+			end_of_column
+			column
+				button("action22","Put \"7\"")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action31","Put 3")
+			end_of_column
+			column
+				button("action32","Put \"Ninth\"")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action41","Put 0")
+			end_of_column
+			column
+				button("action42","Put \"0\"")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action51","Put 'unknown'")
+			end_of_column
+			column
+				button("action52","Put 'X'")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action61","Put #")
+			end_of_column
+			column
+				button("action62","Put _")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action7","Get value")
+			end_of_column
+		end_of_row
+	end_of_grid
+end_of_vbox
+end_of_dialog

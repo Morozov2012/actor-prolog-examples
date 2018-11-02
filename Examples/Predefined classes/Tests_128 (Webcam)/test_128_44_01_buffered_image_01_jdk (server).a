@@ -1,0 +1,62 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute this example in the first environment and
+-- the client example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+-----------------------------------------------------------------------
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	buffer		= ('BufferedImage');
+	timer		= ('Timer');
+	con		= ('Console');
+--
+	store		= ('DataStore',
+				name="MyDataStore1.dat",
+				access_mode='modifying',
+				sharing_mode='shared_access');
+	database	= ('MyDatabase',
+				place=shared(store,"MyTable"));
+--
+constant:
+--
+	image_encoding_attributes = {
+				format:'JPEG',
+				compressionQuality:0.9};
+--
+[
+goal:-
+	con ? set_color('Orange'),
+	con ? write("OPENING THE DATA STORE... "),
+	store ? open,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	database ? begin_transaction('modifying'),!,
+	database ? insert(buffer),
+	database ? end_transaction,
+	watch_webcam_state('yes'),
+	-- set_default_resolution('VGA'),
+	set_default_resolution('HD720'),
+	open.
+goal:-!,
+	con ? set_color('Red'),
+	con ? writeln("Sorry, I cannot access the database."),
+	con ? set_color('default').
+--
+webcam_image_obtained(_):-!,
+	get_image(buffer).
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,979 @@
+<html>
+<head>
+<title>Actor Prolog. Example &quot;D:\MOROZOV\Z\Z-DJ\DEMO\EXE\EXAMPLES\DEMO PROGRAMS\JAVA3D\TEST_CANVAS3D_12_JAVA (CALCULATOR).A&quot;</title>
+</head>
+<body bgcolor="#F0F0F0">
+<table align="center" bgcolor="#FFFFFF" cellpadding=30>
+<tr>
+<td>
+<pre>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+<font color="0000FF"><i>-- An example of Actor Prolog program.                               --</i></font>
+<font color="0000FF"><i>-- (c) 2012 IRE RAS Alexei A. Morozov                                --</i></font>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+
+<font color="7F7F00"><u>import</u></font> .. <font color="7F7F00"><u>from</u></font> <font color="0000FF">&quot;morozov/Java3D&quot;</font>;
+<font color="7F7F00"><u>import</u></font> .. <font color="7F7F00"><u>from</u></font> <font color="0000FF">&quot;morozov/Sound&quot;</font>;
+
+<font color="7F7F00"><u>class</u></font> 'Main' <font color="#993300">(</font><font color="7F7F00"><u>specialized</u></font> 'Canvas3D'<font color="#993300">)</font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>constant</u></font>:
+<font color="0000FF"><i>--</i></font>
+bounds          : <font color="#008000">BoundingSphere</font>        = 'BoundingSphere'<font color="#993300">(</font><font color="FF00FF">{}</font><font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+clicked_color   : <font color="#008000">Appearance</font>
+                        = 'Appearance'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                material: 'Material'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        emissiveColor: 'Emerald',
+                                        lightingEnable: 'yes'
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>;
+entered_color   : <font color="#008000">Appearance</font>
+                        = 'Appearance'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                material: 'Material'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        emissiveColor: 'Lime',
+                                        lightingEnable: 'yes'
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>;
+exited_color    : <font color="#008000">Appearance</font>
+                        = 'Appearance'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                material: 'Material'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        emissiveColor: 'Black',
+                                        lightingEnable: 'yes'
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+fontName        : <font color="#008000">FontName</font>              = 'helvetica';
+tessellationTolerance
+                : <font color="#008000">TessellationTolerance</font> = <font color="FF00FF">1.0e-2</font>;
+<font color="0000FF"><i>--</i></font>
+bold_font       : <font color="#008000">Font3D</font>
+                        = 'Font3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                fontName,
+                                fontSize: <font color="0000FF">230</font>,
+                                fontStyle: <font color="#800080">[</font>'bold'<font color="#800080">]</font>,
+                                extrudePath: 'FontExtrusion'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        depth: <font color="0000FF">0</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                tessellationTolerance
+                                <font color="FF00FF">}</font><font color="#993300">)</font>;
+normal_font     : <font color="#008000">Font3D</font>
+                        = 'Font3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                fontName,
+                                fontSize: <font color="0000FF">230</font>,
+                                fontStyle: <font color="#800080">[]</font>,
+                                extrudePath: 'FontExtrusion'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        depth: <font color="0000FF">0</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                tessellationTolerance
+                                <font color="FF00FF">}</font><font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+background_color                        = 'Black';
+enable_scene_antialiasing               = 'yes';
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>internal</u></font>:
+<font color="0000FF"><i>--</i></font>
+clip_0          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_0.wav&quot;</font><font color="#993300">)</font>;
+clip_1          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_1.wav&quot;</font><font color="#993300">)</font>;
+clip_2          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_2.wav&quot;</font><font color="#993300">)</font>;
+clip_3          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_3.wav&quot;</font><font color="#993300">)</font>;
+clip_4          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_4.wav&quot;</font><font color="#993300">)</font>;
+clip_5          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_5.wav&quot;</font><font color="#993300">)</font>;
+clip_6          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_6.wav&quot;</font><font color="#993300">)</font>;
+clip_7          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_7.wav&quot;</font><font color="#993300">)</font>;
+clip_8          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_8.wav&quot;</font><font color="#993300">)</font>;
+clip_9          = <font color="#993300">(</font>'Clip',
+                        name=<font color="0000FF">&quot;jar:data/phone_button_9.wav&quot;</font><font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+calculator      = <font color="#993300">(</font>'SimpleCalculator',
+                        display=self<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+con             = <font color="#993300">(</font>'Console',
+                        x= <font color="0000FF">40</font>,
+                        width= <font color="0000FF">40</font><font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>constant</u></font>:
+<font color="0000FF"><i>--</i></font>
+character_code_Sign             = <font color="0000FF">16</font>#<font color="#008000">B1</font>#;
+character_code_Backspace        = <font color="0000FF">16</font>#<font color="0000FF">2190</font>#;
+character_code_Multiply         = <font color="0000FF">16</font>#<font color="#008000">D7</font>#;
+character_code_Minus            = <font color="0000FF">16</font>#<font color="0000FF">2212</font>#;
+<font color="0000FF"><i>--</i></font>
+<font color="#800080">[</font>
+<font color="7F7F00"><u>PREDICATES</u></font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>imperative</u></font>:
+<font color="0000FF"><i>--</i></font>
+one_button<font color="#993300">(</font>     <font color="#008000">Numerical</font>,
+                <font color="#008000">Numerical</font>,
+                <font color="#008000">STRING</font><font color="#993300">)</font> = <font color="#008000">Node</font>          - <font color="#993300">(</font>i,i,i<font color="#993300">)</font>;
+one_button<font color="#993300">(</font>     <font color="#008000">Numerical</font>,
+                <font color="#008000">Numerical</font>,
+                <font color="#008000">STRING</font>,
+                <font color="#008000">Text3D_VerticalAlignment</font>,
+                <font color="#008000">Numerical</font><font color="#993300">)</font> = <font color="#008000">Node</font>       - <font color="#993300">(</font>i,i,i,i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+display<font color="#993300">(</font><font color="#008000">Numerical</font>,<font color="#008000">Numerical</font><font color="#993300">)</font> = <font color="#008000">Node</font>             - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+point_light<font color="#993300">(</font>    <font color="#008000">Numerical</font>,
+                <font color="#008000">Numerical</font>,
+                <font color="#008000">Angle</font>,
+                <font color="#008000">TimeInterval</font>,
+                <font color="#008000">Color3D</font><font color="#993300">)</font> = <font color="#008000">Node</font>         - <font color="#993300">(</font>i,i,i,i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+update_appearance_and_font
+        <font color="#993300">(</font><font color="#008000">NodeLabels</font>,<font color="#008000">Appearance</font>,<font color="#008000">Font3D</font><font color="#993300">)</font>          - <font color="#993300">(</font>i,i,i<font color="#993300">)</font>;
+update_appearance_and_font_of_node
+        <font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Appearance</font>,<font color="#008000">Font3D</font><font color="#993300">)</font>           - <font color="#993300">(</font>i,i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+update_font<font color="#993300">(</font><font color="#008000">NodeLabels</font>,<font color="#008000">Font3D</font><font color="#993300">)</font>                  - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+update_font_of_node<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Font3D</font><font color="#993300">)</font>           - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+get_sound<font color="#993300">(</font><font color="#008000">NodeLabel</font>,'Clip'<font color="#993300">)</font>                     - <font color="#993300">(</font>i,o<font color="#993300">)</font>;
+get_numbered_sound<font color="#993300">(</font><font color="#008000">Numerical</font>,'Clip'<font color="#993300">)</font>            - <font color="#993300">(</font>i,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+play_clip<font color="#993300">(</font>'Clip'<font color="#993300">)</font>                               - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+process_mouse_click<font color="#993300">(</font><font color="#008000">NodeLabel</font><font color="#993300">)</font>                  - <font color="#993300">(</font>i<font color="#993300">)</font>;
+show_value<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">)</font>                                   - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>determ</u></font>:
+<font color="0000FF"><i>--</i></font>
+concat<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">NodeLabel</font>,<font color="#008000">NodeLabel</font><font color="#993300">)</font>   - <font color="#993300">(</font>i,o,i<font color="#993300">)(</font>i,i,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>CLAUSES</u></font>:
+<font color="0000FF"><i>--</i></font>
+goal:-!,
+        clip_0 <font color="#993300">?</font> open,
+        clip_1 <font color="#993300">?</font> open,
+        clip_2 <font color="#993300">?</font> open,
+        clip_3 <font color="#993300">?</font> open,
+        clip_4 <font color="#993300">?</font> open,
+        clip_5 <font color="#993300">?</font> open,
+        clip_6 <font color="#993300">?</font> open,
+        clip_7 <font color="#993300">?</font> open,
+        clip_8 <font color="#993300">?</font> open,
+        clip_9 <font color="#993300">?</font> open,
+        <font color="0000FF"><i>--</i></font>
+        <font color="#008000">Sign</font>== <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Sign<font color="#800080">]</font><font color="#993300">)</font>,
+        <font color="#008000">Backspace</font>== <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Backspace<font color="#800080">]</font><font color="#993300">)</font>,
+        <font color="#008000">Multiply</font>== <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Multiply<font color="#800080">]</font><font color="#993300">)</font>,
+        <font color="#008000">Minus</font>== <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Minus<font color="#800080">]</font><font color="#993300">)</font>,
+        <font color="0000FF"><i>--</i></font>
+        <font color="#008000">Brightness</font>== <font color="FF00FF">1.0</font>,
+        <font color="#008000">HalfBrightness</font>== <font color="#008000">Brightness</font> / <font color="0000FF">2</font>,
+        <font color="0000FF"><i>--</i></font>
+        <font color="#008000">DeltaX</font>== <font color="0000FF">450</font>,
+        <font color="#008000">X_U1</font>== <font color="#008000">DeltaX</font>,
+        <font color="#008000">X_U2</font>== <font color="#008000">X_U1</font> + <font color="#008000">DeltaX</font>,
+        <font color="#008000">X_D1</font>== - <font color="#993300">(</font><font color="#008000">DeltaX</font><font color="#993300">)</font>,
+        <font color="#008000">X_D2</font>== <font color="#008000">X_D1</font> - <font color="#008000">DeltaX</font>,
+        <font color="0000FF"><i>--</i></font>
+        <font color="#008000">DeltaY</font>== <font color="0000FF">320</font>,
+        <font color="#008000">Y_U1</font>== <font color="#008000">DeltaY</font>,
+        <font color="#008000">Y_U2</font>== <font color="#008000">Y_U1</font> + <font color="0000FF">220</font>,
+        <font color="#008000">Y_D1</font>== - <font color="#993300">(</font><font color="#008000">DeltaY</font><font color="#993300">)</font>,
+        <font color="#008000">Y_D2</font>== <font color="#008000">Y_D1</font> - <font color="#008000">DeltaY</font>,
+        <font color="0000FF"><i>--</i></font>
+        show<font color="#993300">(</font><font color="#800080">[</font>  'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        allowChildrenWrite: 'yes',
+                        transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                scale: <font color="FF00FF">0.00059</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                        branches: <font color="#800080">[</font>
+                                <font color="#993300">?</font>display<font color="#993300">(</font><font color="0000FF">0</font>,<font color="#008000">Y_U2</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_D2</font>,<font color="#008000">Y_D2</font>,<font color="0000FF">&quot;0&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_D1</font>,<font color="#008000">Y_D2</font>,<font color="#008000">Sign</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="0000FF">0</font>,<font color="#008000">Y_D2</font>,<font color="0000FF">&quot;,&quot;</font>,'ALIGN_TOP',<font color="0000FF">0</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_D2</font>,<font color="#008000">Y_D1</font>,<font color="0000FF">&quot;1&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_D1</font>,<font color="#008000">Y_D1</font>,<font color="0000FF">&quot;2&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="0000FF">0</font>,<font color="#008000">Y_D1</font>,<font color="0000FF">&quot;3&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_D2</font>,<font color="0000FF">0</font>,<font color="0000FF">&quot;4&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_D1</font>,<font color="0000FF">0</font>,<font color="0000FF">&quot;5&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="0000FF">0</font>,<font color="0000FF">0</font>,<font color="0000FF">&quot;6&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_D2</font>,<font color="#008000">Y_U1</font>,<font color="0000FF">&quot;7&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_D1</font>,<font color="#008000">Y_U1</font>,<font color="0000FF">&quot;8&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="0000FF">0</font>,<font color="#008000">Y_U1</font>,<font color="0000FF">&quot;9&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_U1</font>,<font color="#008000">Y_U1</font>,<font color="0000FF">&quot;/&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_U1</font>,<font color="0000FF">0</font>,<font color="#008000">Multiply</font>,'ALIGN_CENTER',-<font color="0000FF">35</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_U1</font>,<font color="#008000">Y_D1</font>,<font color="#008000">Minus</font>,'ALIGN_CENTER',-<font color="0000FF">60</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_U1</font>,<font color="#008000">Y_D2</font>,<font color="0000FF">&quot;+&quot;</font>,'ALIGN_CENTER',-<font color="0000FF">27</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_U2</font>,<font color="#008000">Y_U1</font>,<font color="0000FF">&quot;C&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_U2</font>,<font color="0000FF">0</font>,<font color="#008000">Backspace</font>,'ALIGN_TOP',<font color="0000FF">11</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_U2</font>,<font color="#008000">Y_D1</font>,<font color="0000FF">&quot;%&quot;</font><font color="#993300">)</font>,
+                                <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X_U2</font>,<font color="#008000">Y_D2</font>,<font color="0000FF">&quot;=&quot;</font>,'ALIGN_TOP',-<font color="0000FF">14</font><font color="#993300">)</font>
+                                <font color="#800080">]</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                'Background'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        color: background_color,
+                        applicationBounds: bounds
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                'AmbientLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        lightOn: 'yes',
+                        color: 'White',
+                        influencingBounds: bounds
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                <font color="#993300">?</font>point_light<font color="#993300">(</font>-<font color="FF00FF">0.5</font>,<font color="FF00FF">0.5</font>,<font color="#993300">(</font><font color="#993300">?</font>'-'<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">())</font> / <font color="0000FF">4</font><font color="#993300">)</font>,<font color="0000FF">7300</font>,c3<font color="#993300">(</font><font color="#008000">Brightness</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font><font color="#993300">))</font>,
+                <font color="#993300">?</font>point_light<font color="#993300">(</font><font color="FF00FF">0.1</font>,<font color="FF00FF">0.5</font>,<font color="#993300">?</font>'-'<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">())</font>,<font color="0000FF">15100</font>,c3<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="#008000">Brightness</font>,<font color="FF00FF">0.0</font><font color="#993300">))</font>,
+                <font color="#993300">?</font>point_light<font color="#993300">(</font>-<font color="FF00FF">0.5</font>,<font color="FF00FF">0.1</font>,<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">()</font> / <font color="0000FF">4</font><font color="#993300">)</font>,<font color="0000FF">9100</font>,c3<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,<font color="#008000">Brightness</font><font color="#993300">))</font>,
+                <font color="#993300">?</font>point_light<font color="#993300">(</font><font color="FF00FF">0.5</font>,<font color="FF00FF">0.1</font>,<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">()</font> / <font color="0000FF">8</font><font color="#993300">)</font>,<font color="0000FF">5310</font>,c3<font color="#993300">(</font><font color="#008000">HalfBrightness</font>,<font color="#008000">HalfBrightness</font>,<font color="FF00FF">0.0</font><font color="#993300">))</font>,
+                <font color="#993300">?</font>point_light<font color="#993300">(</font>-<font color="FF00FF">0.1</font>,-<font color="FF00FF">0.5</font>,<font color="#993300">(</font><font color="#993300">?</font>'-'<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">())</font> / <font color="0000FF">8</font><font color="#993300">)</font>,<font color="0000FF">11010</font>,c3<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="#008000">HalfBrightness</font>,<font color="#008000">HalfBrightness</font><font color="#993300">))</font>,
+                <font color="#993300">?</font>point_light<font color="#993300">(</font>-<font color="FF00FF">0.5</font>,-<font color="FF00FF">0.1</font>,<font color="#993300">(</font><font color="#993300">?</font>'-'<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">())</font> / <font color="0000FF">3</font><font color="#993300">)</font>,<font color="0000FF">8310</font>,c3<font color="#993300">(</font><font color="#008000">HalfBrightness</font>,<font color="FF00FF">0.0</font>,<font color="#008000">HalfBrightness</font><font color="#993300">))</font>,
+                'PickCanvas'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        handleMouseClicked: 'yes',
+                        handleMouseEntered: 'yes',
+                        handleMouseExited: 'yes',
+                        handleMousePressed: 'yes',
+                        handleMouseReleased: 'no',
+                        handleMouseDragged: 'no',
+                        handleMouseMoved: 'no',
+                        isPassive: 'no',
+                        period: <font color="0000FF">150</font>,
+                        tolerance: <font color="0000FF">3</font>,
+                        mode: 'GEOMETRY'
+                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                <font color="#800080">]</font><font color="#993300">)</font>,
+        calculator <font color="#993300">?</font> display_current_value.
+<font color="0000FF"><i>--</i></font>
+one_button<font color="#993300">(</font><font color="#008000">X</font>,<font color="#008000">Y</font>,<font color="#008000">Text</font><font color="#993300">)</font>
+        = <font color="#993300">?</font>one_button<font color="#993300">(</font><font color="#008000">X</font>,<font color="#008000">Y</font>,<font color="#008000">Text</font>,'ALIGN_CENTER',<font color="0000FF">0</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+one_button<font color="#993300">(</font><font color="#008000">X</font>,<font color="#008000">Y</font>,<font color="#008000">Text</font>,<font color="#008000">VerticalAlignment</font>,<font color="#008000">Y0</font><font color="#993300">)</font>
+        = 'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                allowChildrenWrite: 'yes',
+                transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        translation: <font color="#800080">[</font><font color="#008000">X</font>,<font color="#008000">Y</font>,<font color="0000FF">0</font><font color="#800080">]</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                branches: <font color="#800080">[</font>
+                        'Sphere'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                label: <font color="#993300">?</font>cast<font color="#993300">(</font><font color="0000FF">&quot;NodeLabel&quot;</font>,<font color="#008000">Text</font><font color="#993300">)</font>,
+                                radius: <font color="0000FF">150</font>,
+                                divisions: <font color="0000FF">300</font>,
+                                enableGeometryPicking: 'yes',
+                                enableAppearanceModify: 'yes',
+                                generateNormals: 'yes',
+                                generateNormalsInward: 'yes',
+                                appearance: 'Appearance'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        material: 'Material'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                ambientColor: 'Black',
+                                                diffuseColor: 'Black',
+                                                specularColor: 'White',
+                                                emissiveColor: 'Black',
+                                                shininess: <font color="0000FF">25</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                        'Shape3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                label: <font color="#008000">LetterLabel</font>,
+                                allowGeometryRead: 'yes',
+                                allowAppearanceWrite: 'yes',
+                                geometry: 'Text3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        allowFont3DRead: 'yes',
+                                        allowFont3DWrite: 'yes',
+                                        font3D: normal_font,
+                                        string: <font color="#008000">Text</font>,
+                                        position: p<font color="#993300">(</font><font color="0000FF">0</font>,<font color="#008000">Y0</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                                        horizontalAlignment: 'ALIGN_CENTER',
+                                        verticalAlignment: <font color="#008000">VerticalAlignment</font>,
+                                        path: 'PATH_RIGHT',
+                                        characterSpacing: <font color="FF00FF">0.0</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                appearance: exited_color
+                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                        <font color="#800080">]</font>
+                <font color="FF00FF">}</font><font color="#993300">)</font> :-
+        <font color="#008000">LetterLabel</font>== <font color="0000FF">&quot;letter_&quot;</font> + <font color="#008000">Text</font>.
+        <font color="0000FF"><i>--</i></font>
+display<font color="#993300">(</font><font color="#008000">X</font>,<font color="#008000">Y</font><font color="#993300">)</font>
+        = 'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                allowChildrenWrite: 'yes',
+                transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        translation: <font color="#800080">[</font><font color="#008000">X</font>,<font color="#008000">Y</font>,<font color="0000FF">0</font><font color="#800080">]</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                branches: <font color="#800080">[</font>
+                        'Shape3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                label: <font color="0000FF">&quot;DISPLAY&quot;</font>,
+                                allowGeometryRead: 'yes',
+                                allowAppearanceWrite: 'yes',
+                                geometry: 'Text3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        allowFont3DRead: 'yes',
+                                        allowFont3DWrite: 'yes',
+                                        allowStringRead: 'yes',
+                                        allowStringWrite: 'yes',
+                                        font3D: 'Font3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                fontName,
+                                                fontSize: <font color="0000FF">270</font>,
+                                                fontStyle: <font color="#800080">[]</font>,
+                                                extrudePath: 'FontExtrusion'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        depth: <font color="0000FF">0</font>
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                tessellationTolerance
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                        string: <font color="0000FF">&quot;&quot;</font>,
+                                        position: p<font color="#993300">(</font><font color="0000FF">0</font>,<font color="0000FF">0</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                                        horizontalAlignment: 'ALIGN_CENTER',
+                                        verticalAlignment: 'ALIGN_CENTER',
+                                        path: 'PATH_RIGHT',
+                                        characterSpacing: <font color="FF00FF">0.0</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                appearance: exited_color
+                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                        <font color="#800080">]</font>
+                <font color="FF00FF">}</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+point_light<font color="#993300">(</font><font color="#008000">X0</font>,<font color="#008000">Y0</font>,<font color="#008000">RotZ</font>,<font color="#008000">Increasing</font>,<font color="#008000">C</font><font color="#993300">)</font>
+        = 'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                allowTransformRead: 'yes',
+                allowTransformWrite: 'yes',
+                branches: <font color="#800080">[</font>
+                        'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        translation: <font color="#800080">[</font><font color="#008000">X0</font>,<font color="#008000">Y0</font>,<font color="FF00FF">0.5</font><font color="#800080">]</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                branches: <font color="#800080">[</font>
+                                        'PointLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                color: <font color="#008000">C</font>,
+                                                influencingBounds: <font color="#008000">Bounds</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                                        <font color="#800080">]</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                        'RotationInterpolator'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                alpha: 'Alpha3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        increasingAlphaDuration: <font color="#008000">Increasing</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                transformAxis: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        rotZ: <font color="#008000">RotZ</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                schedulingBounds: <font color="#008000">Bounds</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                        <font color="#800080">]</font>
+                <font color="FF00FF">}</font><font color="#993300">)</font>
+        :-
+        <font color="#008000">Bounds</font>== 'BoundingSphere'<font color="#993300">(</font><font color="FF00FF">{</font>radius: <font color="0000FF">10</font><font color="FF00FF">}</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+mouse_clicked<font color="#993300">(</font><font color="#800080">[</font><font color="#008000">NodeLabel</font>|<font color="#008000">_</font><font color="#800080">]</font><font color="#993300">)</font>:-!,
+        update_font_of_node<font color="#993300">(</font><font color="#008000">NodeLabel</font>,normal_font<font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+mouse_entered<font color="#993300">(</font><font color="#800080">[</font><font color="#008000">NodeLabel</font>|<font color="#008000">_</font><font color="#800080">]</font><font color="#993300">)</font>:-!,
+        update_appearance_and_font_of_node<font color="#993300">(</font>
+                <font color="#008000">NodeLabel</font>,entered_color,normal_font<font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+mouse_exited<font color="#993300">(</font><font color="#800080">[</font><font color="#008000">NodeLabel</font>|<font color="#008000">_</font><font color="#800080">]</font><font color="#993300">)</font>:-!,
+        update_appearance_and_font_of_node<font color="#993300">(</font>
+                <font color="#008000">NodeLabel</font>,exited_color,normal_font<font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+mouse_pressed<font color="#993300">(</font><font color="#800080">[</font><font color="#008000">NodeLabel</font>|<font color="#008000">_</font><font color="#800080">]</font><font color="#993300">)</font>:-!,
+        get_sound<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Clip</font><font color="#993300">)</font>,
+        play_clip<font color="#993300">(</font><font color="#008000">Clip</font><font color="#993300">)</font>,
+        update_appearance_and_font_of_node<font color="#993300">(</font>
+                <font color="#008000">NodeLabel</font>,clicked_color,bold_font<font color="#993300">)</font>,
+        process_mouse_click<font color="#993300">(</font><font color="#008000">NodeLabel</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+mouse_released<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">)</font>:-!.
+<font color="0000FF"><i>--</i></font>
+mouse_dragged<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">)</font>:-!.
+<font color="0000FF"><i>--</i></font>
+mouse_moved<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">)</font>:-!.
+<font color="0000FF"><i>--</i></font>
+update_appearance_and_font<font color="#993300">(</font><font color="#800080">[</font><font color="#008000">NL</font>|<font color="#008000">Rest</font><font color="#800080">]</font>,<font color="#008000">Appearance</font>,<font color="#008000">Font</font><font color="#993300">)</font>:-!,
+        update_appearance_and_font_of_node<font color="#993300">(</font><font color="#008000">NL</font>,<font color="#008000">Appearance</font>,<font color="#008000">Font</font><font color="#993300">)</font>,
+        update_appearance_and_font<font color="#993300">(</font><font color="#008000">Rest</font>,<font color="#008000">Appearance</font>,<font color="#008000">Font</font><font color="#993300">)</font>.
+update_appearance_and_font<font color="#993300">(</font><font color="#800080">[]</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+update_appearance_and_font_of_node<font color="#993300">(</font><font color="0000FF">&quot;DISPLAY&quot;</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font>:-!.
+update_appearance_and_font_of_node<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Appearance</font>,<font color="#008000">Font</font><font color="#993300">)</font>:-
+        concat<font color="#993300">(</font><font color="0000FF">&quot;letter_&quot;</font>,<font color="#008000">_</font>,<font color="#008000">NodeLabel</font><font color="#993300">)</font>,!,
+        set_appearance<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Appearance</font><font color="#993300">)</font>,
+        set_font3d<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Font</font><font color="#993300">)</font>.
+update_appearance_and_font_of_node<font color="#993300">(</font><font color="#008000">NodeLabel1</font>,<font color="#008000">Appearance</font>,<font color="#008000">Font</font><font color="#993300">)</font>:-
+        concat<font color="#993300">(</font><font color="0000FF">&quot;letter_&quot;</font>,<font color="#008000">NodeLabel1</font>,<font color="#008000">NodeLabel2</font><font color="#993300">)</font>,!,
+        set_appearance<font color="#993300">(</font><font color="#008000">NodeLabel2</font>,<font color="#008000">Appearance</font><font color="#993300">)</font>,
+        set_font3d<font color="#993300">(</font><font color="#008000">NodeLabel2</font>,<font color="#008000">Font</font><font color="#993300">)</font>.
+update_appearance_and_font_of_node<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+update_font<font color="#993300">(</font><font color="#800080">[</font><font color="#008000">NL</font>|<font color="#008000">Rest</font><font color="#800080">]</font>,<font color="#008000">Font</font><font color="#993300">)</font>:-!,
+        update_font_of_node<font color="#993300">(</font><font color="#008000">NL</font>,<font color="#008000">Font</font><font color="#993300">)</font>,
+        update_font<font color="#993300">(</font><font color="#008000">Rest</font>,<font color="#008000">Font</font><font color="#993300">)</font>.
+update_font<font color="#993300">(</font><font color="#800080">[]</font>,<font color="#008000">_</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+update_font_of_node<font color="#993300">(</font><font color="0000FF">&quot;DISPLAY&quot;</font>,<font color="#008000">_</font><font color="#993300">)</font>:-!.
+update_font_of_node<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Font</font><font color="#993300">)</font>:-
+        concat<font color="#993300">(</font><font color="0000FF">&quot;letter_&quot;</font>,<font color="#008000">_</font>,<font color="#008000">NodeLabel</font><font color="#993300">)</font>,!,
+        set_font3d<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Font</font><font color="#993300">)</font>.
+update_font_of_node<font color="#993300">(</font><font color="#008000">NodeLabel1</font>,<font color="#008000">Font</font><font color="#993300">)</font>:-
+        concat<font color="#993300">(</font><font color="0000FF">&quot;letter_&quot;</font>,<font color="#008000">NodeLabel1</font>,<font color="#008000">NodeLabel2</font><font color="#993300">)</font>,!,
+        set_font3d<font color="#993300">(</font><font color="#008000">NodeLabel2</font>,<font color="#008000">Font</font><font color="#993300">)</font>.
+update_font_of_node<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+set_font3d<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font>:-!.
+<font color="0000FF"><i>--</i></font>
+get_sound<font color="#993300">(</font><font color="#008000">NodeLabel</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-
+        <font color="#008000">N</font>== <font color="#993300">?</font>convert_to_integer<font color="#993300">(</font><font color="#008000">NodeLabel</font><font color="#993300">)</font>,!,
+        get_numbered_sound<font color="#993300">(</font><font color="#008000">N</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="0000FF">&quot;/&quot;</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">1</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="0000FF">&quot;C&quot;</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">2</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="#008000">Label</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-
+        <font color="#008000">Label</font> == <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Multiply<font color="#800080">]</font><font color="#993300">)</font>,!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">3</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="#008000">Label</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-
+        <font color="#008000">Label</font> == <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Backspace<font color="#800080">]</font><font color="#993300">)</font>,!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">4</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="#008000">Label</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-
+        <font color="#008000">Label</font> == <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Minus<font color="#800080">]</font><font color="#993300">)</font>,!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">5</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="0000FF">&quot;%&quot;</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">6</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="0000FF">&quot;,&quot;</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">7</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="#008000">Label</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-
+        <font color="#008000">Label</font> == <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Sign<font color="#800080">]</font><font color="#993300">)</font>,!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">8</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="0000FF">&quot;+&quot;</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">9</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="0000FF">&quot;=&quot;</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-!,
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">0</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+get_sound<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">Clip</font><font color="#993300">)</font>:-
+        get_numbered_sound<font color="#993300">(</font><font color="0000FF">0</font>,<font color="#008000">Clip</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">0</font>,clip_0<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">1</font>,clip_1<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">2</font>,clip_2<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">3</font>,clip_3<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">4</font>,clip_4<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">5</font>,clip_5<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">6</font>,clip_6<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">7</font>,clip_7<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">8</font>,clip_8<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="0000FF">9</font>,clip_9<font color="#993300">)</font>:-!.
+get_numbered_sound<font color="#993300">(</font><font color="#008000">_</font>,clip_0<font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+play_clip<font color="#993300">(</font><font color="#008000">Clip</font><font color="#993300">)</font>:-
+        <font color="#008000">Clip</font> <font color="#993300">?</font> stop,
+        <font color="#008000">Clip</font> <font color="#993300">?</font> set_frame_position<font color="#993300">(</font><font color="0000FF">0</font><font color="#993300">)</font>,
+        <font color="#008000">Clip</font> <font color="#993300">?</font> start,!.
+play_clip<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+process_mouse_click<font color="#993300">(</font><font color="#008000">Label</font><font color="#993300">)</font>:-
+        <font color="#008000">N</font>== <font color="#993300">?</font>convert_to_integer<font color="#993300">(</font><font color="#008000">Label</font><font color="#993300">)</font>,!,
+        calculator <font color="#993300">?</font> enter_digit<font color="#993300">(</font><font color="#008000">N</font><font color="#993300">)</font>.
+process_mouse_click<font color="#993300">(</font><font color="#008000">Label</font><font color="#993300">)</font>:-
+        <font color="#008000">Label</font> == <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Sign<font color="#800080">]</font><font color="#993300">)</font>,!,
+        calculator <font color="#993300">?</font> change_sign.
+process_mouse_click<font color="#993300">(</font><font color="0000FF">&quot;,&quot;</font><font color="#993300">)</font>:-!,
+        calculator <font color="#993300">?</font> begin_fractional_part.
+process_mouse_click<font color="#993300">(</font><font color="0000FF">&quot;C&quot;</font><font color="#993300">)</font>:-!,
+        calculator <font color="#993300">?</font> reset.
+process_mouse_click<font color="#993300">(</font><font color="#008000">Label</font><font color="#993300">)</font>:-
+        <font color="#008000">Label</font> == <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Backspace<font color="#800080">]</font><font color="#993300">)</font>,!,
+        calculator <font color="#993300">?</font> backspace.
+process_mouse_click<font color="#993300">(</font><font color="0000FF">&quot;+&quot;</font><font color="#993300">)</font>:-!,
+        calculator <font color="#993300">?</font> operation<font color="#993300">(</font>'plus'<font color="#993300">)</font>.
+process_mouse_click<font color="#993300">(</font><font color="#008000">Label</font><font color="#993300">)</font>:-
+        <font color="#008000">Label</font> == <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Minus<font color="#800080">]</font><font color="#993300">)</font>,!,
+        calculator <font color="#993300">?</font> operation<font color="#993300">(</font>'minus'<font color="#993300">)</font>.
+process_mouse_click<font color="#993300">(</font><font color="#008000">Label</font><font color="#993300">)</font>:-
+        <font color="#008000">Label</font> == <font color="#993300">?</font>codes_to_string<font color="#993300">(</font><font color="#800080">[</font>character_code_Multiply<font color="#800080">]</font><font color="#993300">)</font>,!,
+        calculator <font color="#993300">?</font> operation<font color="#993300">(</font>'multiply'<font color="#993300">)</font>.
+process_mouse_click<font color="#993300">(</font><font color="0000FF">&quot;/&quot;</font><font color="#993300">)</font>:-!,
+        calculator <font color="#993300">?</font> operation<font color="#993300">(</font>'divide'<font color="#993300">)</font>.
+process_mouse_click<font color="#993300">(</font><font color="0000FF">&quot;=&quot;</font><font color="#993300">)</font>:-!,
+        calculator <font color="#993300">?</font> enter.
+process_mouse_click<font color="#993300">(</font><font color="0000FF">&quot;%&quot;</font><font color="#993300">)</font>:-!,
+        calculator <font color="#993300">?</font> percent.
+process_mouse_click<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+show_value<font color="#993300">(</font><font color="#008000">V</font><font color="#993300">)</font>:-
+        set_string<font color="#993300">(</font><font color="0000FF">&quot;DISPLAY&quot;</font>,<font color="#008000">V</font><font color="#993300">)</font>.
+<font color="#800080">]</font>
+
+<font color="7F7F00"><u>class</u></font> 'SimpleCalculator' <font color="#993300">(</font><font color="7F7F00"><u>specialized</u></font> 'Database'<font color="#993300">)</font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>internal</u></font>:
+<font color="0000FF"><i>--</i></font>
+display         : 'Main';
+<font color="0000FF"><i>--</i></font>
+text_operations = <font color="#993300">(</font>'Text'<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+con             = <font color="#993300">(</font>'Console'<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="#800080">[</font>
+<font color="7F7F00"><u>DOMAINS</u></font>:
+<font color="0000FF"><i>--</i></font>
+<font color="#008000">Target</font>          = sign<font color="#993300">(</font><font color="#008000">INTEGER</font><font color="#993300">)</font>;
+                  integer_part<font color="#993300">(</font><font color="#008000">INTEGER</font><font color="#993300">)</font>;
+                  'has_fractional_part';
+                  fractional_part<font color="#993300">(</font><font color="#008000">INTEGER</font>,<font color="#008000">INTEGER</font><font color="#993300">)</font>;
+                  first_argument<font color="#993300">(</font>
+                        <font color="#008000">INTEGER</font>,<font color="#008000">INTEGER</font>,<font color="#008000">INTEGER</font>,<font color="#008000">INTEGER</font><font color="#993300">)</font>;
+                  second_argument<font color="#993300">(</font>
+                        <font color="#008000">INTEGER</font>,<font color="#008000">INTEGER</font>,<font color="#008000">INTEGER</font>,<font color="#008000">INTEGER</font><font color="#993300">)</font>;
+                  current_operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">)</font>;
+                  'first_argument_is_displayed';
+                  'result_is_displayed'.
+<font color="#008000">Operation</font>       = 'plus'; 'minus'; 'multiply'; 'divide'.
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>PREDICATES</u></font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>imperative</u></font>:
+<font color="0000FF"><i>--</i></font>
+reset;
+prepare_display_if_necessary;
+clear_display;
+<font color="0000FF"><i>--</i></font>
+enter_digit<font color="#993300">(</font><font color="#008000">INTEGER</font><font color="#993300">)</font>                            - <font color="#993300">(</font>i<font color="#993300">)</font>;
+percent;
+change_sign;
+begin_fractional_part;
+backspace;
+<font color="0000FF"><i>--</i></font>
+operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">)</font>                            - <font color="#993300">(</font>i<font color="#993300">)</font>;
+enter;
+<font color="0000FF"><i>--</i></font>
+remember_second_argument;
+<font color="0000FF"><i>--</i></font>
+implement_operation<font color="#993300">(</font>
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Sign */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* IntegerPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* FractionalPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Counter */</i></font>,
+        <font color="#008000">Operation</font><font color="#993300">)</font>                      - <font color="#993300">(</font>i,i,i,i,i<font color="#993300">)</font>;
+implement_operation<font color="#993300">(</font>
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Sign */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* IntegerPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* FractionalPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Counter */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Sign */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* IntegerPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* FractionalPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Counter */</i></font>,
+        <font color="#008000">Operation</font><font color="#993300">)</font>                      - <font color="#993300">(</font>i,i,i,i,i,i,i,i,i<font color="#993300">)</font>;
+implement_operation<font color="#993300">(</font>
+        <font color="#008000">Numerical</font>,
+        <font color="#008000">Numerical</font>,
+        <font color="#008000">Operation</font><font color="#993300">)</font> = <font color="#008000">Numerical</font>          - <font color="#993300">(</font>i,i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>determ</u></font>:
+<font color="0000FF"><i>--</i></font>
+is_zero<font color="#993300">(</font><font color="#008000">Numerical</font><font color="#993300">)</font>                              - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>imperative</u></font>:
+<font color="0000FF"><i>--</i></font>
+assemble_number<font color="#993300">(</font>
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Sign */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* IntegerPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* FractionalPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Counter */</i></font><font color="#993300">)</font> = <font color="#008000">Numerical</font>      - <font color="#993300">(</font>i,i,i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+dismantle_number<font color="#993300">(</font>
+        <font color="#008000">Numerical</font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Sign */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* IntegerPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* FractionalPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Counter */</i></font><font color="#993300">)</font>          - <font color="#993300">(</font>i,o,o,o,o<font color="#993300">)</font>;
+dismantle_number<font color="#993300">(</font>
+        <font color="#008000">Numerical</font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* IntegerPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* FractionalPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Counter */</i></font><font color="#993300">)</font>          - <font color="#993300">(</font>i,o,o,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>determ</u></font>:
+<font color="0000FF"><i>--</i></font>
+search_dot<font color="#993300">(</font><font color="#008000">STRING</font><font color="#993300">)</font> = <font color="#008000">INTEGER</font>                    - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>imperative</u></font>:
+<font color="0000FF"><i>--</i></font>
+count_nonzero_digits
+        <font color="#993300">(</font><font color="#008000">STRING</font>,<font color="#008000">STRING</font>,<font color="#008000">INTEGER</font>,<font color="#008000">INTEGER</font><font color="#993300">)</font>         - <font color="#993300">(</font>i,o,i,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>determ</u></font>:
+<font color="0000FF"><i>--</i></font>
+are_zeros<font color="#993300">(</font><font color="#008000">STRING</font><font color="#993300">)</font>                               - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>imperative</u></font>:
+<font color="0000FF"><i>--</i></font>
+convert_number<font color="#993300">(</font><font color="#008000">INTEGER</font>,<font color="#008000">STRING</font><font color="#993300">)</font> = <font color="#008000">INTEGER</font>        - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+update_current_value<font color="#993300">(</font>
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Sign */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* IntegerPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* FractionalPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Counter */</i></font><font color="#993300">)</font>          - <font color="#993300">(</font>i,i,i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+display_current_value;
+display_current_value<font color="#993300">(</font><font color="#008000">INTEGER</font><font color="#993300">)</font>                  - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+get_current_value<font color="#993300">(</font>
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Sign */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* IntegerPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* FractionalPart */</i></font>,
+        <font color="#008000">INTEGER</font> <font color="0000FF"><i>/* Counter */</i></font><font color="#993300">)</font>          - <font color="#993300">(</font>o,o,o,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+get_sign<font color="#993300">(</font><font color="#008000">INTEGER</font><font color="#993300">)</font>                               - <font color="#993300">(</font>o<font color="#993300">)</font>;
+sign_to_text<font color="#993300">(</font><font color="#008000">INTEGER</font>,<font color="#008000">STRING</font><font color="#993300">)</font>                    - <font color="#993300">(</font>i,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>determ</u></font>:
+<font color="0000FF"><i>--</i></font>
+get_fractional_part_or_Fail<font color="#993300">(</font><font color="#008000">INTEGER</font>,<font color="#008000">INTEGER</font><font color="#993300">)</font>    - <font color="#993300">(</font>o,o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>imperative</u></font>:
+<font color="0000FF"><i>--</i></font>
+get_integer_part<font color="#993300">(</font><font color="#008000">INTEGER</font><font color="#993300">)</font>                       - <font color="#993300">(</font>o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+'+'<font color="#993300">(</font><font color="#008000">Numerical</font>,<font color="#008000">Numerical</font><font color="#993300">)</font> = <font color="#008000">Numerical</font>            - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+'-'<font color="#993300">(</font><font color="#008000">Numerical</font>,<font color="#008000">Numerical</font><font color="#993300">)</font> = <font color="#008000">Numerical</font>            - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+'-'<font color="#993300">(</font><font color="#008000">Numerical</font><font color="#993300">)</font> = <font color="#008000">Numerical</font>                      - <font color="#993300">(</font>i<font color="#993300">)</font>;
+'*'<font color="#993300">(</font><font color="#008000">Numerical</font>,<font color="#008000">Numerical</font><font color="#993300">)</font> = <font color="#008000">Numerical</font>            - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+'/'<font color="#993300">(</font><font color="#008000">Numerical</font>,<font color="#008000">Numerical</font><font color="#993300">)</font> = <font color="#008000">Numerical</font>            - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>CLAUSES</u></font>:
+<font color="0000FF"><i>--</i></font>
+reset:-
+        retract_all,
+        display_current_value.
+<font color="0000FF"><i>--</i></font>
+prepare_display_if_necessary:-
+        find<font color="#993300">(</font>'result_is_displayed'<font color="#993300">)</font>,!,
+        retract_all<font color="#993300">(</font>'result_is_displayed'<font color="#993300">)</font>,
+        clear_display.
+prepare_display_if_necessary:-
+        find<font color="#993300">(</font>'first_argument_is_displayed'<font color="#993300">)</font>,!,
+        retract_all<font color="#993300">(</font>'first_argument_is_displayed'<font color="#993300">)</font>,
+        clear_display.
+prepare_display_if_necessary.
+<font color="0000FF"><i>--</i></font>
+clear_display:-
+        retract_all<font color="#993300">(</font>'has_fractional_part'<font color="#993300">)</font>,
+        retract_all<font color="#993300">(</font>sign<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        retract_all<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        retract_all<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>.
+<font color="0000FF"><i>--</i></font>
+enter_digit<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">)</font>:-
+        prepare_display_if_necessary,
+        fail.
+enter_digit<font color="#993300">(</font><font color="#008000">Digit</font><font color="#993300">)</font>:-
+        <font color="#008000">Item</font>== <font color="#993300">?</font>match<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item</font> == fractional_part<font color="#993300">(</font><font color="#008000">N1</font>,<font color="#008000">C1</font><font color="#993300">)</font>,!,
+        <font color="#008000">N2</font>== <font color="#008000">N1</font> * <font color="0000FF">10</font> + <font color="#008000">Digit</font>,
+        <font color="#008000">C2</font>== <font color="#008000">C1</font> + <font color="0000FF">1</font>,
+        retract_all<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">N2</font>,<font color="#008000">C2</font><font color="#993300">))</font>,
+        display_current_value.
+enter_digit<font color="#993300">(</font><font color="#008000">N2</font><font color="#993300">)</font>:-
+        find<font color="#993300">(</font>'has_fractional_part'<font color="#993300">)</font>,!,
+        insert<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">N2</font>,<font color="0000FF">1</font><font color="#993300">))</font>,
+        display_current_value.
+enter_digit<font color="#993300">(</font><font color="#008000">Digit</font><font color="#993300">)</font>:-
+        <font color="#008000">Item</font>== <font color="#993300">?</font>match<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item</font> == integer_part<font color="#993300">(</font><font color="#008000">N1</font><font color="#993300">)</font>,!,
+        <font color="#008000">N2</font>== <font color="#008000">N1</font> * <font color="0000FF">10</font> + <font color="#008000">Digit</font>,
+        retract_all<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">N2</font><font color="#993300">))</font>,
+        display_current_value.
+enter_digit<font color="#993300">(</font><font color="#008000">N2</font><font color="#993300">)</font>:-
+        insert<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">N2</font><font color="#993300">))</font>,
+        display_current_value.
+<font color="0000FF"><i>--</i></font>
+percent:-
+        <font color="#008000">Item1</font>== <font color="#993300">?</font>match<font color="#993300">(</font>first_argument<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item1</font> == first_argument<font color="#993300">(</font>
+                <font color="#008000">Sign1</font>,<font color="#008000">IntegerPart1</font>,<font color="#008000">FractionalPart1</font>,<font color="#008000">Counter1</font><font color="#993300">)</font>,!,
+        get_current_value<font color="#993300">(</font>
+                <font color="#008000">Sign2</font>,<font color="#008000">IntegerPart2</font>,<font color="#008000">FractionalPart2</font>,<font color="#008000">Counter2</font><font color="#993300">)</font>,
+        <font color="#008000">V1</font>== <font color="#993300">?</font>assemble_number<font color="#993300">(</font>
+                <font color="#008000">Sign1</font>,<font color="#008000">IntegerPart1</font>,<font color="#008000">FractionalPart1</font>,<font color="#008000">Counter1</font><font color="#993300">)</font>,
+        <font color="#008000">V2</font>== <font color="#993300">?</font>assemble_number<font color="#993300">(</font>
+                <font color="#008000">Sign2</font>,<font color="#008000">IntegerPart2</font>,<font color="#008000">FractionalPart2</font>,<font color="#008000">Counter2</font><font color="#993300">)</font>,
+        <font color="#008000">V3</font>== <font color="#008000">V1</font> / <font color="0000FF">100</font> * <font color="#008000">V2</font>,
+        dismantle_number<font color="#993300">(</font>
+                <font color="#008000">V3</font>,<font color="#008000">Sign3</font>,<font color="#008000">IntegerPart3</font>,<font color="#008000">FractionalPart3</font>,<font color="#008000">Counter3</font><font color="#993300">)</font>,
+        update_current_value<font color="#993300">(</font>
+                <font color="#008000">Sign3</font>,<font color="#008000">IntegerPart3</font>,<font color="#008000">FractionalPart3</font>,<font color="#008000">Counter3</font><font color="#993300">)</font>,
+        display_current_value.
+percent.
+<font color="0000FF"><i>--</i></font>
+change_sign:-
+        prepare_display_if_necessary,
+        fail.
+change_sign:-
+        <font color="#008000">Item</font>== <font color="#993300">?</font>match<font color="#993300">(</font>sign<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item</font> == sign<font color="#993300">(</font><font color="#008000">N1</font><font color="#993300">)</font>,!,
+        <font color="#008000">N2</font>== - <font color="#993300">(</font><font color="#008000">N1</font><font color="#993300">)</font>,
+        retract_all<font color="#993300">(</font>sign<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>sign<font color="#993300">(</font><font color="#008000">N2</font><font color="#993300">))</font>,
+        display_current_value<font color="#993300">(</font><font color="#008000">N2</font><font color="#993300">)</font>.
+change_sign:-
+        <font color="#008000">N2</font>== -<font color="0000FF">1</font>,
+        insert<font color="#993300">(</font>sign<font color="#993300">(</font><font color="#008000">N2</font><font color="#993300">))</font>,
+        display_current_value<font color="#993300">(</font><font color="#008000">N2</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+begin_fractional_part:-
+        prepare_display_if_necessary,
+        fail.
+begin_fractional_part:-
+        find<font color="#993300">(</font>'has_fractional_part'<font color="#993300">)</font>,!.
+begin_fractional_part:-
+        insert<font color="#993300">(</font>'has_fractional_part'<font color="#993300">)</font>,
+        display_current_value.
+<font color="0000FF"><i>--</i></font>
+backspace:-
+        prepare_display_if_necessary,
+        fail.
+backspace:-
+        <font color="#008000">Item</font>== <font color="#993300">?</font>match<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item</font> == fractional_part<font color="#993300">(</font><font color="#008000">_</font>,<font color="0000FF">1</font><font color="#993300">)</font>,!,
+        retract_all<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        display_current_value.
+backspace:-
+        <font color="#008000">Item</font>== <font color="#993300">?</font>match<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item</font> == fractional_part<font color="#993300">(</font><font color="#008000">N1</font>,<font color="#008000">C1</font><font color="#993300">)</font>,!,
+        <font color="#008000">N2</font>== <font color="#993300">?</font>div<font color="#993300">(</font><font color="#008000">N1</font>,<font color="0000FF">10</font><font color="#993300">)</font>,
+        <font color="#008000">C2</font>== <font color="#008000">C1</font> - <font color="0000FF">1</font>,
+        retract_all<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">N2</font>,<font color="#008000">C2</font><font color="#993300">))</font>,
+        display_current_value.
+backspace:-
+        find<font color="#993300">(</font>'has_fractional_part'<font color="#993300">)</font>,!,
+        retract_all<font color="#993300">(</font>'has_fractional_part'<font color="#993300">)</font>,
+        display_current_value.
+backspace:-
+        <font color="#008000">Item</font>== <font color="#993300">?</font>match<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item</font> == integer_part<font color="#993300">(</font><font color="#008000">N1</font><font color="#993300">)</font>,!,
+        <font color="#008000">N2</font>== <font color="#993300">?</font>div<font color="#993300">(</font><font color="#008000">N1</font>,<font color="0000FF">10</font><font color="#993300">)</font>,
+        retract_all<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">N2</font><font color="#993300">))</font>,
+        display_current_value.
+backspace.
+<font color="0000FF"><i>--</i></font>
+operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">)</font>:-
+        find<font color="#993300">(</font>'result_is_displayed'<font color="#993300">)</font>,!,
+        retract_all<font color="#993300">(</font>current_operation<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>current_operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">))</font>.
+operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">)</font>:-
+        find<font color="#993300">(</font>'first_argument_is_displayed'<font color="#993300">)</font>,!,
+        retract_all<font color="#993300">(</font>current_operation<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>current_operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">))</font>.
+operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">)</font>:-
+        get_current_value<font color="#993300">(</font>
+                <font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,<font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,
+        retract_all<font color="#993300">(</font>first_argument<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        retract_all<font color="#993300">(</font>second_argument<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        retract_all<font color="#993300">(</font>current_operation<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        retract_all<font color="#993300">(</font>'first_argument_is_displayed'<font color="#993300">)</font>,
+        insert<font color="#993300">(</font>first_argument<font color="#993300">(</font>
+                <font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,
+                <font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>current_operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>'first_argument_is_displayed'<font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+enter:-
+        find<font color="#993300">(</font>'result_is_displayed'<font color="#993300">)</font>,
+        <font color="#008000">Item1</font>== <font color="#993300">?</font>match<font color="#993300">(</font>first_argument<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item2</font>== <font color="#993300">?</font>match<font color="#993300">(</font>current_operation<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item1</font> == first_argument<font color="#993300">(</font>
+                <font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,<font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,
+        <font color="#008000">Item2</font> == current_operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">)</font>,!,
+        implement_operation<font color="#993300">(</font>
+                <font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,<font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font>,
+                <font color="#008000">Operation</font><font color="#993300">)</font>.
+enter:-
+        remember_second_argument,
+        <font color="#008000">Item1</font>== <font color="#993300">?</font>match<font color="#993300">(</font>first_argument<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item2</font>== <font color="#993300">?</font>match<font color="#993300">(</font>current_operation<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item1</font> == first_argument<font color="#993300">(</font>
+                <font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,<font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,
+        <font color="#008000">Item2</font> == current_operation<font color="#993300">(</font><font color="#008000">Operation</font><font color="#993300">)</font>,!,
+        implement_operation<font color="#993300">(</font>
+                <font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,<font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font>,
+                <font color="#008000">Operation</font><font color="#993300">)</font>.
+enter.
+<font color="0000FF"><i>--</i></font>
+remember_second_argument:-
+        get_current_value<font color="#993300">(</font>
+                <font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,<font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,
+        retract_all<font color="#993300">(</font>second_argument<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>second_argument<font color="#993300">(</font>
+                <font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,
+                <font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font><font color="#993300">))</font>.
+<font color="0000FF"><i>--</i></font>
+implement_operation<font color="#993300">(</font>
+                <font color="#008000">Sign1</font>,<font color="#008000">IntegerPart1</font>,<font color="#008000">FractionalPart1</font>,<font color="#008000">Counter1</font>,
+                <font color="#008000">Operation</font><font color="#993300">)</font>:-
+        <font color="#008000">Item1</font>== <font color="#993300">?</font>match<font color="#993300">(</font>second_argument<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item1</font> == second_argument<font color="#993300">(</font>
+                <font color="#008000">Sign2</font>,<font color="#008000">IntegerPart2</font>,<font color="#008000">FractionalPart2</font>,<font color="#008000">Counter2</font><font color="#993300">)</font>,!,
+        implement_operation<font color="#993300">(</font>
+                <font color="#008000">Sign1</font>,<font color="#008000">IntegerPart1</font>,<font color="#008000">FractionalPart1</font>,<font color="#008000">Counter1</font>,
+                <font color="#008000">Sign2</font>,<font color="#008000">IntegerPart2</font>,<font color="#008000">FractionalPart2</font>,<font color="#008000">Counter2</font>,
+                <font color="#008000">Operation</font><font color="#993300">)</font>.
+implement_operation<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font>:-
+        break<font color="#993300">(</font>'implement_operation'<font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+implement_operation<font color="#993300">(</font>
+                <font color="#008000">Sign1</font>,<font color="#008000">IntegerPart1</font>,<font color="#008000">FractionalPart1</font>,<font color="#008000">Counter1</font>,
+                <font color="#008000">Sign2</font>,<font color="#008000">IntegerPart2</font>,<font color="#008000">FractionalPart2</font>,<font color="#008000">Counter2</font>,
+                <font color="#008000">Operation</font><font color="#993300">)</font>:-
+        <font color="#008000">V1</font>== <font color="#993300">?</font>assemble_number<font color="#993300">(</font>
+                <font color="#008000">Sign1</font>,<font color="#008000">IntegerPart1</font>,<font color="#008000">FractionalPart1</font>,<font color="#008000">Counter1</font><font color="#993300">)</font>,
+        <font color="#008000">V2</font>== <font color="#993300">?</font>assemble_number<font color="#993300">(</font>
+                <font color="#008000">Sign2</font>,<font color="#008000">IntegerPart2</font>,<font color="#008000">FractionalPart2</font>,<font color="#008000">Counter2</font><font color="#993300">)</font>,
+        <font color="#008000">V3</font>== <font color="#993300">?</font>implement_operation<font color="#993300">(</font><font color="#008000">V1</font>,<font color="#008000">V2</font>,<font color="#008000">Operation</font><font color="#993300">)</font>,
+        dismantle_number<font color="#993300">(</font>
+                <font color="#008000">V3</font>,<font color="#008000">Sign3</font>,<font color="#008000">IntegerPart3</font>,<font color="#008000">FractionalPart3</font>,<font color="#008000">Counter3</font><font color="#993300">)</font>,
+        retract_all<font color="#993300">(</font>first_argument<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>first_argument<font color="#993300">(</font>
+                <font color="#008000">Sign3</font>,<font color="#008000">IntegerPart3</font>,
+                <font color="#008000">FractionalPart3</font>,<font color="#008000">Counter3</font><font color="#993300">))</font>,
+        update_current_value<font color="#993300">(</font>
+                <font color="#008000">Sign3</font>,<font color="#008000">IntegerPart3</font>,<font color="#008000">FractionalPart3</font>,<font color="#008000">Counter3</font><font color="#993300">)</font>,
+        insert<font color="#993300">(</font>'result_is_displayed'<font color="#993300">)</font>,
+        display_current_value.
+<font color="0000FF"><i>--</i></font>
+implement_operation<font color="#993300">(</font><font color="#008000">V1</font>,<font color="#008000">V2</font>,'plus'<font color="#993300">)</font> = <font color="#008000">V1</font> + <font color="#008000">V2</font> :-!.
+implement_operation<font color="#993300">(</font><font color="#008000">V1</font>,<font color="#008000">V2</font>,'minus'<font color="#993300">)</font> = <font color="#008000">V1</font> - <font color="#008000">V2</font> :-!.
+implement_operation<font color="#993300">(</font><font color="#008000">V1</font>,<font color="#008000">V2</font>,'multiply'<font color="#993300">)</font> = <font color="#008000">V1</font> * <font color="#008000">V2</font> :-!.
+implement_operation<font color="#993300">(</font><font color="#008000">V1</font>,<font color="#008000">V2</font>,'divide'<font color="#993300">)</font> = <font color="#008000">V1</font> :-
+        is_zero<font color="#993300">(</font><font color="#008000">V2</font><font color="#993300">)</font>,!,
+        con <font color="#993300">?</font> error<font color="#993300">(</font><font color="0000FF">&quot;Division by zero error!&quot;</font><font color="#993300">)</font>.
+implement_operation<font color="#993300">(</font><font color="#008000">V1</font>,<font color="#008000">V2</font>,'divide'<font color="#993300">)</font> = <font color="#008000">V1</font> / <font color="#008000">V2</font>.
+<font color="0000FF"><i>--</i></font>
+is_zero<font color="#993300">(</font><font color="0000FF">0</font><font color="#993300">)</font>:-!.
+is_zero<font color="#993300">(</font><font color="FF00FF">0.0</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+assemble_number<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">IP</font>,<font color="0000FF">0</font>,<font color="#008000">_</font><font color="#993300">)</font> = <font color="#008000">Value</font>
+        :-!,
+        <font color="#008000">Value</font>== <font color="#008000">Sign</font> * <font color="#008000">IP</font>.
+assemble_number<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">IP</font>,<font color="#008000">FP</font>,<font color="#008000">Counter</font><font color="#993300">)</font> = <font color="#008000">Value</font>
+        :-
+        <font color="#008000">Format</font>== text_operations<font color="#993300">?</font>format<font color="#993300">(</font><font color="0000FF">&quot;%%s%%d.%%0%dd&quot;</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,
+        sign_to_text<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">ST</font><font color="#993300">)</font>,
+        <font color="#008000">SignedValue</font>== text_operations<font color="#993300">?</font>format<font color="#993300">(</font><font color="#008000">Format</font>,<font color="#008000">ST</font>,<font color="#008000">IP</font>,<font color="#008000">FP</font><font color="#993300">)</font>,
+        <font color="#008000">Value</font>== <font color="#993300">?</font>convert_to_real<font color="#993300">(</font><font color="#008000">SignedValue</font><font color="#993300">)</font>,!.
+assemble_number<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font> = <font color="#008000">_</font>
+        :-
+        break<font color="#993300">(</font>'assemble_number'<font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+dismantle_number<font color="#993300">(</font><font color="#008000">V1</font>,-<font color="0000FF">1</font>,<font color="#008000">IP</font>,<font color="#008000">FP</font>,<font color="#008000">Counter</font><font color="#993300">)</font>:-
+        <font color="#008000">V1</font> &lt; <font color="0000FF">0</font>,!,
+        <font color="#008000">V2</font>== -<font color="#993300">(</font><font color="#008000">V1</font><font color="#993300">)</font>,
+        dismantle_number<font color="#993300">(</font><font color="#008000">V2</font>,<font color="#008000">IP</font>,<font color="#008000">FP</font>,<font color="#008000">Counter</font><font color="#993300">)</font>.
+dismantle_number<font color="#993300">(</font><font color="#008000">V</font>,<font color="0000FF">1</font>,<font color="#008000">IP</font>,<font color="#008000">FP</font>,<font color="#008000">Counter</font><font color="#993300">)</font>:-
+        dismantle_number<font color="#993300">(</font><font color="#008000">V</font>,<font color="#008000">IP</font>,<font color="#008000">FP</font>,<font color="#008000">Counter</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+dismantle_number<font color="#993300">(</font><font color="#008000">V1</font>,<font color="#008000">V2</font>,<font color="0000FF">0</font>,<font color="0000FF">0</font><font color="#993300">)</font>:-
+        <font color="#008000">V2</font>== <font color="#993300">?</font>val<font color="#993300">(</font><font color="0000FF">&quot;INTEGER&quot;</font>,<font color="#008000">V1</font><font color="#993300">)</font>,!.
+dismantle_number<font color="#993300">(</font><font color="#008000">V</font>,<font color="#008000">IP</font>,<font color="#008000">FP</font>,<font color="#008000">Counter</font><font color="#993300">)</font>:-
+        <font color="0000FF"><i>-- Text== text_operations?format(&quot;%1.15f&quot;,V),</i></font>
+        <font color="#008000">Text</font>== text_operations<font color="#993300">?</font>format<font color="#993300">(</font><font color="0000FF">&quot;%1.14f&quot;</font>,<font color="#008000">V</font><font color="#993300">)</font>,
+        <font color="#008000">P1</font>== <font color="#993300">?</font>search_dot<font color="#993300">(</font><font color="#008000">Text</font><font color="#993300">)</font>,
+        <font color="#008000">P2</font>== <font color="#008000">P1</font> - <font color="0000FF">1</font>,
+        text_operations<font color="#993300">?</font>split<font color="#993300">(</font><font color="#008000">P2</font>,<font color="#008000">Text</font>,<font color="#008000">Front</font>,<font color="#008000">Rest1</font><font color="#993300">)</font>,
+        text_operations<font color="#993300">?</font>split<font color="#993300">(</font><font color="0000FF">1</font>,<font color="#008000">Rest1</font>,<font color="#008000">_</font>,<font color="#008000">Rest2</font><font color="#993300">)</font>,
+        <font color="#008000">IP</font>== <font color="#993300">?</font>convert_to_integer<font color="#993300">(</font><font color="#008000">Front</font><font color="#993300">)</font>,!,
+        count_nonzero_digits<font color="#993300">(</font><font color="#008000">Rest2</font>,<font color="#008000">Rest3</font>,<font color="0000FF">0</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,
+        <font color="#008000">FP</font>== <font color="#993300">?</font>convert_number<font color="#993300">(</font><font color="#008000">Counter</font>,<font color="#008000">Rest3</font><font color="#993300">)</font>.
+dismantle_number<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font>:-
+        break<font color="#993300">(</font>'dismantle_number'<font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+search_dot<font color="#993300">(</font><font color="#008000">Text</font><font color="#993300">)</font> = <font color="#008000">P</font> :-
+        <font color="#008000">P</font>== text_operations<font color="#993300">?</font>search<font color="#993300">(</font><font color="#008000">Text</font>,<font color="0000FF">&quot;.&quot;</font><font color="#993300">)</font>,!.
+search_dot<font color="#993300">(</font><font color="#008000">Text</font><font color="#993300">)</font> = <font color="#008000">P</font> :-
+        <font color="#008000">P</font>== text_operations<font color="#993300">?</font>search<font color="#993300">(</font><font color="#008000">Text</font>,<font color="0000FF">&quot;,&quot;</font><font color="#993300">)</font>,!.
+<font color="0000FF"><i>--</i></font>
+count_nonzero_digits<font color="#993300">(</font><font color="#008000">S1</font>,<font color="0000FF">&quot;&quot;</font>,<font color="#008000">Counter</font>,<font color="#008000">Counter</font><font color="#993300">)</font>:-
+        are_zeros<font color="#993300">(</font><font color="#008000">S1</font><font color="#993300">)</font>,!.
+count_nonzero_digits<font color="#993300">(</font><font color="#008000">S1</font>,<font color="#008000">S4</font>,<font color="#008000">C1</font>,<font color="#008000">C2</font><font color="#993300">)</font>:-
+        text_operations<font color="#993300">?</font>split<font color="#993300">(</font><font color="0000FF">1</font>,<font color="#008000">S1</font>,<font color="#008000">Digit</font>,<font color="#008000">S2</font><font color="#993300">)</font>,!,
+        count_nonzero_digits<font color="#993300">(</font><font color="#008000">S2</font>,<font color="#008000">S3</font>,<font color="#008000">C1</font>+<font color="0000FF">1</font>,<font color="#008000">C2</font><font color="#993300">)</font>,
+        text_operations<font color="#993300">?</font>concat<font color="#993300">(</font><font color="#008000">Digit</font>,<font color="#008000">S3</font>,<font color="#008000">S4</font><font color="#993300">)</font>.
+count_nonzero_digits<font color="#993300">(</font><font color="#008000">_</font>,<font color="0000FF">&quot;&quot;</font>,<font color="#008000">Counter</font>,<font color="#008000">Counter</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+are_zeros<font color="#993300">(</font><font color="#008000">S1</font><font color="#993300">)</font>:-
+        text_operations<font color="#993300">?</font>concat<font color="#993300">(</font><font color="0000FF">&quot;0&quot;</font>,<font color="#008000">S2</font>,<font color="#008000">S1</font><font color="#993300">)</font>,!,
+        are_zeros<font color="#993300">(</font><font color="#008000">S2</font><font color="#993300">)</font>.
+are_zeros<font color="#993300">(</font><font color="0000FF">&quot;&quot;</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+convert_number<font color="#993300">(</font><font color="0000FF">0</font>,<font color="#008000">_</font><font color="#993300">)</font> = <font color="0000FF">0</font> :- !.
+convert_number<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">Text</font><font color="#993300">)</font> = <font color="#008000">N</font> :-
+        <font color="#008000">N</font>== <font color="#993300">?</font>convert_to_integer<font color="#993300">(</font><font color="#008000">Text</font><font color="#993300">)</font>,!.
+convert_number<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font> = <font color="#008000">_</font> :-
+        break<font color="#993300">(</font>'convert_number_if_necessary'<font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+update_current_value<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">)</font>:-
+        clear_display,
+        fail.
+update_current_value<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">IP</font>,<font color="0000FF">0</font>,<font color="#008000">_</font><font color="#993300">)</font>:-!,
+        insert<font color="#993300">(</font>sign<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">IP</font><font color="#993300">))</font>.
+update_current_value<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">IP</font>,<font color="#008000">FP</font>,<font color="#008000">Counter</font><font color="#993300">)</font>:-
+        insert<font color="#993300">(</font>'has_fractional_part'<font color="#993300">)</font>,
+        insert<font color="#993300">(</font>sign<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">IP</font><font color="#993300">))</font>,
+        insert<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">FP</font>,<font color="#008000">Counter</font><font color="#993300">))</font>.
+<font color="0000FF"><i>--</i></font>
+display_current_value:-
+        get_sign<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">)</font>,
+        display_current_value<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+display_current_value<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">)</font>:-
+        get_fractional_part_or_Fail<font color="#993300">(</font><font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,!,
+        sign_to_text<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">ST</font><font color="#993300">)</font>,
+        get_integer_part<font color="#993300">(</font><font color="#008000">IntegerPart</font><font color="#993300">)</font>,
+        <font color="#008000">Format</font>== text_operations<font color="#993300">?</font>format<font color="#993300">(</font><font color="0000FF">&quot;%%s%%d,%%0%dd&quot;</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,
+        <font color="#008000">SignedValue</font>==
+                text_operations<font color="#993300">?</font>format<font color="#993300">(</font>
+                        <font color="#008000">Format</font>,<font color="#008000">ST</font>,<font color="#008000">IntegerPart</font>,<font color="#008000">FractionalPart</font><font color="#993300">)</font>,
+        display <font color="#993300">?</font> show_value<font color="#993300">(</font><font color="#008000">SignedValue</font><font color="#993300">)</font>.
+display_current_value<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">)</font>:-
+        find<font color="#993300">(</font>'has_fractional_part'<font color="#993300">)</font>,!,
+        sign_to_text<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">ST</font><font color="#993300">)</font>,
+        get_integer_part<font color="#993300">(</font><font color="#008000">IntegerPart</font><font color="#993300">)</font>,
+        display <font color="#993300">?</font> show_value<font color="#993300">(</font>
+                text_operations<font color="#993300">?</font>format<font color="#993300">(</font><font color="0000FF">&quot;%s%d,&quot;</font>,<font color="#008000">ST</font>,<font color="#008000">IntegerPart</font><font color="#993300">))</font>.
+display_current_value<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">)</font>:-
+        sign_to_text<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">ST</font><font color="#993300">)</font>,
+        get_integer_part<font color="#993300">(</font><font color="#008000">IntegerPart</font><font color="#993300">)</font>,
+        display <font color="#993300">?</font> show_value<font color="#993300">(</font>
+                text_operations<font color="#993300">?</font>format<font color="#993300">(</font><font color="0000FF">&quot;%s%d&quot;</font>,<font color="#008000">ST</font>,<font color="#008000">IntegerPart</font><font color="#993300">))</font>.
+<font color="0000FF"><i>--</i></font>
+get_current_value<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,<font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font><font color="#993300">)</font>:-
+        get_fractional_part_or_Fail<font color="#993300">(</font><font color="#008000">FractionalPart</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,!,
+        get_sign<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">)</font>,
+        get_integer_part<font color="#993300">(</font><font color="#008000">IntegerPart</font><font color="#993300">)</font>.
+get_current_value<font color="#993300">(</font><font color="#008000">Sign</font>,<font color="#008000">IntegerPart</font>,<font color="0000FF">0</font>,<font color="0000FF">0</font><font color="#993300">)</font>:-
+        get_sign<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">)</font>,
+        get_integer_part<font color="#993300">(</font><font color="#008000">IntegerPart</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+get_sign<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">)</font>:-
+        <font color="#008000">Item</font>== <font color="#993300">?</font>match<font color="#993300">(</font>sign<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item</font> == sign<font color="#993300">(</font><font color="#008000">Sign</font><font color="#993300">)</font>,!.
+get_sign<font color="#993300">(</font><font color="0000FF">1</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+sign_to_text<font color="#993300">(</font>-<font color="0000FF">1</font>,<font color="0000FF">&quot;-&quot;</font><font color="#993300">)</font>:-!.
+sign_to_text<font color="#993300">(</font><font color="#008000">_</font>,<font color="0000FF">&quot;&quot;</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+get_fractional_part_or_Fail<font color="#993300">(</font><font color="#008000">N</font>,<font color="#008000">Counter</font><font color="#993300">)</font>:-
+        <font color="#008000">Item</font>== <font color="#993300">?</font>match<font color="#993300">(</font>fractional_part<font color="#993300">(</font><font color="#008000">_</font>,<font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item</font> == fractional_part<font color="#993300">(</font><font color="#008000">N</font>,<font color="#008000">Counter</font><font color="#993300">)</font>,!.
+<font color="0000FF"><i>--</i></font>
+get_integer_part<font color="#993300">(</font><font color="#008000">N</font><font color="#993300">)</font>:-
+        <font color="#008000">Item</font>== <font color="#993300">?</font>match<font color="#993300">(</font>integer_part<font color="#993300">(</font><font color="#008000">_</font><font color="#993300">))</font>,
+        <font color="#008000">Item</font> == integer_part<font color="#993300">(</font><font color="#008000">N</font><font color="#993300">)</font>,!.
+get_integer_part<font color="#993300">(</font><font color="0000FF">0</font><font color="#993300">)</font>.
+<font color="#800080">]</font>
+</pre>
+</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,29 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'MyArray' (specialized 'BacktrackableArray'):
+--
+indices_range		= [[-100,100]];
+--
+[
+DOMAINS:
+--
+reference:
+--
+Target	= REAL.
+--
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+array	= ('MyArray');
+--
+[
+goal:-
+	I1== 101,
+	writeln("array[",I1,"] = ", array[I1] ),!.
+]
+-----------------------------------------------------------------------

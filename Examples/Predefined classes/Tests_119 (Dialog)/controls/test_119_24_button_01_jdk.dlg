@@ -1,0 +1,17 @@
+mesh(80,25)
+failure_color('Red','White')
+dialog_font("SansSerif",24)
+
+dialog 'MyDialog'("Demo Dialog",default,default,default,centered,centered,default)
+vbox(center)
+	button("action1","&Press this button, please")
+	button(1010,"&Then press this button")
+	editname(1020,7,"Text editor")
+	hbox(center)
+		ok("default","&Default button")
+		button(reset,"&Reset")
+		button(verify,"&Verify")
+		button(close,"&Close")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

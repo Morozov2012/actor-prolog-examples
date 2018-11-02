@@ -1,0 +1,78 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving information from arbitrary        --
+--       number of Web resources.                     --
+--------------------------------------------------------
+project: (('Main'))
+--------------------------------------------------------
+class 'Main' (specialized 'WebReceptor'):
+--
+constant:
+--
+	location =
+		"http://www.cplire.ru/Lab144/"
+		"selected.html";
+--
+protecting:
+--
+	max_date;
+--
+constant:
+--
+	dialog	 = (('Output',
+			constant:
+				location,
+			suspending:
+				max_date));
+--
+[
+goal:-!,
+	inspect_pages(?get_references,#).
+--
+inspect_pages([URL|Rest],Max1):-!,
+	check_date(?get_parameters(URL),Max1,Max2),
+	inspect_pages(Rest,Max2).
+inspect_pages(_,max_date).
+--
+check_date(entry(_,Date2,_,_),Date1,Date2):-
+	less(Date1,Date2),!.
+check_date(_,MaxDate,MaxDate).
+--
+less(#,_):-!.
+less(_,#):-!,
+	fail.
+less(Date1,Date2):-
+	Date1 < Date2.
+]
+--------------------------------------------------------
+class 'Output' (specialized 'Dialog'):
+--
+constant:
+--
+	location;
+--
+variable:
+--
+	max_date;
+--
+protecting:
+--
+	recent_update;
+--
+internal:
+--
+	txt		= ('Text');
+--
+[
+goal:-!,
+	show,
+	check_date(max_date).
+--
+check_date(date(Year,Month,Day)):-
+	recent_update==
+		txt ? format(
+			"%04d-%02d-%d",Year,Month,Day),!.
+check_date(_).
+]
+--------------------------------------------------------

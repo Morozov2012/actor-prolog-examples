@@ -1,0 +1,57 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+
+class 'Main' (specialized 'Alpha'):
+--
+	file1		= ('TestFile',
+				name="test.txt");
+	file2		= ('TestFile',
+				name='stdin');
+	file3		= ('TestFile',
+				name='stdout');
+	file4		= ('TestFile',
+				name='stderr');
+--
+[
+]
+
+class 'TestFile' (specialized 'File'):
+--
+constant:
+--
+	name;
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test1,
+	test2.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tIs the ",name," file a standard one?"),
+	is_standard_file,!,
+	con ? writeln("\tYes, it is.").
+test1:-
+	con ? writeln("\tNo, it is not.").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tIs the ",name," file a standard one?"),
+	is_standard_file(name),!,
+	con ? writeln("\tYes, it is.").
+test2:-
+	con ? writeln("\tNo, it is not.").
+]

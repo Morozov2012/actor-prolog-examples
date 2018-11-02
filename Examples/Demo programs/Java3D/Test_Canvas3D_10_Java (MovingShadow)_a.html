@@ -1,0 +1,227 @@
+<html>
+<head>
+<title>Actor Prolog. Example &quot;D:\MOROZOV\Z\Z-DJ\DEMO\EXE\EXAMPLES\DEMO PROGRAMS\JAVA3D\TEST_CANVAS3D_10_JAVA (MOVINGSHADOW).A&quot;</title>
+</head>
+<body bgcolor="#F0F0F0">
+<table align="center" bgcolor="#FFFFFF" cellpadding=30>
+<tr>
+<td>
+<pre>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+<font color="0000FF"><i>-- An example of Actor Prolog program.                               --</i></font>
+<font color="0000FF"><i>-- (c) 2012 IRE RAS Alexei A. Morozov                                --</i></font>
+<font color="0000FF"><i>-----------------------------------------------------------------------</i></font>
+
+<font color="7F7F00"><u>import</u></font> .. <font color="7F7F00"><u>from</u></font> <font color="0000FF">&quot;morozov/Java3D&quot;</font>;
+
+<font color="7F7F00"><u>class</u></font> 'Main' <font color="#993300">(</font><font color="7F7F00"><u>specialized</u></font> 'Canvas3D'<font color="#993300">)</font>:
+<font color="0000FF"><i>--</i></font>
+background_color                = 'White';
+enable_scene_antialiasing       = 'yes';
+<font color="0000FF"><i>--</i></font>
+bounds  : <font color="#008000">BoundingSphere</font>        = 'BoundingSphere'<font color="#993300">(</font><font color="FF00FF">{}</font><font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="#800080">[</font>
+<font color="7F7F00"><u>PREDICATES</u></font>:
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>imperative</u></font>:
+<font color="0000FF"><i>--</i></font>
+create_dodecahedron = <font color="#008000">Shape3D</font>;
+vertices<font color="#993300">(</font><font color="#008000">Vertices</font><font color="#993300">)</font>                      - <font color="#993300">(</font>o<font color="#993300">)</font>;
+phi<font color="#993300">(</font><font color="#008000">Numerical</font><font color="#993300">)</font>                          - <font color="#993300">(</font>o<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+revolving_group<font color="#993300">(</font>
+        <font color="#008000">TimeInterval</font>,
+        <font color="#008000">TimeInterval</font>,
+        <font color="#008000">Angle</font>,
+        <font color="#008000">Node</font><font color="#993300">)</font> = <font color="#008000">Node</font>                    - <font color="#993300">(</font>i,i,i,i<font color="#993300">)</font>;
+point_light<font color="#993300">(</font>
+        <font color="#008000">Angle</font>,
+        <font color="#008000">TimeInterval</font>,
+        <font color="#008000">Color3D</font><font color="#993300">)</font> = <font color="#008000">Node</font>                 - <font color="#993300">(</font>i,i,i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+'/'<font color="#993300">(</font><font color="#008000">Numerical</font>,<font color="#008000">Numerical</font><font color="#993300">)</font> = <font color="#008000">Numerical</font>    - <font color="#993300">(</font>i,i<font color="#993300">)</font>;
+'-'<font color="#993300">(</font><font color="#008000">Numerical</font><font color="#993300">)</font> = <font color="#008000">Numerical</font>              - <font color="#993300">(</font>i<font color="#993300">)</font>;
+<font color="0000FF"><i>--</i></font>
+<font color="7F7F00"><u>CLAUSES</u></font>:
+<font color="0000FF"><i>--</i></font>
+goal:-!,
+        <font color="#008000">DodecahedronShape</font>== <font color="#993300">?</font>create_dodecahedron<font color="#993300">()</font>,
+        show<font color="#993300">(</font><font color="#800080">[</font>
+                'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        allowChildrenWrite: 'yes',
+                        transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                scale: <font color="FF00FF">0.18</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                        branches: <font color="#800080">[</font>
+                                <font color="#993300">?</font>revolving_group<font color="#993300">(</font>
+                                        <font color="0000FF">0</font>,<font color="0000FF">14000</font>,
+                                        <font color="0000FF">0</font>,
+                                        <font color="#993300">?</font>revolving_group<font color="#993300">(</font>
+                                                <font color="0000FF">0</font>,<font color="0000FF">7000</font>,
+                                                -<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">())</font>/<font color="0000FF">4</font>,
+                                                <font color="#008000">DodecahedronShape</font><font color="#993300">))</font>,
+                                'PointLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        label: <font color="0000FF">&quot;MyLamp&quot;</font>,
+                                        color: 'White',
+                                        position: p<font color="#993300">(</font><font color="0000FF">0</font>,<font color="0000FF">100</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                                        attenuation: a<font color="#993300">(</font><font color="0000FF">1</font>,<font color="0000FF">0</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                                        influencingBounds: bounds
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                'MovingShadow'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        object: <font color="0000FF">&quot;RevolvingDodecahedron&quot;</font>,
+                                        pointLight: <font color="0000FF">&quot;MyLamp&quot;</font>,
+                                        plane: <font color="#800080">[</font><font color="0000FF">0</font>,<font color="0000FF">1</font>,<font color="0000FF">0</font>,<font color="0000FF">3</font><font color="#800080">]</font>,
+                                        standoff: <font color="FF00FF">0.001</font>,
+                                        appearance: 'Appearance'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                coloringAttributes: 'ColoringAttributes'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        color: c3<font color="#993300">(</font><font color="FF00FF">0.1</font>,<font color="FF00FF">0.25</font>,<font color="FF00FF">0.1</font><font color="#993300">)</font>,
+                                                        shadeModel: 'FASTEST'
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                transparencyAttributes: 'TransparencyAttributes'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        transparency: <font color="FF00FF">0.90</font>,
+                                                        transparencyMode: 'BLENDED'
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                                polygonAttributes: 'PolygonAttributes'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                        cullFace: 'CULL_NONE'
+                                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                        schedulingBounds: bounds
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                                <font color="#800080">]</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                'Background'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        color: c3<font color="#993300">(</font><font color="FF00FF">0.8</font>,<font color="FF00FF">0.8</font>,<font color="FF00FF">0.8</font><font color="#993300">)</font>,
+                        applicationBounds: bounds
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                'AmbientLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        lightOn: 'yes',
+                        color: 'White',
+                        influencingBounds: bounds
+                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                <font color="#993300">?</font>point_light<font color="#993300">(</font>-<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">())</font>/<font color="0000FF">4</font>,<font color="0000FF">730</font>,c3<font color="#993300">(</font><font color="FF00FF">0.5</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font><font color="#993300">))</font>,
+                <font color="#993300">?</font>point_light<font color="#993300">(</font>-<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">())</font>,<font color="0000FF">1510</font>,c3<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.5</font>,<font color="FF00FF">0.0</font><font color="#993300">))</font>,
+                <font color="#993300">?</font>point_light<font color="#993300">(</font><font color="#993300">?</font>pi<font color="#993300">()</font>/<font color="0000FF">4</font>,<font color="0000FF">910</font>,c3<font color="#993300">(</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">0.5</font><font color="#993300">))</font>
+                <font color="#800080">]</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+create_dodecahedron =
+        'Shape3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                label: <font color="0000FF">&quot;RevolvingDodecahedron&quot;</font>,
+                geometry: geometryArray<font color="#993300">(</font>
+                        'GeometryInfo'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                primitive: 'POLYGON_ARRAY',
+                                coordinates: <font color="#008000">Vertices</font>,
+                                coordinateIndices: <font color="#008000">Indices</font>,
+                                stripCounts: <font color="#008000">StripCounts</font>,
+                                generateNormals: 'yes'
+                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                        <font color="#993300">)</font>,
+                appearance: 'Appearance'<font color="#993300">(</font><font color="FF00FF">{</font>
+                        material: 'Material'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                diffuseColor: c3<font color="#993300">(</font><font color="FF00FF">0.7</font>,<font color="FF00FF">0.7</font>,<font color="FF00FF">0.7</font><font color="#993300">)</font>,
+                                specularColor: 'White',
+                                shininess: <font color="FF00FF">128.0</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                        transparencyAttributes: 'TransparencyAttributes'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                transparency: <font color="FF00FF">0.12</font>,
+                                transparencyMode: 'BLENDED'
+                                <font color="FF00FF">}</font><font color="#993300">)</font>,
+                        polygonAttributes: 'PolygonAttributes'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                cullFace: 'CULL_NONE'
+                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                        <font color="FF00FF">}</font><font color="#993300">)</font>
+                <font color="FF00FF">}</font><font color="#993300">)</font> :-
+        vertices<font color="#993300">(</font><font color="#008000">Vertices</font><font color="#993300">)</font>,
+        <font color="#008000">Indices</font>== <font color="#800080">[</font>
+                <font color="0000FF">00</font>,<font color="0000FF">01</font>,<font color="0000FF">05</font>,<font color="0000FF">06</font>,<font color="0000FF">02</font>, <font color="0000FF">00</font>,<font color="0000FF">02</font>,<font color="0000FF">07</font>,<font color="0000FF">08</font>,<font color="0000FF">03</font>, <font color="0000FF">00</font>,<font color="0000FF">03</font>,<font color="0000FF">09</font>,<font color="0000FF">04</font>,<font color="0000FF">01</font>,
+                <font color="0000FF">01</font>,<font color="0000FF">04</font>,<font color="0000FF">10</font>,<font color="0000FF">11</font>,<font color="0000FF">05</font>, <font color="0000FF">02</font>,<font color="0000FF">06</font>,<font color="0000FF">12</font>,<font color="0000FF">13</font>,<font color="0000FF">07</font>, <font color="0000FF">03</font>,<font color="0000FF">08</font>,<font color="0000FF">14</font>,<font color="0000FF">15</font>,<font color="0000FF">09</font>,
+                <font color="0000FF">05</font>,<font color="0000FF">11</font>,<font color="0000FF">16</font>,<font color="0000FF">12</font>,<font color="0000FF">06</font>, <font color="0000FF">07</font>,<font color="0000FF">13</font>,<font color="0000FF">18</font>,<font color="0000FF">14</font>,<font color="0000FF">08</font>, <font color="0000FF">09</font>,<font color="0000FF">15</font>,<font color="0000FF">17</font>,<font color="0000FF">10</font>,<font color="0000FF">04</font>,
+                <font color="0000FF">19</font>,<font color="0000FF">16</font>,<font color="0000FF">11</font>,<font color="0000FF">10</font>,<font color="0000FF">17</font>, <font color="0000FF">19</font>,<font color="0000FF">17</font>,<font color="0000FF">15</font>,<font color="0000FF">14</font>,<font color="0000FF">18</font>, <font color="0000FF">19</font>,<font color="0000FF">18</font>,<font color="0000FF">13</font>,<font color="0000FF">12</font>,<font color="0000FF">16</font><font color="#800080">]</font>,
+        <font color="#008000">StripCounts</font>== <font color="#800080">[</font><font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font>,<font color="0000FF">5</font><font color="#800080">]</font>.
+<font color="0000FF"><i>--</i></font>
+vertices<font color="#993300">(</font><font color="#008000">Vertices</font><font color="#993300">)</font>:-
+        phi<font color="#993300">(</font><font color="#008000">Phi</font><font color="#993300">)</font>,
+        <font color="#008000">Vertices</font>== <font color="#800080">[</font>
+                p<font color="#993300">(</font><font color="0000FF">1</font>,<font color="0000FF">1</font>,<font color="0000FF">1</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="0000FF">0</font>,<font color="0000FF">1</font>/<font color="#008000">Phi</font>,<font color="#008000">Phi</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="#008000">Phi</font>,<font color="0000FF">0</font>,<font color="0000FF">1</font>/<font color="#008000">Phi</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="0000FF">1</font>/<font color="#008000">Phi</font>,<font color="#008000">Phi</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font>-<font color="0000FF">1</font>,<font color="0000FF">1</font>,<font color="0000FF">1</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="0000FF">0</font>,-<font color="0000FF">1</font>/<font color="#008000">Phi</font>,<font color="#008000">Phi</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="0000FF">1</font>,-<font color="0000FF">1</font>,<font color="0000FF">1</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="#008000">Phi</font>,<font color="0000FF">0</font>,-<font color="0000FF">1</font>/<font color="#008000">Phi</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="0000FF">1</font>,<font color="0000FF">1</font>,-<font color="0000FF">1</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font>-<font color="0000FF">1</font>/<font color="#008000">Phi</font>,<font color="#008000">Phi</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font>-<font color="#993300">(</font><font color="#008000">Phi</font><font color="#993300">)</font>,<font color="0000FF">0</font>,<font color="0000FF">1</font>/<font color="#008000">Phi</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font>-<font color="0000FF">1</font>,-<font color="0000FF">1</font>,<font color="0000FF">1</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="0000FF">1</font>/<font color="#008000">Phi</font>,-<font color="#993300">(</font><font color="#008000">Phi</font><font color="#993300">)</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="0000FF">1</font>,-<font color="0000FF">1</font>,-<font color="0000FF">1</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="0000FF">0</font>,<font color="0000FF">1</font>/<font color="#008000">Phi</font>,-<font color="#993300">(</font><font color="#008000">Phi</font><font color="#993300">))</font>,
+                p<font color="#993300">(</font>-<font color="0000FF">1</font>,<font color="0000FF">1</font>,-<font color="0000FF">1</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font>-<font color="0000FF">1</font>/<font color="#008000">Phi</font>,-<font color="#993300">(</font><font color="#008000">Phi</font><font color="#993300">)</font>,<font color="0000FF">0</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font>-<font color="#993300">(</font><font color="#008000">Phi</font><font color="#993300">)</font>,<font color="0000FF">0</font>,-<font color="0000FF">1</font>/<font color="#008000">Phi</font><font color="#993300">)</font>,
+                p<font color="#993300">(</font><font color="0000FF">0</font>,-<font color="0000FF">1</font>/<font color="#008000">Phi</font>,-<font color="#993300">(</font><font color="#008000">Phi</font><font color="#993300">))</font>,
+                p<font color="#993300">(</font>-<font color="0000FF">1</font>,-<font color="0000FF">1</font>,-<font color="0000FF">1</font><font color="#993300">)</font>
+                <font color="#800080">]</font>.
+<font color="0000FF"><i>--</i></font>
+phi<font color="#993300">(</font><font color="#008000">Value</font><font color="#993300">)</font>:-
+        <font color="#008000">Value</font>== <font color="FF00FF">0.5</font>*<font color="#993300">(</font><font color="#993300">?</font>sqrt<font color="#993300">(</font><font color="0000FF">5</font><font color="#993300">)</font>+<font color="0000FF">1</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+revolving_group<font color="#993300">(</font><font color="#008000">Increasing</font>,<font color="#008000">Decreasing</font>,<font color="#008000">RotZ</font>,<font color="#008000">Node</font><font color="#993300">)</font> =
+        'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                allowTransformRead: 'yes',
+                allowTransformWrite: 'yes',
+                branches: <font color="#800080">[</font>
+                        <font color="#008000">Node</font>,
+                        'RotationInterpolator'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                alpha: 'Alpha3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        increasingAlphaDuration: <font color="#008000">Increasing</font>,
+                                        decreasingAlphaDuration: <font color="#008000">Decreasing</font>,
+                                        increasingEnable: 'yes',
+                                        decreasingEnable: 'yes',
+                                        loopCount: -<font color="0000FF">1</font>,
+                                        triggerTime: <font color="0000FF">0</font>,
+                                        phaseDelayDuration: <font color="0000FF">0</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                transformAxis: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        rotZ: <font color="#008000">RotZ</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                schedulingBounds: bounds
+                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                        <font color="#800080">]</font>
+                <font color="FF00FF">}</font><font color="#993300">)</font>.
+<font color="0000FF"><i>--</i></font>
+point_light<font color="#993300">(</font><font color="#008000">RotZ</font>,<font color="#008000">Increasing</font>,<font color="#008000">C</font><font color="#993300">)</font> =
+        'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                allowTransformRead: 'yes',
+                allowTransformWrite: 'yes',
+                branches: <font color="#800080">[</font>
+                        'TransformGroup'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                transform3D: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        translation: <font color="#800080">[</font><font color="FF00FF">0.0</font>,<font color="FF00FF">0.0</font>,<font color="FF00FF">5.0</font><font color="#800080">]</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                branches: <font color="#800080">[</font>
+                                        'PointLight'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                                color: <font color="#008000">C</font>,
+                                                influencingBounds: <font color="#008000">Bounds</font>
+                                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                                        <font color="#800080">]</font><font color="FF00FF">}</font><font color="#993300">)</font>,
+                        'RotationInterpolator'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                alpha: 'Alpha3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        increasingAlphaDuration: <font color="#008000">Increasing</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                transformAxis: 'Transform3D'<font color="#993300">(</font><font color="FF00FF">{</font>
+                                        rotZ: <font color="#008000">RotZ</font>
+                                        <font color="FF00FF">}</font><font color="#993300">)</font>,
+                                schedulingBounds: <font color="#008000">Bounds</font>
+                                <font color="FF00FF">}</font><font color="#993300">)</font>
+                        <font color="#800080">]</font>
+                <font color="FF00FF">}</font><font color="#993300">)</font> :-
+        <font color="#008000">Bounds</font> == 'BoundingSphere'<font color="#993300">(</font><font color="FF00FF">{</font>radius: <font color="0000FF">10</font><font color="FF00FF">}</font><font color="#993300">)</font>.
+<font color="#800080">]</font>
+</pre>
+</td>
+</tr>
+</table>
+</body>
+</html>

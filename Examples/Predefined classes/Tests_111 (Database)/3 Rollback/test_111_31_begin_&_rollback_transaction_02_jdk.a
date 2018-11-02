@@ -1,0 +1,173 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+store		= ('DataStore',
+			access_mode='modifying');
+data_base	= ('MyDatabase',
+			place=shared(store,"MyTable"),
+			con=self);
+--
+[
+goal:-!,
+	set_color('RoyalBlue'),
+	writeln("Test datastore."),
+	set_color('default'),
+	data_base ? test_database_inspection(1),
+	data_base ? test_database_updating,
+	data_base ? test_database_inspection(1),
+	data_base ? test_database_updating,
+	data_base ? test_database_inspection(1),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'LinkedHashMap'):
+--
+internal:
+--
+con;
+--
+[
+DOMAINS:
+--
+TargetValue	= {	name:Name,
+			age:INTEGER,
+			position:SYMBOL,
+			address:AddressList}.
+Name		= n(STRING,STRING,STRING).
+AddressList	= Address*.
+Address		= {	zip:INTEGER,
+			city:STRING,
+			street:STRING,
+			building:INTEGER}.
+--
+PREDICATES:
+--
+imperative:
+--
+test_database_updating;
+test_nested_database_updating;
+test_database_inspection(INTEGER)	- (i);
+inspect_database(INTEGER)		- (i);
+write_tabulation(INTEGER)		- (i);
+--
+CLAUSES:
+--
+test_database_updating:-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest database updating."),
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"\t\tOPERATION: begin_transaction('modifying')"),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"\t\tOPERATION: ",
+		"put(11112,{name:n(\"John\",\"Richard\",\"Doe\")})"),
+	put(11112,{name:n("John","Richard","Doe")}),
+	con ? writeln(
+		"\t\tOPERATION: ",
+		"put(11113,{address:[{city:\"Berlin\"}]})"),
+	put(11113,{address:[{city:"Berlin"}]}),
+	con ? set_color('default'),
+	test_nested_database_updating,
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"\t\tOPERATION: ",
+		"put(11111,{age:100,address:[{city:\"Budapest\"}]})"),
+	put(11111,{age:100,address:[{city:"Budapest"}]}),
+	con ? set_color('default'),
+	test_database_inspection(2),
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"\t\tOPERATION: end_transaction"),
+	end_transaction,
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test_database_updating:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+test_nested_database_updating:-
+	con ? set_color('Violet'),
+	con ? writeln("\t\tTest database updating."),
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"\t\t\tOPERATION: begin_transaction('modifying')"),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"\t\t\tOPERATION: ",
+		"put(11114,{name:n(\"Mary\",\"Tyler\",\"Moore\")})"),
+	put(11114,{name:n("Mary","Tyler","Moore")}),
+	con ? writeln(
+		"\t\t\tOPERATION: ",
+		"put(11115,{address:[{city:\"Minneapolis\"}]})"),
+	put(11115,{address:[{city:"Minneapolis"}]}),
+	con ? set_color('default'),
+	test_database_inspection(3),
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"\t\t\tOPERATION: rollback_transaction"),
+	rollback_transaction,
+	con ? writeln("\t\tO.K."),
+	con ? set_color('default').
+test_nested_database_updating:-
+	con ? set_color('Red'),
+	con ? writeln("\t\tTransaction failed."),
+	con ? set_color('default').
+--
+test_database_inspection(N):-
+	con ? set_color('Violet'),
+	write_tabulation(N),
+	con ? writeln("Test database inspection."),
+	con ? set_color('DkGreen'),
+	write_tabulation(N),
+	con ? writeln(
+		"\tOPERATION: begin_transaction('reading')"),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	inspect_database(N+1),
+	con ? set_color('DkGreen'),
+	write_tabulation(N),
+	con ? writeln(
+		"\tOPERATION: end_transaction"),
+	end_transaction,
+	write_tabulation(N),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test_database_inspection(N):-
+	con ? set_color('Red'),
+	write_tabulation(N),
+	con ? writeln("Transaction failed."),
+	con ? set_color('default').
+--
+inspect_database(N):-
+	write_tabulation(N),
+	con ? writeln("Database content:"),
+	con ? set_color('Blue'),
+	find(Item),
+		write_tabulation(N),
+		con ? writeln("\t",Item),
+		fail.
+inspect_database(N):-
+	con ? set_color('default'),
+	write_tabulation(N),
+	con ? writeln("No more records.").
+--
+write_tabulation(N):-
+	N > 0,!,
+	con ? write("\t"),
+	write_tabulation(N-1).
+write_tabulation(_).
+]
+-----------------------------------------------------------------------

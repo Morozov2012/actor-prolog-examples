@@ -1,0 +1,54 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+IMPERATIVES:
+--
+test0;
+test1;
+test2;
+--
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+Target	= REAL.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+constant:
+--
+	database_name	= "SpecialTest.db";
+--
+internal:
+--
+	store	= ('MyDatabase',
+			name= database_name);
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2.
+--
+test0:-
+	writeln("Test 0:"),
+	store ? get_URL(),
+	store ? get_URL(database_name),
+	writeln("\tDone.").
+--
+test1:-
+	writeln("Test 1:"),
+	writeln("\tWhat is URL of the database?"),
+	Name== store ? get_URL(),
+	writeln("\t",Name).
+--
+test2:-
+	writeln("Test 2:"),
+	writeln("\tWhat is URL of the database?"),
+	Name== store ? get_URL(database_name),
+	writeln("\t",Name).
+]
+-----------------------------------------------------------------------

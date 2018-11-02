@@ -1,0 +1,51 @@
+mesh(70,40)
+failure_color('Red','White')
+
+dialog '_Control' (
+     "Control",'White','Blue',default,
+     centered,centered,default)
+vbox(center)
+     vbox(left)
+          radiobuttons(value_o1)
+               radiobutton("Output value 1")
+               radiobutton("Output value 2")
+               radiobutton("Output value 3")
+               radiobutton("Output value 4")
+               radiobutton("Output value 5")
+          end_of_radiobuttons
+     end_of_vbox
+     button(close,"&Close dialog")
+end_of_vbox
+end_of_dialog
+
+dialog '_Sender' (
+     "Sender",'White','Blue',default,
+     centered,centered,default)
+vbox(center)
+     grid
+     row(center)
+          column(left)
+               "&Message "
+          end_of_column
+          column(left)
+               editname(
+                    text,20,"Some text...")
+          end_of_column
+     end_of_row
+     row(center)
+          column(left)
+               "&Period "
+          end_of_column
+          column(left)
+               editreal(period,9,0.3)
+               checkbox(
+                    mode_of_timer,"&Timer mode ")
+          end_of_column
+     end_of_row
+     end_of_grid
+     hbox(center)
+          button("send","&Send message")
+          button(close,"&Close dialog")
+     end_of_hbox
+end_of_vbox
+end_of_dialog

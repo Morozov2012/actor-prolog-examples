@@ -1,0 +1,191 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Column':
+--
+constant:
+--
+	x	: X;
+--
+	color1	: Color;
+	color2	: Color;
+	color3	: Color;
+	color4	: Color;
+--
+w1	= ('Report',
+		x,
+		y= 0,
+		width=1,
+		height=1,
+		text_color= 'Black',
+		space_color= 'default',
+		font_name= 'helvetica',
+		font_size= 18,
+		font_style= 'bold',
+		background_color= color1);
+--
+w2	= ('Report',
+		x,
+		y= 1,
+		width=1,
+		height=1,
+		text_color= 'Black',
+		space_color= 'default',
+		font_name= 'helvetica',
+		font_size= 18,
+		font_style= 'bold',
+		background_color= color2);
+--
+w3	= ('Report',
+		x,
+		y= 2,
+		width=1,
+		height=1,
+		text_color= 'Black',
+		space_color= 'default',
+		font_name= 'helvetica',
+		font_size= 18,
+		font_style= 'bold',
+		background_color= color3);
+--
+w4	= ('Report',
+		x,
+		y= 3,
+		width=1,
+		height=1,
+		text_color= 'Black',
+		space_color= 'default',
+		font_name= 'helvetica',
+		font_size= 18,
+		font_style= 'bold',
+		background_color= color4);
+--
+[
+goal:-
+	w1 ? writeln(color1),
+	w2 ? writeln(color2),
+	w3 ? writeln(color3),
+	w4 ? writeln(color4).
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Row':
+--
+constant:
+--
+	color11	: Color	= 'Red';
+	color12	: Color = 'Green';
+	color13	: Color = 'DkGreen';
+	color14	: Color = 'Blue';
+--
+	color21	: Color = 'Cyan';
+	color22	: Color = 'Magenta';
+	color23	: Color = 'Yellow';
+	color24	: Color = 'DkGray'; -- 'Black';
+--
+	color31	: Color = 'Gray';
+	color32	: Color = 'LtGray';
+	color33	: Color = 'White';
+	color34	: Color = 'Orange';
+--
+	color41	: Color = 'Pink';
+	color42	: Color = 'Violet';
+	color43	: Color = 'Brown';
+	color44	: Color = 'Silver';
+--
+	color51	: Color = 'Maroon';
+	color52	: Color = 'Purple';
+	color53	: Color = 'Fuchsia';
+	color54	: Color = 'Lime';
+--
+	color61	: Color = 'Olive';
+	color62	: Color = 'Navy';
+	color63	: Color = 'Teal';
+	color64	: Color = 'Aqua';
+--
+	color71	: Color = 'Terracotta';
+	color72	: Color = 'Lilac';
+	color73	: Color = 'Gold';
+	color74	: Color = 'Indigo';
+--
+	color81	: Color = 'RoyalBlue';
+	color82	: Color = 'Lemon';
+	color83	: Color = 'Emerald';
+	color84	: Color = 'SkyBlue';
+--
+w1	= ('Column',
+		x= 0,
+		color1= color11,
+		color2= color12,
+		color3= color13,
+		color4= color14);
+--
+w2	= ('Column',
+		x= 1,
+		color1= color21,
+		color2= color22,
+		color3= color23,
+		color4= color24);
+w3	= ('Column',
+		x= 2,
+		color1= color31,
+		color2= color32,
+		color3= color33,
+		color4= color34);
+--
+w4	= ('Column',
+		x= 3,
+		color1= color41,
+		color2= color42,
+		color3= color43,
+		color4= color44);
+--
+w5	= ('Column',
+		x= 4,
+		color1= color51,
+		color2= color52,
+		color3= color53,
+		color4= color54);
+--
+w6	= ('Column',
+		x= 5,
+		color1= color61,
+		color2= color62,
+		color3= color63,
+		color4= color64);
+--
+w7	= ('Column',
+		x= 6,
+		color1= color71,
+		color2= color72,
+		color3= color73,
+		color4= color74);
+--
+w8	= ('Column',
+		x= 7,
+		color1= color81,
+		color2= color82,
+		color3= color83,
+		color4= color84);
+--
+[
+goal.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= ('Row');
+--
+[
+goal.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------

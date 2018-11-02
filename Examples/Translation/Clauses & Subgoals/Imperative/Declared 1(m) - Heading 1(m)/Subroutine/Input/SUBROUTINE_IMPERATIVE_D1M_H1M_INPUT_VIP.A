@@ -1,0 +1,265 @@
+-----------------------------------------------------------------------
+--                                                                   --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+--                                                                   --
+-- Predicate calls testing.                                          --
+--                                                                   --
+-- Requested: 1 argument, asterisk.                                  --
+-- Exists:    1 argument, asterisk.                                  --
+-- Flow direction: input.                                            --
+--                                                                   --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+D1	= INTEGER; REAL; SYMBOL; STRING.
+--
+reference:
+--
+D2	= INTEGER; REAL; SYMBOL; STRING.
+--
+lazy:
+--
+D3	= ('Testbed'); #.
+D4	= ('Testbed'); INTEGER; #.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+world1		= ('Test1');
+world2		= ('Test2',
+			first_test= world1);
+world3		= ('Test3',
+			second_test= world2);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Test1' (specialized 'Testbed'):
+--
+internal:
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 1"),
+	fail.
+--
+p(N*):-
+	con ? writeln("Test1 (1): p/1, N=",N).
+--
+q(N*):-
+	con ? writeln("Test1 (2): q/1, N=",N).
+--
+r(N*):-!,
+	con ? writeln("Test1 (3): r/1, N=",N*).
+--
+r(K,N*):-
+	con ? writeln("Test1 (4): r/2, K=",K,", N=",N).
+]
+-----------------------------------------------------------------------
+class 'Test2' (specialized 'Testbed'):
+--
+internal:
+--
+	first_test;
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 2"),
+	fail.
+--
+M(N*):-!,
+	con ? writeln("Test2 (1): M=",M,", N=",N*).
+--
+M(K,N*):-
+	con ? writeln("Test2 (2): M=",M,", K=",K,", N=",N).
+]
+-----------------------------------------------------------------------
+class 'Test3' (specialized 'Testbed'):
+--
+internal:
+--
+	second_test;
+--
+	con;
+--
+[
+goal:-
+	con ? writeln("TEST 3"),
+	fail.
+--
+M(R*):-
+	con ? writeln("Test3 (1): M=",M,", R=",R),
+	second_test ? M(R*),
+	con ? writeln("Test3 (2): M=",M,", R=",R).
+]
+-----------------------------------------------------------------------
+class 'Testbed':
+--
+internal:
+--
+	world1	: 'Testbed'	= self;
+--
+variable:
+--
+	world21	: D3		= self;
+	world22	: D3		= #;
+	world23	: D3		= _;
+	world24	: D3		= _;
+--
+	world31	: D4		= self;
+	world32	: D4		= #;
+	world33	: D4		= -100;
+	world34	: D4		= _;
+	world35	: D4		= _;
+	world36	: D4		= _;
+--
+internal:
+--
+	auxiliary_tools		= ('AuxiliaryTools',
+					world23,
+					world24,
+					world34,
+					world35,
+					world36);
+--
+	con			= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+p(D1*)			- (i);
+q(D2*)			- (i);
+--
+r(D2*)			- (i);
+r(D4,D2*)		- (i,i);
+--
+CLAUSES:
+--
+goal:-
+	--
+	p(0101),
+	p(0101,0102),
+	p(0101,0102,0103),
+	--
+	q(0201),
+	q(0201,0202),
+	q(0201,0202,0203),
+	--
+	world1 ? p(1001),
+	world1 ? p(1001,1002),
+	world1 ? p(1001,1002,1003),
+	--
+	world1 ? q(1101),
+	world1 ? q(1101,1102),
+	world1 ? q(1101,1102,1103),
+	--
+	world21 ? r(2101),
+	world21 ? r(2101,2102),
+	world21 ? r(2101,2102,2103),
+	--
+	world22 ? r(2201),
+	world22 ? r(2201,2202),
+	world22 ? r(2201,2202,2203),
+	--
+	world23 ? r(2301),
+	world23 ? r(2301,2302),
+	world23 ? r(2301,2302,2303),
+	--
+	world24 ? r(2401),
+	world24 ? r(2401,2402),
+	world24 ? r(2401,2402,2403),
+	--
+	world31 ? r(3101),
+	world31 ? r(3101,3102),
+	world31 ? r(3101,3102,3103),
+	--
+	world32 ? r(3201),
+	world32 ? r(3201,3202),
+	world32 ? r(3201,3202,3203),
+	--
+	world33 ? r(3301),
+	world33 ? r(3301,3302),
+	world33 ? r(3301,3302,3303),
+	--
+	world34 ? r(3401),
+	world34 ? r(3401,3402),
+	world34 ? r(3401,3402,3403),
+	--
+	world35 ? r(3501),
+	world35 ? r(3501,3502),
+	world35 ? r(3501,3502,3503),
+	--
+	world36 ? r(3601),
+	world36 ? r(3601,3602),
+	world36 ? r(3601,3602,3603),
+	--
+	con ? writeln("I will instantiate the world23 slot."),
+	auxiliary_tools ? set_world23(self),
+	con ? writeln("I will instantiate the world24 slot."),
+	auxiliary_tools ? set_world24(#),
+	--
+	con ? writeln("I will instantiate the world34 slot."),
+	auxiliary_tools ? set_world34(self),
+	con ? writeln("I will instantiate the world35 slot."),
+	auxiliary_tools ? set_world35(#),
+	con ? writeln("I will instantiate the world36 slot."),
+	auxiliary_tools ? set_world36(-300),
+	--
+	con ? writeln("O.K.").
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'AuxiliaryTools' (specialized 'Alpha'):
+--
+variable:
+--
+	world23	: D3;
+	world24	: D3;
+--
+	world34	: D4;
+	world35	: D4;
+	world36	: D4;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_world23(D3)		- (i);
+set_world24(D3)		- (i);
+--
+set_world34(D4)		- (i);
+set_world35(D4)		- (i);
+set_world36(D4)		- (i);
+--
+CLAUSES:
+--
+set_world23(world23):-!.
+set_world23(_).
+--
+set_world24(world24):-!.
+set_world24(_).
+--
+set_world34(world34):-!.
+set_world34(_).
+--
+set_world35(world35):-!.
+set_world35(_).
+--
+set_world36(world36):-!.
+set_world36(_).
+]
+-----------------------------------------------------------------------

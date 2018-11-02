@@ -1,0 +1,165 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2012 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Sound":
+
+--------------------------------------------------------------------
+-- The 'Clip' class is specialized class 'DataAbstraction'.       --
+--------------------------------------------------------------------
+
+class 'Clip' (specialized 'DataAbstraction'):
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+maximal_waiting_time	= 'default';
+--
+-- The implementation of the 'OperatingSystemResource' interface:
+--
+name			= "a-prolog.wav";
+extension		= ".wav";
+--
+-- The implementation of the 'AccessibleDataResource' interface:
+--
+character_set		= 'none';
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+backslash_always_is_separator			= 'yes';
+accept_only_uniform_resource_identifiers	= 'no';
+--
+[
+SOURCE:
+	"morozov.built_in.Clip";
+
+CLAUSES:
+
+play:
+	[external "play"].
+play(FileName):
+	[external "play"].
+--
+open:
+	[external "open"].
+open(FileName):
+	[external "open"].
+--
+close:
+	[external "close"].
+--
+start:
+	[external "start"].
+stop:
+	[external "stop"].
+loop(Count):
+	[external "loop"].
+--
+get_frame_length() = NumberOfFrames:
+	[external "getFrameLength"].
+get_microsecond_length() = Microseconds:
+	[external "getMicrosecondLength"].
+--
+get_frame_position() = NumberOfFrames:
+	[external "getFramePosition"].
+get_microsecond_position() = Microseconds:
+	[external "getMicrosecondPosition"].
+--
+set_frame_position(NumberOfFrames):
+	[external "setFramePosition"].
+set_microsecond_position(Microseconds):
+	[external "setMicrosecondPosition"].
+set_loop_points(Start,End):
+	[external "setLoopPoints"].
+--
+is_open:
+	[external "isOpen"].
+is_active:
+	[external "isActive"].
+is_running:
+	[external "isRunning"].
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+set_maximal_waiting_time(WaitingInterval):
+	[external "setMaximalWaitingTime"].
+get_maximal_waiting_time() = WaitingInterval:
+	[external "getMaximalWaitingTime"].
+--
+-- The implementation of the 'OperatingSystemResource' interface:
+--
+delete:
+	[external "delete"].
+delete(FileName):
+	[external "delete"].
+rename(NewName):
+	[external "rename"].
+rename(OldName,NewName):
+	[external "rename"].
+copy(Destination):
+	[external "copy"].
+copy(Origin,Destination):
+	[external "copy"].
+is_standard_file:
+	[external "isStandardFile"].
+is_standard_file(FileName):
+	[external "isStandardFile"].
+set_current_directory(Path):
+	[external "setCurrentDirectory"].
+get_current_directory() = Path:
+	[external "getCurrentDirectory"].
+extract_path(Path,FileName):
+	[external "extractPath"].
+extract_path(OldFileName,Path,NewFileName):
+	[external "extractPath"].
+extract_extension(Name,Extension):
+	[external "extractExtension"].
+extract_extension(FileName,Name,Extension):
+	[external "extractExtension"].
+replace_extension(Extension) = NewFileName:
+	[external "replaceExtension"].
+replace_extension(OldFileName,Extension) = NewFileName:
+	[external "replaceExtension"].
+set_name(Name):
+	[external "setName"].
+get_name() = Name:
+	[external "getName"].
+set_extension(Extension):
+	[external "setExtension"].
+get_extension() = Extension:
+	[external "getExtension"].
+--
+-- The implementation of the 'AccessibleDataResource' interface:
+--
+does_exist:
+	[external "doesExist"].
+does_exist(FileName):
+	[external "doesExist"].
+is_local_resource:
+	[external "isLocalResource"].
+is_local_resource(URL):
+	[external "isLocalResource"].
+get_full_name = FileName:
+	[external "getFullName"].
+get_full_name(ShortName) = FullName:
+	[external "getFullName"].
+get_URL = FileName:
+	[external "getURL"].
+get_URL(ShortName) = FullName:
+	[external "getURL"].
+set_character_set(StandardCharset):
+	[external "setCharacterSet"].
+get_character_set() = StandardCharset:
+	[external "getCharacterSet"].
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+set_backslash_always_is_separator(YesNo):
+	[external "setBackslashAlwaysIsSeparator"].
+get_backslash_always_is_separator() = YesNo:
+	[external "getBackslashAlwaysIsSeparator"].
+set_accept_only_uniform_resource_identifiers(YesNo):
+	[external "setAcceptOnlyUniformResourceIdentifiers"].
+get_accept_only_uniform_resource_identifiers() = YesNo:
+	[external "getAcceptOnlyUniformResourceIdentifiers"].
+]

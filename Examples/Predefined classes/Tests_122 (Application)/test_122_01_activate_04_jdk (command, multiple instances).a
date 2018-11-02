@@ -1,0 +1,77 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011-2015 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+ApplicationArguments	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+invoke_external_editor(ApplicationArguments)	- (i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+constant:
+--
+	command		=
+			"e:\\Program Files\\"
+			"Microsoft Office 1997\\Office\\"
+			"winword.exe";
+--
+internal:
+--
+	argument_file	= ('File',
+				name= "data/report2.rtf");
+--
+	external_editor	= ('ExternalEditor',
+				command,
+				arguments);
+--
+variable:
+--
+	arguments	: ApplicationArguments;
+--
+[
+goal:-!,
+	writeln("I will try to invoke 5 external editors..."),
+	arguments== "\"" + argument_file?get_full_name() + "\"",
+	invoke_external_editor(arguments),
+	writeln("3 accountable and 2 nonmetering "
+		"editors were opened.").
+--
+invoke_external_editor(Arguments):-
+	external_editor ? activate(),
+	external_editor ? activate(),
+	external_editor ? activate(),
+	external_editor ? activate(command),
+	AL== ?cast("STRING",Arguments),
+	external_editor ? activate(command,AL).
+]
+-----------------------------------------------------------------------
+class 'ExternalEditor' (specialized 'Application'):
+--
+variable:
+--
+	arguments	: ApplicationArguments;
+--
+constant:
+--
+	window_mode			= 'maximized';
+	enable_multiple_instances	= 'yes';
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+end(Code):-!,
+	con ? writeln("ExitCode: ",Code).
+]
+-----------------------------------------------------------------------

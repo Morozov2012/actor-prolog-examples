@@ -1,0 +1,129 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+test9;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6,
+	test7,
+	test8,
+	test9.
+--
+test0:-
+	con ? writeln("Test 0:"),
+	T1== 100,
+	con ? writeln("   Input:  ",T1," (an integer)"),
+	?convert_to_real(T1),!,
+	con ? writeln("   O.K.").
+test0:-
+	con ? writeln("Failure").
+--
+test1:-
+	con ? writeln("Test 1:"),
+	T1== 100,
+	con ? writeln("   Input:  ",T1," (an integer)"),
+	N1== ?convert_to_real(T1),!,
+	con ? writeln("   Result: ",N1).
+test1:-
+	con ? writeln("Failure").
+--
+test2:-
+	con ? writeln("Test 2:"),
+	T1== 100.0,
+	con ? writeln("   Input:  ",T1," (a real)"),
+	N1== ?convert_to_real(T1),!,
+	con ? writeln("   Result: ",N1).
+test2:-
+	con ? writeln("Failure").
+--
+test3:-
+	con ? writeln("Test 3:"),
+	T1== "100.0",
+	con ? writeln("   Input:  ",T1," (a string)"),
+	N1== ?convert_to_real(T1),!,
+	con ? writeln("   Result: ",N1).
+test3:-
+	con ? writeln("Failure").
+--
+test4:-
+	con ? writeln("Test 4:"),
+	T1== "+100.0",
+	con ? writeln("   Input:  ",T1," (a string)"),
+	N1== ?convert_to_real(T1),!,
+	con ? writeln("   Result: ",N1).
+test4:-
+	con ? writeln("Failure").
+--
+test5:-
+	con ? writeln("Test 5:"),
+	T1== "-100.0",
+	con ? writeln("   Input:  ",T1," (a string)"),
+	N1== ?convert_to_real(T1),!,
+	con ? writeln("   Result: ",N1).
+test5:-
+	con ? writeln("Failure").
+--
+test6:-
+	con ? writeln("Test 6:"),
+	T1== "16#1#e2",
+	con ? writeln("   Input:  ",T1," (a string)"),
+	N1== ?convert_to_real(T1),!,
+	con ? writeln("   Result: ",N1).
+test6:-
+	con ? writeln("Failure").
+--
+test7:-
+	con ? writeln("Test 7:"),
+	T1== "+16#1#e2",
+	con ? writeln("   Input:  ",T1," (a string)"),
+	N1== ?convert_to_real(T1),!,
+	con ? writeln("   Result: ",N1).
+test7:-
+	con ? writeln("Failure").
+--
+test8:-
+	con ? writeln("Test 8:"),
+	T1== "-16#1.0#e2",
+	con ? writeln("   Input:  ",T1," (a string)"),
+	N1== ?convert_to_real(T1),!,
+	con ? writeln("   Result: ",N1).
+test8:-
+	con ? writeln("Failure").
+--
+test9:-
+	con ? writeln("Test 9:"),
+	T1== "`a",
+	con ? writeln("   Input:  ",T1," (a string)"),
+	N1== ?convert_to_real(T1),!,
+	con ? writeln("   Result: ",N1).
+test9:-
+	con ? writeln("Failure").
+]

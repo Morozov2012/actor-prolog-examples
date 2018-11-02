@@ -1,0 +1,305 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-----------------------------------------------------------------------
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Note: one has to start two instances of the Editor environment
+-- to study this example. Please compile and execute this example
+-- in the first environment and the agent_Kinect_**_consumer_**
+-- example in the second environment.
+-- Please translate these examples to Java.
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+	datastore	= ('DataStore',
+				name="AgentBlackboard.db",
+				sharing_mode='shared_access',
+				access_mode='modifying');
+	database	= ('3DDataSources',
+				place= shared(
+					datastore,
+					"3DDataSources"));
+	dialog		= ('MainDialog',
+				communicator=self,
+				graphic_window,
+				message_window=con);
+	graphic_window	= ('Canvas3D',
+				enable_scene_antialiasing='yes');
+	video_supplier	= ('3DVideoProducer',
+				communicator=self,
+				graphic_window,
+				con);
+	state		= ('DataProducerState');
+	con		= ('Console');
+	trap		= ('Trap',
+				world=self,
+				handler=self);
+--
+[
+MODEL:
+--
+?register_consumer(ExternalAgent).
+?forget_consumer(ExternalAgent).
+--
+CLAUSES:
+--
+goal:-
+	dialog ? show,
+	fail.
+goal:-
+	con ? set_color('Orange'),
+	con ? write("OPENING THE DATA STORE... "),
+	datastore ? open,
+	con ? writeln("DONE."),
+	con ? set_color('Violet'),
+	con ? write("UPDATING THE TABLE... "),
+	database ? begin_transaction('modifying'),
+	database ? retract_all(),
+	database ? insert(self),
+	database ? end_transaction,
+	con ? writeln("DONE."),
+	con ? set_color('Orange'),
+	con ? write("CLOSING THE DATA STORE... "),
+	datastore ? close,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	fail.
+goal:-
+	video_supplier ? initialize,
+	video_supplier ? start,
+	fail.
+goal:-!.
+--
+register_consumer(ExternalAgent):-
+	state ? register_consumer(ExternalAgent),
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"A new consumer is connected: ",
+		ExternalAgent),
+	con ? set_color('default').
+--
+forget_consumer(ExternalAgent):-
+	state ? forget_consumer(ExternalAgent),
+	con ? set_color('Violet'),
+	con ? writeln(
+		"This consumer is disconnected: ",
+		ExternalAgent),
+	con ? set_color('default').
+--
+notify_all_consumers(Skeletons,Image):-
+	state ? get_any_consumer(ExternalAgent),
+		trap ? notify_consumer(
+			ExternalAgent,Skeletons,Image),
+		fail.
+notify_all_consumers(_,_).
+--
+notify_consumer(ExternalAgent,Skeletons,Image):-
+	[ExternalAgent] [<<] new_frame(Skeletons,Image).
+--
+reset_all_consumers:-
+	state ? get_any_consumer(ExternalAgent),
+		trap ? reset_consumer(ExternalAgent),
+		fail.
+reset_all_consumers.
+--
+reset_consumer(ExternalAgent):-
+	[ExternalAgent] [<<] reset(),
+	con ? set_color('Magenta'),
+	con ? writeln(
+		"The reset message is dispatched to ",
+		ExternalAgent),
+	con ? set_color('default').
+--
+alarm(_,'reset_consumer',ExternalAgent):-
+	forget_consumer(ExternalAgent).
+alarm(_,'notify_consumer',ExternalAgent,_,_):-
+	forget_consumer(ExternalAgent).
+]
+-----------------------------------------------------------------------
+class '3DVideoSupplier' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	name	=	"J:/J4K (2018-05-07-Sixth_attempt)"
+			"/Kinect2/Video/"
+			"006.k2j";
+	first_frame	= 1;
+	end_frame	= 841;
+--
+	operating_mode	= 'PLAYING';
+	frame_type	= 'POINT_CLOUDS';
+	people_index	= 'EXTRACT_PEOPLE';
+	skeletons	= 'DETECT_SKELETONS';
+	displaying_mode	= {frame_type,people_index,skeletons};
+	color_map	= 'OPTICAL';
+--
+internal:
+--
+	communicator;
+	graphic_window;
+	buffer2D	= ('BufferedImage');
+	buffer3D	= ('BufferedScene');
+	image		= ('BufferedImage');
+	frame_info	= ('FirstFrameInformation');
+	text		= ('Text');
+	con;
+--
+constant:
+--
+	main_label		= "People";
+--
+	texture_file_format	= "%08d.jpeg";
+--
+	texture_directory	=
+		"J:/J4K (2018-05-07-Sixth_attempt)"
+		"/TEV1/Video/"
+		-- "2018-05-07-00-37-47-medical";
+		"2018-05-07-00-37-47-purple";
+		-- "2018-05-07-00-37-47-gray";
+	texture_frame_rate		= 8.845074812967582;
+	texture_frame_number_shift	= 2161;
+--
+	lookup_table_file_name	=
+		"J:/J4K (2018-05-07-Sixth_attempt)/stereo/"
+		"IdealLookUpTable.txt";
+--
+[
+initialize:-!,
+	set_lookup_table(lookup_table_file_name),
+	create_list_of_nodes(VisualScene),
+	graphic_window ? show(VisualScene).
+--
+frame_obtained:-
+	commit,!,
+	get_recent_frame_number(FrameNumber),
+	get_recent_frame_time(Time1),
+	frame_info ? set_first_frame_time(Time1),
+	process_frame(FrameNumber,Time1).
+--
+process_frame(FrameNumber,Time1):-
+	FrameNumber >= first_frame,
+	FrameNumber <= end_frame,
+	frame_info ? get_first_frame_time(Time0),
+	Time2== Time1 - Time0 - texture_frame_number_shift,
+	FileNumber==
+		texture_frame_rate * Time2 / 1000,
+	ShortFileName== text?format(
+		texture_file_format,?round(FileNumber)),
+	ImageToBeLoaded==
+		texture_directory + "/" +
+		ShortFileName,
+	image ? does_exist(ImageToBeLoaded),!,
+	image ? load(ImageToBeLoaded),
+	get_recent_scene(buffer3D,image),
+	get_recent_mapping(buffer2D,image),
+	get_skeletons(Skeletons),
+	communicator ? notify_all_consumers(
+		Skeletons,buffer2D?get_binary()),
+	graphic_window ? set_node(
+		main_label,
+		'BranchGroup'({
+			label: main_label,
+			allowDetach: 'yes',
+			compile: 'yes',
+			branches: [buffer3D]
+		})).
+process_frame(FrameNumber,_):-
+	FrameNumber > end_frame,!,
+	stop,
+	start.
+process_frame(_,_).
+--
+data_transfer_completion:-!,
+	stop,
+	start.
+-----------------------------------------------------------------------
+create_list_of_nodes(Nodes):-
+	Bounds== 'BoundingSphere'({radius:10.0}),
+	create_main_group(MainGroup),
+	Nodes == [
+		MainGroup,
+		'OrbitBehavior'({
+			rotationCenter: p(0.0,0.0,-2.1),
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			}),
+		'AmbientLight'({
+			lightOn: 'yes',
+			color: 'White',
+			influencingBounds: Bounds
+			})
+		].
+--
+create_main_group(MainGroup):-
+	MainGroup== 'TransformGroup'({
+		allowChildrenRead: 'yes',
+		allowChildrenWrite: 'yes',
+		branches: [
+			'BranchGroup'({
+				label: main_label,
+				allowDetach: 'yes',
+				compile: 'yes',
+				branches: []
+				})
+			]
+		}).
+]
+-----------------------------------------------------------------------
+class 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	communicator;
+	message_window;
+	graphic_window;
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+action("reset"):-!,
+	communicator ? reset_all_consumers.
+]
+-----------------------------------------------------------------------
+class '3DDataSources' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------
+class 'DataSupplierState' (specialized 'Database'):
+[
+register_consumer(ExternalAgent):-
+	find(consumer(ExternalAgent)),!.
+register_consumer(ExternalAgent):-
+	append(consumer(ExternalAgent)).
+--
+forget_consumer(ExternalAgent):-
+	retract_all(consumer(ExternalAgent)).
+--
+get_any_consumer(ExternalAgent):-
+	Item== ?match(consumer(_)),
+	Item == consumer(ExternalAgent).
+]
+-----------------------------------------------------------------------
+class 'FirstFrameInformation' (specialized 'Database'):
+[
+set_first_frame_time(_):-
+	find(_),!.
+set_first_frame_time(Time):-
+	insert(Time).
+--
+get_first_frame_time(Time):-
+	find(Time),!.
+get_first_frame_time(0).
+]
+-----------------------------------------------------------------------

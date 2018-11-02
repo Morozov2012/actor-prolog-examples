@@ -1,0 +1,13 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'DemoConsole'):
+[
+goal:-
+	fail,
+	write("Success").
+goal:-
+	write("Failure").
+]

@@ -1,0 +1,146 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+r1	= ('DataResource',
+		name=	"file:///"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_108%20(File)/Part%20II/"
+			"data.dir/report1.html");
+r2	= ('DataResource',
+		name=	"file://"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_108%20(File)/Part%20II/"
+			"data.dir/report1.html");
+r3	= ('DataResource',
+		name=	"file:///"
+			"../../"
+			"Tests_108%20(File)/Part%20II/"
+			"data.dir/report1.html");
+r4	= ('DataResource',
+		name=	"file://"
+			"../../"
+			"Tests_108%20(File)/Part%20II/"
+			"data.dir/report1.html");
+r5	= ('DataResource',
+		name=	"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined classes/"
+			"Tests_108 (File)/Part II/"
+			"data.dir/report1.html");
+r6	= ('DataResource',
+		name=	"../../"
+			"Tests_108 (File)/Part II/"
+			"data.dir/report1.html");
+r7	= ('DataResource',
+		name=	"data.dir/report1.html");
+r8	= ('DataResource',
+		name=	"");
+r9	= ('DataResource',
+		name=	"../../Tests_108 (File)/Part II/");
+r10	= ('DataResource',
+		name=	"../../Tests_108 (File)/test_name");
+r11	= ('DataResource',
+		name=	"../read.me");
+r12	= ('DataResource',
+		name=	"http://xxx.yyy.zzz"
+			"/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_108%20(File)/Part%20II/"
+			"data.dir/report1.html");
+r13	= ('DataResource',
+		name=	"ftp://xxx.yyy.zzz"
+			"/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_108%20(File)/Part%20II/"
+			"data.dir/report1.html");
+r14	= ('DataResource',
+		name=	"https://xxx.yyy.zzz"
+			"/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_108%20(File)/Part%20II/"
+			"data.dir/report1.html");
+--
+[
+goal:-
+	r1 <- test_1,
+	r2 <- test_1,
+	r3 <- test_1,
+	r4 <- test_1,
+	r5 <- test_1,
+	r6 <- test_1,
+	r7 <- test_1,
+	r8 <- test_2,
+	r9 <- test_2,
+	r10 <- test_2,
+	r11 <- test_3,
+	r12 <- test_1,
+	r13 <- test_1,
+	r14 <- test_1.
+]
+-----------------------------------------------------------------------
+class 'DataResource' (specialized 'File'):
+--
+internal:
+--
+browser			= ('Application');
+timer			= ('Timer');
+con			= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test_1;
+test_2;
+test_3;
+--
+check_file(STRING,Color)		- (i,o);
+check_if_file_does_exist(STRING,Color)	- (i,o);
+--
+CLAUSES:
+--
+test_1:-
+	?get_URL(	"../Part II/data.dir/report2.html"),
+	Text== ?get_URL("../Part II/data.dir/report2.html"),
+	check_file(Text,Color),
+	con ? set_color(Color),
+	con ? writeln("FullName: ",Text),
+	con ? set_color('Black').
+--
+test_2:-
+	?get_URL(	"file://../../"
+			"Tests_108%20(File)/Part%20II/"
+			"data.dir/report2.html"),
+	Text== ?get_URL("file://../../"
+			"Tests_108%20(File)/Part%20II/"
+			"data.dir/report2.html"),
+	check_file(Text,Color),
+	con ? set_color(Color),
+	con ? writeln("FullName: ",Text),
+	con ? set_color('Black').
+--
+test_3:-
+	?get_URL("data.dir/report2.html"),
+	Text== ?get_URL("data.dir/report2.html"),
+	check_file(Text,Color),
+	con ? set_color(Color),
+	con ? writeln("FullName: ",Text),
+	con ? set_color('Black').
+--
+check_file(FileName,Color):-
+	is_local_resource(FileName),!,
+	check_if_file_does_exist(FileName,Color).
+check_file(_,'Cyan').
+--
+check_if_file_does_exist(FileName,'DkGreen'):-
+	does_exist(FileName),!.
+check_if_file_does_exist(_,'Magenta').
+]
+-----------------------------------------------------------------------

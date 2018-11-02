@@ -1,0 +1,25 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/TEV1";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'TEV1'):
+--
+internal:
+--
+	main_window	: 'Canvas2D';
+	image		: 'BufferedImage';
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+initialize_data_acquisition(DeviceIdentifierList)	- (i);
+initialize_selected_device(DeviceIdentifier)		- (i);
+list_devices(DeviceIdentifierList)			- (i);
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,58 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',14)
+
+dialog 'MyDialog'("EditText Demo",default,default,default,centered,centered,default)
+vbox(center)
+	groupbox("EditText")
+		edittext['ReadOnly'](output_slot_1,10,3,"Hello world!")
+	end_of_groupbox
+	grid
+		row
+			column
+				button("action11","Put \"ABCDE\"")
+			end_of_column
+			column
+				button("action12","Put 'symbol'")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action21","Put text")
+			end_of_column
+			column
+				button("action22","Put long text")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action31","Put 1000")
+			end_of_column
+			column
+				button("action32","Put ?pi()")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action41","Put user-defined real")
+			end_of_column
+			column
+				button("action42","Put user-defined text")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action51","Put #")
+			end_of_column
+			column
+				button("action52","Put _")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action6","Get value")
+			end_of_column
+		end_of_row
+	end_of_grid
+end_of_vbox
+end_of_dialog

@@ -1,0 +1,36 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2017 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/ScreenCapture":
+
+import 'WritableImageProducer' from "Morozov/Java2D";
+import 'BufferedImage' from "Morozov/Java2D";
+
+--------------------------------------------------------------------
+-- The 'ScreenCapture' class is                                   --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+interface 'ScreenCapture'
+
+(specialized
+	'DataAbstraction',
+	'WritableImageProducer'):
+
+[
+PREDICATES:
+--
+imperative:
+--
+get_image('BufferedImage')	- (i);
+--
+get_image(
+	'BufferedImage',
+	INTEGER,	-- X
+	INTEGER,	-- Y
+	INTEGER,	-- Width
+	INTEGER)	-- Height
+	- (i,i,i,i,i);
+]

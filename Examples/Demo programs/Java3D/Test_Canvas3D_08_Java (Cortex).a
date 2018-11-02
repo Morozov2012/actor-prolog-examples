@@ -1,0 +1,99 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java3D";
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Canvas3D'):
+--
+internal:
+--
+set		: 'FindAllNodes';
+--
+data		: 'MyDatabase';
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Canvas3D'):
+--
+internal:
+--
+set		= ('FindAll',
+			world=data);
+--
+data		= ('MyDatabase');
+--
+[
+goal:-!,
+	data ? load("jar:data/cortex1.db"),
+	data ? load("jar:data/cortex2.db"),
+	NodeList== set ? get_node,
+	Bounds== 'BoundingSphere'({}),
+	show([
+		'TransformGroup'({
+			allowTransformWrite: 'yes',
+			allowTransformRead: 'yes',
+			branches: [
+				'TransformGroup'({
+					transform3D: 'Transform3D'({
+						scale: 7,
+						rotX: -(?pi()/2),
+						rotZ: ?pi()*3/4
+						}),
+					branches: NodeList
+					})
+				]
+			}),
+		'OrbitBehavior'({
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			})
+		]).
+]
+-----------------------------------------------------------------------
+interface 'FindAllNodes' (specialized 'FindAll'):
+[
+PREDICATES:
+--
+imperative:
+--
+get_node = NodeList;
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	= v(Numerical,Numerical,Numerical,Color).
+--
+PREDICATES:
+--
+nondeterm:
+--
+get_node = TransformGroup;
+--
+CLAUSES:
+--
+get_node = 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [X,Y,Z]
+			}),
+		branches: [
+			'Sphere'({
+				radius: 0.002,
+				appearance: 'Appearance'({
+					material: 'Material'({
+						emissiveColor: C
+						})
+					})
+				})
+			]
+		})
+	:-
+	Item== ?match(_),
+	Item == v(X,Y,Z,C).
+]
+-----------------------------------------------------------------------

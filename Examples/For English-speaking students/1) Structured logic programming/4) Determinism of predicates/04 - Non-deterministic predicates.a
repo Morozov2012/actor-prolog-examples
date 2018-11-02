@@ -1,0 +1,38 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Deterministic,     --
+-- non-deterministic, and imperative     --
+-- predicates.                           --
+--                                       --
+-- Questions: What are non-deterministic --
+-- predicates? In what order will the    --
+-- program write these numbers?          --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+nondeterm:
+
+p(INTEGER)	- (o);
+q(INTEGER)	- (o);
+
+CLAUSES:
+
+goal:-
+	p(X),
+	writeln("X= ",X),
+	fail.
+
+p(1).
+p(X):-
+	q(X).
+p(5).
+
+q(2).
+q(3).
+q(4).

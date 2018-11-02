@@ -1,0 +1,317 @@
+package "Morozov/Web/Scanning/Tables":
+---------------------------------------------------------------------
+--           The "SCANNING/TABLES" Actor Prolog package.           --
+--           (c) 2002-2005, IRE RAS, Alexei A. Morozov.            --
+---------------------------------------------------------------------
+import 'LogicProgrammingSites' from "Morozov/Web/Data/Prolog";
+import 'WebResourceRegistry' from "Morozov/Web/Scanning/Counter";
+import 'WebText' from "Morozov/Web/Scanning/Counter";
+---------------------------------------------------------------------
+class 'AddressTable' (specialized 'Alpha'):
+--
+variable:
+--
+	keywords;
+--
+internal:
+--
+	report_1		= ('Report',
+					title="Sites to be analyzed",
+					x=15,
+					y=1,
+					width=50,
+					height=20);
+	report_2		= ('Report',
+					title="Parameters of Site",
+					x=17,
+					y=3,
+					width=50,
+					height=20);
+--
+	list_of_target_sites	= ('LogicProgrammingSites');
+	temporary_table		= ('WebResourceRegistry',
+					name="Address");
+--
+	file_of_results		= ('TableOfResults',
+					report=report_2);
+--
+	env			= ('Timer');
+--
+--	con			= ('Console');
+--
+constant:
+--
+	minimal_check_period	= 7;	-- Days
+--
+[
+goal:-
+	temporary_table ? does_exist,
+	temporary_table ? load,
+	temporary_table_is_not_empty,!,
+	report_sites_to_be_analyzed,
+	delete_temporary_table_if_need.
+goal:-!,
+	create_temporary_table,
+	report_sites_to_be_analyzed.
+--
+temporary_table_is_not_empty:-
+	temporary_table ? find(_),!.
+--
+delete_temporary_table_if_need:-
+	temporary_table ? find(Item),
+	resource_was_not_inspected(Item),!.
+delete_temporary_table_if_need:-
+	temporary_table ? retract_all(),
+	create_temporary_table,
+	temporary_table ? save,
+	report_sites_to_be_analyzed.
+--
+create_temporary_table:-
+	temporary_table ? retract_all(),
+	list_of_target_sites ? {name:Alias|Pairs},
+	temporary_table ? append({name:Alias|Pairs}),
+	fail.
+create_temporary_table:-
+	temporary_table ? save.
+---------------------------------------------------------------------
+report_sites_to_be_analyzed:-
+	report_1 ? clear,
+	temporary_table ? find(Item),
+	resource_was_not_inspected(Item),
+	Item == {name:Name,address:Address|_},
+	report_1 ? set_color('Red','White'),
+	report_1 ? writef("%-20s ",Name),
+	report_1 ? set_color('Green','White'),
+	report_1 ? writeln(Address),
+	fail.
+report_sites_to_be_analyzed.
+---------------------------------------------------------------------
+get_some_file= Item
+	:-
+	-- con ? writeln("Tables:: I will get a file"),
+	temporary_table ? find(Item),
+	-- con ? writeln("Tables:: find ",Item),
+	reshuffle_file(Item),
+	resource_was_not_inspected(Item),!.
+	-- con ? writeln("Tables:: I have got a file: ",Item).
+--
+resource_was_not_inspected({name:ResourceName|_}):-
+	-- con ? writeln("Tables:: Check: ",ResourceName),
+	file_of_results ? find(Record),
+	-- con ? writeln("Tables:: find: ",Record),
+	Record == {name:ResourceName,inspected:Date1|_},
+	Date2== env ? date(),
+	-- con ? writeln("Tables:: ",Date2," ",Date1," Delta: ",Date2 - Date1),
+	resource_was_inspected(Date1,Date2),!,
+	-- Date2 - Date1 < 7,!,
+	fail.
+resource_was_not_inspected(_).
+--
+resource_was_inspected(Date1,Date2):-
+	Date2 - Date1 < minimal_check_period.
+--
+reshuffle_file(Item):-
+	temporary_table ? retract(Item),
+	temporary_table ? save,
+	fail.
+reshuffle_file(_):-
+	temporary_table ? find(_),!.
+-- reshuffle_file(_):-!,
+--	create_temporary_table.
+reshuffle_file(_).
+---------------------------------------------------------------------
+save_results(r(Description,Parameters)):-
+	--
+	Description == {name:Name,address:Location|_},
+	Parameters == {
+		updated:Date,items:I,size:S,
+		hyper_links:H,pictures:P,other_links:O,
+		error_links:E,'keywords':NList|_},!,
+	--
+	report_2 ? clear,
+	-- report_2 ? nl,
+	report_2 ? writeln("Name: ",Name),
+	report_2 ? writeln("Location: ",Location),
+	report_2 ? writeln("Parameters:"),
+	report_2 ? writeln("Date = ",Date),
+	report_2 ? writeln("Pages = ",I),
+	report_2 ? writeln("Size = ",S),
+	report_2 ? writeln("Number of links to external HTML = ",H),
+	report_2 ? writeln("Number of pictures = ",P),
+	report_2 ? writeln("Number of links to other data = ",O),
+	report_2 ? writeln("Number of error links = ",E),
+	report_2 ? writeln("Numbers of Keywords = ",NList),
+	--
+	file_of_results ? update(Description,Date,I,S,H,P,O,E,NList),
+	file_of_results ? save_results(keywords).
+save_results(Term):-
+	report_2 ? clear,
+	report_2 ? writeln(
+		"Sorry, an internal error\n",
+		"Data set has unexpected value:\n",
+		Term).
+---------------------------------------------------------------------
+find(Item):-
+	temporary_table ? find(Item).
+]
+---------------------------------------------------------------------
+class 'TableOfResults' (specialized 'Database'):
+--
+constant:
+--
+	name			= "Results.db";
+--
+	name_of_auxiliary_file	= "Results.txt";
+--
+internal:
+--
+	file_test		= ('File');
+	auxiliary_output	= ('File',
+					name=name_of_auxiliary_file);
+--
+constant:
+--
+	report			= #;
+--
+internal:
+--
+	text_operations		= ('WebText');
+	env			= ('Timer');
+--
+	con			= ('Console');
+--
+[
+goal:-
+	file_test ? does_exist(name),!,
+	retract_all(),
+	load.
+goal:-!.
+--
+update(Description,_,_,_,_,_,_,_,_):-
+	Description == {'name':N|_},
+	find(Record),
+	Record == {'name':N|_},
+	retract(Record),
+	fail.
+update(Description,_,_,_,_,_,_,_,_):-
+	Description == {address:A|_},
+	find(Record),
+	Record == {address:A|_},
+	retract(Record),
+	fail.
+update(Description,
+		RecentDate,Pages,Size,Hyperlinks,Pictures,
+		Others,Errors,NList):-
+	Description == {'name':Name,address:Address|_},!,
+	CurrentDate== env ? date(),
+	insert({
+		'name':Name,address:Address,
+		updated:RecentDate,
+		inspected:?cast("WebResourceDate",CurrentDate),
+		items:Pages,
+		size:Size,
+		hyper_links:Hyperlinks,
+		pictures:Pictures,
+		other_links:Others,
+		error_links:Errors,
+		keywords:NList}).
+update(Description,_,_,_,_,_,_,_,_):-
+	con ? warning("Sorry, an internal error",Description).
+--
+save_results(Keywords):-
+	--con ? note("1"),
+	/* 2010.12.11
+	retrieve_schema,
+	*/
+	--con ? note("2"),
+	update_list_of_keywords(Keywords),
+	--con ? note("3"),
+	save,
+	--con ? note("4"),
+	write_auxiliary_file(Keywords).
+	--con ? note("5").
+--
+update_list_of_keywords(_):-
+	find(Record),
+	Record == {list_of_keywords:_|_},
+	retract_all(Record),
+	fail.
+update_list_of_keywords(Keywords):-
+	insert({list_of_keywords:Keywords}),
+	fail.
+update_list_of_keywords(_).
+--
+write_auxiliary_file(Keywords):-
+	auxiliary_output ? open('writing'),
+	auxiliary_output ? write(
+		"Name\tDate\tPages\tSize"
+		"\tHyperlinks\tPictures"
+		"\tOther_links\tError_links\t"),
+	write_keywords(Keywords),
+	auxiliary_output ? nl,
+	find(Record),
+	Record == {
+		'name':N,
+		/*
+		address:Address,
+		*/
+		updated:Date,
+		items:I,size:S,
+		hyper_links:H,pictures:P,other_links:O,
+		error_links:E,keywords:NList
+		|_},
+	auxiliary_output ? write(N,"\t"),
+	write_date(Date),
+	--
+	auxiliary_output ? write(
+		"\t",I,"\t",S,
+		"\t",H,"\t",P,"\t",O,"\t",E,"\t"),
+	write_NList(NList),
+	auxiliary_output ? nl,
+	--
+	-- report_warning_if_need(N,Address,I),
+	--
+	fail.
+write_auxiliary_file(_):-
+	auxiliary_output ? close.
+--
+write_keywords([Name|List]):-!,
+	auxiliary_output ? write("k_"),
+	write_name(Name),
+	auxiliary_output ? write("\t"),
+	write_keywords(List).
+write_keywords(_).
+--
+write_name(S1):-
+	text_operations ? split(1,S1,Front,Rest),!,
+	write_character(Front),
+	write_name(Rest).
+write_name(_).
+--
+write_character(" "):-!,
+	auxiliary_output ? write("_").
+write_character("."):-!,
+	auxiliary_output ? write("_").
+write_character(C):-
+	auxiliary_output ? write(C).
+--
+write_date(date(Year,Month,Day)):-!,
+	auxiliary_output ? write(Day,"/",Month,"/",Year).
+write_date(_):-
+	env ? date(Year,Month,Day),
+	auxiliary_output ? write(Day,"/",Month,"/",Year).
+--
+write_NList([N|List]):-!,
+	auxiliary_output ? write(N,"\t"),
+	write_NList(List).
+write_NList(_).
+--
+report_warning_if_need(Name,Address,Pages):-
+	Pages <= 1,
+	report ? set_color('White','Red'),
+	report ? writeln(
+		"Check the address of ",Name," (",Address,")!"),
+	report ? set_color('Black','White'),!.
+report_warning_if_need(_,_,_).
+]
+---------------------------------------------------------------------

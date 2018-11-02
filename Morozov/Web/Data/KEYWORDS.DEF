@@ -1,0 +1,61 @@
+package "Morozov/Web/Data/Keywords":
+---------------------------------------------------------------
+--           The "KEYWORDS" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains a collection of some useful         --
+-- keywords related to the logic programming and Prolog.     --
+---------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+KeywordList	= Keyword*; #.
+Keyword		= STRING.
+--
+---------------------------------------------------------------
+interface 'LogicProgrammingKeywords' (specialized 'Alpha'):
+--
+variable:
+--
+	output	: KeywordList;
+	list	: KeywordList;
+--
+internal:
+--
+	log	: 'KeywordStore';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+keywords(KeywordList)		- (o);
+--
+save_keywords(KeywordList)	- (i);
+--
+determ:
+--
+check_list(KeywordList)		- (i);
+--
+imperative:
+--
+save_list(KeywordList)		- (i);
+--
+nondeterm:
+--
+keyword = Keyword;
+--
+]
+---------------------------------------------------------------
+interface 'KeywordStore' (specialized 'Database'):
+[
+DOMAINS:
+--
+mixed:
+--
+Target	= keyword(Keyword).
+--
+]
+---------------------------------------------------------------

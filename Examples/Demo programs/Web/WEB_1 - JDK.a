@@ -1,0 +1,110 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, IRE RAS, Alexei A. Morozov. --
+-- Retrieving Web information.           --
+-- Logical representation of HTML data.  --
+-------------------------------------------
+project: (('Web1'))
+-------------------------------------------
+class 'Web1' (specialized 'WebReceptor'):
+--
+constant:
+--
+-- location		= "http://www.cplire.ru";
+location		= "http://www.cplire.ru/Lab144/index.html";
+maximal_waiting_time	= seconds(12);
+revision_period		= days(3);
+attempt_period		= hours(1);
+tags			= ["FONT","P"];
+--
+internal:
+--
+w1	= ('Report',
+		title="Parameters",
+		background_color='Yellow',
+		x=0,
+		y=0,
+		width=40,
+		height=10);
+w2	= ('Report',
+		title="Text of Resource",
+		background_color='Cyan',
+		x=40,
+		y=0,
+		width=40,
+		height=10);
+w3	= ('Report',
+		title="Links of Resource",
+		text_color='Magenta',
+		x=0,
+		y=10,
+		width=40,
+		height=15);
+w4	= ('Report',
+		title="Resource Structure",
+		text_color='Blue',
+		x=40,
+		y=10,
+		width=40,
+		height=15);
+--
+[
+goal:-!,
+	Parameters== ?get_parameters(),
+	w1 ? clear,
+	write_parameters(Parameters),
+	--
+	Text== ?get_text(),
+	w2 ? clear,
+	w2 ? write(Text),
+	--
+	List== ?get_references(),
+	w3 ? clear,
+	write_references(1,List),
+	--
+	Structure== ?get_trees(),
+	w4 ? clear,
+	write_tag_structure(0,Structure).
+--
+write_parameters(entry(URL,D,T,S)):-
+	w1 ? writeln("URL:  ",URL),
+	write_date(D),
+	write_time(T),!,
+	w1 ? writeln("Size: ",S).
+write_parameters(Error):-
+	w1 ? writeln(Error).
+--
+write_date(date(Y,M,D)):-!,
+	w1 ? writeln(
+		"Date: ",Y,"-",M,"-",D).
+write_date(_).
+--
+write_time(time(H,M,S,_)):-!,
+	w1 ? writeln(
+		"Time: ",H,":",M,":",S).
+write_time(_).
+--
+write_references(N,[URL|Rest]):-!,
+	w3 ? writef("%3d %s\n",N,URL),
+	write_references(N+1,Rest).
+write_references(_,_).
+--
+write_tag_structure(T,
+		[block(Tag,List)|Rest]):-!,
+	shift_text(T),
+	w4 ? writeln("block \"",Tag,"\":"),
+	write_tag_structure(T+1,List),
+	write_tag_structure(T,Rest).
+write_tag_structure(T,[Item|Rest]):-!,
+	shift_text(T),
+	w4 ? writeln(Item),
+	write_tag_structure(T,Rest).
+write_tag_structure(_,_).
+--
+shift_text(T):-
+	T > 0,!,
+	w4 ? write("   "),
+	shift_text(T-1).
+shift_text(_).
+]
+-------------------------------------------

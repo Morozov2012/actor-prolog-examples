@@ -1,0 +1,11 @@
+class 'Main' (specialized 'Console'):
+--
+w	= (('Demo'));
+--
+[
+goal:-!,
+	w <- show.
+]
+class 'Demo' (specialized 'Dialog'):
+[
+]

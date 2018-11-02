@@ -1,0 +1,57 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test10;
+test11;
+test12;
+test13;
+test20;
+test21;
+
+class 'Main' (specialized 'File'):
+--
+constant:
+--
+	name		= "test";
+	extension	= ".asc";
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	set_string("Hello world!"),
+	test10,
+	test11,
+	test12,
+	test13,
+	test20,
+	test21.
+--
+test10:-
+	?get_string().
+--
+test11:-
+	Text== ?get_string(),
+	con ? writeln(Text).
+--
+test12:-
+	con ? writeln(?upper()).
+--
+test13:-
+	con ? writeln(?lower()).
+--
+test20:-
+	?get_string("test.asc").
+--
+test21:-
+	Text== ?get_string("test.asc"),
+	con ? writeln(Text).
+]

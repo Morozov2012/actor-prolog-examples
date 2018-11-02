@@ -1,0 +1,215 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+A1	= f(INTEGER,A2,REAL); g(A2).
+A2	= {name:SYMBOL,text:STRING,list:A3}.
+A3	= A4*.
+A4	= {a:INTEGER,b:A5,c:SYMBOL,d:STRING}.
+--
+A5	= 'WrongTerm'; REAL.
+--
+B1	= f(INTEGER,B2,REAL); g(B2).
+B2	= {name:SYMBOL,list:B3,text:STRING}.
+B3	= B4*.
+B4	= {a:INTEGER,c:SYMBOL,b:REAL,d:STRING}.
+--
+IMPERATIVES:
+--
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'DatabaseA' (specialized 'File'):
+--
+constant:
+--
+name	= "ErrorTest.db";
+--
+[
+DOMAINS:
+--
+Target	= A1.
+--
+]
+-----------------------------------------------------------------------
+class 'DatabaseB' (specialized 'Database'):
+--
+constant:
+--
+name	= "ErrorTest.db";
+--
+internal:
+--
+trap	: 'SpecialStoreTrap'	= ('Trap',
+					world=self,
+					handler=self);
+con				= ('Console');
+--
+[
+DOMAINS:
+--
+Target	= B1.
+--
+PREDICATES:
+--
+imperative:
+--
+consult;
+--
+determ:
+--
+check_if_file_does_exist;
+--
+imperative:
+--
+alarm(_*)		- (i);
+--
+extract_text_segment(STRING,INTEGER,STRING)	- (i,i,o);
+write_error_message(ExceptionName,STRING)	- (i,i);
+--
+CLAUSES:
+--
+consult:-
+	check_if_file_does_exist,
+	trap ? load,!,
+	con ? writeln("\tDone.").
+consult.
+--
+check_if_file_does_exist:-
+	does_exist,!,
+	con ? writeln("\tLoading the ",name," database...").
+check_if_file_does_exist:-
+	con ? set_color('Red'),
+	con ? writeln("\tThe ",name," database does not exist!"),
+	con ? set_color('default'),
+	fail.
+--
+alarm(_,_*):-
+	recent_loading_error(Text,Position,Error,Message),!,
+	-- con ? writeln("Text: ",Text),
+	-- con ? writeln("Position: ",Position),
+	-- con ? writeln("Error message: ",Message),
+	extract_text_segment(Text,Position,Segment),
+	con ? set_color('Red'),
+	con ? writeln("\tI cannot load the ",name," database."),
+	write_error_message(Error,Message),
+	con ? write("\t>>> "),
+	con ? set_color('Purple'),
+	con ? writeln(Segment),
+	con ? set_color('default').
+alarm(Error,Arguments*):-!,
+	con ? set_color('Red'),
+	con ? writeln("\tI cannot load the ",name," database."),
+	con ? writeln("\tError: ",Error," ",Arguments),
+	con ? set_color('default').
+alarm(Arguments*):-!,
+	con ? writeln(Arguments).
+--
+extract_text_segment(Text,P0,Segment):-
+	con ? split(P0,Text,_,Rest),
+	Lines== con?extract_lines(Rest),
+	Lines == [Segment|_],!.
+extract_text_segment(Text,P0,Segment):-
+	con ? split(P0,Text,_,Segment),!.
+extract_text_segment(Text,_,Text).
+--
+write_error_message(ExceptionName,Message):-
+	Message == ?val("STRING",ExceptionName),!,
+	con ? writeln("\tError: ",Message).
+write_error_message(Error,Message):-
+	con ? writeln("\tError: ",Error," ",Message).
+]
+-----------------------------------------------------------------------
+interface 'SpecialStoreTrap' (specialized 'Trap'):
+--
+[
+PREDICATES:
+--
+determ:
+--
+load;
+--
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+store1	= ('DatabaseA');
+store2	= ('DatabaseB');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+write_term(A1)		- (i);
+--
+CLAUSES:
+--
+goal:-
+	test1,
+	test2,
+	test3,
+	test4.
+--
+test1:-
+	writeln("Test 1:"),
+	writeln("\tI will save data to the TestError.db file."),
+	store1 ? open('writing'),
+	write_term(
+		f(1,{	name:'n1',
+			list:[{a:1,b:11.0,c:'symb1'}]
+			},3.0)),
+	write_term(
+		f(-10,{	list:[
+				{a:3,b:'WrongTerm',c:'symb2'}],
+			name:'n2'
+			},9.0)),
+	write_term(
+		f(17,{	name:'n3',
+			list:[{a:5,b:1.0,c:'symb3'}]
+			},11.0)),
+	store1 ? close,
+	writeln("\tDone.").
+--
+write_term(Term):-
+	store1 ? writeln(Term).
+--
+test2:-
+	writeln("Test 2:"),
+	writeln("\tI will check the TestError.db file:\n"),
+	Text== store1?get_string(),
+	set_color('Blue'),
+	writeln(Text),
+	set_color('default'),
+	fail.
+test2:-
+	writeln("\tDone.").
+--
+test3:-
+	writeln("Test 3:"),
+	writeln("\tI consult data from the TestError.db file."),
+	store2 ? consult,
+	writeln("\tDone.").
+--
+test4:-
+	writeln("Test 4:"),
+	writeln("\tI will search data items:"),
+	store2 ? find(Item),
+	set_color('DkGreen'),
+	writeln("\t\t",Item),
+	set_color('default'),
+	fail.
+test4:-
+	writeln("\tDone.").
+]
+-----------------------------------------------------------------------

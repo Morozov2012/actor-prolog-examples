@@ -1,0 +1,32 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Predefined classes of the  --
+-- Actor Prolog system. The Alpha class. --
+--                                       --
+-- Questions: What are predefined        --
+-- classes? What is the destination of   --
+-- the Alpha predefined class? How can   --
+-- one use arithmetical functions of the --
+-- Alpha class?                          --
+--                                       --
+-------------------------------------------
+
+class 'Main' (specialized 'Alpha'):
+
+con	= ('Console');
+
+[
+
+goal:-!,
+	X== 100,
+	con ? writeln("X= ",X),
+	Y== ?sin(X),
+	con ? writeln("Y= ",Y),
+	N== ?div(X,31),
+	con ? writeln("N= ",N),
+	M== ?mod(X,31),
+	con ? writeln("M= ",M).
+]

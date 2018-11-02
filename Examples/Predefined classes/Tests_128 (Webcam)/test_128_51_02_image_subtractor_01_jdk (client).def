@@ -1,0 +1,67 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Vision";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	subtractor	: 'SynchronizedImageSubtractor';
+	buffer		: 'BufferedImage';
+	panel		: 'Canvas2D';
+	counter		: 'Counter';
+	text		: 'Text';
+	con		: 'Console';
+	database	: 'MyDatabase';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+draw_blobs(PointX,PointY,BlobList)	- (i,i,i);
+draw_blob(PointX,PointY,Blob)		- (i,i,i);
+--
+draw_blob_identifier(
+		PointX,
+		PointY,
+		PointX,
+		PointY,
+		INTEGER)	- (i,i,i,i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'Counter' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	= INTEGER.
+--
+PREDICATES:
+--
+determ:
+--
+check_and_update(INTEGER)		- (i);
+]
+-----------------------------------------------------------------------
+interface 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= ('ImageSubtractor').
+--
+]
+-----------------------------------------------------------------------

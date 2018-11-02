@@ -1,0 +1,53 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+--
+write_view_sizes(ViewSizeList)		- (i);
+
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+	webcam	= ('Webcam');
+--
+[
+goal:-!,
+	webcam ? open,
+	test1,
+	test2,
+	webcam ? close.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test 1"),
+	webcam ? get_view_sizes(),
+	writeln("O.K.").
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("Test 2"),
+	set_color('default'),
+	List== webcam?get_view_sizes(),
+	set_color('DkGreen'),
+	writeln("Supported webcam view sizes:"),
+	set_color('default'),
+	write_view_sizes(List),
+	set_color('RoyalBlue'),
+	writeln("O.K.").
+--
+write_view_sizes([size(W,H)|Rest]):-!,
+	writeln("\tWidth=",W," Height=",H),
+	write_view_sizes(Rest).
+write_view_sizes(_).
+]

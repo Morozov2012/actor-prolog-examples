@@ -1,0 +1,128 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+draft('off')
+
+dialog 'Viewer'(
+	"Thermal Image Viewer",
+	default,default,default,centered,centered,default)
+vbox(justify)
+	hbox(center)
+		vbox(center)
+			button("Calibrate","Ca&librate")
+			checkbox(1110,"Anomalous Voltage Detector",'yes')
+			editreal(1120,10,10.0)
+			checkbox(1130,"Anomalous Temperature Detector",'yes')
+			editreal(1140,10,0.10)
+			statictext("")
+			statictext("")
+			button("AnnulCalibration","A&nnul Calibration")
+			statictext("")
+			statictext("")
+			"Number of Dead Pixels:"
+			editinteger['ReadOnly'](1150,10,0)
+			"Anomalous Voltage Pixels:"
+			editinteger['ReadOnly'](1160,10,0)
+			"Anomalous Temperature Pixels:"
+			editinteger['ReadOnly'](1170,10,0)
+			statictext("")
+			statictext("")
+			checkbox(1180,"Eliminate Anomalous Pixels",'yes')
+			statictext("")
+			statictext("")
+			button("SaveSensorAttributes","Sa&ve Sensor Attributes")
+			button("LoadSensorAttributes","&Load Sensor Attributes")
+		end_of_vbox
+		custom['KeepProportions'](main_window,70,55,"Control2D")
+		vbox(justify)
+			listbutton(0,1210,15,7,
+				[
+				"Aqua",
+				"Autumn",
+				"Blackhot",
+				"Blaze",
+				"BlueRed",
+				"Bone",
+				"Bright Rainbow",
+				"Cool",
+				"Copper",
+				"Gray",
+				"Green",
+				"Hot",
+				"HSV",
+				"Iron",
+				"Jet",
+				"LightJet",
+				"Medical",
+				"Ocean",
+				"Parula",
+				"Pink",
+				"Prism",
+				"Purple",
+				"Red",
+				"Reptiloid",
+				"Soft Rainbow",
+				"Spring",
+				"Summer",
+				"Winter",
+				"Optical",
+				"None"
+				],
+				"Purple"
+				)
+			statictext("")
+			statictext("")
+			togglebutton(1220,"&Zoom Image",'no')
+			editreal(1230,10,2.1)
+			statictext("")
+			statictext("")
+			checkbox(1240,"Do NOT Suspend USB",'yes')
+			statictext("")
+			statictext("")
+			statictext("Debug Information:")
+			listbutton(0,1250,15,7,
+				[
+				"0",
+				"1",
+				"2",
+				"3",
+				"4",
+				"5"
+				],
+				"1")
+		end_of_vbox
+	end_of_hbox
+	vbox(center)
+		hbox(justify)
+			"USB Read Time-out [ms]: "
+			hscroll(0,2010,50,[0,100],0)
+			editinteger(2020,15,70)
+		end_of_hbox
+		hbox(justify)
+			"USB Write Time-out [ms]: "
+			hscroll(0,3010,50,[0,100],0)
+			editinteger(3020,15,70)
+		end_of_hbox
+	end_of_vbox
+	hbox(justify)
+	scaling(2.5,1.0)
+		button("Open","&Open")
+		ok("Start","&Start")
+		button("Pause","Pa&use")
+		button("Stop","S&top")
+		button("Close","&Close")
+		button(close,"&Quit")
+	end_of_scaling
+	end_of_hbox
+	padding(0,0)
+		statictext(
+			"The project is supported by the Russian "
+			"Foundation for Basic Research, "
+			"grant 16-29-09626-ofi_m.")
+	end_of_padding
+end_of_vbox
+end_of_dialog

@@ -1,0 +1,68 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',24,'bold')
+draft('off')
+
+dialog 'MainDialog'("3D THz Player",default,default,default,centered,centered,default)
+vbox(justify)
+	custom['KeepProportions'](graphic_window,15,45,"Control3D")
+	hbox(center)
+		padding(0,0)
+		listbutton(0,1010,15,7,
+		[
+		"Aqua",
+		"Autumn",
+		"Blackhot",
+		"Blaze",
+		"BlueRed",
+		"Bone",
+		"Bright Rainbow",
+		"Cool",
+		"Copper",
+		"Gray",
+		"Green",
+		"Hot",
+		"HSV",
+		"Iron",
+		"Jet",
+		"LightJet",
+		"Medical",
+		"Ocean",
+		"Parula",
+		"Pink",
+		"Prism",
+		"Purple",
+		"Red",
+		"Reptiloid",
+		"Soft Rainbow",
+		"Spring",
+		"Summer",
+		"Winter",
+		"Optical",
+		"None"
+		],
+		"Blackhot"
+		-- "Purple"
+		-- "Green"
+		)
+		togglebutton(1020,"Show Skeletons",'no')
+		scaling(2.1,1.0)
+			ok("play","&Play")
+			button("pause","P&ause")
+			button("stop","S&top")
+			button(close,"&Quit")
+		end_of_scaling
+		end_of_padding
+	end_of_hbox
+	padding(0,0)
+	statictext(
+		"(c) 2018 www.fullvision.ru "
+		"The project is supported by RFBR, "
+		"No. 16-29-09626-ofi_m.")
+	end_of_padding
+end_of_vbox
+end_of_dialog

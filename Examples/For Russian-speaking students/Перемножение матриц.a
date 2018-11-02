@@ -1,0 +1,73 @@
+--
+-- Перемножение матриц (A1*B1)=C1
+-- (c) 2007 Ефимов Андрей, МГППУ, Ит4-2
+--
+
+DOMAINS:
+
+N = INTEGER.
+
+Matrix	= Row*.
+Row	= INTEGER*.
+
+PREDICATES:
+
+multiplyMatrices(Matrix,Matrix,Matrix)			- (i,i,o);
+getRowOfSecondMatrix(Row,Matrix,Row)			- (i,i,o);
+sumOfMultipliedElementsOfRowAndColumn(Row,Row,N,N)	- (i,i,i,o);
+showMatrix(Matrix)					- (i);
+writeRow(Row)						- (i);
+inverseRow(Matrix,Row,Matrix)				- (i,o,o);
+transposeMatrix(Matrix,Matrix)				- (i,o);
+
+CLAUSES:
+
+goal:-
+	A1==[[1,2,3],
+	     [3,4,3],
+	     [5,6,1]],
+	writeln("Матрица А:"),
+	showMatrix(A1),
+	B1==[[1,2,3],
+	     [4,5,6],
+	     [7,8,9]],
+	transposeMatrix(B1,F),
+	writeln("Матрица B:"),
+	showMatrix(B1),
+	multiplyMatrices(A1,F,C1),
+	writeln("Матрица A*B:"),
+	showMatrix(C1).
+
+inverseRow([[H|T]|T1],[H|T2],[T|M]):-
+	inverseRow(T1,T2,M).
+inverseRow([],[],[]).
+
+transposeMatrix(M1,[Row|M3]):-
+	inverseRow(M1,Row,M2),!,
+	transposeMatrix(M2,M3).
+transposeMatrix(_,[]).
+
+showMatrix([H|T]):-
+	writeRow(H),
+	writeln(""),
+	showMatrix(T).
+showMatrix([]).
+
+writeRow([H3|T3]):-
+	write(" ",H3),
+	writeRow(T3).
+writeRow([]).
+
+multiplyMatrices([G|H],B1,[Sc|C1]):-
+	getRowOfSecondMatrix(G,B1,Sc),
+	multiplyMatrices(H,B1,C1).
+multiplyMatrices([],_,[]).
+
+getRowOfSecondMatrix(Sa,[Gb|Hb],[F|Sc]):-
+	sumOfMultipliedElementsOfRowAndColumn(Sa,Gb,0,F),
+	getRowOfSecondMatrix(Sa,Hb,Sc).
+getRowOfSecondMatrix(_,[],[]).
+
+sumOfMultipliedElementsOfRowAndColumn([H1|T1],[H2|T2],F1,D):-
+	sumOfMultipliedElementsOfRowAndColumn(T1,T2,F1+H1*H2,D).
+sumOfMultipliedElementsOfRowAndColumn([],[],F1,F1).

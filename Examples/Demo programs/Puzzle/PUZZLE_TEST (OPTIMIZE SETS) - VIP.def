@@ -1,0 +1,73 @@
+------------------------------------------------------------------------
+--               An example of Actor Prolog program.                  --
+--             (c) 2003-2007, IRE RAS, Alexei A. Morozov.             --
+------------------------------------------------------------------------
+--
+DOMAINS:
+--
+mixed:
+--
+Homes		= Home*.
+--
+reference:
+--
+Home		= {	number: N,
+			nationality: Nationality,
+			colour: Colour,
+			animal: Animal,
+			drink: Drink,
+			smoke: Cigarette
+			}.
+--
+lazy:
+--
+N		= INTEGER.
+--
+reference:
+--
+Nationality	= 'Dane'; 'Englishman'; 'German';
+		  'Norwegian'; 'Swede'; 'No more solutions'.
+Colour		= 'Red'; 'Green'; 'White'; 'Yellow'; 'Blue'.
+Animal		= 'dog'; 'bird'; 'cat'; 'horse'; 'goldfish'.
+Drink		= 'tea'; 'coffee'; 'milk'; 'beer'; 'water'.
+Cigarette	=	'Pall Mall'; 'Dunhill'; 'Marlboro';
+			'Winfield'; 'Rothmans'.
+--
+------------------------------------------------------------------------
+interface 'Puzzle' (specialized 'Alpha'):
+--
+con		: 'Console';
+timer		: 'Timer';
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goldfish3(Nationality)					- (o);
+--
+imperative:
+--
+abstime(Hours,Minutes,Seconds,Milliseconds,REAL)	- (i,i,i,i,o);
+prepare_homes(Homes)					- (o);
+--
+nondeterm:
+--
+conditions1(Homes)					- (i);
+conditions2(Homes)					- (i);
+--
+apply(Homes,Home)					- (i,i);
+--
+nondeterm:
+--
+less(N,N)						- (i,i);
+--
+nearby(N,N)						- (i,i);
+near(N,N)						- (i,i);
+--
+imperative:
+--
+'+'(N,N) = N						- (i,i);
+'-'(N,N) = N						- (i,i);
+]
+------------------------------------------------------------------------

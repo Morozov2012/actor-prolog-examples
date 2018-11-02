@@ -1,0 +1,212 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+class 'Main' (specialized 'Canvas3D'):
+--
+background_color		= color3(0.8,0.8,0.8);
+enable_scene_antialiasing	= 'yes';
+--
+bounds	: BoundingSphere	= 'BoundingSphere'({});
+--
+[
+PREDICATES:
+--
+imperative:
+--
+create_dodecahedron = Shape3D;
+vertices(Vertices)			- (o);
+phi(Numerical)				- (o);
+--
+revolving_group(
+	TimeInterval,
+	TimeInterval,
+	Angle,
+	Node) = Node			- (i,i,i,i);
+point_light(
+	Angle,
+	TimeInterval,
+	Color) = Node			- (i,i,i);
+--
+'/'(Numerical,Numerical) = Numerical	- (i,i);
+'-'(Numerical) = Numerical		- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	DodecahedronShape== ?create_dodecahedron(),
+	show([
+		'TransformGroup'({
+			allowChildrenWrite: 'yes',
+			transform3D: 'Transform3D'({
+				scale: 0.18
+				}),
+			branches: [
+				?revolving_group(
+					0,14000,
+					0,
+					?revolving_group(
+						0,7000,
+						-(?pi())/4,
+						DodecahedronShape)),
+				'PointLight'({
+					label: "MyLamp",
+					color: 'White',
+					position: p(0,100,0),
+					attenuation: a(1,0,0),
+					influencingBounds: bounds
+					}),
+				'MovingShadow'({
+					object: "RevolvingDodecahedron",
+					pointLight: "MyLamp",
+					plane: [0,1,0,3],
+					standoff: 0.001,
+					appearance: 'Appearance'({
+						coloringAttributes: 'ColoringAttributes'({
+							color: color3(0.1,0.25,0.1),
+							shadeModel: 'FASTEST'
+							}),
+						transparencyAttributes: 'TransparencyAttributes'({
+							transparency: 0.90,
+							transparencyMode: 'BLENDED'
+							}),
+						polygonAttributes: 'PolygonAttributes'({
+							cullFace: 'CULL_NONE'
+							})
+						}),
+					schedulingBounds: bounds
+					})
+				]
+			}),
+		'Background'({
+			color: background_color,
+			applicationBounds: bounds
+			}),
+		'AmbientLight'({
+			lightOn: 'yes',
+			color: 'White',
+			influencingBounds: bounds
+			}),
+		?point_light(-(?pi())/4,730,color3(0.5,0.0,0.0)),
+		?point_light(-(?pi()),1510,color3(0.0,0.5,0.0)),
+		?point_light(?pi()/4,910,color3(0.0,0.0,0.5))
+		]).
+--
+create_dodecahedron =
+	'Shape3D'({
+		label: "RevolvingDodecahedron",
+		geometry: geometryArray(
+			'GeometryInfo'({
+				primitive: 'POLYGON_ARRAY',
+				coordinates: Vertices,
+				coordinateIndices: Indices,
+				stripCounts: StripCounts,
+				generateNormals: 'yes'
+				})
+			),
+		appearance: 'Appearance'({
+			material: 'Material'({
+				diffuseColor: color3(0.7,0.7,0.7),
+				specularColor: 'White',
+				shininess: 128.0
+				}),
+			transparencyAttributes: 'TransparencyAttributes'({
+				transparency: 0.12,
+				transparencyMode: 'BLENDED'
+				}),
+			polygonAttributes: 'PolygonAttributes'({
+				cullFace: 'CULL_NONE'
+				})
+			})
+		}) :-
+	vertices(Vertices),
+	Indices== [
+		00,01,05,06,02, 00,02,07,08,03, 00,03,09,04,01,
+		01,04,10,11,05, 02,06,12,13,07, 03,08,14,15,09,
+		05,11,16,12,06, 07,13,18,14,08, 09,15,17,10,04,
+		19,16,11,10,17, 19,17,15,14,18, 19,18,13,12,16],
+	StripCounts== [5,5,5,5,5,5,5,5,5,5,5,5].
+--
+vertices(Vertices):-
+	phi(Phi),
+	Vertices== [
+		p(1,1,1),
+		p(0,1/Phi,Phi),
+		p(Phi,0,1/Phi),
+		p(1/Phi,Phi,0),
+		p(-1,1,1),
+		p(0,-1/Phi,Phi),
+		p(1,-1,1),
+		p(Phi,0,-1/Phi),
+		p(1,1,-1),
+		p(-1/Phi,Phi,0),
+		p(-(Phi),0,1/Phi),
+		p(-1,-1,1),
+		p(1/Phi,-(Phi),0),
+		p(1,-1,-1),
+		p(0,1/Phi,-(Phi)),
+		p(-1,1,-1),
+		p(-1/Phi,-(Phi),0),
+		p(-(Phi),0,-1/Phi),
+		p(0,-1/Phi,-(Phi)),
+		p(-1,-1,-1)
+		].
+--
+phi(Value):-
+	Value== 0.5*(?sqrt(5)+1).
+--
+revolving_group(Increasing,Decreasing,RotZ,Node) =
+	'TransformGroup'({
+		allowTransformRead: 'yes',
+		allowTransformWrite: 'yes',
+		branches: [
+			Node,
+			'RotationInterpolator'({
+				alpha: 'Alpha3D'({
+					increasingAlphaDuration: Increasing,
+					decreasingAlphaDuration: Decreasing,
+					increasingEnable: 'yes',
+					decreasingEnable: 'yes',
+					loopCount: -1,
+					triggerTime: 0,
+					phaseDelayDuration: 0
+					}),
+				transformAxis: 'Transform3D'({
+					rotZ: RotZ
+					}),
+				schedulingBounds: bounds
+				})
+			]
+		}).
+--
+point_light(RotZ,Increasing,C) =
+	'TransformGroup'({
+		allowTransformRead: 'yes',
+		allowTransformWrite: 'yes',
+		branches: [
+			'TransformGroup'({
+				transform3D: 'Transform3D'({
+					translation: [0.0,0.0,5.0]
+					}),
+				branches: [
+					'PointLight'({
+						color: C,
+						influencingBounds: Bounds
+						})
+					]}),
+			'RotationInterpolator'({
+				alpha: 'Alpha3D'({
+					increasingAlphaDuration: Increasing
+					}),
+				transformAxis: 'Transform3D'({
+					rotZ: RotZ
+					}),
+				schedulingBounds: Bounds
+				})
+			]
+		}) :-
+	Bounds == 'BoundingSphere'({radius: 10}).
+]

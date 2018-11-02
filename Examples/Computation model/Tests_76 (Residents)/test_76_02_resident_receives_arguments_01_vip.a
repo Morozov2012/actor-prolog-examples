@@ -1,0 +1,84 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+p1	= (('Target'));
+p2	= (('Observer',
+		data= r3
+		));
+--
+r3	= p1 ?? f(A,B,C,D);
+--
+s4	= (('Sender',
+		output= [A,B,C,D]));
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Target' (specialized 'Alpha'):
+[
+f(A,B,_,_)= A + B :-
+	numerical(A,B).
+f(_,_,C,D)= D + C :-
+	numerical(C,D).
+f(A,B,C,D)= A + B + C + D :-
+	numerical(A,B,C,D).
+f(_,_,C,D)= C + D :-
+	numerical(C,D).
+f(A,B,_,_)= B + A :-
+	numerical(A,B).
+]
+-----------------------------------------------------------------------
+class 'Observer' (specialized 'Report'):
+--
+variable:
+--
+	data;
+--
+constant:
+--
+	y	= 10;
+	height	= 15;
+--
+[
+goal:-!,
+	set_color('RoyalBlue'),
+	writeln("Received data:"),
+	set_color('Violet'),
+	writeln(data),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Report',
+			y= 0,
+			height= 10);
+--
+protecting:
+--
+	output;
+--
+[
+goal:-!,
+	set_period(0.314,0),
+	activate.
+--
+tick:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Sender: I will send arguments:"),
+	time(Hour,Minute,Second,MSec),
+	H== ?val("T_Item",Hour),
+	M== ?val("T_Item",Minute),
+	S== ?val("T_Item",Second),
+	MS== ?val("T_Item",MSec),
+	output == [H,M,S,MS],!,
+	con ? set_color('DkGreen'),
+	con ? writeln(output),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,170 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import 'ColoredReport' from "report_toolbox";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+w	= ('MyDialog');
+--
+[
+goal:-
+	w ? test2,
+	w ? test4,
+	w ? show.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	report1		= ('ColoredReport',
+				title= "Tests",
+				x= 0,
+				width= 35);
+	report2		= ('ListButtonWatch',
+				target_slot= output_slot_2,
+				title= "ListButton Value Watch",
+				x= 35,
+				width= 45);
+	con		= ('Console');
+--
+variable:
+--
+	output_slot_2;
+--
+[
+DOMAINS:
+--
+reference:
+--
+ListButtonItems	= ListButtonItem*; ListButtonItem.
+ListButtonItem	= STRING; SYMBOL; INTEGER; REAL; ListButtonItems.
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1(ListButtonItems)		- (i);
+test2;
+test3(ListButtonItems)		- (i);
+test4;
+create_term(ListButtonItems)	- (o);
+--
+CLAUSES:
+--
+action("action11"):-!,
+	test3([-10,-20,-30,-40,-50]).
+action("action12"):-!,
+	test1(3).
+action("action21"):-!,
+	test3(["Red",'Green',"Blue"]).
+action("action22"):-!,
+	test1("Two").
+action("action31"):-!,
+	test3(["One","Two","Three","Four","Five","Six","Seven"]).
+action("action32"):-!,
+	test1([2,5,"Red"]).	
+action("action41"):-!,
+	test3(	["One",
+			["Two",#,
+				["Three","Four"],
+			#,"Five"],
+		#,"Six","Seven"]).
+action("action42"):-!,
+	test1([5,[2.1,'Red']]).
+action("action51"):-!,
+	test3('name1').
+action("action52"):-!,
+	test1('name1').
+action("action61"):-!,
+	test3([1,2,3]).
+action("action62"):-!,
+	test1(0).
+action("action71"):-!,
+	test3([3,[2],1]).
+action("action72"):-!,
+	test1(-1).
+action("action81"):-!,
+	test3([]).
+action("action82"):-!,
+	test1([]).
+action("action91"):-!,
+	test3(#).
+action("action92"):-!,
+	test1(#).
+action("action101"):-!,
+	create_term(FreeVariable),
+	test3(FreeVariable).
+action("action102"):-!,
+	create_term(FreeVariable),
+	test1(FreeVariable).
+action("action111"):-!,
+	test4.
+action("action112"):-!,
+	test2.
+action(Name):-!,
+	con ? note(Name).
+--
+goal:-!,
+	test0.
+--
+test0:-
+	report1 ? writeln("Test 0:"),
+	?get(1010),
+	?get('output_slot_2'),!,
+	report1 ? writeln("\tDone.").
+test0:-
+	report1 ? write_error_message("\tFailure!").
+--
+test1(Value):-
+	report1 ? writeln("Test 1:"),
+	report1 ? writeln("\tI will put position:"),
+	report1 ? write_value("\t",Value),
+	put('output_slot_2',Value),!,
+	report1 ? writeln("\tDone.").
+test1(_):-
+	report1 ? write_error_message("\tFailure!").
+--
+test2:-
+	report1 ? writeln("Test 2:"),
+	report1 ? writeln("\tI will get position:"),
+	report1 ? write_value(
+		"\tPosition: ",?get('output_slot_2')),!.
+test2:-
+	report1 ? write_error_message("\tFailure!").
+--
+test3(Value):-
+	report1 ? writeln("Test 3:"),
+	report1 ? writeln("\tI will put items:"),
+	report1 ? write_value("\t",Value),
+	put(1010,Value),!,
+	report1 ? writeln("\tDone.").
+test3(_):-
+	report1 ? write_error_message("\tFailure!").
+--
+test4:-
+	report1 ? writeln("Test 4:"),
+	report1 ? writeln("\tI will get items:"),
+	report1 ? write_value("\tItems: ",?get(1010)),!.
+test4:-
+	report1 ? write_error_message("\tFailure!").
+--
+create_term(_).
+]
+-----------------------------------------------------------------------
+class 'ListButtonWatch' (specialized 'ColoredReport'):
+--
+variable:
+--
+target_slot;
+--
+[
+goal:-!,
+	write_value("Slot value: ",target_slot).
+]
+-----------------------------------------------------------------------

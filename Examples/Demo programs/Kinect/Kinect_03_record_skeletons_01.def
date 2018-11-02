@@ -1,0 +1,37 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	recorder	: 'KinectBuffer';
+	con		: 'Console';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'DataRecorder' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	people_index	: KinectPeopleIndexMode;
+	circumscription	: KinectCircumscriptionModes;
+	skeletons	: KinectSkeletonsMode;
+--
+	data_acquisition_mode	: KinectDataAcquisitionMode;
+--
+internal:
+--
+	kinect	: 'Kinect';
+	con	: 'Console';
+--
+[
+]
+-----------------------------------------------------------------------

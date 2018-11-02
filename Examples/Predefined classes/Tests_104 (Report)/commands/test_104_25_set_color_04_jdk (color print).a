@@ -1,0 +1,54 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+color_print(_*)		- (i);
+print_item(_)		- (i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Report'):
+--
+constant:
+--
+font_name= 'fixed';
+font_style= 'bold';
+font_size= 36;
+--
+[
+goal:-!,
+	color_print("Hello world! ",2011," ",2.11," ",'Friday').
+--
+color_print(Item,Rest*):-!,
+	print_item(Item),
+	color_print(Rest*).
+color_print().
+--
+print_item(Item):-
+	integer(Item),!,
+	set_color('Blue'),
+	write(Item),
+	set_color('default').
+print_item(Item):-
+	real(Item),!,
+	set_color('Red'),
+	write(Item),
+	set_color('default').
+print_item(Item):-
+	string(Item),!,
+	set_color('Orange'),
+	write(Item),
+	set_color('default').
+print_item(Item):-
+	symbol(Item),!,
+	set_color('DkGreen'),
+	write(Item),
+	set_color('default').
+print_item(Item):-
+	write(Item).
+]
+-----------------------------------------------------------------------

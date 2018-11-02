@@ -1,0 +1,79 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+p;
+
+CLAUSES:
+
+goal:-
+	p,
+	nl,
+	writeln("O.K.").
+
+p:-
+	set_color('RoyalBlue'),
+	writeln("BEEP"),
+	set_color('DkGreen'),
+	spy_point('beep'),
+	fail.
+p:-
+	nl,
+	set_color('RoyalBlue'),
+	writeln("STORAGE"),
+	set_color('DkGreen'),
+	spy_point('storage'),
+	fail.
+p:-
+	nl,
+	set_color('RoyalBlue'),
+	writeln("SLOTS"),
+	set_color('DkGreen'),
+	spy_point('slots'),
+	fail.
+p:-
+	nl,
+	set_color('RoyalBlue'),
+	writeln("WORLDS"),
+	set_color('DkGreen'),
+	spy_point('worlds'),
+	fail.
+p:-
+	nl,
+	set_color('RoyalBlue'),
+	writeln("ACTORS"),
+	set_color('DkGreen'),
+	spy_point('actors'),
+	fail.
+p:-
+	nl,
+	set_color('RoyalBlue'),
+	writeln("PROCESSES"),
+	set_color('DkGreen'),
+	spy_point('processes'),
+	fail.
+p:-
+	nl,
+	set_color('RoyalBlue'),
+	writeln("TEXT NAME"),
+	set_color('DkGreen'),
+	spy_point("SPY POINT NAME 1"),
+	fail.
+p:-
+	nl,
+	set_color('RoyalBlue'),
+	writeln("TRACE"),
+	set_color('DkGreen'),
+	spy_point('trace'),
+	fail.
+p:-
+	nl,
+	set_color('RoyalBlue'),
+	writeln("NO TRACE"),
+	set_color('DkGreen'),
+	--spy_point('no_trace'),
+	fail.
+p.

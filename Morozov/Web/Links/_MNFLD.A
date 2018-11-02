@@ -1,0 +1,33 @@
+package "Morozov/Web/Links/_Mnfld"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--      The "WEB/LINKS/MANIFOLD" Actor Prolog package.       --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains a set of connectors for             --
+-- linking various program components.                       --
+---------------------------------------------------------------
+class '_Convert_Message_"Search"_to_"Show"_and_"Search"'
+(specialized '_Block'):
+--
+internal:
+--
+	entry_i1;
+	entry_o1;
+	entry_o2;
+--
+[
+goal:-!.
+--
+open(P*):-!,
+	-- entry_o2 << open(P*),
+	entry_o1 << open(P*).
+start(P*):-!,
+	-- entry_o2 << start(P*),
+	entry_o1 << start(P*).
+--
+search(SearchPattern):-
+	entry_o2 << search(SearchPattern),
+	entry_o1 << show.
+]
+---------------------------------------------------------------

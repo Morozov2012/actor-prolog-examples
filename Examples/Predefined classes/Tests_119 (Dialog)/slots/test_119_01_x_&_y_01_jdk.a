@@ -1,0 +1,81 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+R_STRING= STRING.
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+w01	= ('DemoPanel',
+		x= 10);
+w02	= ('DemoPanel',
+		x= 10.5);
+w03	= ('DemoPanel',
+		x= 'centered');
+w04	= ('DemoPanel',
+		x= 'default');
+--
+w05	= ('DemoPanel',
+		x= -5);
+w06	= ('DemoPanel',
+		x= -5.5);
+w07	= ('DemoPanel',
+		x= 0);
+w08	= ('DemoPanel',
+		x= 0.0);
+--
+w09	= ('DemoPanel',
+		y= 1);
+w10	= ('DemoPanel',
+		y= 1.5);
+w11	= ('DemoPanel',
+		y= 'centered');
+w12	= ('DemoPanel',
+		y= 'default');
+--
+w13	= ('DemoPanel',
+		y= -5);
+w14	= ('DemoPanel',
+		y= -5.5);
+w15	= ('DemoPanel',
+		y= 0);
+w16	= ('DemoPanel',
+		y= 0.0);
+--
+w17	= ('DemoPanel',
+		x= 'centered',
+		y= 'centered');
+--
+[
+goal.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+--
+constant:
+--
+	x;
+	y;
+--
+variable:
+--
+	title	: R_STRING = _;
+--
+internal:
+--
+	text_tools	= ('Text');
+--
+[
+goal:-!,
+	title== text_tools?format("x=%s, y=%s",x,y),
+	show.
+]
+-----------------------------------------------------------------------

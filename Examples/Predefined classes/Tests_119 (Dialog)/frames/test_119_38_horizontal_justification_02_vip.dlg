@@ -1,0 +1,20 @@
+mesh(80,25)
+dialog_font(default,12)
+padding(3,3)
+
+modeless dialog 'DemoPanel' ("Demo Panel",default,default,default,centered,centered,default)
+vbox(justify)
+	hbox(up)
+		groupbox
+			"FIRST"
+			checkbox(1002,"CheckBox")
+			"THIRD_CONTROL"
+			vbox(right)
+				statictext("FOURTH")
+				"FIFTH"
+			end_of_vbox
+		end_of_groupbox
+	end_of_hbox
+	"< ---------- ---------- ---------- ---------- ---------- >"
+end_of_vbox
+end_of_dialog

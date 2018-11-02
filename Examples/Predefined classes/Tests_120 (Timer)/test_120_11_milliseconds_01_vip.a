@@ -1,0 +1,39 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support the milliseconds function.
+--
+PREDICATES:
+--
+imperative:
+--
+test10;
+test11;
+--
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	delay(1).
+--
+tick:-!,
+	test10,
+	test11.
+--
+test10:-
+	con ? writeln("Test 1.0:"),
+	milliseconds(),
+	con ? writeln("\tDone.").
+--
+test11:-
+	con ? writeln("Test 1.1:"),
+	Time== ?milliseconds(),
+	con ? writeln("\tCurrent time: ",Time).
+]
+-----------------------------------------------------------------------

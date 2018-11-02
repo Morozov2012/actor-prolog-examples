@@ -1,0 +1,59 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute the server example in the first environment and
+-- this example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+-----------------------------------------------------------------------
+import .. from "morozov/Webcam";
+import .. from "morozov/Vision";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	subtractor	= ('SynchronizedImageSubtractor');
+--
+	database	= ('MyDatabase',
+				name="MyDatabase3.db");
+	buffer		= ('BufferedImage');
+	timer		= ('Timer');
+	con		= ('Console');
+--
+[
+goal:-
+	con ? set_color('Orange'),
+	con ? write("LOADING THE DATABASE... "),
+	database ? load,
+	con ? writeln("DONE."),
+	database ? find(Subtractor),!,
+	subtractor ? set_image_subtractor(Subtractor),
+	watch_webcam_state('yes'),
+	set_default_resolution('VGA'),
+	-- set_default_resolution('HD720'),
+	open.
+goal:-!,
+	con ? set_color('Red'),
+	con ? writeln("Sorry, I cannot access the database."),
+	con ? set_color('default').
+--
+webcam_image_obtained(_):-!,
+	get_image(buffer),
+	FrameNumber== ?cast("FrameNumber",timer?milliseconds()),
+	subtractor ? subtract(FrameNumber,buffer).
+--
+alarm(ExceptionName):-!,
+	con ? set_color('Red'),
+	con ? writeln(ExceptionName),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------

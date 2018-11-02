@@ -1,0 +1,70 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving information from arbitrary        --
+--       number of Web resources.                     --
+--------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+RefString	= STRING.
+--
+--------------------------------------------------------
+interface 'Main' (specialized 'WebReceptor'):
+--
+protecting:
+--
+	max_date	: ResourceDate;
+--
+internal:
+--
+	dialog		: 'Dialog';
+--
+[
+PREDICATES:
+--
+determ:
+--
+inspect_pages(ReferenceList,ResourceDate);
+--
+imperative:
+--
+check_date(	ContentParameters,
+		ResourceDate,
+		ResourceDate)		- (i,i,o);
+--
+determ:
+--
+less(ResourceDate,ResourceDate);
+--
+'<'(ResourceDate,ResourceDate);
+]
+--------------------------------------------------------
+interface 'Output' (specialized 'Dialog'):
+--
+constant:
+--
+	location	: STRING;
+--
+suspending:
+--
+	max_date	: ResourceDate;
+--
+protecting:
+--
+	recent_update	: RefString;
+--
+internal:
+--
+	txt		: 'Text';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+check_date(ResourceDate);
+]
+--------------------------------------------------------

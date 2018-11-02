@@ -1,0 +1,313 @@
+package "Morozov/Web/Scanning/Messages":
+---------------------------------------------------------------
+--       The "SCANNING/MESSAGES" Actor Prolog package.       --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+class 'ErrorMessages' (specialized 'Database'):
+--
+variable:
+--
+	report;
+--
+[
+goal:-!.
+--
+write_header:-
+	report ? write_header,!.
+write_header.
+--
+write_footer:-
+	report ? write_footer,!.
+write_footer.
+--
+append_message(L,N,Mother,Node,ErrorType):-
+	store_ancestor_name(L,Mother),
+	-- determine_error_type(Message,ErrorType),
+	append(message(L,N,Mother,Node,ErrorType)).
+--
+store_ancestor_name(L,Mother):-
+	check_current_ancestor(L,Mother),!.
+store_ancestor_name(Level,Mother):-
+	insert(current_ancestor(Level,Mother)).
+--
+check_current_ancestor(Level2,Name2):-
+	find(current_ancestor(Level1,Name1)),!,
+	Level1 == Level2,
+	Name1 == Name2.
+--
+flush_buffer:-
+	retract(current_ancestor(_,Name)),!,
+	write_results_of_analysis(Name).
+flush_buffer.
+--
+flush_buffer(Level):-
+	check_current_level(Level),
+	retract(current_ancestor(_,Name)),!,
+	write_results_of_analysis(Name).
+flush_buffer(_).
+--
+check_current_level(Level2):-
+	find(current_ancestor(Level1,_)),!,
+	Level1 == Level2.
+--
+write_results_of_analysis(Name):-
+	find(Message),
+	Message == message(_,_,Name,_,_),
+	report ? begin_title("An error on the page "),
+	report ? write_valid_URL(Name),
+	report ? end_title,!,
+	write_relevant_messages(Name).
+write_results_of_analysis(_).
+--
+write_relevant_messages(Mother):-
+	find(Message),
+	Message == message(_,_,Mother,Page,Error),
+	retract_all(message(_,_,Mother,Page,Error)),
+	report ? write_error_message(Error),
+	report ? write_bad_URL(Error,Page),
+	report ? write_comment(Error),
+	report ? break_line,
+	fail.
+write_relevant_messages(_).
+]
+---------------------------------------------------------------
+class 'AnalyserMessages' (specialized 'ErrorMessages'):
+--
+internal:
+--
+	report;
+--
+[
+goal:-!.
+--
+append_message(_,_,Mother,Page,ErrorType):-!,
+	--
+	report ? begin_title("An error on the page "),
+	report ? write_valid_URL(Mother),
+	report ? end_title,
+	--
+	report ? write_error_message(ErrorType),
+	report ? write_bad_URL(ErrorType,Page),
+	report ? write_comment(ErrorType),
+	report ? break_line.
+]
+---------------------------------------------------------------
+class 'Plain_Report' (specialized 'GenericReport'):
+--
+constant:
+--
+	comment_1;
+--
+internal:
+--
+	output	= ('ReportWindow',
+			title="Error Messages",
+			y=17,
+			maximal_line_number='no_limit');
+--
+[
+write_header:-!,
+	output ? clear,
+	output ? show,
+	output ? set_color('Black','Green'),
+	output ? writeln(comment_1),
+	output ? set_color('Black','White').
+--
+write_footer:-!,
+	output ? writeln("The analysis is completed.").
+--
+write_error_message(Code):-!,
+	output ? write("   "),
+	output ? set_color('Red'),
+	write_error_code(Code),
+	output ? set_color('Black').
+--
+begin_title(Message):-!,
+	output ? set_color('Black'),
+	output ? write(Message).
+--
+end_title:-!,
+	output ? writeln(":"),
+	output ? set_color('Black').
+--
+write_valid_URL(Name):-!,
+	output ? set_color('Blue'),
+	output ? write(Name),
+	output ? set_color('Black').
+--
+write_bad_URL(Mode,Name):-!,
+	select_color(Mode,TextColor,SpaceColor),
+	output ? set_color(TextColor,SpaceColor),
+	output ? write(Name),
+	output ? set_color('Black','White').
+--
+select_color('lateness','Black','Yellow'):-!.
+select_color(error('unreadable_answer'),'White','Blue'):-!.
+select_color(_,'White','Red'):-!.
+--
+/* 2011.04.17
+write_comment(lateness(Delta)):-!,
+	output ? set_color('Red'),
+	output ? write(" during the ",Delta," seconds"),
+	output ? set_color('Black').
+*/
+write_comment(_):-!.
+--
+break_line:-!,
+	output ? nl.
+]
+---------------------------------------------------------------
+class 'HTML_Report' (specialized 'GenericReport'):
+--
+constant:
+--
+	comment_1;
+--
+internal:
+--
+	output;
+--
+internal:
+--
+	html	= ('WebResource',
+			location="");
+--
+[
+write_header:-!,
+	output ? close,
+	output ? open('writing'),
+	output ? writeln(
+		"<HTML>\n",
+		"<HEAD>\n",
+		"<TITLE>",comment_1,"</TITLE>\n",
+		"</HEAD>\n",
+		"<BODY>\n",
+		"<H1><FONT COLOR=\"BLUE\">",
+		comment_1,
+		"</FONT></H1>").
+--
+write_footer:-!,
+	output ? writeln(
+		"</BODY>\n",
+		"</HTML>\n"),
+	output ? close.
+--
+write_error_message(Code):-!,
+	select_HTML_color(Code,COLOR),
+	output ? write("<FONT COLOR=\"",COLOR,"\">"),
+	write_error_code(Code),
+	output ? write("</FONT>").
+--
+select_HTML_color('lateness','Orange'):-!.
+select_HTML_color(error('unreadable_answer'),'Blue'):-!.
+select_HTML_color(_,'Red'):-!.
+--
+begin_title(Message):-!,
+	output ? write("<H2><FONT COLOR=\"BLUE\">",Message).
+--
+end_title:-!,
+	output ? writeln(":</FONT></H2>").
+--
+write_valid_URL(Name):-!,
+	write_URL(Name).
+--
+write_bad_URL(_,Name):-!,
+	write_URL(Name).
+--
+write_URL(Name1):-
+	SN== ?val("STRING",Name1),
+	concat("file:",_,SN),!,
+	Name2== html?replace_all(SN,"\\","/"),
+	output ? write("<A HREF=\"",Name2,"\">",Name1,"</A>").
+write_URL(Name1):-
+	SN== ?val("STRING",Name1),
+	html ? is_local_resource(SN),!,
+	Name2== html?replace_all(SN,"\\","/"),
+	output ? write(
+		"<A HREF=\"file:///",Name2,"\">",
+		Name1,
+		"</A>").
+write_URL(Name):-
+	output ? write("<A HREF=\"",Name,"\">",Name,"</A>").
+--
+/* 2011.04.17
+write_comment(lateness(Delta)):-!,
+	output ? write(" <FONT COLOR=\"ORANGE\">"),
+	output ? write("during the ",Delta," seconds"),
+	output ? write("</FONT>").
+*/
+write_comment(_):-!.
+--
+break_line:-!,
+	output ? writeln("<BR>").
+]
+---------------------------------------------------------------
+class 'GenericReport' (specialized 'Alpha'):
+--
+constant:
+--
+	comment_1	= "This report was produced by "
+			  "powerful Actor Prolog language";
+--
+internal:
+--
+	output;
+--
+[
+goal:-!.
+--
+write_error_code('lateness'):-!,
+	output ? write("I received no answer from  ").
+write_error_code(failure(404)):-!,
+	output ? write("An illegal address         ").
+write_error_code(failure(_)):-!,
+	output ? write("A failure during access to ").
+write_error_code(error('unreadable_answer')):-!,
+	output ? write("An unreadable answer from  ").
+write_error_code(error(_)):-!,
+	output ? write("An error during access to  ").
+write_error_code(Message):-
+	string(Message),!,
+	output ? write(Message," ").
+write_error_code(Error):-
+	output ? writeln(Error),
+	output ? write("An unknown problem with    ").
+--
+get_string()= Text
+	:-
+	Text== output ?get_string().
+--
+set_color(T*):-
+	output ? set_color(T*).
+--
+write(S*):-
+	output ? write(S*).
+--
+writeln(S*):-
+	output ? write(S*),
+	break_line.
+nl:-
+	break_line.
+]
+---------------------------------------------------------------
+class 'ReportWindow' (specialized 'Report'):
+--
+title			= "The results of the analysis";
+y			= 17;
+maximal_line_number	= 'no_limit';	-- 'window_height'
+--
+[
+open(_).
+close.
+]
+---------------------------------------------------------------
+class 'ReportFile' (specialized 'File'):
+--
+extension	= ".html";
+--
+[
+show(_*).
+set_color(_,_).
+set_color(_).
+]
+---------------------------------------------------------------

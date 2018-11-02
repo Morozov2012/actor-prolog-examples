@@ -1,0 +1,37 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: reverse a list.             --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Disassembling of a list.           --
+-- 2) Input assembling of a list.        --
+-- 3) An output argument.                --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+p(List,List,List)	- (i,i,o);
+
+CLAUSES:
+
+goal:-
+	p([1,2,3,4,5],[],Y),
+	writeln(Y).
+
+p([X|Rest1],Rest2,Result):-
+	p(Rest1,[X|Rest2],Result).
+p([],AssembledList,AssembledList).

@@ -1,0 +1,95 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(Width,Height)	- (i,i);
+--
+class 'Main' (specialized 'Report'):
+--
+internal:
+--
+	con		= ('Console');
+	timer		= ('Timer');
+--
+constant:
+--
+	x		= 'centered';
+	y		= 'centered';
+	time_delay	= 1.0;
+--
+[
+goal:-!,
+	test0,
+	show,
+	test1,
+	timer ? sleep(time_delay),
+	test2(47,12),
+	test1,
+	timer ? sleep(time_delay),
+	test2(-17.9,-9.3),
+	test1,
+	timer ? sleep(time_delay),
+	test2(0,0),
+	test1,
+	timer ? sleep(time_delay),
+	test2('default','default'),
+	test1,
+	timer ? sleep(time_delay),
+	hide.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	get_actual_size(_,_),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default'),
+	con ? redraw.
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default'),
+	con ? redraw.
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	get_actual_size(W,H),!,
+	con ? write("Width: "),
+	con ? set_color('Violet'),
+	con ? write(W),
+	con ? set_color('default'),
+	con ? write(", Height: "),
+	con ? set_color('Violet'),
+	con ? writeln(H),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default'),
+	con ? redraw.
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default'),
+	con ? redraw.
+--
+test2(W,H):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	con ? writeln("I will set: Width= ",W,", Height= ",H),
+	set_actual_size(W,H),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default'),
+	con ? redraw.
+]
+-----------------------------------------------------------------------

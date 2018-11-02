@@ -1,0 +1,32 @@
+mesh(80,25)
+dialog_font("Arial",15,[])
+padding(1.4,1.4)
+dialog 'Output' (
+          "",default,default,default,
+          centered,centered,default)
+     vbox(center)
+          "Recent update of selected papers "
+          "about the Actor Prolog:"
+          grid
+               row
+                    column
+                         "Date"
+                    end_of_column
+                    column
+                         text['AlignCenter']
+                              (recent_update,7,1,"")
+                    end_of_column
+               end_of_row
+               row
+                    column
+                         "Web Page"
+                    end_of_column
+                    column
+                         text['AlignLeft']
+                              (location,22,1,"")
+                    end_of_column
+               end_of_row
+          end_of_grid
+          button(close,"&Exit")
+     end_of_vbox
+end_of_dialog

@@ -1,0 +1,53 @@
+X,Y co-ordinates of defining points in meters:
+0.0000 0.0000
+0.5600 0.0000
+0.5600 0.3000
+0.0000 0.3000
+X,Y co-ordinates of defining points in pixels:
+ 72.2000  85.8000
+671.6000  72.0000
+684.6000 426.2000
+ 71.4000 416.8000
+Projective transformation matrix:
+992.4767  -32.9922   -0.1160
+ -7.6952 1073.9793   -0.0704
+ 72.2000   85.8000    1.0000
+Inverse matrix of projective transformation:
+ 0.0010  0.0000  0.0001
+ 0.0000  0.0009  0.0001
+-0.0734 -0.0821  1.0000
+This matrix is to be used in the demos.
+=======================================
+Self-check (1): Image -> Physical space
+=======================================
+Expected: u=72.2 v=85.8
+Obtained: u=72.2 v=85.8
+Expected: u=671.6 v=72
+Obtained: u=671.6 v=72
+Expected: u=684.6 v=426.2
+Obtained: u=684.6 v=426.2
+Expected: u=71.4 v=416.8
+Obtained: u=71.4 v=416.8
+=======================================
+Self-check (2): Image -> Physical space
+=======================================
+Expected: u=72.2 v=85.8
+Obtained: u=72.2 v=85.8
+Expected: u=671.6 v=72
+Obtained: u=671.6 v=72
+Expected: u=684.6 v=426.2
+Obtained: u=684.6 v=426.2
+Expected: u=71.4 v=416.8
+Obtained: u=71.4 v=416.8
+=======================================
+Self-check (3): Physical space -> Image
+=======================================
+Expected: x=0 y=0
+Obtained: x=0 y=-1.3682e-17
+Expected: x=0.56 y=0
+Obtained: x=0.56 y=0
+Expected: x=0.56 y=0.3
+Obtained: x=0.56 y=0.3
+Expected: x=0 y=0.3
+Obtained: x=0 y=0.3
+>> 

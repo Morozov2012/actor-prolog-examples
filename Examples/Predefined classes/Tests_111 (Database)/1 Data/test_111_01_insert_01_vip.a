@@ -1,0 +1,46 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+--
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+Target	= person(INTEGER,STRING,REAL).
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyDatabase');
+--
+[
+goal:-!,
+	test1,
+	test2.
+--
+test1:-
+	writeln("I will store data items."),
+	store ? insert(person(35,"John",65.70)),
+	store ? insert(person(41,"Robert",71.30)),
+	store ? insert(person(23,"Smith",59.10)),
+	writeln("Done.").
+--
+test2:-
+	writeln("I will retrieve data items:"),
+	store ? find(Item),
+	writeln("\t",Item),
+	fail.
+test2:-
+	writeln("Done.").
+]
+-----------------------------------------------------------------------

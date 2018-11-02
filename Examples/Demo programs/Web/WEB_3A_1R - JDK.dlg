@@ -1,0 +1,12 @@
+
+mesh(80,25)
+dialog_font("Arial",12,[])
+dialog 'Main' (
+          "",default,default,default,
+          centered,centered,default)
+     vbox(center)
+          "Parameters of Web sites:"
+          listbox['UseTabStops'](results,0000,55,4,[],[])
+          button(close,"&Exit")
+     end_of_vbox
+end_of_dialog

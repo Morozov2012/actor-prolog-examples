@@ -1,0 +1,40 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas. The element predicate.   --
+--                                       --
+-- The task: check whether a number is   --
+-- an element of a list.                 --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) An input argument.                 --
+-- 2) Disassembling of a list.           --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+nondeterm:
+
+element(INTEGER,List)		- (i,i);
+
+CLAUSES:
+
+goal:-
+	X== 3,
+	element(X,[1,2,3,4,5]),
+	writeln("Yes, X is an element.").
+goal:-
+	writeln("No, X isn't an element.").
+
+element(H,[H|_]).
+element(H,[_|Rest]):-
+	element(H,Rest).

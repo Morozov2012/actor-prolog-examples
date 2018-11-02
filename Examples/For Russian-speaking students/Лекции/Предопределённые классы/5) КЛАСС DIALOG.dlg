@@ -1,0 +1,17 @@
+
+dialog 'Main' (
+		"Demo Dialog",	-- Заголовок окна
+		'Red',		-- Цвет надписей
+		'White',	-- Цвет подложки надписей
+		20,		-- Размер фонта
+		10,		-- X
+		7,		-- Y
+		'Green')	-- Цвет фона
+
+	statictext("Please enter text:")
+
+	edittext("MyValue",12,2,"Text")
+
+	button(1,"&Action")
+
+end_of_dialog

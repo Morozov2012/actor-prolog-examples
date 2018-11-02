@@ -1,0 +1,59 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- INTEGER.                              --
+--                                       --
+-- Questions: What are integer numbers?  --
+-- When the integer numbers are more     --
+-- appropriate than the float (real)     --
+-- numbers? How can one define octal and --
+-- hexadecimal numbers in Actor Prolog?  --
+-- What number systems are supported in  --
+-- Actor Prolog? Can one use an exponent --
+-- part in the integer numbers in Actor  --
+-- Prolog? Is it enabled to use the plus --
+-- sign in the exponent part of the      --
+-- integer numbers? Is it enabled to use --
+-- the minus sign in the exponent part   --
+-- of the integer numbers? Is it enabled --
+-- to use the dot sign in the integer    --
+-- numbers?                              --
+--                                       --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	T1== 1000,
+	writeln(T1),
+	--
+	T2== -1000,
+	writeln(T2),
+	--
+	T3== 70_000_000,
+	writeln(T3),
+	--
+	T4== 1e3,
+	writeln(T4),
+	--
+	T5== 1E+3,
+	writeln(T5),
+	--
+	T6== 16#0057C900#,
+	writeln(T6),
+	--
+	T7== 2#011111#,
+	writeln(T7),
+	--
+	T8== 36#PROLOG#,
+	writeln(T8),
+	--
+	T9== 8#1777#e3,
+	writeln(T9),
+	--
+	T10== 5#00_144#E+3,
+	writeln(T10).

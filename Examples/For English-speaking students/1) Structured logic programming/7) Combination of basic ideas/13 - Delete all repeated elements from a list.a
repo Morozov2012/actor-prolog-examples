@@ -1,0 +1,51 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas. The element predicate.   --
+--                                       --
+-- The task: delete all repeated         --
+-- elements from a list.                 --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Disassembling of a list.           --
+-- 2) Output assembling of a list.       --
+-- 3) The element predicate.             --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+p(List,List)		- (i,o);
+
+determ:
+
+element(INTEGER,List)	- (i,i);
+
+CLAUSES:
+
+goal:-
+	L1== [1,5,1,3,2,4,5,2],
+	writeln("L1=",L1),
+	p(L1,L2),
+	writeln("L2=",L2).
+
+p([Head|Rest1],Rest2):-
+	element(Head,Rest1),!,
+	p(Rest1,Rest2).
+p([Head|Rest1],[Head|Rest2]):-
+	p(Rest1,Rest2).
+p([],[]).
+
+element(H,[H|_]):-!.
+element(H,[_|Rest]):-
+	element(H,Rest).

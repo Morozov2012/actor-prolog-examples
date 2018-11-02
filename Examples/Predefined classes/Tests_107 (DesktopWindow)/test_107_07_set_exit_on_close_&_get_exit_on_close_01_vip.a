@@ -1,0 +1,24 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support these operations.
+--
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	env	= ('DesktopWindow');
+--
+[
+goal:-!,
+	env ? set_exit_on_close('no'),
+	Mode1== env?get_exit_on_close(),
+	show,
+	env ? set_exit_on_close('yes'),
+	Mode2== env?get_exit_on_close(),
+	writeln("Mode1: ",Mode1),
+	writeln("Mode2: ",Mode2).
+]
+-----------------------------------------------------------------------

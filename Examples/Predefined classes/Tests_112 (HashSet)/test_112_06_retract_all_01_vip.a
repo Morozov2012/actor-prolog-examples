@@ -1,0 +1,78 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+MyData		= {x:R_INTEGER,y:R_INTEGER,z:R_INTEGER}.
+R_INTEGER	= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'MyHashSet' (specialized 'HashSet'):
+[
+DOMAINS:
+--
+Target	= MyData.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyHashSet');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test2,
+	test1,
+	test2,
+	test4,
+	test2.
+--
+test1:-
+	writeln("Test 1: append(i)"),
+	writeln("\tI will store data items."),
+	store ? append({x:10,y:20}),
+	store ? append({y:23,x:25,z:7}),
+	store ? append({x:100,y:21}),
+	store ? append({y:23,x:25,z:7}),
+	store ? append({x:30,y:25}),
+	store ? append({x:25,y:23,z:7}),
+	store ? append({x:30,y:50,z:5}),
+	writeln("\tDone.").
+--
+test2:-
+	writeln("Test 2: find(o)"),
+	writeln("\tI will retrieve data items:"),
+	store ? find(Item),
+	writeln("\t",Item),
+	fail.
+test2:-
+	writeln("\tDone.").
+--
+test3:-
+	writeln("Test 3: retract_all()"),
+	writeln("\tI will delete all data item:"),
+	store ? retract_all,
+	writeln("\tDone.").
+--
+test4:-
+	writeln("Test 4: retract_all(i)"),
+	writeln("\tI will delete selected data items:"),
+	store ? retract_all({z:Z|Rest}),
+	writeln("\tDone: z=",Z," Rest=",Rest).
+]
+-----------------------------------------------------------------------

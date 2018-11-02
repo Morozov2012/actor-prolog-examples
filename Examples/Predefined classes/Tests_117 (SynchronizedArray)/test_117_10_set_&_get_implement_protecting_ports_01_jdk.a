@@ -1,0 +1,78 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(YesNo)	- (i);
+--
+-----------------------------------------------------------------------
+class 'MyArray' (specialized 'SynchronizedArray'):
+[
+DOMAINS:
+Target	= STRING.
+PREDICATES:
+nondeterm:
+element(ArrayIndex*) = Target		- (i);
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	my_array	= 'MyArray'[..];
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2('yes'),
+	test1,
+	test2('no'),
+	test1.
+--
+test0:-
+	set_color('RoyalBlue'),
+	writeln("Test 0."),
+	set_color('default'),
+	my_array?get_implement_protecting_ports(),!,
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+test0:-
+	set_color('Red'),
+	writeln("Failed!"),
+	set_color('default').
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test 1."),
+	set_color('default'),
+	Mode== my_array?get_implement_protecting_ports(),!,
+	set_color('Black'),
+	write("Implement protecting ports: "),
+	set_color('Violet'),
+	writeln(Mode),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+test1:-
+	set_color('Red'),
+	writeln("Failed!"),
+	set_color('default').
+--
+test2(Mode):-
+	set_color('RoyalBlue'),
+	writeln("Test 2."),
+	set_color('default'),
+	my_array ? set_implement_protecting_ports(Mode),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+]
+-----------------------------------------------------------------------

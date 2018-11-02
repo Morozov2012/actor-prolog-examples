@@ -1,0 +1,525 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test101;
+test102;
+test103;
+test104;
+test105;
+test106;
+test107;
+test108;
+test109;
+test110;
+test111;
+test112;
+test113;
+--
+test201;
+test202;
+test203;
+test204;
+test205;
+test206;
+test207;
+test208;
+test209;
+test210;
+test211;
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test101,
+	test102,
+	test103,
+	test104,
+	test105,
+	test106,
+	test107,
+	test108,
+	test109,
+	test110,
+	test111,
+	test112,
+	test113,
+	test201,
+	test202,
+	test203,
+	test204,
+	test205,
+	test206,
+	test207,
+	test208,
+	test209,
+	test210,
+	test211.
+--
+-- (i,o,o)
+--
+test101:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.01 (i,o,o)"),
+	Text== "ABCDE",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test101:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test102:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.02 (i,o,o)"),
+	Text== "¨ÅÄÃÂÁÀ",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test102:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+-- (i,i,o)
+--
+test103:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.03 (i,i,o)"),
+	Text== "ABCDE",
+	Code== `A,
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test103:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test104:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.04 (i,i,o)"),
+	Text== "¨ÅÄÃÂÁÀ",
+	Code== `¨,
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test104:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test105:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.05 (i,i,o)"),
+	Text== "ABCDE",
+	Code== `N,
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Red'),
+	con ? writeln("\tFailure. Output arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test105:-
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.: No solutions").
+--
+-- (i,o,i)
+--
+test106:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.06 (i,o,i)"),
+	Text== "ABCDE",
+	Rest== "BCDE",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code).
+test106:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test107:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.07 (i,o,i)"),
+	Text== "¨ÅÄÃÂÁÀ",
+	Rest== "ÅÄÃÂÁÀ",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code).
+test107:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test108:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.08 (i,o,i)"),
+	Text== "ABCDE",
+	Rest== "TAIL",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Red'),
+	con ? writeln("\tFailure. Output arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code).
+test108:-
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.: No solutions").
+--
+-- (i,i,i)
+--
+test109:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.09 (i,i,i)"),
+	Text== "ABCDE",
+	Code== `A,
+	Rest== "BCDE",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.").
+test109:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test110:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.10 (i,i,i)"),
+	Text== "¨ÅÄÃÂÁÀ",
+	Code== `¨,
+	Rest== "ÅÄÃÂÁÀ",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.").
+test110:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test111:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.11 (i,i,i)"),
+	Text== "ABCDE",
+	Code== `N,
+	Rest== "TAIL",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Red'),
+	con ? writeln("\tFailure.").
+test111:-
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.: No solutions").
+--
+-- (o,i,i)
+--
+test112:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.12 (o,i,i)"),
+	Code== `A,
+	Rest== "BCDE",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tText: >>>",Text,"<<<").
+test112:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test113:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.13 (o,i,i)"),
+	Code== `¨,
+	Rest== "ÅÄÃÂÁÀ",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_code(Text,Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tText: >>>",Text,"<<<").
+test113:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+-- (i,o,o)
+--
+test201:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.01 (o,o)"),
+	Text== "ABCDE",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test201:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test202:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.02 (o,o)"),
+	Text== "¨ÅÄÃÂÁÀ",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test202:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+-- (i,i,o)
+--
+test203:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.03 (i,o)"),
+	Text== "ABCDE",
+	Code== `A,
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test203:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test204:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.04 (i,o)"),
+	Text== "¨ÅÄÃÂÁÀ",
+	Code== `¨,
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test204:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test205:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.05 (i,o)"),
+	Text== "ABCDE",
+	Code== `N,
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Red'),
+	con ? writeln("\tFailure. Output arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<").
+test205:-
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.: No solutions").
+--
+-- (i,o,i)
+--
+test206:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.06 (o,i)"),
+	Text== "ABCDE",
+	Rest== "BCDE",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code).
+test206:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test207:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.07 (o,i)"),
+	Text== "¨ÅÄÃÂÁÀ",
+	Rest== "ÅÄÃÂÁÀ",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code).
+test207:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test208:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.08 (o,i)"),
+	Text== "ABCDE",
+	Rest== "TAIL",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Red'),
+	con ? writeln("\tFailure. Output arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tCode: ",Code).
+test208:-
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.: No solutions").
+--
+-- (i,i,i)
+--
+test209:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.09 (i,i)"),
+	Text== "ABCDE",
+	Code== `A,
+	Rest== "BCDE",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.").
+test209:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test210:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.10 (i,i)"),
+	Text== "¨ÅÄÃÂÁÀ",
+	Code== `¨,
+	Rest== "ÅÄÃÂÁÀ",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.").
+test210:-
+	con ? set_color('Red'),
+	con ? writeln("\tFailure").
+--
+test211:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.11 (i,i)"),
+	Text== "ABCDE",
+	Code== `N,
+	Rest== "TAIL",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tCode: ",Code),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	set_string(Text),
+	extract_front_code(Code,Rest),!,
+	con ? set_color('Red'),
+	con ? writeln("\tFailure.").
+test211:-
+	con ? set_color('Black'),
+	con ? writeln("\tO.K.: No solutions").
+]

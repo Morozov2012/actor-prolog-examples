@@ -1,0 +1,108 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  QSORT                                                            --
+--                                                                   --
+--  David H.D. Warren                                                --
+--                                                                   --
+--  Quicksort a list of 50 integers                                  --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--  (Warning: Program text is modified a bit!)                       --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+-- Pentium Q9450, 2.67GHz, 3.25GB, Windows XP, SP3 (Home)            --
+-- ======================================================            --
+-- Socket775 ASUS "P5K/EPU" (iP35, 4xDDR2, U133, SATA II, 2xPCI-E,   --
+-- SB, 1Gbit LAN, IEEE1394a, USB2.0, ATX)                            --
+-- Intel "Core 2 Quad Q9450" (2.66GHz, 2x6MB, 1333MHz, EM64T)        --
+-- 2 x 2GB DDR2 SDRAM Kingston "ValueRAM" KVR800D2N5/2G (PC6400,     --
+-- 800MHz, CL5)                                                      --
+--                                                                   --
+-- EXE file produced by the Actor Prolog system:                     --
+--                                                                   --
+-- 1000 iterations take 10 msec                                      --
+-- 0.01 milliseconds per iteration                                   --
+-- 100000 iterations take 1420 msec                                  --
+-- 0.0142 milliseconds per iteration                                 --
+--                                                                   --
+-- java version "1.7.0"                                              --
+-- Java(TM) SE Runtime Environment (build 1.7.0-b147)                --
+-- Java HotSpot(TM) Server VM (build 21.0-b17, mixed mode, sharing)  --
+--                                                                   --
+-- === BigInteger ===                                                --
+-- java -Xrs -XX:+UseNUMA -server -Xbatch -jar main.jar              --
+--                                                                   --
+-- 1000 iterations take 203 msec                                     --
+-- 0,203000 milliseconds per iteration                               --
+-- 100000 iterations take 7297 msec                                  --
+-- 0,072970 milliseconds per iteration                               --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+-- Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB          --
+-- Windows7 - PM.64 (RUS)                                            --
+-- ================================================================= --
+-- AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                            --
+--                                                                   --
+-- EXE file produced by the Actor Prolog system:                     --
+-- 2011.08.15 17:48 (Kupavna)                                        --
+--                                                                   --
+-- 1000 iterations take 20 msec                                      --
+-- 0.02 milliseconds per iteration                                   --
+-- 100000 iterations take 890 msec                                   --
+-- 0.0089 milliseconds per iteration                                 --
+-- 1000000 iterations take 8890 msec                                 --
+-- 0.00889 milliseconds per iteration                                --
+--                                                                   --
+-- java version "1.7.0"                                              --
+-- Java(TM) SE Runtime Environment (build 1.7.0-b147)                --
+-- Java HotSpot(TM) 64-Bit Server VM (build 21.0-b17, mixed mode)    --
+--                                                                   --
+-- === BigInteger ===                                                --
+-- java -Xrs -XX:+UseNUMA -server -Xbatch -jar main.jar              --
+--                                                                   --
+-- 1000 iterations take 156 msec                                     --
+-- 0,156000 milliseconds per iteration                               --
+-- 100000 iterations take 5055 msec                                  --
+-- 0,050550 milliseconds per iteration                               --
+-- 1000000 iterations take 47487 msec                                --
+-- 0,047487 milliseconds per iteration                               --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities' from "HARNESS1";
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+qsort(TestData,TestData,TestData)		- (i,o,i);
+partition(TestData,Number,TestData,TestData)	- (i,i,o,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+[
+benchmark(Data,Out):-
+	qsort(Data,Out,[]).
+--
+data([	27,74,17,33,94,18,46,83,65, 2,
+	32,53,28,85,99,47,28,82, 6,11,
+	55,29,39,81,90,37,10, 0,66,51,
+	 7,21,85,27,31,63,75, 4,95,99,
+	11,28,61,74,18,92,40,53,59, 8]):-!.
+--
+qsort([X|L],R,R0):-!,
+	partition(L,X,L1,L2),
+	qsort(L2,R1,R0),
+	qsort(L1,R,[X|R1]).
+qsort(_,R,R).
+--
+partition([X|L],Y,[X|L1],L2):-
+	X <= Y,!,
+	partition(L,Y,L1,L2).
+partition([X|L],Y,L1,[X|L2]):-!,
+	partition(L,Y,L1,L2).
+partition(_,_,[],[]).
+]
+-----------------------------------------------------------------------

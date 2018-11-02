@@ -1,0 +1,9 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, IRE RAS, Alexei A. Morozov. --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	writeln("Hello World!").

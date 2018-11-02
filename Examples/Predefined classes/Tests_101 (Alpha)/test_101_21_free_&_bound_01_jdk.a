@@ -1,0 +1,120 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+Value	= f(N).
+N	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+create_values(Value,Value)	- (o,o);
+test0;
+test1(Value)			- (i);
+test2(Value)			- (i);
+test3(Value)			- (i);
+test4(Value)			- (i);
+test5(Value,Value)		- (i,i);
+test6(Value,Value)		- (i,i);
+test7(Value,Value)		- (i,i);
+test8(Value,Value)		- (i,i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	create_values(V1,V2),
+	test0,
+	test1(V1),
+	test2(V1),
+	test3(V2),
+	test4(V2),
+	test5(V1,V1),
+	test6(V1,V2),
+	test7(V1,V2),
+	test8(V2,V2).
+--
+create_values(_,f(_)).
+--
+test0:-
+	con ? writeln("Test 0:"),
+	?free(),
+	?bound(),!,
+	con ? writeln("   O.K.").
+test0:-
+	con ? writeln("Failure").
+--
+test1(X):-
+	con ? writeln("Test 1:"),
+	con ? writeln("   x=",X),
+	?free(X),!,
+	con ? writeln("   O.K.: x is free.").
+test1(_):-
+	con ? writeln("Failure").
+--
+test2(X):-
+	con ? writeln("Test 2:"),
+	con ? writeln("   x=",X),
+	?bound(X),!,
+	con ? writeln("Failure").
+test2(_):-
+	con ? writeln("   O.K.: x is not bound.").
+--
+test3(X):-
+	con ? writeln("Test 3:"),
+	con ? writeln("   x=",X),
+	?free(X),!,
+	con ? writeln("Failure").
+test3(_):-
+	con ? writeln("   O.K.: x is not free.").
+--
+test4(X):-
+	con ? writeln("Test 3:"),
+	con ? writeln("   x=",X),
+	?bound(X),!,
+	con ? writeln("   O.K.: x is bound.").
+test4(_):-
+	con ? writeln("Failure").
+--
+test5(X,Y):-
+	con ? writeln("Test 5:"),
+	con ? writeln("   x=",X," y=",Y),
+	?free(X,Y),!,
+	con ? writeln("   O.K.: x and y are free.").
+test5(_,_):-
+	con ? writeln("Failure").
+--
+test6(X,Y):-
+	con ? writeln("Test 6:"),
+	con ? writeln("   x=",X," y=",Y),
+	?bound(X,Y),!,
+	con ? writeln("Failure").
+test6(_,_):-
+	con ? writeln("   O.K.: x or y is not bound.").
+--
+test7(X,Y):-
+	con ? writeln("Test 7:"),
+	con ? writeln("   x=",X," y=",Y),
+	?free(X,Y),!,
+	con ? writeln("Failure").
+test7(_,_):-
+	con ? writeln("   O.K.: x or y is not free.").
+--
+test8(X,Y):-
+	con ? writeln("Test 8:"),
+	con ? writeln("   x=",X," y=",Y),
+	?bound(X,Y),!,
+	con ? writeln("   O.K.: x and y are bound.").
+test8(_,_):-
+	con ? writeln("Failure").
+]

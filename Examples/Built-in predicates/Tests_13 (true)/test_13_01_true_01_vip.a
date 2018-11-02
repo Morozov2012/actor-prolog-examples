@@ -1,0 +1,13 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'Console'):
+[
+goal:-!,
+	true,
+	true(),
+	true(1,2,3,4,5,6,[1,2,3]),
+	write("O.K.").
+]

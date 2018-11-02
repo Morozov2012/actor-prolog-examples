@@ -1,0 +1,363 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+-----------------------------------------------------------------------
+project: (('ControlDialog'))
+-----------------------------------------------------------------------
+class 'ControlDialog' (specialized 'Dialog'):
+--
+constant:
+--
+	data_directory =
+		"F:/= Video =/W_L_Object 10 07 2017/"
+		"22 object/2 session";
+--
+	file_name_format	= "time 17-07-10 15-16-42 %04d.jpg";
+	frame_rate		= 30.0;
+	subsampling		= 2;
+--
+constant:
+--
+-- Warning: This matrix corresponds to
+-- the "time 17-07-10 15-16-42.avi" data set only.
+--
+inverse_transformation_matrix	= [
+		[ 0.0011, 0.0000,0.0001],
+		[ 0.0000, 0.0010,0.0001],
+		[-0.0670,-0.0839,1.0000]];
+--
+internal:
+--
+	vpm		= ('VideoProcessingMachine',
+				minimal_training_interval= -1,
+				-- maximal_training_interval= 100,
+				horizontal_blob_border= 10,
+				vertical_blob_border= 10,
+				horizontal_extra_border_coefficient= -1.0,
+				vertical_extra_border_coefficient= -1.0,
+				minimal_blob_intersection_area= 1,
+				minimal_blob_size= 1,
+				maximal_blob_invisibility_interval= 30,
+				minimal_track_duration= 50,
+				maximal_track_retention_interval= 50,
+				maximal_chronicle_length= 1000,
+				inverse_transformation_matrix,
+				synthesized_image_transparency= 48);
+	timer		= ('SpecialTimer',
+				target_world= self);
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	text		= ('Text');
+	image1		= ('BufferedImage');
+	image2		= ('BufferedImage');
+	state		= ('ProgramState');
+	accumulator	= ('Accumulator');
+	con		= ('Console');
+--
+variable:
+--
+	first_frame;
+	last_frame;
+--
+constant:
+--
+	circle_radius	= 0.005;
+--
+[
+goal:-!,
+	maximize,
+	Time0== timer?milliseconds(),
+	state ? set_beginning_time(Time0),
+	timer ? set_period(1/(frame_rate*2),0),
+	detect_minimal_file_number(1,MinFileNumber),
+	detect_maximal_file_number(1,MaxFileNumber,MinFileNumber),
+	put(1002,[MinFileNumber,MaxFileNumber]),
+	put(1004,[MinFileNumber,MaxFileNumber]),
+	put('first_frame',MinFileNumber),
+	put('last_frame',MaxFileNumber),
+	modified_control(0),
+	timer ? activate.
+--
+detect_minimal_file_number(N,N):-
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N),
+	image1 ? does_exist(ImageToBeLoaded),!.
+detect_minimal_file_number(N1,N2):-
+	N1 < 1_000_000,!,
+	detect_minimal_file_number(N1+1,N2).
+detect_minimal_file_number(_,1).
+--
+detect_maximal_file_number(N1,N3,Min):-
+	N2== N1 + 1,
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N2),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	show_frame_range_if_necessary(Min,N2),
+	detect_maximal_file_number(N2,N3,Min).
+detect_maximal_file_number(N,N,_).
+--
+show_frame_range_if_necessary(Min,Max):-
+	?mod(Max,1000) == 0,!,
+	put(1004,[Min,Max]),
+	put('last_frame',Max).
+show_frame_range_if_necessary(_,_).
+-----------------------------------------------------------------------
+modified_control(_):-!,
+	vpm ? suspend_processing,
+	vpm ? retract_all_instructions,
+	L11== [	p(57,89),p(589,61),p(606,212),p(602,411),
+		p(357,409),p(217,421),p(51,417)],
+	divide_list(subsampling,L11,L12),
+	vpm ? msk_select_polygon(L12),
+	--
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('SATURATION',0,50),
+	vpm ? msk_select_foreground('BRIGHTNESS',0,150),
+	vpm ? pxl_select_image_channel('BRIGHTNESS'),
+	vpm ? pxl_compute_gradient('MODULUS'),
+	vpm ? pxl_normalize_pixels(0,10),
+	vpm ? pxl_smooth_image(13),
+	vpm ? msk_select_foreground(0,150),
+	vpm ? msk_erode_foreground(5),
+	vpm ? msk_dilate_foreground(5),
+	vpm ? blb_extract_blobs('body','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? blb_set_blob_borders(15,15),
+	--
+	vpm ? pxl_withdraw_pixel_preprocessing,
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('HUE',185,245),
+	vpm ? msk_select_foreground('SATURATION',50,255),
+	vpm ? msk_select_foreground('BRIGHTNESS',0,150),
+	vpm ? msk_erode_foreground(2),
+	vpm ? msk_dilate_foreground(2),
+	vpm ? blb_extract_blobs('cap','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? blb_set_blob_borders(1,1),
+	--
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('HUE',111,138),
+	vpm ? msk_select_foreground('SATURATION',50,255),
+	vpm ? msk_erode_foreground(2),
+	vpm ? msk_dilate_foreground(2),
+	vpm ? blb_extract_blobs('green_object','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('HUE',147,183),
+	vpm ? msk_select_foreground('SATURATION',103,255),
+	vpm ? msk_erode_foreground(2),
+	vpm ? msk_dilate_foreground(2),
+	vpm ? blb_extract_blobs('blue_object','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? blb_track_blobs,
+	vpm ? pxl_select_image_channel('ALL'),
+	vpm ? process_now.
+--
+divide_list(K,[p(X,Y)|R1],[p(X/K,Y/K)|R2]):-!,
+	divide_list(K,R1,R2).
+divide_list(_,_,[]).
+-----------------------------------------------------------------------
+tick:-
+	T2== timer?milliseconds(),
+	state ? get_beginning_time(T1),
+	Delta== (T2 - T1) / 1000.0 * frame_rate,
+	N== ?convert_to_integer(?round(Delta)),
+	FFN== ?val("INTEGER",?get('first_frame')),!,
+	load_figure(N+FFN-1,T2).
+tick.
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	LFN== ?val("INTEGER",?get('last_frame')),
+	N <= LFN,
+	state ? set_current_frame(N),
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	image1 ? load(	ImageToBeLoaded,
+			subsampling,subsampling,0,0),
+	vpm ? process_realtime_frame(image1),
+	state ? increase_global_counter,
+	draw_scene.
+load_figure(_,T2):-
+	state ? set_beginning_time(T2).
+--
+draw_scene:-
+	vpm ? commit,
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	vpm ? get_synthesized_image(image2),
+	graphic_window ? draw_image(image2,0,0,1,1),
+	vpm ? get_blobs(BlobList),
+	image2 ? get_size_in_pixels(IW,IH),
+	draw_blob_list(BlobList,IW,IH),
+	draw_legend,
+	graphic_window ? draw_now.
+--
+draw_blob_list([Blob|Rest],IW,IH):-
+	draw_blob(Blob,IW,IH),
+	draw_blob_list(Rest,IW,IH).
+draw_blob_list([],_,_).
+--
+draw_blob(Blob,IW,IH):-
+	Blob == {type:Type,x:X0,y:Y0,width:W1,height:H1|_},
+	select_blob_color(Type,Color),
+	graphic_window ? set_pen({color:Color,lineWidth:3}),
+	graphic_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	X2== (X0 - W1 / 2) / IW,
+	Y2== (Y0 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	fail.
+draw_blob(_,_,_).
+--
+select_blob_color('cap','Cyan'):-!.
+select_blob_color('body','Orange'):-!.
+select_blob_color('green_object','DkGreen'):-!.
+select_blob_color('blue_object','Navy'):-!.
+select_blob_color(_,'Magenta').
+--
+draw_legend:-
+	state ? get_current_frame(FrameNumber),!,
+	state ? get_stopwatch_time(Delay),
+	state ? get_frame_counter(FrameQuantity),
+	state ? get_global_counter(GlobalCounter),
+	Time== Delay / 1000.0,
+	FrameRate== FrameQuantity / Time,
+	graphic_window ? set_brush('Red'),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('LEFT','TOP'),
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %3.2f [sec]; Frame: %d (%d)",
+			Time,FrameNumber,GlobalCounter)),
+	graphic_window ? set_text_alignment('RIGHT','TOP'),
+	graphic_window ? draw_text(
+		0.98, 0.02,
+		text?format(
+			"Frame Rate: %3.2f [Hz]",
+			FrameRate)).
+draw_legend.
+]
+-----------------------------------------------------------------------
+class 'SpecialTimer' (specialized 'Timer'):
+--
+internal:
+--
+target_world;
+--
+[
+tick:-!,
+	target_world ? tick.
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		= ('Timer');
+--
+[
+CLAUSES:
+--
+get_beginning_time(Time):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(Time),!.
+--
+set_beginning_time(Time):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(Time)),
+	reset_stopwatch,
+	reset_frame_counter.
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)),
+	increase_frame_counter.
+--
+reset_stopwatch:-
+	retract_all(stop_watch_time(_)),
+	append(stop_watch_time(timer?milliseconds())).
+--
+get_stopwatch_time(Delay):-
+	T2== timer?milliseconds(),
+	Item== ?match(stop_watch_time(_)),
+	Item == stop_watch_time(T1),!,
+	Delay== T2 - T1.
+get_stopwatch_time(0).
+--
+reset_frame_counter:-
+	retract_all(frame_counter(_)).
+--
+increase_frame_counter:-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!,
+	retract_all(frame_counter(_)),
+	append(frame_counter(N+1)).
+increase_frame_counter:-
+	append(frame_counter(1)).
+--
+get_frame_counter(N):-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!.
+get_frame_counter(0).
+--
+increase_global_counter:-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!,
+	retract_all(global_counter(_)),
+	append(global_counter(N+1)).
+increase_global_counter:-
+	append(global_counter(1)).
+--
+get_global_counter(N):-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!.
+get_global_counter(0).
+]
+-----------------------------------------------------------------------
+class 'Accumulator' (specialized 'Database'):
+[
+add_value(BlobType,Label,Value):-
+	Item== ?match(accumulated_sum(_,_,_,_)),
+	Item == accumulated_sum(BlobType,Label,N,Sum),!,
+	retract_all(accumulated_sum(BlobType,Label,N,Sum)),
+	append(accumulated_sum(BlobType,Label,N+1,Sum+Value)).
+add_value(BlobType,Label,Value):-
+	append(accumulated_sum(BlobType,Label,1,Value)).
+--
+get_average_value(BlobType,Label,Mean):-
+	Item== ?match(accumulated_sum(_,_,_,_)),
+	Item == accumulated_sum(BlobType,Label,N,Sum),!,
+	Mean== Sum / N.
+]
+-----------------------------------------------------------------------

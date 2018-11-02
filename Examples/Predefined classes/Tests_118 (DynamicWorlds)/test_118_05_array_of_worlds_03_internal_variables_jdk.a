@@ -1,0 +1,50 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+
+import 'WorldArray' as 'WindowArray'
+	from "Arrays"('TargetClass':='MyWorld');
+
+DOMAINS:
+reference:
+R_REAL	= REAL.
+
+class 'Main' (specialized 'Alpha'):
+w	= 'WindowArray'[..] of ('MyWorld',slot1=_);
+[
+goal:-!,
+	w[1] ? write_data("Window1",3.1416),
+	w[2] ? write_data("Window2",2.7183),!.
+]
+
+class 'MyWorld' (specialized 'Report'):
+--
+variable:
+--
+slot1	: R_REAL;
+slot2	: R_REAL;
+--
+[
+PREDICATES:
+--
+determ:
+write_data(STRING,R_REAL)	- (i,i);
+--
+CLAUSES:
+--
+write_data(Name,K):-
+	set_color('RoyalBlue'),
+	writeln(Name),
+	set_color('default'),
+	slot2 == K,!,
+	set_color('DkGreen'),
+	writeln("slot1= ",slot1),
+	writeln("slot2= ",slot2),
+	set_color('default').
+write_data(_,_):-
+	set_color('Red'),
+	write("Failure"),
+	set_color('default'),
+	fail.
+]

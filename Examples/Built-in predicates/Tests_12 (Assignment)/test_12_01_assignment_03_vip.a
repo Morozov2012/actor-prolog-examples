@@ -1,0 +1,63 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+Message		= f(R_INTEGER).
+R_INTEGER	= INTEGER.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+w	= ('Observer',
+		channel=value);
+--
+con	= ('Console');
+--
+variable:
+--
+value	: Message;
+--
+[
+goal:-!,
+	set_period(0.5),
+	activate,
+	con ? writeln("(1) Goal value=",value),
+	value == f(100),
+	con ? writeln("(2) Goal value=",value).
+--
+tick:-
+	con ? writeln("======== TICK ========"),
+	con ? writeln("(1) Main: ",value),
+	value := f(Message),
+	con ? writeln("(2) Main: ",value," ",Message),
+	fail.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Observer':
+--
+internal:
+--
+con	= ('Console');
+--
+variable:
+--
+channel	: Message;
+--
+[
+goal:-
+	con ? writeln("Observer: ",channel).
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------

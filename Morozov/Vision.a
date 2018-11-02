@@ -1,0 +1,1027 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2013-2017 IRE RAS Alexei A. Morozov                        --
+--------------------------------------------------------------------
+
+package "Morozov/Vision":
+
+--------------------------------------------------------------------
+-- The 'VideoProcessingMachine' class is                          --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+class 'VideoProcessingMachine' (specialized 'DataAbstraction'):
+--
+brightness_histogram_tail_coefficient		= 0.005;
+color_histogram_tail_coefficient		= 0.001;
+--
+-- The implementation of the 'BlobProcessingAttributes' interface:
+--
+minimal_training_interval			= -1;
+maximal_training_interval			= -1;
+horizontal_blob_border				= 3;
+vertical_blob_border				= 3;
+horizontal_extra_border_coefficient		= -1.0;
+vertical_extra_border_coefficient		= -1.0;
+minimal_blob_intersection_area			= 1;
+minimal_blob_size				= 10;
+minimal_track_duration				= 5;
+maximal_track_duration				= -1;
+maximal_chronicle_length			= -1;
+maximal_blob_invisibility_interval		= 3;
+maximal_track_retention_interval		= 4500;
+inverse_transformation_matrix			= [];
+sampling_rate					= -1.0;
+r2_window_halfwidth				= 5;
+apply_median_filtering_to_characteristic_length	= 'yes';
+characteristic_length_median_filter_halfwidth	= 3;
+apply_median_filtering_to_velocity		= 'yes';
+velocity_median_filter_halfwidth		= 3;
+synthesized_image_transparency			= 64;
+make_rectangular_blobs_in_synthesized_image	= 'no';
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+image_encoding_attributes			= {};
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+maximal_waiting_time				= 'default';
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+backslash_always_is_separator			= 'yes';
+accept_only_uniform_resource_identifiers	= 'no';
+
+[
+SOURCE:
+	"morozov.built_in.VideoProcessingMachine";
+
+CLAUSES:
+
+img_get_subimage(X,Y,Width,Height):
+	[external "imgGetSubimage"].
+img_resize_image(Width,Height):
+	[external "imgResizeImage"].
+img_apply_gaussian_filter(Radius):
+	[external "imgApplyGaussianFilter"].
+img_withdraw_image_preprocessing:
+	[external "imgWithdrawImagePreprocessing"].
+--
+pxl_adjust_contrast:
+	[external "pxlAdjustContrast"].
+pxl_adjust_contrast(Coefficient):
+	[external "pxlAdjustContrast"].
+pxl_adjust_contrast(MinimalValue,MaximalValue):
+	[external "pxlAdjustContrast"].
+--
+pxl_adjust_levels:
+	[external "pxlAdjustLevels"].
+pxl_adjust_levels(Coefficient):
+	[external "pxlAdjustLevels"].
+--
+pxl_invert_colors:
+	[external "pxlInvertColors"].
+--
+pxl_select_image_channel(ChannelName):
+	[external "pxlSelectImageChannel"].
+--
+pxl_compute_gradient(GradientComputationMode):
+	[external "pxlComputeGradient"].
+pxl_smooth_image(StructuringElementHalfwidth):
+	[external "pxlSmoothImage"].
+pxl_normalize_pixels(MinimalValue,MaximalValue):
+	[external "pxlNormalizePixels"].
+pxl_withdraw_pixel_preprocessing:
+	[external "pxlWithdrawPixelPreprocessing"].
+--
+msk_push_foreground:
+	[external "mskPushForeground"].
+msk_push_foreground(PushOperationMode):
+	[external "mskPushForeground"].
+--
+msk_pop_foreground:
+	[external "mskPopForeground"].
+msk_pop_foreground(PopOperationMode):
+	[external "mskPopForeground"].
+--
+msk_select_foreground(LowerBound,UpperBound):
+	[external "mskSelectForeground"].
+msk_select_foreground(ImageChannelName,LowerBound,UpperBound):
+	[external "mskSelectForeground"].
+--
+msk_add_foreground(LowerBound,UpperBound):
+	[external "mskAddForeground"].
+msk_add_foreground(ImageChannelName,LowerBound,UpperBound):
+	[external "mskAddForeground"].
+--
+msk_exclude_foreground(LowerBound,UpperBound):
+	[external "mskExcludeForeground"].
+msk_exclude_foreground(ImageChannelName,LowerBound,UpperBound):
+	[external "mskExcludeForeground"].
+--
+msk_flip_foreground(LowerBound,UpperBound):
+	[external "mskFlipForeground"].
+msk_flip_foreground(ImageChannelName,LowerBound,UpperBound):
+	[external "mskFlipForeground"].
+--
+msk_select_polygon(PointList):
+	[external "mskSelectPolygon"].
+msk_add_polygon(PointList):
+	[external "mskAddPolygon"].
+msk_exclude_polygon(PointList):
+	[external "mskExcludePolygon"].
+msk_flip_polygon(PointList):
+	[external "mskFlipPolygon"].
+--
+msk_select_all:
+	[external "mskSelectAll"].
+msk_deselect_all:
+	[external "mskDeselectAll"].
+--
+msk_subtract_gaussian_background(
+		StandardDeviationFactor):
+	[external "mskSubtractGaussianBackground"].
+msk_subtract_gaussian_background(
+		StandardDeviationFactor,
+		StabilityInterval):
+	[external "mskSubtractGaussianBackground"].
+msk_subtract_gaussian_background(
+		StandardDeviationFactor,
+		StabilityInterval,
+		ReductionCoefficient):
+	[external "mskSubtractGaussianBackground"].
+--
+msk_subtract_nonparametric_background(
+		NumberOfBins,
+		AlphaLevel):
+	[external "mskSubtractNonparametricBackground"].
+msk_subtract_nonparametric_background(
+		NumberOfBins,
+		AlphaLevel,
+		StabilityInterval):
+	[external "mskSubtractNonparametricBackground"].
+msk_subtract_nonparametric_background(
+		NumberOfBins,
+		AlphaLevel,
+		StabilityInterval,
+		ReductionCoefficient):
+	[external "mskSubtractNonparametricBackground"].
+--
+msk_apply_rank_filter(RankFilterThreshold):
+	[external "mskApplyRankFilter"].
+--
+msk_dilate_foreground:
+	[external "mskDilateForeground"].
+msk_dilate_foreground(StructuringElementHalfwidth):
+	[external "mskDilateForeground"].
+msk_dilate_foreground(
+		StructuringElementHalfwidth,DilationAlgorithm):
+	[external "mskDilateForeground"].
+--
+msk_erode_foreground:
+	[external "mskErodeForeground"].
+msk_erode_foreground(StructuringElementHalfwidth):
+	[external "mskErodeForeground"].
+msk_erode_foreground(StructuringElementHalfwidth,ErodingAlgorithm):
+	[external "mskErodeForeground"].
+--
+msk_contour_foreground:
+	[external "mskContourForeground"].
+--
+blb_extract_blobs(BlobType,BlobExtractionAlgorithm):
+	[external "blbExtractBlobs"].
+--
+blb_sort_blobs_by(BlobSortingCriterion):
+	[external "blbSortBlobsBy"].
+blb_sort_blobs_by(BlobSortingCriterion,SortingMode):
+	[external "blbSortBlobsBy"].
+--
+blb_select_front_blobs(NumberOfBlobs):
+	[external "blbSelectFrontBlobs"].
+blb_select_front_blobs(NumberOfBlobs,BlobSortingCriterion):
+	[external "blbSelectFrontBlobs"].
+blb_select_front_blobs
+	(NumberOfBlobs,BlobSortingCriterion,SortingMode):
+	[external "blbSelectFrontBlobs"].
+--
+blb_select_superior_blob(BlobSortingCriterion):
+	[external "blbSelectSuperiorBlob"].
+blb_select_superior_blob(BlobSortingCriterion,SortingMode):
+	[external "blbSelectSuperiorBlob"].
+--
+blb_fill_blobs:
+	[external "blbFillBlobs"].
+--
+blb_compute_color_histograms:
+	[external "blbComputeColorHistograms"].
+blb_compute_color_histograms(NumberOfBins):
+	[external "blbComputeColorHistograms"].
+--
+blb_track_blobs:
+	[external "blbTrackBlobs"].
+--
+blb_set_blob_borders(HorizontalBorder,VerticalBorder):
+	[external "blbSetBlobBorders"].
+blb_set_extra_border_coefficients(HorizontalCoef,VerticalCoef):
+	[external "blbSetExtraBorderCoefficients"].
+blb_set_minimal_blob_intersection_area(Number):
+	[external "blbSetMinimalBlobIntersectionArea"].
+blb_set_minimal_blob_size(Number):
+	[external "blbSetMinimalBlobSize"].
+--
+trk_select_front_tracks(NumberOfTracks,TrackSortingCriterion):
+	[external "trkSelectFrontTracks"].
+trk_select_front_tracks
+	(NumberOfTracks,TrackSortingCriterion,SortingMode):
+	[external "trkSelectFrontTracks"].
+--
+trk_select_superior_track(TrackSortingCriterion):
+	[external "trkSelectSuperiorTrack"].
+trk_select_superior_track(TrackSortingCriterion,SortingMode):
+	[external "trkSelectSuperiorTrack"].
+--
+trk_refuse_slow_tracks(
+		FuzzyVelocityThreshold,
+		FuzzyDistanceThreshold,
+		FuzzyThresholdBorder):
+	[external "trkRefuseSlowTracks"].
+--
+retract_all_instructions:
+	[external "retractAllInstructions"].
+suspend_processing:
+	[external "suspendProcessing"].
+process_now:
+	[external "processNow"].
+--
+-- The implementation of
+-- the 'VideoProcessingMachineOperations' interface:
+--
+process_numbered_frame(Image):
+	[external "processNumberedFrame"].
+process_numbered_frame(Image,FrameNumber):
+	[external "processNumberedFrame"].
+process_numbered_frame(Image,FrameNumber,TakeFrameIntoAccount):
+	[external "processNumberedFrame"].
+--
+process_realtime_frame(Image):
+	[external "processRealtimeFrame"].
+process_realtime_frame(Image,TimeInMilliseconds):
+	[external "processRealtimeFrame"].
+process_realtime_frame(
+		Image,TimeInMilliseconds,TakeFrameIntoAccount):
+	[external "processRealtimeFrame"].
+--
+commit:
+	[external "commit"].
+--
+reset_settings:
+	[external "resetSettings"].
+reset_statistics:
+	[external "resetStatistics"].
+reset_results:
+	[external "resetResults"].
+reset_all:
+	[external "resetAll"].
+--
+get_recent_frame_number(FrameNumber):
+	[external "getRecentFrameNumber"].
+get_recent_frame_time(Milliseconds):
+	[external "getRecentFrameTime"].
+--
+get_recent_image(Image):
+	[external "getRecentImage"].
+get_preprocessed_image(Image):
+	[external "getPreprocessedImage"].
+get_foreground_image(Image):
+	[external "getForegroundImage"].
+get_synthesized_image(Image):
+	[external "getSynthesizedImage"].
+--
+get_background_image(Image):
+	[external "getBackgroundImage"].
+get_background_image(Image,LayerNumber):
+	[external "getBackgroundImage"].
+--
+get_sigma_image(Image):
+	[external "getSigmaImage"].
+get_sigma_image(Image,LayerNumber):
+	[external "getSigmaImage"].
+--
+get_blobs(BlobList):
+	[external "getBlobs"].
+get_tracks(TrackList):
+	[external "getTracks"].
+get_connected_graphs(GraphList):
+	[external "getConnectedGraphs"].
+get_chronicle(BlobChronicle):
+	[external "getChronicle"].
+--
+physical_coordinates(PixelX,PixelY,PhysicalX,PhysicalY):
+	[external "physicalCoordinates"].
+characteristic_length(X,Y) = Value:
+	[external "characteristicLength"].
+--
+set_brightness_histogram_tail_coefficient(Coefficient):
+	[external "setBrightnessHistogramTailCoefficient"].
+get_brightness_histogram_tail_coefficient = Coefficient:
+	[external "getBrightnessHistogramTailCoefficient"].
+--
+set_color_histogram_tail_coefficient(Coefficient):
+	[external "setColorHistogramTailCoefficient"].
+get_color_histogram_tail_coefficient = Coefficient:
+	[external "getColorHistogramTailCoefficient"].
+--
+-- The implementation of the 'BlobProcessingAttributes' interface:
+--
+set_minimal_training_interval(Number):
+	[external "setMinimalTrainingInterval"].
+get_minimal_training_interval() = Number:
+	[external "getMinimalTrainingInterval"].
+--
+set_maximal_training_interval(Number):
+	[external "setMaximalTrainingInterval"].
+get_maximal_training_interval() = Number:
+	[external "getMaximalTrainingInterval"].
+--
+set_horizontal_blob_border(Number):
+	[external "setHorizontalBlobBorder"].
+get_horizontal_blob_border() = Number:
+	[external "getHorizontalBlobBorder"].
+--
+set_vertical_blob_border(Number):
+	[external "setVerticalBlobBorder"].
+get_vertical_blob_border() = Number:
+	[external "getVerticalBlobBorder"].
+--
+set_horizontal_extra_border_coefficient(Coefficient):
+	[external "setHorizontalExtraBorderCoefficient"].
+get_horizontal_extra_border_coefficient() = Coefficient:
+	[external "getHorizontalExtraBorderCoefficient"].
+--
+set_vertical_extra_border_coefficient(Coefficient):
+	[external "setVerticalExtraBorderCoefficient"].
+get_vertical_extra_border_coefficient() = Coefficient:
+	[external "getVerticalExtraBorderCoefficient"].
+--
+set_minimal_blob_intersection_area(Number):
+	[external "setMinimalBlobIntersectionArea"].
+get_minimal_blob_intersection_area() = Number:
+	[external "getMinimalBlobIntersectionArea"].
+--
+set_minimal_blob_size(Number):
+	[external "setMinimalBlobSize"].
+get_minimal_blob_size() = Number:
+	[external "getMinimalBlobSize"].
+--
+set_minimal_track_duration(FrameNumber):
+	[external "setMinimalTrackDuration"].
+get_minimal_track_duration() = FrameNumber:
+	[external "getMinimalTrackDuration"].
+--
+set_maximal_track_duration(FrameNumber):
+	[external "setMaximalTrackDuration"].
+get_maximal_track_duration() = FrameNumber:
+	[external "getMaximalTrackDuration"].
+--
+set_maximal_chronicle_length(Seconds):
+	[external "setMaximalChronicleLength"].
+get_maximal_chronicle_length() = Seconds:
+	[external "getMaximalChronicleLength"].
+--
+set_maximal_blob_invisibility_interval(FrameNumber):
+	[external "setMaximalBlobInvisibilityInterval"].
+get_maximal_blob_invisibility_interval() = FrameNumber:
+	[external "getMaximalBlobInvisibilityInterval"].
+--
+set_maximal_track_retention_interval(FrameNumber):
+	[external "setMaximalTrackRetentionInterval"].
+get_maximal_track_retention_interval() = FrameNumber:
+	[external "getMaximalTrackRetentionInterval"].
+--
+set_inverse_transformation_matrix(TransformationMatrix):
+	[external "setInverseTransformationMatrix"].
+get_inverse_transformation_matrix() = TransformationMatrix:
+	[external "getInverseTransformationMatrix"].
+--
+set_sampling_rate(Value):
+	[external "setSamplingRate"].
+get_sampling_rate() = Value:
+	[external "getSamplingRate"].
+--
+set_r2_window_halfwidth(Number):
+	[external "setR2WindowHalfwidth"].
+get_r2_window_halfwidth() = Number:
+	[external "getR2WindowHalfwidth"].
+--
+set_characteristic_length_median_filtering_mode(YesNo):
+	[external "setCharacteristicLengthMedianFilteringMode"].
+get_characteristic_length_median_filtering_mode() = YesNo:
+	[external "getCharacteristicLengthMedianFilteringMode"].
+--
+set_characteristic_length_median_filter_halfwidth(Number):
+	[external "setCharacteristicLengthMedianFilterHalfwidth"].
+get_characteristic_length_median_filter_halfwidth = Number:
+	[external "getCharacteristicLengthMedianFilterHalfwidth"].
+--
+set_velocity_median_filtering_mode(YesNo):
+	[external "setVelocityMedianFilteringMode"].
+get_velocity_median_filtering_mode() = YesNo:
+	[external "getVelocityMedianFilteringMode"].
+--
+set_velocity_median_filter_halfwidth(Number):
+	[external "setVelocityMedianFilterHalfwidth"].
+get_velocity_median_filter_halfwidth() = Number:
+	[external "getVelocityMedianFilterHalfwidth"].
+--
+set_synthesized_image_transparency(Number):
+	[external "setSynthesizedImageTransparency"].
+get_synthesized_image_transparency() = Number:
+	[external "getSynthesizedImageTransparency"].
+--
+set_synthesized_image_rectangular_blobs_mode(YesNo):
+	[external "setSynthesizedImageRectangularBlobsMode"].
+get_synthesized_image_rectangular_blobs_mode() = YesNo:
+	[external "getSynthesizedImageRectangularBlobsMode"].
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+set_image_encoding_attributes(ImageAttributes):
+	[external "setImageEncodingAttributes"].
+get_image_encoding_attributes() = ImageAttributes:
+	[external "getImageEncodingAttributes"].
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+set_maximal_waiting_time(WaitingInterval):
+	[external "setMaximalWaitingTime"].
+get_maximal_waiting_time() = WaitingInterval:
+	[external "getMaximalWaitingTime"].
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+set_backslash_always_is_separator(YesNo):
+	[external "setBackslashAlwaysIsSeparator"].
+get_backslash_always_is_separator() = YesNo:
+	[external "getBackslashAlwaysIsSeparator"].
+set_accept_only_uniform_resource_identifiers(YesNo):
+	[external "setAcceptOnlyUniformResourceIdentifiers"].
+get_accept_only_uniform_resource_identifiers() = YesNo:
+	[external "getAcceptOnlyUniformResourceIdentifiers"].
+]
+
+--------------------------------------------------------------------
+-- The 'SynchronizedVideoProcessingMachine' class is              --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+class 'SynchronizedVideoProcessingMachine'
+(specialized 'DataAbstraction'):
+--
+variable:
+--
+video_processing_machine;
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+image_encoding_attributes			= {};
+
+[
+SOURCE:
+	"morozov.built_in.SynchronizedVideoProcessingMachine";
+
+CLAUSES:
+
+set_video_processing_machine(VideoProcessingMachine):
+	[external "setVideoProcessingMachine"].
+get_video_processing_machine() = VideoProcessingMachine:
+	[external "getVideoProcessingMachine"].
+--
+-- The implementation of
+-- the 'VideoProcessingMachineOperations' interface:
+--
+process_numbered_frame(Image):
+	[external "processNumberedFrame"].
+process_numbered_frame(Image,FrameNumber):
+	[external "processNumberedFrame"].
+process_numbered_frame(Image,FrameNumber,TakeFrameIntoAccount):
+	[external "processNumberedFrame"].
+--
+process_realtime_frame(Image):
+	[external "processRealtimeFrame"].
+process_realtime_frame(Image,TimeInMilliseconds):
+	[external "processRealtimeFrame"].
+process_realtime_frame(
+		Image,TimeInMilliseconds,TakeFrameIntoAccount):
+	[external "processRealtimeFrame"].
+--
+commit:
+	[external "commit"].
+--
+reset_settings:
+	[external "resetSettings"].
+reset_statistics:
+	[external "resetStatistics"].
+reset_results:
+	[external "resetResults"].
+reset_all:
+	[external "resetAll"].
+--
+get_recent_frame_number(FrameNumber):
+	[external "getRecentFrameNumber"].
+get_recent_frame_time(Milliseconds):
+	[external "getRecentFrameTime"].
+--
+get_recent_image(Image):
+	[external "getRecentImage"].
+get_preprocessed_image(Image):
+	[external "getPreprocessedImage"].
+get_foreground_image(Image):
+	[external "getForegroundImage"].
+get_synthesized_image(Image):
+	[external "getSynthesizedImage"].
+--
+get_background_image(Image):
+	[external "getBackgroundImage"].
+get_background_image(Image,LayerNumber):
+	[external "getBackgroundImage"].
+--
+get_sigma_image(Image):
+	[external "getSigmaImage"].
+get_sigma_image(Image,LayerNumber):
+	[external "getSigmaImage"].
+--
+get_blobs(BlobList):
+	[external "getBlobs"].
+get_tracks(TrackList):
+	[external "getTracks"].
+get_connected_graphs(GraphList):
+	[external "getConnectedGraphs"].
+get_chronicle(BlobChronicle):
+	[external "getChronicle"].
+--
+physical_coordinates(PixelX,PixelY,PhysicalX,PhysicalY):
+	[external "physicalCoordinates"].
+characteristic_length(X,Y) = Value:
+	[external "characteristicLength"].
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+set_image_encoding_attributes(ImageAttributes):
+	[external "setImageEncodingAttributes"].
+get_image_encoding_attributes() = ImageAttributes:
+	[external "getImageEncodingAttributes"].
+]
+
+--------------------------------------------------------------------
+-- The 'ImageSubtractor' class                                    --
+-- is specialized class 'DataAbstraction'.                        --
+--------------------------------------------------------------------
+
+class 'ImageSubtractor' (specialized 'DataAbstraction'):
+
+extract_blobs					= 'no';
+track_blobs					= 'no';
+use_grayscale_colors				= 'yes';
+apply_gaussian_filtering_to_background		= 'yes';
+background_gaussian_filter_radius		= 1;
+apply_rank_filtering_to_background		= 'yes';
+background_rank_filter_threshold		= 4;
+background_standard_deviation_factor		= 1.2;
+contour_foreground				= 'no';
+refuse_slow_tracks				= 'yes';
+fuzzy_velocity_threshold			= 0.3;
+fuzzy_distance_threshold			= 40.0;
+fuzzy_threshold_border				= 0.50;
+--
+-- The implementation of the 'BlobProcessingAttributes' interface:
+--
+minimal_training_interval			= 7;
+maximal_training_interval			= -1;
+horizontal_blob_border				= 3;
+vertical_blob_border				= 3;
+horizontal_extra_border_coefficient		= -1.0;
+vertical_extra_border_coefficient		= -1.0;
+minimal_blob_intersection_area			= 1;
+minimal_blob_size				= 10;
+minimal_track_duration				= 5;
+maximal_track_duration				= -1;
+maximal_chronicle_length			= -1;
+maximal_blob_invisibility_interval		= 3;
+maximal_track_retention_interval		= 4500;
+inverse_transformation_matrix			= [];
+sampling_rate					= -1.0;
+r2_window_halfwidth				= 5;
+apply_median_filtering_to_characteristic_length	= 'yes';
+characteristic_length_median_filter_halfwidth	= 3;
+apply_median_filtering_to_velocity		= 'yes';
+velocity_median_filter_halfwidth		= 3;
+synthesized_image_transparency			= 64;
+make_rectangular_blobs_in_synthesized_image	= 'no';
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+image_encoding_attributes			= {};
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+maximal_waiting_time				= 'default';
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+backslash_always_is_separator			= 'yes';
+accept_only_uniform_resource_identifiers	= 'no';
+
+[
+SOURCE:
+	"morozov.built_in.ImageSubtractor";
+
+CLAUSES:
+
+set_blob_extraction_mode(YesNo):
+	[external "setBlobExtractionMode"].
+get_blob_extraction_mode() = YesNo:
+	[external "getBlobExtractionMode"].
+--
+set_blob_tracing_mode(YesNo):
+	[external "setBlobTracingMode"].
+get_blob_tracing_mode() = YesNo:
+	[external "getBlobTracingMode"].
+--
+set_grayscale_mode(YesNo):
+	[external "setGrayscaleMode"].
+get_grayscale_mode() = YesNo:
+	[external "getGrayscaleMode"].
+--
+set_background_gaussian_filtering_mode(YesNo):
+	[external "setBackgroundGaussianFilteringMode"].
+get_background_gaussian_filtering_mode() = YesNo:
+	[external "getBackgroundGaussianFilteringMode"].
+--
+set_background_gaussian_filter_radius(Radius):
+	[external "setBackgroundGaussianFilterRadius"].
+get_background_gaussian_filter_radius() = Radius:
+	[external "getBackgroundGaussianFilterRadius"].
+--
+set_background_rank_filtering_mode(YesNo):
+	[external "setBackgroundRankFilteringMode"].
+get_background_rank_filtering_mode() = YesNo:
+	[external "getBackgroundRankFilteringMode"].
+--
+set_background_rank_filter_threshold(Number):
+	[external "setBackgroundRankFilterThreshold"].
+get_background_rank_filter_threshold() = Number:
+	[external "getBackgroundRankFilterThreshold"].
+--
+set_background_standard_deviation_factor(Value):
+	[external "setBackgroundStandardDeviationFactor"].
+get_background_standard_deviation_factor() = Value:
+	[external "getBackgroundStandardDeviationFactor"].
+--
+set_foreground_contouring_mode(YesNo):
+	[external "setForegroundContouringMode"].
+get_foreground_contouring_mode() = YesNo:
+	[external "getForegroundContouringMode"].
+--
+set_slow_tracks_deletion_mode(YesNo):
+	[external "setSlowTracksDeletionMode"].
+get_slow_tracks_deletion_mode() = YesNo:
+	[external "getSlowTracksDeletionMode"].
+--
+set_fuzzy_velocity_threshold(Value):
+	[external "setFuzzyVelocityThreshold"].
+get_fuzzy_velocity_threshold() = Value:
+	[external "getFuzzyVelocityThreshold"].
+--
+set_fuzzy_distance_threshold(Value):
+	[external "setFuzzyDistanceThreshold"].
+get_fuzzy_distance_threshold() = Value:
+	[external "getFuzzyDistanceThreshold"].
+--
+set_fuzzy_threshold_border(Value):
+	[external "setFuzzyThresholdBorder"].
+get_fuzzy_threshold_border() = Value:
+	[external "getFuzzyThresholdBorder"].
+--
+-- The implementation of the 'ImageSubtractorOperations' interface:
+--
+subtract(FrameNumber,Image):
+	[external "subtract"].
+subtract(FrameNumber,Image,TakeFrameIntoAccount):
+	[external "subtract"].
+--
+-- The implementation of
+-- the 'VideoProcessingMachineOperations' interface:
+--
+process_numbered_frame(Image):
+	[external "processNumberedFrame"].
+process_numbered_frame(Image,FrameNumber):
+	[external "processNumberedFrame"].
+process_numbered_frame(Image,FrameNumber,TakeFrameIntoAccount):
+	[external "processNumberedFrame"].
+--
+process_realtime_frame(Image):
+	[external "processRealtimeFrame"].
+process_realtime_frame(Image,TimeInMilliseconds):
+	[external "processRealtimeFrame"].
+process_realtime_frame(
+		Image,TimeInMilliseconds,TakeFrameIntoAccount):
+	[external "processRealtimeFrame"].
+--
+commit:
+	[external "commit"].
+--
+reset_settings:
+	[external "resetSettings"].
+reset_statistics:
+	[external "resetStatistics"].
+reset_results:
+	[external "resetResults"].
+reset_all:
+	[external "resetAll"].
+--
+get_recent_frame_number(FrameNumber):
+	[external "getRecentFrameNumber"].
+get_recent_frame_time(Milliseconds):
+	[external "getRecentFrameTime"].
+--
+get_recent_image(Image):
+	[external "getRecentImage"].
+get_preprocessed_image(Image):
+	[external "getPreprocessedImage"].
+get_foreground_image(Image):
+	[external "getForegroundImage"].
+get_synthesized_image(Image):
+	[external "getSynthesizedImage"].
+--
+get_background_image(Image):
+	[external "getBackgroundImage"].
+get_background_image(Image,LayerNumber):
+	[external "getBackgroundImage"].
+--
+get_sigma_image(Image):
+	[external "getSigmaImage"].
+get_sigma_image(Image,LayerNumber):
+	[external "getSigmaImage"].
+--
+get_blobs(BlobList):
+	[external "getBlobs"].
+get_tracks(TrackList):
+	[external "getTracks"].
+get_connected_graphs(GraphList):
+	[external "getConnectedGraphs"].
+get_chronicle(BlobChronicle):
+	[external "getChronicle"].
+--
+physical_coordinates(PixelX,PixelY,PhysicalX,PhysicalY):
+	[external "physicalCoordinates"].
+characteristic_length(X,Y) = Value:
+	[external "characteristicLength"].
+--
+-- The implementation of the 'BlobProcessingAttributes' interface:
+--
+set_minimal_training_interval(Number):
+	[external "setMinimalTrainingInterval"].
+get_minimal_training_interval() = Number:
+	[external "getMinimalTrainingInterval"].
+--
+set_maximal_training_interval(Number):
+	[external "setMaximalTrainingInterval"].
+get_maximal_training_interval() = Number:
+	[external "getMaximalTrainingInterval"].
+--
+set_horizontal_blob_border(Number):
+	[external "setHorizontalBlobBorder"].
+get_horizontal_blob_border() = Number:
+	[external "getHorizontalBlobBorder"].
+--
+set_vertical_blob_border(Number):
+	[external "setVerticalBlobBorder"].
+get_vertical_blob_border() = Number:
+	[external "getVerticalBlobBorder"].
+--
+set_horizontal_extra_border_coefficient(Coefficient):
+	[external "setHorizontalExtraBorderCoefficient"].
+get_horizontal_extra_border_coefficient() = Coefficient:
+	[external "getHorizontalExtraBorderCoefficient"].
+--
+set_vertical_extra_border_coefficient(Coefficient):
+	[external "setVerticalExtraBorderCoefficient"].
+get_vertical_extra_border_coefficient() = Coefficient:
+	[external "getVerticalExtraBorderCoefficient"].
+--
+set_minimal_blob_intersection_area(Number):
+	[external "setMinimalBlobIntersectionArea"].
+get_minimal_blob_intersection_area() = Number:
+	[external "getMinimalBlobIntersectionArea"].
+--
+set_minimal_blob_size(Number):
+	[external "setMinimalBlobSize"].
+get_minimal_blob_size() = Number:
+	[external "getMinimalBlobSize"].
+--
+set_minimal_track_duration(FrameNumber):
+	[external "setMinimalTrackDuration"].
+get_minimal_track_duration() = FrameNumber:
+	[external "getMinimalTrackDuration"].
+--
+set_maximal_track_duration(FrameNumber):
+	[external "setMaximalTrackDuration"].
+get_maximal_track_duration() = FrameNumber:
+	[external "getMaximalTrackDuration"].
+--
+set_maximal_chronicle_length(Seconds):
+	[external "setMaximalChronicleLength"].
+get_maximal_chronicle_length() = Seconds:
+	[external "getMaximalChronicleLength"].
+--
+set_maximal_blob_invisibility_interval(FrameNumber):
+	[external "setMaximalBlobInvisibilityInterval"].
+get_maximal_blob_invisibility_interval() = FrameNumber:
+	[external "getMaximalBlobInvisibilityInterval"].
+--
+set_maximal_track_retention_interval(FrameNumber):
+	[external "setMaximalTrackRetentionInterval"].
+get_maximal_track_retention_interval() = FrameNumber:
+	[external "getMaximalTrackRetentionInterval"].
+--
+set_inverse_transformation_matrix(TransformationMatrix):
+	[external "setInverseTransformationMatrix"].
+get_inverse_transformation_matrix() = TransformationMatrix:
+	[external "getInverseTransformationMatrix"].
+--
+set_sampling_rate(Value):
+	[external "setSamplingRate"].
+get_sampling_rate() = Value:
+	[external "getSamplingRate"].
+--
+set_r2_window_halfwidth(Number):
+	[external "setR2WindowHalfwidth"].
+get_r2_window_halfwidth() = Number:
+	[external "getR2WindowHalfwidth"].
+--
+set_characteristic_length_median_filtering_mode(YesNo):
+	[external "setCharacteristicLengthMedianFilteringMode"].
+get_characteristic_length_median_filtering_mode() = YesNo:
+	[external "getCharacteristicLengthMedianFilteringMode"].
+--
+set_characteristic_length_median_filter_halfwidth(Number):
+	[external "setCharacteristicLengthMedianFilterHalfwidth"].
+get_characteristic_length_median_filter_halfwidth = Number:
+	[external "getCharacteristicLengthMedianFilterHalfwidth"].
+--
+set_velocity_median_filtering_mode(YesNo):
+	[external "setVelocityMedianFilteringMode"].
+get_velocity_median_filtering_mode() = YesNo:
+	[external "getVelocityMedianFilteringMode"].
+--
+set_velocity_median_filter_halfwidth(Number):
+	[external "setVelocityMedianFilterHalfwidth"].
+get_velocity_median_filter_halfwidth() = Number:
+	[external "getVelocityMedianFilterHalfwidth"].
+--
+set_synthesized_image_transparency(Number):
+	[external "setSynthesizedImageTransparency"].
+get_synthesized_image_transparency() = Number:
+	[external "getSynthesizedImageTransparency"].
+--
+set_synthesized_image_rectangular_blobs_mode(YesNo):
+	[external "setSynthesizedImageRectangularBlobsMode"].
+get_synthesized_image_rectangular_blobs_mode() = YesNo:
+	[external "getSynthesizedImageRectangularBlobsMode"].
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+set_image_encoding_attributes(ImageAttributes):
+	[external "setImageEncodingAttributes"].
+get_image_encoding_attributes() = ImageAttributes:
+	[external "getImageEncodingAttributes"].
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+set_maximal_waiting_time(WaitingInterval):
+	[external "setMaximalWaitingTime"].
+get_maximal_waiting_time() = WaitingInterval:
+	[external "getMaximalWaitingTime"].
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+set_backslash_always_is_separator(YesNo):
+	[external "setBackslashAlwaysIsSeparator"].
+get_backslash_always_is_separator() = YesNo:
+	[external "getBackslashAlwaysIsSeparator"].
+set_accept_only_uniform_resource_identifiers(YesNo):
+	[external "setAcceptOnlyUniformResourceIdentifiers"].
+get_accept_only_uniform_resource_identifiers() = YesNo:
+	[external "getAcceptOnlyUniformResourceIdentifiers"].
+]
+
+--------------------------------------------------------------------
+-- The 'SynchronizedImageSubtractor' class                        --
+-- is specialized class 'DataAbstraction'.                        --
+--------------------------------------------------------------------
+
+class 'SynchronizedImageSubtractor'
+(specialized 'DataAbstraction'):
+--
+variable:
+--
+image_subtractor;
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+image_encoding_attributes			= {};
+
+[
+SOURCE:
+	"morozov.built_in.SynchronizedImageSubtractor";
+
+CLAUSES:
+
+set_image_subtractor(ImageSubtractor):
+	[external "setImageSubtractor"].
+get_image_subtractor() = ImageSubtractor:
+	[external "getImageSubtractor"].
+--
+-- The implementation of the 'ImageSubtractorOperations' interface:
+--
+subtract(FrameNumber,Image):
+	[external "subtract"].
+subtract(FrameNumber,Image,TakeFrameIntoAccount):
+	[external "subtract"].
+--
+-- The implementation of
+-- the 'VideoProcessingMachineOperations' interface:
+--
+process_numbered_frame(Image):
+	[external "processNumberedFrame"].
+process_numbered_frame(Image,FrameNumber):
+	[external "processNumberedFrame"].
+process_numbered_frame(Image,FrameNumber,TakeFrameIntoAccount):
+	[external "processNumberedFrame"].
+--
+process_realtime_frame(Image):
+	[external "processRealtimeFrame"].
+process_realtime_frame(Image,TimeInMilliseconds):
+	[external "processRealtimeFrame"].
+process_realtime_frame(
+		Image,TimeInMilliseconds,TakeFrameIntoAccount):
+	[external "processRealtimeFrame"].
+--
+commit:
+	[external "commit"].
+--
+reset_settings:
+	[external "resetSettings"].
+reset_statistics:
+	[external "resetStatistics"].
+reset_results:
+	[external "resetResults"].
+reset_all:
+	[external "resetAll"].
+--
+get_recent_frame_number(FrameNumber):
+	[external "getRecentFrameNumber"].
+get_recent_frame_time(Milliseconds):
+	[external "getRecentFrameTime"].
+--
+get_recent_image(Image):
+	[external "getRecentImage"].
+get_preprocessed_image(Image):
+	[external "getPreprocessedImage"].
+get_foreground_image(Image):
+	[external "getForegroundImage"].
+get_synthesized_image(Image):
+	[external "getSynthesizedImage"].
+--
+get_background_image(Image):
+	[external "getBackgroundImage"].
+get_background_image(Image,LayerNumber):
+	[external "getBackgroundImage"].
+--
+get_sigma_image(Image):
+	[external "getSigmaImage"].
+get_sigma_image(Image,LayerNumber):
+	[external "getSigmaImage"].
+--
+get_blobs(BlobList):
+	[external "getBlobs"].
+get_tracks(TrackList):
+	[external "getTracks"].
+get_connected_graphs(GraphList):
+	[external "getConnectedGraphs"].
+get_chronicle(BlobChronicle):
+	[external "getChronicle"].
+--
+physical_coordinates(PixelX,PixelY,PhysicalX,PhysicalY):
+	[external "physicalCoordinates"].
+characteristic_length(X,Y) = Value:
+	[external "characteristicLength"].
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+set_image_encoding_attributes(ImageAttributes):
+	[external "setImageEncodingAttributes"].
+get_image_encoding_attributes() = ImageAttributes:
+	[external "getImageEncodingAttributes"].
+]

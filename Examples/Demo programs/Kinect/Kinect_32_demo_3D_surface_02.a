@@ -1,0 +1,175 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-----------------------------------------------------------------------
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Thanks to Andrew Davison                                          --
+-- Davison A. Kinect Open Source Programming Secrets (KOPS). -       --
+-- McGraw Hill, 2012.                                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	name	=
+		"J:/J4K-006 (2018-03-10)/"
+		"PointCloud001.k2j";
+--
+	operating_mode	= 'PLAYING';
+	frame_type	= 'POINT_CLOUDS';
+	people_index	= 'EXTRACT_PEOPLE';
+--
+	displaying_mode	= {
+		frame_type,
+		people_index};
+--
+	-- color_map		= 'OPTICAL';
+	color_map		= 'NONE';
+--
+	scene_surface_type	= 'CONCAVE'; -- 'CONVEX'
+--
+internal:
+--
+	window	= ('Canvas3D');
+	dialog	= ('MainDialog',
+		graphic_window= window);
+	buffer	= ('BufferedScene');
+	con	= ('Console');
+--
+constant:
+--
+	main_label		= "3DScene";
+--
+[
+goal:-!,
+	dialog ? maximize,
+	/*
+	set_scene_appearance(
+		'Appearance'({
+			material: 'Material'({}),
+			polygonAttributes: 'PolygonAttributes'({
+				backFaceNormalFlip: 'yes'
+				})
+			})),
+	*/
+	create_list_of_nodes(VisualScene),
+	window ? show(VisualScene),
+	start.
+--
+create_list_of_nodes(Nodes):-
+	Bounds== 'BoundingSphere'({}),
+	Attenuation== a(2,1,0),
+	create_main_group(MainGroup),
+	Nodes == [
+		MainGroup,
+		'OrbitBehavior'({
+			rotationCenter: p(-0.5,-0.7,-3.0),
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(-3,3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(-3,3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(-3,-3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(-3,-3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(3,3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(3,3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(3,-3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(3,-3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			})
+		].
+--
+create_main_group(MainGroup):-
+	MainGroup== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			scale: 3,
+			rotX: 0.5,
+			rotY: -0.5,
+			translation: [-1.5,-1.5,0]
+			}),
+		allowChildrenRead: 'yes',
+		allowChildrenWrite: 'yes',
+		branches: [
+			'BranchGroup'({
+				label: main_label,
+				allowDetach: 'yes',
+				compile: 'yes',
+				branches: []
+				})
+			]
+		}).
+--
+frame_obtained:-
+	commit,!,
+	get_recent_scene(buffer),
+	window ? set_node(
+		main_label,
+		'BranchGroup'({
+			label: main_label,
+			allowDetach: 'yes',
+			compile: 'yes',
+			branches: [buffer]
+		})).
+--
+data_transfer_completion:-!,
+	start.
+]
+-----------------------------------------------------------------------
+class 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	graphic_window;
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+]
+-----------------------------------------------------------------------

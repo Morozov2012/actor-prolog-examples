@@ -1,0 +1,49 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute this example in the first environment and
+-- the client example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+-----------------------------------------------------------------------
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	buffer		= ('BufferedImage');
+	timer		= ('Timer');
+	con		= ('Console');
+--
+	text_file	= ('File',
+				name="MyFile1.txt");
+--
+constant:
+--
+	image_encoding_attributes = {
+				format:'JPEG',
+				compressionQuality:0.9};
+--
+[
+goal:-!,
+	con ? set_color('Orange'),
+	con ? write("CREATION OF THE FILE... "),
+	text_file ? open('writing'),
+	text_file ? write(buffer),
+	text_file ? close,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	watch_webcam_state('yes'),
+	-- set_default_resolution('VGA'),
+	set_default_resolution('HD720'),
+	open.
+--
+webcam_image_obtained(_):-!,
+	get_image(buffer).
+]
+-----------------------------------------------------------------------

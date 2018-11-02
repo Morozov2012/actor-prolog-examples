@@ -1,0 +1,82 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+
+class 'Main':
+--
+internal:
+--
+	file1	= ('Test',
+			name= "test_directory");
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'File'):
+--
+constant:
+--
+	name	: FileName;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("=== Directory: ",name," ==="),
+	test1,
+	test2,
+	test3,
+	test1,
+	test2,
+	test4,
+	test1,
+	test2.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tDoes the directory exist?"),
+	?does_exist(),!,
+	con ? writeln("\tYes, it does!").
+test1:-
+	con ? writeln("\tNo, it doesn't.").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tDoes the directory exist?"),
+	?does_exist(name),!,
+	con ? writeln("\tYes, it does!").
+test2:-
+	con ? writeln("\tNo, it doesn't.").
+--
+test3:-
+	con ? writeln("Test 3"),
+	con ? writeln("\tI will try to delete the directory."),
+	?delete(name),!,
+	con ? writeln("\tThe directory was deleted successfully.").
+test3:-
+	con ? writeln("\tI cannot delete it.").
+--
+test4:-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to create the directory."),
+	?make_directory(name),
+	con ? writeln("\tDone!").
+]

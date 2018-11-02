@@ -1,0 +1,65 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+
+PREDICATES:
+
+determ:
+
+check_webcam;
+
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	webcam	= ('Webcam');
+	buffer	= ('BufferedImage');
+--
+	panel	= ('Canvas2D',
+			x=30,
+			y=0,
+			width=50,
+			height=25);
+	con	= ('Console',
+			x=0,
+			y=0,
+			width=30,
+			height=25);
+--
+[
+goal:-!,
+	webcam ? open,
+	panel ? show,
+	set_period(0.01,0.0),
+	activate.
+--
+tick:-
+	check_webcam,!,
+	webcam ? get_image(buffer),
+	panel ? get_size_in_pixels(WP,HP),
+	buffer ? get_size_in_pixels(WI,HI),
+	X0== (WP - WI) / 2 / WP,
+	Y0== (HP - HI) / 2 / HP,
+	Width== WI / WP,
+	Height== HI / HP,
+	panel ? clear('no'),
+	panel ? draw_image(buffer,X0,Y0,Width,Height),
+	panel ? draw_now.
+tick:-!.
+--
+check_webcam:-
+	time(H,M,S,T),
+	con ? set_color('RoyalBlue'),
+	con ? writeln(H,":",M,":",S,".",T),
+	webcam ? contains_new_image,!,
+	con ? set_color('DkGreen'),
+	con ? writeln("A new image is acquired!").
+check_webcam:-
+	con ? set_color('Red'),
+	con ? writeln("There is no new image."),
+	fail.
+]

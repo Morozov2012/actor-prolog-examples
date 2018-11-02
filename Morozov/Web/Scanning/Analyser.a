@@ -1,0 +1,400 @@
+package "Morozov/Web/Scanning/Analyser":
+---------------------------------------------------------------------
+--              The "ANALYSER" Actor Prolog package.               --
+--           (c) 2002-2005, IRE RAS, Alexei A. Morozov.            --
+---------------------------------------------------------------------
+-- This package provides an engine for analyzing Web Sites and     --
+-- collecting information about them.                              --
+---------------------------------------------------------------------
+import 'ControlDialog'	    from "Morozov/Web/Scanning/Control";
+import 'Scanner'	    from "Morozov/Web/Scanning/Core";
+import 'WebFile'	    from "Morozov/Web/Scanning/Core";
+import 'Plain_Report'	    from "Morozov/Web/Scanning/Messages";
+import 'AnalyserMessages'   from "Morozov/Web/Scanning/Messages";
+import 'Statistics'	    from "Morozov/Web/Scanning/Counter";
+import 'StatisticsReporter' from "Morozov/Web/Scanning/Counter";
+import 'PageRegistry'	    from "Morozov/Web/Scanning/Counter";
+---------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+make_filtering_prefix
+	(WebResourceAttributes,WebAddressSegment)	- (i,o);
+--
+make_disabled_prefixes
+	(WebResourceAttributes,WebAddressSegments)	- (i,o);
+make_disabled_prefix
+	(WebAddressSegments,STRING,WebAddressSegments)	- (i,i,o);
+--
+start_analysis(
+	WebAddressList,
+	WebAddressSegment,
+	WebAddressSegments);
+check_reference(
+	Level,
+	Node,
+	WebAddressList,
+	WebAddressList,
+	WebAddressSegment,
+	WebAddressSegments);
+check_HTML_text(
+	Level,
+	Node,
+	WebAddressList,
+	WebAddressList,
+	WebAddressSegment,
+	WebAddressSegments);
+--
+determ:
+--
+address_has_disabled_prefix(WebAddressList,WebAddressSegments);
+--
+imperative:
+--
+check_internal_HTML_text(
+	Level,
+	Node,
+	WebAddressList,
+	WebAddressList,
+	WebAddressSegment,
+	WebAddressSegments);
+--
+refine_size(
+	PlainContent,
+	ContentParameters,
+	ContentParameters)		- (i,i,o);
+--
+check_internal_references(
+	Level,
+	Node,
+	WebAddressList,
+	WebAddressSegment,
+	WebAddressSegments,
+	ReferenceList)			- (i,i,i,i,i,i);
+--
+loop(	Level,
+	Node,
+	WebAddressList,
+	ReferenceList,
+	WebAddressSegment,
+	WebAddressSegments);
+--
+analyse_reference(
+	Level,
+	Node,
+	WebAddressList,
+	WebAddress,
+	WebAddressSegment,
+	WebAddressSegments);
+--
+determ:
+--
+replace_virtual_path_or_Fail(
+	WebAddressList,
+	WebAddress,
+	WebAddress)			- (i,i,o);
+replace_pattern_if_possible(
+	WebAddressList,
+	WebAddressList,
+	WebAddress,
+	WebAddress)			- (i,i,i,o);
+--
+---------------------------------------------------------------------
+class 'ScanSite':
+--
+variable:
+--
+	keywords;
+	location;
+--
+internal:
+--
+	dialog		= ('ControlDialog',
+				location,
+				default_output_file="REPORT.HTML",
+				maximal_waiting_time,
+				domain,
+				use_max_depth,
+				max_depth,
+				virtual_resources,
+				output_device,
+				engine=self);
+--
+variable:
+--
+	maximal_waiting_time;
+	domain;
+	use_max_depth;
+	max_depth;
+	virtual_resources;
+--
+	output_device;
+--
+internal:
+--
+	main_engine	= ('SpecialScanner',
+				variable:
+					keywords,
+					maximal_waiting_time,
+					use_max_depth,
+					max_depth,
+					virtual_resources,
+				internal:
+					site_statistics);
+--
+	site_statistics	= ('Statistics',
+				report=('Plain_Report'),
+				found_pages);
+--
+	found_pages	= ('PageRegistry');
+--
+	reporter	= ('StatisticsReporter',
+				internal:
+					site_statistics,
+					found_pages,
+				variable:
+					output=output_device);
+--
+variable:
+--
+	report_creater	= reporter ?? write_report;
+--
+[
+goal.
+--
+show(_*):-
+	dialog ? show.
+--
+open(_*):-
+	dialog ? show.
+--
+start(_*):-
+	[output_device,virtual_resources],
+	[maximal_waiting_time],
+	[use_max_depth,max_depth],!,
+	main_engine ? inspect({address:location,domain}).
+start(_*).
+--
+alarm(_):-
+	fail.
+]
+---------------------------------------------------------------------
+-- Class 'SpecialScanner' analyses given Web Site.                 --
+---------------------------------------------------------------------
+class 'SpecialScanner' (specialized 'Scanner'):
+--
+variable:
+--
+	keywords;
+--
+	maximal_waiting_time;
+--
+	use_max_depth;
+	max_depth;
+--
+	virtual_resources;
+--
+internal:
+--
+	diary;
+--
+	messages	= ('AnalyserMessages',
+				report= ('Plain_Report'));
+--
+	site_statistics;
+	file_operations	= ('WebFile');
+--
+[
+goal:-!.
+--
+inspect(Item):-
+	Item == {address:Location|_},!,
+	--
+	make_filtering_prefix(Item,Enabled1),
+	Enabled2== ?replace_all(Enabled1,"\\","/"),
+	diary ? writeln("Filtering prefix: ",Enabled2),
+	--
+	make_disabled_prefixes(Item,Disabled),
+	diary ? writeln("Disabled prefix: ",Disabled),
+	--
+	site_statistics ? reset(Enabled2,Item),
+	--
+	start_analysis(Location,Enabled2,Disabled).
+inspect(Item):-
+	diary ? writeln("Illegal definition of resource:\n",Item).
+--
+get_results= r(R,Parameters)
+	:-
+	site_statistics
+		? get_parameters(R,Date,I,Size,H,P,O,E,NList),
+	--
+	Parameters== {
+		updated:Date,items:I,size:Size,
+		hyper_links:H,pictures:P,other_links:O,
+		error_links:E,'keywords':NList}.
+--
+make_filtering_prefix(Item,Enabled):-
+	Item == {domain:Enabled|_},!.
+make_filtering_prefix(Item,Enabled):-
+	Item == {prefix:Segment,address:Location|_},
+	string(Segment),
+	file_operations ? extract_path(Location,Domain,_),!,
+	Enabled== Domain + Segment.
+make_filtering_prefix(Item,Enabled):-
+	Item == {address:Location|_},!,
+	file_operations ? extract_path(Location,Enabled,_).
+make_filtering_prefix(Item,""):-
+	diary ? writeln("Illegal definition of resource:\n",Item).
+--
+make_disabled_prefixes(Item,Disabled):-
+	Item == {disabled_prefix:Segments,address:Location|_},
+	file_operations ? extract_path(Location,Domain,_),!,
+	make_disabled_prefix(Segments,Domain,Disabled).
+make_disabled_prefixes(_,[]).
+--
+make_disabled_prefix([Segment|Rest1],Domain,[Prefix2|Rest2]):-!,
+	Prefix1== Domain + Segment,
+	Prefix2== ?replace_all(Prefix1,"\\","/"),
+	make_disabled_prefix(Rest1,Domain,Rest2).
+make_disabled_prefix(_,_,[]).
+--
+start_analysis(Name,Enabled,Disabled):-
+	diary ? writeln("I will check reference ",Name),
+	check_reference(1/*0*/,1,[],Name,Enabled,Disabled).
+	-- site_statistics ? add_old_node(Enabled,Name).
+--
+check_reference(_,_,_,Name,_,_):-
+	resource_has_unknown_type(Name),!,
+	diary ? writeln("I will not check ",Name).
+check_reference(L,N,List,Name,Enabled,Disabled):-
+	is_HTML_file(Name),!,
+	diary ? writeln("I have recognized HTML file: ",Name),
+	check_HTML_text(L,N,List,Name,Enabled,Disabled).
+	-- site_statistics ? add_old_node(Enabled,Name).
+check_reference(_,_,_,Name,Enabled,_):-
+	is_picture(Name),!,
+	diary ? writeln("I have recognized a picture: ",Name),
+	site_statistics ? add_old_node(Enabled,Name),
+	site_statistics ? count_picture_leaf(Enabled).
+check_reference(_,_,_,Name,Enabled,_):-
+	diary ? writeln("I have recognized a binary file: ",Name),
+	site_statistics ? add_old_node(Enabled,Name),
+	site_statistics ? count_binary_leaf(Enabled).
+-- check_reference(_,_,_,_,_,_).
+--
+/*
+check_HTML_text(Level,_,_,_,_,_):-
+	[use_max_depth,max_depth],
+	use_max_depth == 'yes',
+	max_depth < Level,!,
+	diary ? writeln(
+		".. The limit of the depth "
+		"of search is exceeded.").
+*/
+check_HTML_text(_,_,_,Name1,_,Disabled):-
+	Name2== ?replace_all(Name1,"\\","/"),
+	address_has_disabled_prefix(Name2,Disabled),!.
+check_HTML_text(L,N,List,Name1,Enabled,Disabled):-
+	Name2== ?replace_all(Name1,"\\","/"),
+	diary ? writeln("I will search ",Enabled," in ",Name2),
+	search(Name2,Enabled),!,
+	diary ? writeln("<<< ",Name1),
+	site_statistics ? add_old_node(Enabled,Name1),
+	self << check_internal_HTML_text(
+		L,N,List,Name1,Enabled,Disabled).
+check_HTML_text(_,_,_,Name,Enabled,_):-
+	diary ? writeln("I will not analyse ",Name),
+	site_statistics ? add_old_node(Enabled,Name),
+	site_statistics ? count_HTML_leaf(Enabled).
+--
+address_has_disabled_prefix(Name,[Disabled|_]):-
+	Disabled <> "",
+	diary ? writeln("I will search ",Disabled," in ",Name),
+	search(Name,Disabled),!,
+	diary ? writeln("I will ignore page ",Name).
+address_has_disabled_prefix(Name,[_|Rest]):-
+	address_has_disabled_prefix(Name,Rest).
+--
+check_internal_HTML_text(L,N,List,URL,Enabled,Disabled):-
+	[virtual_resources],
+	[maximal_waiting_time],
+	[use_max_depth,max_depth],
+	diary ? show,
+	diary ? writeln(">>> ",URL),
+	Parameters1== ?get_parameters(URL),
+	Text== ?get_text(URL),
+	HyperLinks== ?get_references(URL),!,
+	refine_size(Text,Parameters1,Parameters2),
+	site_statistics
+		? register_parameters(
+			Enabled,URL,Text,keywords,Parameters2),
+	diary ? writeln("register: ",Parameters2),
+	check_internal_references(
+		L,N,[URL|List],
+		Enabled,Disabled,HyperLinks).
+check_internal_HTML_text(_,_,_,URL,_,_):-
+	diary ? show,
+	diary ? writeln("I cannot process resource:\n",URL).
+--
+refine_size(Text,entry(N,D,T,_),entry(N,D,T,Size)):-
+	string(Text),
+	Size== ?length(Text),!.
+refine_size(_,Parameters,Parameters).
+--
+check_internal_references(_,_,_,_,_,[]):-!.
+check_internal_references(Level,_,_,_,_,_):-
+	[use_max_depth,max_depth],
+	use_max_depth == 'yes',
+	max_depth <= Level,!,
+	diary ? show,
+	diary ? writeln(".. The depth limit is exceeded.").
+check_internal_references(
+		Level,_,List,
+		Enabled,Disabled,HyperLinks):-
+	is_non_empty_list(HyperLinks),!,
+	diary ? writeln(
+		".. I go to the next level of the tree."),
+	loop(Level+1,1,List,HyperLinks,Enabled,Disabled).
+check_internal_references(L,N,List,Enabled,_,Message):-
+	site_statistics ? register_error(Enabled),
+	produce_message(L,N,List,Message).
+--
+loop(Level,Number,List,[Name|Rest],Enabled,Disabled):-!,
+	diary ? writef("Level %3d, N=%3d: %s",Level,Number,Name),
+	diary ? nl,
+	analyse_reference(
+		Level,Number,List,Name,Enabled,Disabled),
+	loop(Level,Number+1,List,Rest,Enabled,Disabled).
+loop(_,_,_,_,_,_):-
+	diary ? writeln(
+		".. I return to the previous level of the tree.").
+--
+analyse_reference(_,_,_,Name,Enabled,_):-
+	site_statistics ? is_old_node(Enabled,Name),!,
+	diary ? writeln("Already checked: ",Name).
+analyse_reference(_,_,List,Name,_,_):-
+	contains(List,Name),!,
+	diary ? writeln("Recursion: ",Name).
+analyse_reference(L,N,List,Name1,EP,DP):-
+	replace_virtual_path_or_Fail(
+		virtual_resources,Name1,Name2),!,
+	diary ? writeln("A virtual resource ",Name1),
+	analyse_reference(L,N,List,Name2,EP,DP).
+analyse_reference(
+		Level,Number,List,Name,
+		Enabled,Disabled):-
+	check_reference(
+		Level,Number,List,Name,Enabled,Disabled).
+	-- site_statistics ? add_old_node(Enabled,Name).
+--
+replace_virtual_path_or_Fail([Item|AnotherCases],Name1,Name2):-
+	replace_pattern_if_possible(AnotherCases,Item,Name1,Name2).
+--
+replace_pattern_if_possible([Pattern|_],Item,Name1,Name2):-
+	Name2 == ?replace(Name1,Pattern,Item),!.
+replace_pattern_if_possible([_|Rest],Item,Name1,Name2):-
+	replace_pattern_if_possible(Rest,Item,Name1,Name2).
+]
+---------------------------------------------------------------------

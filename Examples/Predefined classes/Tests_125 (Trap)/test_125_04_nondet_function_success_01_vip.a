@@ -1,0 +1,99 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+D1	= INTEGER.
+D3	= STRING.
+--
+D4	= SYMBOL.
+D6	= INTEGER.
+--
+D7	= REAL.
+D9	= SYMBOL.
+--
+DR	= STRING.
+--
+reference:
+--
+D2	= REAL.
+D5	= REAL.
+D8	= REAL.
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+--
+-----------------------------------------------------------------------
+interface 'MyPredicates':
+[
+PREDICATES:
+nondeterm:
+f(D1,D2,D3) = DR			- (i,o,i);
+f(D4,D5,D6) = DR			- (i,o,i);
+f(D7,D8,D9) = DR			- (i,o,i);
+]
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'MyPredicates', 'Console'):
+catch	: 'MyPredicates';
+[
+PREDICATES:
+determ:
+alarm(ExceptionName,SYMBOL,D1,D2,D3)	- (i,i,i,o,i);
+alarm(ExceptionName,SYMBOL,D4,D5,D6)	- (i,i,i,o,i);
+alarm(ExceptionName,SYMBOL,D7,D8,D9)	- (i,i,i,o,i);
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+catch	= ('Trap',
+		world=self,
+		handler=self);
+--
+[
+CLAUSES:
+--
+goal:-!,
+	test0,
+	test1.
+--
+test0:-
+	writeln("Test 0"),
+	writeln("Main:: I will call f/3."),
+	catch ? f(1,B1,"Hello World!"),
+	catch ? f('Symbol',B2,100),
+	catch ? f(1.0,B3,'xyz'),!,
+	writeln("Success: B1=",B1,", B2=",B2,", B3=",B3).
+test0:-
+	writeln("Failure").
+--
+test1:-
+	writeln("Test 1"),
+	writeln("Main:: I will call f/3."),
+	R1== catch ? f(1,B1,"Hello World!"),
+	R2== catch ? f('Symbol',B2,100),
+	R3== catch ? f(1.0,B3,'xyz'),!,
+	writeln("Success: B1=",B1,", B2=",B2,", B3=",B3,", ",
+		"R1=",R1,", R2=",R2,", R3=",R3).
+test1:-
+	writeln("Failure").
+--
+f(A,3.14,C) = "Answer":-
+	writeln("Main:: [1]f: A=",A,", C=\"",C,"\"").
+f(A,3.14,C) = "Answer":-
+	writeln("Main:: [2]f: A=",A,", C=\"",C,"\"").
+--
+alarm(Name):-
+	writeln("Alarm: ",Name),
+	fail.
+alarm(Exception,Name,A1,_,A3):-
+	writeln("Alarm: ",Exception," ",Name," ",A1," ",A3).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,41 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Deterministic,     --
+-- non-deterministic, and imperative     --
+-- predicates. Cuts.                     --
+--                                       --
+-- Questions: What is a green cut? Is    --
+-- the p predicate deterministic from    --
+-- the mathematical point of view? Why   --
+-- does the compiler classify the p      --
+-- predicate as a non-deterministic one? --
+-- (The latter question is to be         --
+-- discussed after the study of          --
+-- arithmetical functions and their      --
+-- implementation).                      --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+determ:
+
+p(INTEGER)	- (i);
+
+CLAUSES:
+
+goal:-
+	X== 9,
+	p(X).
+
+p(X):-
+	X < 10,!,
+	write("X is less than 10.").
+p(X):-
+	X >= 10,
+	write(	"X is more than or ",
+		"equal to 10.").

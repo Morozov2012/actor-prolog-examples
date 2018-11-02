@@ -1,0 +1,1034 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+-----------------------------------------------------------------------
+project: (('ControlDialog'))
+-----------------------------------------------------------------------
+class 'ControlDialog' (specialized 'Dialog'):
+--
+constant:
+--
+	subsampling	= 2;
+--
+internal:
+--
+	vpm		= ('VideoProcessingMachine',
+				minimal_training_interval= -1,
+				-- maximal_training_interval= 100,
+				horizontal_blob_border= 10,
+				vertical_blob_border= 10,
+				horizontal_extra_border_coefficient= -1.0,
+				vertical_extra_border_coefficient= -1.0,
+				minimal_blob_intersection_area= 1,
+				minimal_blob_size= 1,
+				maximal_blob_invisibility_interval= 30,
+				minimal_track_duration= 50,
+				maximal_track_retention_interval= 50,
+				maximal_chronicle_length= 1000,
+				-- inverse_transformation_matrix,
+				-- sampling_rate,
+				synthesized_image_transparency= 48);
+	timer		= ('SpecialTimer',
+				target_world= self);
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	text		= ('Text');
+	file		= ('File');
+	image1		= ('BufferedImage');
+	image2		= ('BufferedImage');
+	configuration	= ('ExperimentalSetting',
+				target_world= self);
+	state		= ('ProgramState');
+	accumulator	= ('Accumulator');
+	protocol	= ('Protocol');
+	con		= ('Console');
+--
+variable:
+--
+	first_frame;
+	last_frame;
+--
+constant:
+--
+	distance_averaging_interval	= 1.0;
+	circle_radius			= 0.005;
+--
+[
+goal:-!,
+	maximize,
+	set_control_text_color(1004,'Blue'),
+	set_control_text_color(2001,'Blue'),
+	set_control_text_color(2003,'Blue'),
+	set_control_text_color(2004,'DkGreen'),
+	set_control_text_color(2005,'DkGreen'),
+	set_control_text_color("rewind",'Blue'),
+	set_control_text_color("play",'DkGreen'),
+	process_file.
+-----------------------------------------------------------------------
+set_analyzer_title(FileName):-
+	put('title',"Rat Behaviour Analyzer ["+FileName+"]").
+--
+set_frame_rate(FrameRate):-
+	timer ? set_period(1/(FrameRate*2),0),
+	vpm ? set_sampling_rate(FrameRate).
+--
+set_inverse_transformation_matrix(Matrix):-
+	vpm ? set_inverse_transformation_matrix(Matrix).
+--
+process_file:-
+	state ? retract_all(),
+	accumulator ? retract_all(),
+	protocol ? retract_all(),
+	detect_minimal_file_number(1,MinFrameNumber),
+	detect_maximal_file_number(1,MaxFrameNumber,MinFrameNumber),
+	put(3001,[MinFrameNumber,MaxFrameNumber]),
+	put(3002,[MinFrameNumber,MaxFrameNumber]),
+	put('first_frame',MinFrameNumber),
+	put('last_frame',MaxFrameNumber),
+	modified_control(0),
+	state ? set_current_frame(MinFrameNumber),
+	play_video.
+--
+detect_minimal_file_number(N,N):-
+	ImageToBeLoaded== configuration?form_file_name(N),
+	image1 ? does_exist(ImageToBeLoaded),!.
+detect_minimal_file_number(N1,N2):-
+	N1 < 1_000_000,!,
+	detect_minimal_file_number(N1+1,N2).
+detect_minimal_file_number(_,1).
+--
+detect_maximal_file_number(N1,N3,Min):-
+	N2== N1 + 1,
+	ImageToBeLoaded== configuration?form_file_name(N2),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	show_frame_range_if_necessary(Min,N2),
+	detect_maximal_file_number(N2,N3,Min).
+detect_maximal_file_number(N,N,_).
+--
+show_frame_range_if_necessary(Min,Max):-
+	?mod(Max,1000) == 0,!,
+	put(3002,[Min,Max]),
+	put('last_frame',Max).
+show_frame_range_if_necessary(_,_).
+-----------------------------------------------------------------------
+action("load"):-
+	FileName== con?input_file_name(
+		"Please select a configuration file",
+		"*.cfg",
+		["*.cfg","Configuration Files"]),!,
+	configuration ? load_experimental_setting(FileName),
+	process_file.
+action("rewind"):-!,
+	pause_video,
+	protocol ? retract_all(),
+	MinFrameNumber== ?cast("INTEGER",?get('first_frame')),
+	T2== timer?milliseconds(),
+	load_figure(MinFrameNumber,T2).
+action("100_steps_back"):-!,
+	go_backward(100).
+action("10_steps_back"):-!,
+	go_backward(10).
+action("1_step_back"):-!,
+	go_backward(1).
+action("play"):-!,
+	play_or_pause_video.
+action("1_step_forward"):-!,
+	go_forward(1).
+action("10_steps_forward"):-!,
+	go_forward(10).
+action("100_steps_forward"):-!,
+	go_forward(100).
+--
+go_backward(StepNumber):-
+	state ? get_current_frame(N),!,
+	pause_video,
+	MinFrameNumber== ?cast("INTEGER",?get('first_frame')),
+	T2== timer?milliseconds(),
+	load_figure(?max(N-StepNumber,MinFrameNumber),T2).
+go_backward(_).
+--
+go_forward(StepNumber):-
+	state ? get_current_frame(N),!,
+	pause_video,
+	MaxFrameNumber== ?cast("INTEGER",?get('last_frame')),
+	T2== timer?milliseconds(),
+	load_figure(?min(N+StepNumber,MaxFrameNumber),T2).
+go_forward(_).
+--
+play_or_pause_video:-
+	timer ? is_active,!,
+	pause_video.
+play_or_pause_video:-
+	play_video.
+--
+play_video:-
+	configuration ? get_frame_rate(FrameRate),
+	state ? get_current_frame(N1),
+	FFN== ?val("INTEGER",?get('first_frame')),!,
+	T2== timer?milliseconds(),
+	N0== N1 - FFN + 2,
+	T1== ?round(T2 - N0 / FrameRate * 1000.0),
+	state ? set_beginning_time(T1),
+	activate_timer.
+play_video:-
+	Time0== timer?milliseconds(),
+	state ? set_beginning_time(Time0),
+	activate_timer.
+--
+activate_timer:-
+	timer ? activate,
+	set_control_text("play","&Pause"),
+	set_control_text_color("play",'Red').
+--
+pause_video:-
+	timer ? suspend,
+	set_control_text("play","&Play"),
+	set_control_text_color("play",'DkGreen').
+-----------------------------------------------------------------------
+modified_control(_):-
+	configuration ? get_cage_polygon(L11),!,
+	vpm ? suspend_processing,
+	vpm ? retract_all_instructions,
+	divide_list(subsampling,L11,L12),
+	vpm ? msk_select_polygon(L12),
+	--
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('SATURATION',0,50),
+	vpm ? msk_select_foreground('BRIGHTNESS',0,150),
+	vpm ? pxl_select_image_channel('BRIGHTNESS'),
+	vpm ? pxl_compute_gradient('MODULUS'),
+	vpm ? pxl_normalize_pixels(0,10),
+	vpm ? pxl_smooth_image(13),
+	vpm ? msk_select_foreground(0,150),
+	vpm ? msk_erode_foreground(5),
+	vpm ? msk_dilate_foreground(5),
+	vpm ? blb_extract_blobs('body','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? blb_set_blob_borders(15,15),
+	--
+	vpm ? pxl_withdraw_pixel_preprocessing,
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('HUE',185,245),
+	vpm ? msk_select_foreground('SATURATION',50,255),
+	vpm ? msk_select_foreground('BRIGHTNESS',0,150),
+	vpm ? msk_erode_foreground(2),
+	vpm ? msk_dilate_foreground(2),
+	vpm ? blb_extract_blobs('cap','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? blb_set_blob_borders(1,1),
+	--
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('HUE',111,138),
+	vpm ? msk_select_foreground('SATURATION',50,255),
+	vpm ? msk_erode_foreground(2),
+	vpm ? msk_dilate_foreground(2),
+	vpm ? blb_extract_blobs('green_object','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('HUE',147,183),
+	vpm ? msk_select_foreground('SATURATION',103,255),
+	vpm ? msk_erode_foreground(2),
+	vpm ? msk_dilate_foreground(2),
+	vpm ? blb_extract_blobs('blue_object','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? blb_track_blobs,
+	vpm ? pxl_select_image_channel('ALL'),
+	vpm ? process_now.
+--
+divide_list(K,[p(X,Y)|R1],[p(X/K,Y/K)|R2]):-!,
+	divide_list(K,R1,R2).
+divide_list(_,_,[]).
+-----------------------------------------------------------------------
+tick:-
+	T2== timer?milliseconds(),
+	state ? get_beginning_time(T1),
+	configuration ? get_frame_rate(FrameRate),
+	Delta== (T2 - T1) / 1000.0 * FrameRate,
+	N== ?convert_to_integer(?round(Delta)),
+	FFN== ?val("INTEGER",?get('first_frame')),!,
+	load_figure(N+FFN-1,T2).
+tick.
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	LFN== ?val("INTEGER",?get('last_frame')),
+	N <= LFN,
+	state ? set_current_frame(N),
+	ImageToBeLoaded== configuration?form_file_name(N),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	image1 ? load(	ImageToBeLoaded,
+			subsampling,subsampling,0,0),
+	vpm ? process_realtime_frame(image1),
+	state ? increase_global_counter,
+	draw_scene(N).
+load_figure(_,_):-
+	configuration ? get_video_file_name(VideoFileName),
+	file ? extract_extension(VideoFileName,ShortName,_),
+	protocol ? save_protocol(ShortName+".log"),
+	fail.
+load_figure(_,T2):-
+	?cast("SYMBOL",?get(3003))=='yes',!,
+	protocol ? retract_all(),
+	state ? set_beginning_time(T2).
+load_figure(_,_):-
+	pause_video.
+--
+draw_scene(N):-
+	vpm ? commit,
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	-- vpm ? get_recent_image(image2),
+	-- vpm ? get_preprocessed_image(image2),
+	-- vpm ? get_background_image(image2),
+	-- vpm ? get_sigma_image(image2),
+	-- vpm ? get_foreground_image(image2),
+	vpm ? get_synthesized_image(image2),
+	graphic_window ? draw_image(image2,0,0,1,1),
+	-- vpm ? select_superior_track(
+	--	'NUMBER_OF_FRAMES','DESCENDING_ORDER'),
+	vpm ? get_chronicle(Chronicle),
+	image2 ? get_size_in_pixels(IW,IH),
+	draw_chronicle(Chronicle,N,IW,IH),
+	draw_legend,
+	graphic_window ? draw_now.
+--
+draw_chronicle(Chronicle,FN,IW,IH):-
+	draw_dynamic_object('cap',Chronicle,IW,IH),
+	draw_dynamic_object('body',Chronicle,IW,IH),
+	draw_static_object('green_object',Chronicle,IW,IH),
+	draw_static_object('blue_object',Chronicle,IW,IH),
+	draw_arrows(Chronicle,FN,IW,IH).
+--
+draw_dynamic_object(Type,Chronicle,IW,IH):-
+	Chronicle == [{blobs:Blobs|_}|_],
+	get_blob_of_type(Type,Blobs,Object),
+	Object== {x:X0,y:Y0,width:W1,height:H1|_},
+	compute_object_color(Type,Color),
+	graphic_window ? set_pen({color:Color,lineWidth:2}),!,
+	graphic_window ? set_brush('off'),
+	X2== (X0 - W1 / 2) / IW,
+	Y2== (Y0 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2).
+draw_dynamic_object(_,_,_,_).
+--
+draw_static_object(Type,Chronicle,_,_):-
+	Chronicle == [{blobs:Blobs|_}|_],
+	get_blob_of_type(Type,Blobs,Object),
+	Object== {x:X0,y:Y0,width:Width,height:Height|_},
+	HalfWidth== Width / 2,
+	HalfHeight== Height / 2,
+	X1== X0 - HalfWidth,
+	X2== X0 + HalfWidth,
+	Y1== Y0 - HalfHeight,
+	Y2== Y0 + HalfHeight,
+	accumulator ? add_value(Type,'x1',X1),
+	accumulator ? add_value(Type,'x2',X2),
+	accumulator ? add_value(Type,'y1',Y1),
+	accumulator ? add_value(Type,'y2',Y2),
+	fail.
+draw_static_object(Type,_,IW,IH):-
+	accumulator ? get_average_value(Type,'x1',X1b),
+	accumulator ? get_average_value(Type,'x2',X2b),
+	accumulator ? get_average_value(Type,'y1',Y1b),
+	accumulator ? get_average_value(Type,'y2',Y2b),!,
+	compute_object_color(Type,Color),
+	graphic_window ? set_pen({color:Color,lineWidth:2}),!,
+	graphic_window ? set_brush('off'),
+	X1p== X1b / IW,
+	X2p== X2b / IW,
+	Y1p== Y1b / IH,
+	Y2p== Y2b / IH,
+	Width== X2p - X1p,
+	Height== Y2p - Y1p,
+	graphic_window ? draw_rectangle(X1p,Y1p,Width,Height).
+draw_static_object(_,_,_,_).
+--
+compute_object_color('cap','Cyan'):-!.
+compute_object_color('body','Orange'):-!.
+compute_object_color('green_object','DkGreen'):-!.
+compute_object_color('blue_object','Navy'):-!.
+compute_object_color(_,'Magenta').
+--
+draw_arrows(Chronicle,FrameNumber,IW,IH):-
+	Chronicle == [{time:Time,blobs:Blobs|_}|_],
+	get_blob_of_type('body',Blobs,Body),
+	get_recent_blob_of_type('cap',Chronicle,0,Cap),
+	get_blob_of_type('green_object',Blobs,GreenObject),
+	get_blob_of_type('blue_object',Blobs,BlueObject),
+	Body== {centroid_x:X1a,centroid_y:Y1a|_},
+	Cap== {centroid_x:X2a,centroid_y:Y2a|_},
+	compute_distance(Body,Cap,RatLength),
+	RatLength <= 0.25,!,
+	select_object(
+		Cap,GreenObject,BlueObject,
+		Object3,X3a,Y3a,Distance3),
+	X1b== X1a / IW,
+	Y1b== Y1a / IH,
+	X2b== X2a / IW,
+	Y2b== Y2a / IH,
+	X3b== X3a / IW,
+	Y3b== Y3a / IH,
+	compute_distance(Body,X3a,Y3a,Distance4),
+	compute_angle(Body,Cap,X3a,Y3a,Angle),
+	determine_nearest_point(Body,Object3,X5a,Y5a,Distance5),
+	X5b== X5a / IW,
+	Y5b== Y5a / IH,
+	compute_velocity_of_body(Chronicle,Velocity),
+	detect_sniffing(
+		Distance3,Distance5,Angle,Velocity,Sniffing1),
+	check_whether_frame_is_marked_by_expert(FrameNumber,Sniffing2),
+	select_sniffing_color(Sniffing1,Sniffing2,ArrowColor),
+	-- Draw line: body - nearest point (3) of the object.
+	graphic_window ? set_brush('Blue'),
+	graphic_window ? set_pen(
+		{color:'Blue',lineWidth:1,dashArray:[3,5]}),
+	graphic_window ? draw_line(X1b,Y1b,X3b,Y3b),
+	-- draw_circle(X3b,Y3b,1.0),
+	-- Draw line: cap - nearest point (3) of the object.
+	graphic_window ? set_brush('Lemon'),
+	graphic_window ? set_pen(
+		{color:'Lemon',lineWidth:1,dashArray:[3,5]}),
+	graphic_window ? draw_line(X2b,Y2b,X3b,Y3b),
+	draw_circle(X3b,Y3b,1.0),
+	-- Draw line: body - nearest point (4) of the object.
+	graphic_window ? set_brush('Pink'),
+	graphic_window ? set_pen(
+		{color:'Pink',lineWidth:1,dashArray:[3,5]}),
+	graphic_window ? draw_line(X1b,Y1b,X5b,Y5b),
+	draw_circle(X5b,Y5b,1.0),
+	-- Draw line: body - cap.
+	graphic_window ? set_brush(ArrowColor),
+	graphic_window ? set_pen({color:ArrowColor,lineWidth:1}),
+	graphic_window ? draw_line(X1b,Y1b,X2b,Y2b),
+	draw_circle(X1b,Y1b,1.0),
+	draw_circle(X2b,Y2b,3.0),
+	-- Draw text label: angle.
+	graphic_window ? set_pen({color:'Aqua',lineWidth:1}),
+	draw_text_label(X1b,Y1b-0.02,text?format("%1.2f",Angle)),
+	-- Draw text label: velocity.
+	graphic_window ? set_pen({color:'Fuchsia',lineWidth:1}),
+	draw_text_label(X1b,Y1b+0.02,text?format("%1.3f",Velocity)),
+	-- Draw text label: the distance between the cap and
+	-- the nearest point (3) of the object.
+	X6b== (X2b + X3b) / 2,
+	Y6b== (Y2b + Y3b) / 2,
+	graphic_window ? set_pen({color:'Lemon',lineWidth:1}),
+	draw_text_label(X6b,Y6b-0.02,text?format("%1.3f",Distance3)),
+	-- Draw text label: the distance between the body and
+	-- the nearest point (4) of the object.
+	X7b== (X1b + X5b) / 2,
+	Y7b== (Y1b + Y5b) / 2,
+	graphic_window ? set_pen({color:'Pink',lineWidth:1}),
+	draw_text_label(X7b,Y7b-0.02,text?format("%1.3f",Distance5)),
+	--
+	protocol ? add_frame(
+		Time,FrameNumber,
+		Distance3,Distance5,Distance4,RatLength,
+		Angle,Velocity,Sniffing1,Sniffing2),
+	show_recognition_results.
+draw_arrows(_,_,_,_).
+--
+detect_sniffing(Distance3,Distance5,Angle,Velocity,1):-
+	sniffing_is_detected(Distance3,Distance5,Angle,Velocity),!.
+detect_sniffing(_,_,_,_,0).
+--
+sniffing_is_detected(DistanceAC,_,_,_):-
+	DistanceAC < 0.01,!.
+sniffing_is_detected(DistanceAC,_,_,_):-
+	DistanceAC > 0.04,!,
+	fail.
+sniffing_is_detected(DistanceAC,DistanceDB,Angle,Velocity):-
+	M1== ?fuzzy_metrics(DistanceDB / DistanceAC,1.3,0.1),
+	M2== 1-?fuzzy_metrics(Angle,50.0,10.0),
+	M3== 1-?fuzzy_metrics(Velocity,0.03,0.01),
+	P== M1*M2*M3,
+	P > ?power(0.5,3).
+--
+fuzzy_metrics(X,Threshold,Halfwidth) = 1.0 :-
+	X >= Threshold + Halfwidth,!.
+fuzzy_metrics(X,Threshold,Halfwidth) = 0.0 :-
+	X <= Threshold - Halfwidth,!.
+fuzzy_metrics(X,Threshold,Halfwidth) = Value :-
+	Value== (X-Threshold+Halfwidth) * (1 / (2*Halfwidth)).
+--
+check_whether_frame_is_marked_by_expert(_,-1):-
+	configuration ? ground_truth_does_not_exist,!.
+check_whether_frame_is_marked_by_expert(FrameNumber,1):-
+	is_marked_by_expert(FrameNumber),!.
+check_whether_frame_is_marked_by_expert(_,0).
+--
+is_marked_by_expert(FrameNumber):-
+	configuration ? get_ground_truth(Beginning,End),
+	Beginning <= FrameNumber,
+	FrameNumber <= End,!.
+--
+select_sniffing_color(1,-1,'Green'):-!.
+select_sniffing_color(0,-1,'Gray'):-!.
+select_sniffing_color(1,1,'Green'):-!,
+	protocol ? register_a_true_positive_detection.
+select_sniffing_color(0,1,'Yellow'):-!,
+	protocol ? register_a_false_negative_detection.
+select_sniffing_color(1,_,'Magenta'):-!,
+	protocol ? register_a_false_positive_detection.
+select_sniffing_color(_,_,'Gray'):-
+	protocol ? register_a_true_negative_detection.
+-----------------------------------------------------------------------
+select_object(Cap,Object1,Object2,Object3,X3,Y3,Distance3):-
+	determine_nearest_point(Cap,Object1,X1,Y1,Distance1),
+	determine_nearest_point(Cap,Object2,X2,Y2,Distance2),
+	select_nearest_object(
+		Object1,X1,Y1,Distance1,
+		Object2,X2,Y2,Distance2,
+		Object3,X3,Y3,Distance3).
+--
+select_nearest_object(
+		Object1,X1,Y1,Distance1,
+		_,_,_,Distance2,
+		Object1,X1,Y1,Distance1):-
+	Distance1 <= Distance2,!.
+select_nearest_object(
+		_,_,_,_,
+		Object2,X2,Y2,Distance2,
+		Object2,X2,Y2,Distance2).
+--
+determine_nearest_point(Cap,Object,Xn,Yn,Distance):-
+	Cap== {centroid_x:X1,centroid_y:Y1|_},
+	Object== {type:ObjectType|_},
+	accumulator ? get_average_value(ObjectType,'x1',X21),
+	accumulator ? get_average_value(ObjectType,'x2',X22),
+	accumulator ? get_average_value(ObjectType,'y1',Y21),
+	accumulator ? get_average_value(ObjectType,'y2',Y22),!,
+	determine_nearest_point(
+		X1,Y1,X21,X22,Y21,Y22,Xn,Yn,Distance).
+determine_nearest_point(_,_,_,_,_):-
+	break('Error: a blob has no co-ordinates.').
+--
+determine_nearest_point(X1,Y1,X21,X22,Y21,Y22,X3,Y3,0.0):-
+	X21 <= X1, X1 <= X22,
+	Y21 <= Y1, Y1 <= Y22,!,
+	convert_integer_to_real(X1,X3),
+	convert_integer_to_real(Y1,Y3).
+determine_nearest_point(X1,Y1,X21,_,Y21,Y22,X21,Y3,Distance):-
+	X1 < X21,
+	Y21 <= Y1, Y1 <= Y22,!,
+	convert_integer_to_real(Y1,Y3),
+	compute_physical_distance(X1,Y1,X21,Y3,Distance).
+determine_nearest_point(X1,Y1,_,X22,Y21,Y22,X22,Y3,Distance):-
+	X1 > X22,
+	Y21 <= Y1, Y1 <= Y22,!,
+	convert_integer_to_real(Y1,Y3),
+	compute_physical_distance(X1,Y1,X22,Y3,Distance).
+determine_nearest_point(X1,Y1,X21,X22,Y21,_,X3,Y21,Distance):-
+	Y1 < Y21,
+	X21 <= X1, X1 <= X22,!,
+	convert_integer_to_real(X1,X3),
+	compute_physical_distance(X1,Y1,X3,Y21,Distance).
+determine_nearest_point(X1,Y1,X21,X22,_,Y22,X3,Y22,Distance):-
+	Y1 > Y22,
+	X21 <= X1, X1 <= X22,!,
+	convert_integer_to_real(X1,X3),
+	compute_physical_distance(X1,Y1,X3,Y22,Distance).
+determine_nearest_point(X1,Y1,X21,_,Y21,_,X21,Y21,Distance):-
+	X1 < X21, Y1 < Y21,!,
+	compute_physical_distance(X1,Y1,X21,Y21,Distance).
+determine_nearest_point(X1,Y1,X21,_,_,Y22,X21,Y22,Distance):-
+	X1 < X21, Y1 > Y22,!,
+	compute_physical_distance(X1,Y1,X21,Y22,Distance).
+determine_nearest_point(X1,Y1,_,X22,Y21,_,X22,Y21,Distance):-
+	X1 > X22, Y1 < Y21,!,
+	compute_physical_distance(X1,Y1,X22,Y21,Distance).
+determine_nearest_point(X1,Y1,_,X22,_,Y22,X22,Y22,Distance):-
+	X1 > X22, Y1 > Y22,!,
+	compute_physical_distance(X1,Y1,X22,Y22,Distance).
+determine_nearest_point(_,_,_,_,_,_,_,_,_):-
+	break('Error: I cannot compute a distance.').
+-----------------------------------------------------------------------
+compute_angle(Body,Cap,X3a,Y3a,Angle):-
+	compute_distance(Cap,X3a,Y3a,A),
+	compute_distance(Body,X3a,Y3a,B),
+	compute_distance(Body,Cap,C),
+	P== (A+B+C)/2,
+	R== ?sqrt((P-A)*(P-B)*(P-C)/P),
+	Angle== ?arctan(R/(P-A)) / ?pi() * 360.
+--
+compute_distance(Body,Object,Distance):-
+	Body== {centroid_x:X1,centroid_y:Y1|_},
+	Object== {centroid_x:X2,centroid_y:Y2|_},!,
+	compute_physical_distance(X1,Y1,X2,Y2,Distance).
+compute_distance(_,_,_):-
+	break('Error: a blob has no co-ordinates.').
+--
+compute_distance(Body,X2,Y2,Distance):-
+	Body== {centroid_x:X1,centroid_y:Y1|_},!,
+	compute_physical_distance(X1,Y1,X2,Y2,Distance).
+compute_distance(_,_,_,_):-
+	break('Error: a blob has no co-ordinates.').
+--
+compute_physical_distance(X1a,Y1a,X2a,Y2a,Distance):-
+	convert_numerical_to_integer(X1a,X1p),
+	convert_numerical_to_integer(Y1a,Y1p),
+	convert_numerical_to_integer(X2a,X2p),
+	convert_numerical_to_integer(Y2a,Y2p),
+	vpm ? physical_coordinates(X1p,Y1p,X1r,Y1r),
+	vpm ? physical_coordinates(X2p,Y2p,X2r,Y2r),
+	Distance== ?sqrt(?power(X1r-X2r,2)+?power(Y1r-Y2r,2)).
+-----------------------------------------------------------------------
+compute_velocity_of_body(Chronicle,Velocity):-
+	Chronicle == [{time:Time0|_}|_],!,
+	compute_velocity_of_body(
+		Chronicle,
+		0.0,0.0,0,
+		0.0,0.0,0,Time0,Velocity).
+compute_velocity_of_body(_,0.0).
+--
+compute_velocity_of_body(
+		[{time:Time2,blobs:Blobs|_}|Rest],
+		X1r,Y1r,_,
+		SumX,SumY,N,
+		Time0,MeanVelocity):-
+	N > 0,
+	(Time0 - Time2) / 1000.0 <= distance_averaging_interval,
+	get_blob_of_type('body',Blobs,Body),
+	Body== {centroid_x:X2p,centroid_y:Y2p|_},!,
+	vpm ? physical_coordinates(X2p,Y2p,X2r,Y2r),
+	DeltaX== X1r - X2r,
+	DeltaY== Y1r - Y2r,
+	compute_velocity_of_body(
+		Rest,X2r,Y2r,Time2,
+		SumX+DeltaX,SumY+DeltaY,N+1,Time0,
+		MeanVelocity).
+compute_velocity_of_body(
+		[{time:Time2,blobs:Blobs|_}|Rest],
+		_,_,_,_,_,N,Time0,MeanVelocity):-
+	N == 0,
+	get_blob_of_type('body',Blobs,Body),
+	Body== {centroid_x:X2p,centroid_y:Y2p|_},!,
+	vpm ? physical_coordinates(X2p,Y2p,X2r,Y2r),
+	compute_velocity_of_body(
+		Rest,X2r,Y2r,Time2,
+		0.0,0.0,1,Time0,
+		MeanVelocity).
+compute_velocity_of_body(
+		[{time:Time2|_}|Rest],X1r,Y1r,
+		Time1,SumX,SumY,N,
+		Time0,MeanVelocity):-
+	(Time0 - Time2) / 1000.0 <= distance_averaging_interval,!,
+	compute_velocity_of_body(
+		Rest,X1r,Y1r,Time1,SumX,SumY,N,
+		Time0,MeanVelocity).
+compute_velocity_of_body(
+		_,_,_,Time1,SumX,SumY,_,Time0,MeanVelocity):-
+	DeltaTime== (Time0 - Time1) / 1000.0,
+	DeltaTime > 0,!,
+	Distance== ?sqrt(?power(SumX,2)+?power(SumY,2)),
+	MeanVelocity== Distance / DeltaTime.
+compute_velocity_of_body(_,_,_,_,_,_,_,_,0.0).
+-----------------------------------------------------------------------
+convert_integer_to_real(I,R):-
+	R== ?convert_to_real(I),!.
+convert_integer_to_real(_,_):-
+	break('Error: I cannot convert an integer to the real.').
+--
+convert_integer_to_real(I,R):-
+	R== ?convert_to_real(I),!.
+convert_integer_to_real(_,_):-
+	break('Error: I cannot convert an integer to the real.').
+--
+convert_numerical_to_integer(N,I):-
+	I== ?trunc(N),!.
+convert_numerical_to_integer(_,_):-
+	break('Error: I cannot convert a number to the integer.').
+-----------------------------------------------------------------------
+get_blob_of_type(Type,[Blob|_],Blob):-
+	Blob == {type:Type|_},!.
+get_blob_of_type(Type,[_|Rest],Blob):-
+	get_blob_of_type(Type,Rest,Blob).
+--
+get_recent_blob_of_type(Type,Chronicle,_,Blob):-
+	Chronicle == [{blobs:Blobs|_}|_],
+	get_blob_of_type(Type,Blobs,Blob),!.
+get_recent_blob_of_type(Type,[_|Rest],TimeLag,Blob):-
+	TimeLag < 2,!,
+	get_recent_blob_of_type(Type,Rest,TimeLag+1,Blob).
+-----------------------------------------------------------------------
+draw_circle(X0,Y0,C):-
+	X1== X0 - circle_radius * C,
+	Y1== Y0 - circle_radius * C,
+	Width== circle_radius * 2 * C,
+	Height== circle_radius * 2 * C,
+	graphic_window ? draw_ellipse(X1,Y1,Width,Height).
+--
+draw_text_label(_,_,""):-!.
+draw_text_label(X,Y,Text):-!,
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? draw_text(X,Y,Text).
+--
+show_recognition_results:-
+	protocol ? get_cumulative_interval(
+		1,SniffingTime,SniffingDistance),
+	protocol ? get_cumulative_interval(
+		0,BackgroundTime,BackgroundDistance),
+	put(1001,text?format("%1.3f",SniffingDistance)),
+	put(1002,text?format("%1.3f",BackgroundDistance)),
+	put(1003,text?format("%1.2f",
+		SniffingDistance/BackgroundDistance)),
+	TotalDistance== SniffingDistance + BackgroundDistance,
+	put(1004,text?format("%1.3f",TotalDistance)),
+	TotalDuration== (SniffingTime+BackgroundTime)/1000,
+	Velocity== TotalDistance / TotalDuration,
+	put(1005,text?format("%1.3f",Velocity)),
+	put(2001,text?format("%1.2f",SniffingTime/1000)),
+	put(2002,text?format("%1.2f",BackgroundTime/1000)),
+	put(2003,text?format("%1.2f",SniffingTime/BackgroundTime)),
+	fail.
+show_recognition_results:-
+	protocol ? get_number_of_true_positive_detections(TP),
+	protocol ? get_number_of_false_positive_detections(FP),
+	protocol ? get_number_of_true_negative_detections(TN),
+	protocol ? get_number_of_false_negative_detections(FN),
+	TP + FN > 0,
+	TN + FP > 0,
+	Sensitivity== TP/(TP+FN),
+	Specificity== TN/(TN+FP),
+	put(2004,text?format("%1.2f",Sensitivity)),
+	put(2005,text?format("%1.2f",Specificity)),
+	fail.
+show_recognition_results.
+--
+draw_legend:-
+	state ? get_current_frame(FrameNumber),
+	configuration ? get_frame_rate(DeclaredFrameRate),!,
+	state ? get_stopwatch_time(DelayInMilliseconds),
+	state ? get_frame_counter(FrameQuantity),
+	state ? get_global_counter(GlobalCounter),
+	DelayInSeconds== DelayInMilliseconds / 1000.0,
+	RealFrameRate== FrameQuantity / DelayInSeconds,
+	FrameTime== (FrameNumber-1) / DeclaredFrameRate,
+	graphic_window ? set_brush('DkGreen'),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('LEFT','TOP'),
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %3.2f [sec]; Frame: %d (%d)",
+			FrameTime,FrameNumber,GlobalCounter)),
+	graphic_window ? set_text_alignment('RIGHT','TOP'),
+	graphic_window ? draw_text(
+		0.98, 0.02,
+		text?format(
+			"Frame Rate: %3.2f [Hz]",
+			RealFrameRate)).
+draw_legend.
+]
+-----------------------------------------------------------------------
+class 'SpecialTimer' (specialized 'Timer'):
+--
+internal:
+--
+target_world;
+--
+[
+tick:-!,
+	target_world ? tick.
+]
+-----------------------------------------------------------------------
+class 'ExperimentalSetting' (specialized 'Database'):
+--
+internal:
+--
+target_world;
+--
+text		= ('Text');
+con		= ('Console');
+--
+[
+load_experimental_setting(FileName):-
+	retract_all(),
+	load(FileName),
+	fail.
+load_experimental_setting(_):-
+	get_video_file_name(FileName),
+	target_world ? set_analyzer_title(FileName),
+	fail.
+load_experimental_setting(_):-
+	get_frame_rate(FrameRate),
+	target_world ? set_frame_rate(FrameRate),
+	fail.
+load_experimental_setting(_):-
+	get_inverse_transformation_matrix(Matrix),
+	target_world ? set_inverse_transformation_matrix(Matrix),
+	fail.
+load_experimental_setting(_).
+--
+get_video_file_name(FileName):-
+	Item== ?match(video_file_name(_)),
+	Item == video_file_name(FileName),!.
+--
+get_data_directory(DirectoryName):-
+	Item== ?match(data_directory(_)),
+	Item == data_directory(DirectoryName),!.
+--
+get_file_name_format(FileNameFormat):-
+	Item== ?match(file_name_format(_)),
+	Item == file_name_format(FileNameFormat),!.
+--
+form_file_name(FrameNumber) = ImageToBeLoaded :-
+	get_data_directory(DirectoryName),
+	get_file_name_format(FileNameFormat),!,
+	ImageToBeLoaded==
+		DirectoryName + "/" +
+		text?format(FileNameFormat,FrameNumber).
+--
+get_frame_rate(FrameRate):-
+	Item== ?match(frame_rate(_)),
+	Item == frame_rate(FrameRate),!.
+--
+get_inverse_transformation_matrix(Matrix):-
+	Item== ?match(inverse_transformation_matrix(_)),
+	Item == inverse_transformation_matrix(Matrix),!.
+--
+get_cage_polygon(PointList):-
+	Item== ?match(cage_polygon_for_slides(_)),
+	Item == cage_polygon_for_slides(PointList),!.
+--
+ground_truth_does_exist:-
+	match(ground_truth(_,_)),!.
+--
+ground_truth_does_not_exist:-
+	ground_truth_does_exist,!,
+	fail.
+ground_truth_does_not_exist.
+--
+get_ground_truth(LeftBound,RightBound):-
+	Item== ?match(ground_truth(_,_)),
+	Item == ground_truth(LeftBound,RightBound).	
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		= ('Timer');
+--
+[
+CLAUSES:
+--
+get_beginning_time(Time):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(Time),!.
+--
+set_beginning_time(Time):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(Time)),
+	reset_stopwatch,
+	reset_frame_counter.
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)),
+	increase_frame_counter.
+--
+reset_stopwatch:-
+	retract_all(stop_watch_time(_)),
+	append(stop_watch_time(timer?milliseconds())).
+--
+get_stopwatch_time(Delay):-
+	T2== timer?milliseconds(),
+	Item== ?match(stop_watch_time(_)),
+	Item == stop_watch_time(T1),!,
+	Delay== T2 - T1.
+get_stopwatch_time(0).
+--
+reset_frame_counter:-
+	retract_all(frame_counter(_)).
+--
+increase_frame_counter:-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!,
+	retract_all(frame_counter(_)),
+	append(frame_counter(N+1)).
+increase_frame_counter:-
+	append(frame_counter(1)).
+--
+get_frame_counter(N):-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!.
+get_frame_counter(0).
+--
+increase_global_counter:-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!,
+	retract_all(global_counter(_)),
+	append(global_counter(N+1)).
+increase_global_counter:-
+	append(global_counter(1)).
+--
+get_global_counter(N):-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!.
+get_global_counter(0).
+]
+-----------------------------------------------------------------------
+class 'Accumulator' (specialized 'Database'):
+[
+add_value(BlobType,Label,Value):-
+	Item== ?match(accumulated_sum(_,_,_,_)),
+	Item == accumulated_sum(BlobType,Label,N,Sum),!,
+	retract_all(accumulated_sum(BlobType,Label,N,Sum)),
+	append(accumulated_sum(BlobType,Label,N+1,Sum+Value)).
+add_value(BlobType,Label,Value):-
+	append(accumulated_sum(BlobType,Label,1,Value)).
+--
+get_average_value(BlobType,Label,Mean):-
+	Item== ?match(accumulated_sum(_,_,_,_)),
+	Item == accumulated_sum(BlobType,Label,N,Sum),!,
+	Mean== Sum / N.
+]
+-----------------------------------------------------------------------
+class 'Protocol' (specialized 'Database'):
+--
+file		= ('File');
+--
+[
+add_frame(	Time,FrameNumber,
+		Distance1,Distance2,Distance3,RatLength,
+		Angle,Velocity,
+		Flag1,Flag2):-
+	modify_counter_mode(Flag1,Time,Velocity),
+	append(frame(
+		Time,FrameNumber,
+		Distance1,Distance2,Distance3,RatLength,
+		Angle,Velocity,Flag1,Flag2)).
+--
+modify_counter_mode(Mode2,Time2,Velocity):-
+	get_current_mode(Mode1,Time1),!,
+	modify_mode_if_necessary(Mode1,Mode2,Time1,Time2,Velocity).
+modify_counter_mode(Mode2,Time2,_):-
+	insert(current_mode(Mode2,Time2)).
+--
+get_current_mode(Mode,Time):-
+	Item== ?match(current_mode(_,_)),
+	Item == current_mode(Mode,Time),!.
+--
+modify_mode_if_necessary(Mode,Mode,Time1,Time2,Velocity):-!,
+	retract_all(current_mode(Mode,_)),
+	insert(current_mode(Mode,Time2)),
+	increase_cumulative_interval(Mode,Time2-Time1,Velocity).
+modify_mode_if_necessary(Mode1,Mode2,Time1,Time2,Velocity):-
+	retract_all(current_mode(Mode2,_)),
+	insert(current_mode(Mode2,Time2)),
+	increase_cumulative_interval(Mode1,Time2-Time1,Velocity).
+--
+increase_cumulative_interval(Mode,DeltaTime,Velocity):-
+	Item== ?match(cumulative_interval(_,_,_)),
+	Item == cumulative_interval(Mode,Sum1,Sum2),!,
+	retract_all(cumulative_interval(Mode,_,_)),
+	Distance== DeltaTime * Velocity / 1000.0,
+	append(cumulative_interval(
+		Mode,Sum1+DeltaTime,Sum2+Distance)).
+increase_cumulative_interval(Mode,DeltaTime,Velocity):-
+	Distance== DeltaTime * Velocity / 1000.0,
+	append(cumulative_interval(Mode,DeltaTime,Distance)).
+--
+get_cumulative_interval(Mode,Time,Distance):-
+	Item== ?match(cumulative_interval(_,_,_)),
+	Item == cumulative_interval(Mode,Time,Distance),!.
+get_cumulative_interval(_,0,0.0).
+--
+save_protocol(FileName):-
+	file ? open(FileName,'writing'),
+	fail.
+save_protocol(_):-
+	Item== ?match(frame(_,_,_,_,_,_,_,_,_,_)),
+		Item == frame(
+			Time,FN,Distance1,Distance2,
+			Distance3,RatLength,
+			Angle,Velocity,Flag1,Flag2),
+		file ? writef(
+			"%d\t%d\t%e\t%e\t%e\t%e\t%e\t%e\t%s\t%s\n",
+			Time,FN,Distance1,Distance2,
+			Distance3,RatLength,
+			Angle,Velocity,Flag1,Flag2),
+		fail.
+save_protocol(_):-
+	file ? close.
+--
+register_a_true_positive_detection:-
+	Item== ?match(true_positive_detections(_)),
+	Item == true_positive_detections(N),!,
+	retract_all(true_positive_detections(_)),
+	append(true_positive_detections(N+1)).
+register_a_true_positive_detection:-
+	append(true_positive_detections(1)).
+--
+register_a_false_positive_detection:-
+	Item== ?match(false_positive_detections(_)),
+	Item == false_positive_detections(N),!,
+	retract_all(false_positive_detections(_)),
+	append(false_positive_detections(N+1)).
+register_a_false_positive_detection:-
+	append(false_positive_detections(1)).
+--
+register_a_true_negative_detection:-
+	Item== ?match(true_negative_detections(_)),
+	Item == true_negative_detections(N),!,
+	retract_all(true_negative_detections(_)),
+	append(true_negative_detections(N+1)).
+register_a_true_negative_detection:-
+	append(true_negative_detections(1)).
+--
+register_a_false_negative_detection:-
+	Item== ?match(false_negative_detections(_)),
+	Item == false_negative_detections(N),!,
+	retract_all(false_negative_detections(_)),
+	append(false_negative_detections(N+1)).
+register_a_false_negative_detection:-
+	append(false_negative_detections(1)).
+--
+get_number_of_true_positive_detections(N):-
+	Item== ?match(true_positive_detections(_)),
+	Item == true_positive_detections(N),!.
+get_number_of_true_positive_detections(0).
+--
+get_number_of_false_positive_detections(N):-
+	Item== ?match(false_positive_detections(_)),
+	Item == false_positive_detections(N),!.
+get_number_of_false_positive_detections(0).
+--
+get_number_of_true_negative_detections(N):-
+	Item== ?match(true_negative_detections(_)),
+	Item == true_negative_detections(N),!.
+get_number_of_true_negative_detections(0).
+--
+get_number_of_false_negative_detections(N):-
+	Item== ?match(false_negative_detections(_)),
+	Item == false_negative_detections(N),!.
+get_number_of_false_negative_detections(0).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,87 @@
+package "Morozov/Web/Scanning/Check":
+---------------------------------------------------------------
+--             The "CHECK" Actor Prolog package.             --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains an engine for analyzing Web Sites   --
+-- and discovering bad links.                                --
+---------------------------------------------------------------
+import 'ControlDialog'	from "Morozov/Web/Scanning/Control";
+import 'AnalyserControl'    from "Morozov/Web/Scanning/Control";
+import 'Scanner'	from "Morozov/Web/Scanning/Core";
+import 'GenericReport'	from "Morozov/Web/Scanning/Messages";
+import 'ErrorMessages'	from "Morozov/Web/Scanning/Messages";
+import 'SearchEngine'	from "Morozov/Web/Engines/Core";
+import 'WebAddressRegistry'
+			from "Morozov/Web/Scanning/Counter";
+---------------------------------------------------------------
+interface 'Check' (specialized 'Alpha', 'AnalyserControl'):
+--
+variable:
+--
+	location		: WebAddressList;
+	maximal_waiting_time	: MaximalWaitingTime;
+	domain			: WebAddressSegment;
+	use_max_depth		: UseMaxDepth;
+	max_depth		: Level;
+	virtual_resources	: WebAddressList;
+--
+internal:
+--
+	dialog			: 'ControlDialog';
+	main_engine		: 'SpecialScanner';
+--
+variable:
+--
+	output_device		: OutputDeviceInstance;
+--
+[
+]
+---------------------------------------------------------------
+-- The 'SpecialScanner' class is the most important one.     --
+-- This class implements collection and analysis of data.    --
+---------------------------------------------------------------
+interface 'SpecialScanner' (specialized 'Scanner'):
+--
+variable:
+--
+	location		: WebAddressList;
+	maximal_waiting_time	: MaximalWaitingTime;
+	domain			: WebAddressSegment;
+	use_max_depth		: UseMaxDepth;
+	max_depth		: Level;
+--
+	virtual_resources	: WebAddressList;
+--
+internal:
+--
+	diary			: 'Report';
+--
+variable:
+--
+	report			: OutputDeviceInstance;
+--
+internal:
+--
+	messages		: 'ErrorMessages';
+--
+	old_nodes		: 'WebAddressRegistry';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+start;
+--
+determ:
+--
+'<='(Level,Level)			- (i,i);
+--
+imperative:
+--
+'+'(Level,Level) = Level		- (i,i);
+'+'(Node,Node) = Node			- (i,i);
+--
+]
+---------------------------------------------------------------

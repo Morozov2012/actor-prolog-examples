@@ -1,0 +1,118 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  QSORT                                                            --
+--                                                                   --
+--  David H.D. Warren                                                --
+--                                                                   --
+--  Quicksort a list of 50 integers                                  --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--  (Warning: Program text is modified a bit!)                       --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+-- Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB          --
+-- Windows7 - PM.64 (RUS)                                            --
+-- ================================================================= --
+-- AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                            --
+--                                                                   --
+-- EXE file produced by the Actor Prolog system:                     --
+--                                                                   --
+-- list_length = 50;                                                 --
+-- 1000 iterations take 20 msec                                      --
+-- 0.02 milliseconds per iteration                                   --
+-- 100000 iterations take 1410 msec                                  --
+-- 0.0141 milliseconds per iteration                                 --
+-- list_length = 100;                                                --
+-- 1000 iterations take 30 msec                                      --
+-- 0.03 milliseconds per iteration                                   --
+-- list_length = 1000;                                               --
+-- 1000 iterations take 560 msec                                     --
+-- 0.56 milliseconds per iteration                                   --
+-- list_length = 5000;                                               --
+-- 1000 iterations take 3680 msec                                    --
+-- 3.68 milliseconds per iteration                                   --
+-- list_length = 10000;                                              --
+-- 1000 iterations take 8020 msec                                    --
+-- 8.02 milliseconds per iteration                                   --
+-- list_length = 100000;                                             --
+-- 1000 iterations take 109390 msec                                  --
+-- 109.39 milliseconds per iteration                                 --
+-- list_length = 250000;                                             --
+-- 100 iterations take 27510 msec                                    --
+-- 275.1 milliseconds per iteration                                  --
+-- 1000 iterations take 279750 msec                                  --
+-- 279.75 milliseconds per iteration                                 --
+--                                                                   --
+-- java version "1.7.0"                                              --
+-- Java(TM) SE Runtime Environment (build 1.7.0-b147)                --
+-- Java HotSpot(TM) 64-Bit Server VM (build 21.0-b17, mixed mode)    --
+--                                                                   --
+-- === BigInteger ===                                                --
+-- java -Xrs -XX:+UseNUMA -server -Xbatch -jar main.jar              --
+--                                                                   --
+-- list_length = 50;                                                 --
+-- 1000 iterations take 313 msec                                     --
+-- 0,313000 milliseconds per iteration                               --
+-- list_length = 100;                                                --
+-- 1000 iterations take 608 msec                                     --
+-- 0,608000 milliseconds per iteration                               --
+-- list_length = 1000;                                               --
+-- 1000 iterations take 9141 msec                                    --
+-- 9,141000 milliseconds per iteration                               --
+-- list_length = 5000;                                               --
+-- 1000 iterations take 56535 msec                                   --
+-- 56,535000 milliseconds per iteration                              --
+-- list_length = 10000;                                              --
+-- java -Xss10000k -Xms1000000k -Xmx1000000k -Xrs -XX:+UseNUMA       --
+-- -server -Xbatch -jar main.jar                                     --
+-- 1000 iterations take 118249 msec                                  --
+-- 118,249000 milliseconds per iteration                             --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities' from "HARNESS2";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+N	= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+create_list(N,TestData)				- (i,o);
+qsort(TestData,TestData,TestData)		- (i,o,i);
+partition(TestData,Number,TestData,TestData)	- (i,i,o,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+--
+list_length	= 1000;
+--
+[
+benchmark(Data,Out):-
+	qsort(Data,Out,[]).
+--
+data(List):-
+	create_list(list_length,List).
+--
+create_list(N,[?random()|Rest]):-
+	N > 0,!,
+	create_list(N-1,Rest).
+create_list(_,[]).
+--
+qsort([X|L],R,R0):-!,
+	partition(L,X,L1,L2),
+	qsort(L2,R1,R0),
+	qsort(L1,R,[X|R1]).
+qsort(_,R,R).
+--
+partition([X|L],Y,[X|L1],L2):-
+	X <= Y,!,
+	partition(L,Y,L1,L2).
+partition([X|L],Y,L1,[X|L2]):-!,
+	partition(L,Y,L1,L2).
+partition(_,_,[],[]).
+]
+-----------------------------------------------------------------------

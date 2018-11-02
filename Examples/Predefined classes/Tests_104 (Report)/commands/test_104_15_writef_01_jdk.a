@@ -1,0 +1,164 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+test9;
+test10;
+test11;
+test12;
+
+class 'Main' (specialized 'Report'):
+--
+constant:
+--
+	x	= 'centered';
+	y	= 'centered';
+	height	= 15;
+	width	= 70;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? show,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6,
+	test7,
+	test8,
+	test9,
+	test10,
+	test11,
+	test12,
+	Text== ?get_string(),
+	con ? writeln(Text).
+--
+test1:-
+	writeln("Test 1: %s"),
+	writef("\t%%s: %s %s%s\n","Hello","World","!"),
+	writef("\t%%s       : >>>%s<<<\n","ABCDE"),
+	writef("\t%%10s     : >>>%10s<<<\n","ABCDE"),
+	-- writef("\t%%010s    : >>>%010s<<<\n","ABCDE"),
+	writef("\t%%-10s    : >>>%-10s<<<\n","ABCDE"),
+	writef("\t%%-010s   : >>>%-10s<<<\n","ABCDE"),
+	writef("\t%%s: >>>%s<<<\n",'symbol'),
+	writef("\t%%s: >>>%s<<<\n",structure(1,3.0,"string",'symbol')),
+	writef("\t%%s: >>>%s<<<\n",[1,3.0,"string",'symbol']),
+	writef("\t%%s: >>>%s<<<\n",{a:1,b:3.0,c:"string",d:'symbol'}).
+--
+test2:-
+	writeln("Test 2: >>>%s"),
+	writef("\t%%s       : >>>%s<<<\n","ABCDE"),
+	writef("\t%%10.3s   : >>>%10.3s<<<\n","ABCDE"),
+	-- writef("\t%%010.3s  : >>>%010.3s<<<\n","ABCDE"),
+	writef("\t%%-10.3s  : >>>%-10.3s<<<\n","ABCDE"),
+	writef("\t%%-010.3s : >>>%-10.3s<<<\n","ABCDE").
+--
+test3:-
+	writeln("Test 3: >>>%d"),
+	writef("\t%%d    : >>>%d<<<\n",100),
+	writef("\t%%15d  : >>>%15d<<<\n",100),
+	-- writef("\t%%15.1d  : >>>%15.1d<<<\n",100),
+	writef("\t%%015d : >>>%015d<<<\n",100),
+	writef("\t%%-15d : >>>%-15d<<<\n",100).
+	-- writef("\t%%-015d: >>>%-015d<<<\n",100).
+--
+test4:-
+	writeln("Test 4: >>>%f"),
+	writef("\t%%f    : >>>%f<<<\n",100.0),
+	writef("\t%%15f  : >>>%15f<<<\n",100.0),
+	writef("\t%%015f : >>>%015f<<<\n",100.0),
+	writef("\t%%-15f : >>>%-15f<<<\n",100.0).
+	-- writef("\t%%-015f: >>>%-015f<<<\n",100.0).
+--
+test5:-
+	writeln("Test 5: >>>%f"),
+	writef("\t%%f      : >>>%f<<<\n",?pi),
+	writef("\t%%15.3f  : >>>%15.3f<<<\n",?pi),
+	writef("\t%%015.3f : >>>%015.3f<<<\n",?pi),
+	writef("\t%%-15.3f : >>>%-15.3f<<<\n",?pi).
+	-- writef("\t%%-015.3f: >>>%-015.3f<<<\n",?pi).
+--
+test6:-
+	writeln("Test 6: >>>%e"),
+	writef("\t%%e      : >>>%e<<<\n",?pi),
+	writef("\t%%25e    : >>>%25e<<<\n",?pi),
+	writef("\t%%15.3e  : >>>%15.3e<<<\n",?pi),
+	writef("\t%%015.3e : >>>%015.3e<<<\n",?pi),
+	writef("\t%%-15.3e : >>>%-15.3e<<<\n",?pi).
+	-- writef("\t%%-015.3e: >>>%-015.3e<<<\n",?pi).
+--
+test7:-
+	writeln("Test 7: >>>%g"),
+	writef("\t%%g      : >>>%g<<<\n",?pi),
+	writef("\t%%25g    : >>>%25g<<<\n",?pi),
+	writef("\t%%15.3g  : >>>%15.3g<<<\n",?pi),
+	writef("\t%%015.3g : >>>%015.3g<<<\n",?pi),
+	writef("\t%%-15.3g : >>>%-15.3g<<<\n",?pi).
+	-- writef("\t%%-015.3g: >>>%-015.3g<<<\n",?pi).
+--
+test8:-
+	writeln("Test 8: >>>%x"),
+	writef("\t%%x    : >>>%x<<<\n",111),
+	-- writef("\t%%x    : >>>%x<<<\n",111.0),
+	writef("\t%%15x  : >>>%15x<<<\n",111),
+	writef("\t%%015x : >>>%015x<<<\n",111),
+	writef("\t%%-15x : >>>%-15x<<<\n",111).
+	-- writef("\t%%-015x: >>>%-015x<<<\n",111).
+--
+test9:-
+	writeln("Test 9: >>>%X"),
+	writef("\t%%X    : >>>%X<<<\n",111),
+	-- writef("\t%%X    : >>>%X<<<\n",111.0),
+	writef("\t%%15X  : >>>%15X<<<\n",111),
+	writef("\t%%015X : >>>%015X<<<\n",111),
+	writef("\t%%-15X : >>>%-15X<<<\n",111).
+	-- writef("\t%%-015X: >>>%-015X<<<\n",111).
+--
+test10:-
+	writeln("Test 10: >>>%o"),
+	writef("\t%%o    : >>>%o<<<\n",111),
+	writef("\t%%15o  : >>>%15o<<<\n",111),
+	writef("\t%%015o : >>>%015o<<<\n",111),
+	writef("\t%%-15o : >>>%-15o<<<\n",111).
+	-- writef("\t%%-015o: >>>%-015o<<<\n",111).
+--
+test11:-
+	writeln("Test 11: >>>%c"),
+	writef("\t%%c    : >>>%c<<<\n",100),
+	writef("\t%%15c  : >>>%15c<<<\n",100),
+	-- writef("\t%%015c : >>>%015c<<<\n",100),
+	writef("\t%%-15c : >>>%-15c<<<\n",100).
+	-- writef("\t%%-015c: >>>%-015c<<<\n",100).
+--
+test12:-
+	writeln("Test 12: >>>%s"),
+	writef(	"\tdigital%%sflame%%stest: "
+		">>>digital%sflame%stest<<<\n",100,3.14),
+	writef(	"\tdigital%%s%%stest: "
+		">>>digital%s%stest<<<\n",100,3.14),
+	writef(	"\tdigital%%sflame%%s: "
+		">>>digital%sflame%s<<<\n",100,3.14),
+	writef(	"\tdigital%%s%%s: "
+		">>>digital%s%s<<<\n",100,3.14),
+	writef(	"\t%%s%%s: "
+		">>>%s%s<<<\n",100,3.14).
+]

@@ -1,0 +1,89 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving and output of information from    --
+--       arbitrary number of Web resources.           --
+--------------------------------------------------------
+project: (('Main'))
+--------------------------------------------------------
+class 'Main' (specialized 'WebReceptor'):
+--
+constant:
+--
+	location =
+		"http://www.cplire.ru/Lab144/"
+		"selected.html";
+--
+	receiver = (('CheckPages'));
+--
+	out	 = (('Output',
+			data_source=receiver));
+--
+[
+goal:-!,
+	send_references(?get_references).
+--
+send_references([URL|Rest]):-!,
+	receiver << check(URL),
+	send_references(Rest).
+send_references(_).
+]
+--------------------------------------------------------
+class 'CheckPages' (specialized 'WebReceptor'):
+--
+constant:
+--
+	location	= "";
+--
+internal:
+--
+	registry	= ('WebPageDatabase');
+--
+[
+goal:-!.
+--
+check(URL):-
+	store_parameters(URL,?get_parameters(URL)).
+--
+store_parameters(URL,_):-
+	registry ? find(Item),
+	Item == page(URL,_),
+	registry ? retract_all(Item),
+	fail.
+store_parameters(URL,Parameters):-
+	registry ? append(page(URL,Parameters)).
+--
+get_data= Line
+	:-
+	registry ? find(Item),
+	Item == page(_,entry(URL,Date,_,_)),
+	Line== ?format(
+		"%s\t%s",
+		URL,
+		?date_to_string(Date)).
+--
+date_to_string(date(Year,Month,Day))=
+	?format("%d-%02d-%04d",Day,Month,Year)
+	:-!.
+date_to_string(_)= "".
+]
+--------------------------------------------------------
+class 'Output' (specialized 'Dialog'):
+--
+constant:
+--
+	data_source;
+--
+variable:
+--
+	results	 = data_source ?? get_data();
+--
+[
+goal:-!,
+	show.
+]
+--------------------------------------------------------
+class 'WebPageDatabase' (specialized 'Database'):
+[
+]
+--------------------------------------------------------

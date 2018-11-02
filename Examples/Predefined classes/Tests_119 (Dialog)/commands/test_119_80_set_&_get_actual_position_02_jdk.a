@@ -1,0 +1,42 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Console',
+			title=	"A current position of "
+				"the Test dialog",
+			x= 40,
+			y= 0,
+			width= 40,
+			height= 25);
+--
+	dialog	= ('TestDialog');
+--
+[
+goal:-!,
+	dialog ? show,
+	set_period(0.1),
+	activate.
+--
+tick:-!,
+	dialog ? get_actual_position(X,Y),
+	con ? set_color('default'),
+	con ? write("X= "),
+	con ? set_color('RoyalBlue'),
+	con ? write(X),
+	con ? set_color('default'),
+	con ? write(", Y= "),
+	con ? set_color('RoyalBlue'),
+	con ? writeln(Y),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'TestDialog' (specialized 'Dialog'):
+[
+]
+-----------------------------------------------------------------------

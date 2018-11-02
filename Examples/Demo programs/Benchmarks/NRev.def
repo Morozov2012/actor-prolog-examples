@@ -1,0 +1,49 @@
+------------------------------------------------------------------
+--                                                              --
+--      An example of Actor Prolog program.                     --
+--      (c) 2004, IRE RAS, Alexei A. Morozov.                   --
+--                                                              --
+--      Naive reverse benchmark used to compute "LIPS".         --
+--      Nominal value to test is length 20.                     --
+--                                                              --
+------------------------------------------------------------------
+
+DOMAINS:
+
+N			= INTEGER.
+List			= N*.
+--
+Period			= REAL.
+
+interface 'NREV' (specialized 'Alpha'):
+--
+internal:
+--
+con		: 'Console';
+window		: 'Report';
+timer		: 'Timer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test(INTEGER,List,Period,Period,Period)			- (i,i,o,o,o);
+runtest(INTEGER,List);
+runcontrol(INTEGER,List);
+runtestonce(List);
+runcontrolonce(List);
+nrev(List,List)						- (i,o);
+append(List,List,List)					- (i,i,o);
+control(List,List)					- (i,o);
+computeavgtime(Period,Period,Period,INTEGER,Period)	- (i,i,i,i,o);
+abstime(Hours,Minutes,Seconds,Milliseconds,Period)	- (i,i,i,i,o);
+--
+nondeterm:
+--
+for(INTEGER,INTEGER,INTEGER)				- (i,i,o);
+--
+imperative:
+--
+genlst(INTEGER,List)					- (i,o);
+]

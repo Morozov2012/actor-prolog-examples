@@ -1,0 +1,639 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-----------------------------------------------------------------------
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Thanks to Andrew Davison                                          --
+-- Davison A. Kinect Open Source Programming Secrets (KOPS). -       --
+-- McGraw Hill, 2012.                                                --
+-----------------------------------------------------------------------
+-- Note: one has to start two instances of the Editor environment
+-- to study this example. Please compile and execute this example
+-- in the first environment and the agent_Kinect_**_supplier_**
+-- example in the second environment.
+-- Please translate these examples to Java.
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	datastore	= ('DataStore',
+				name="AgentBlackboard.db",
+				sharing_mode='shared_access',
+				access_mode='reading');
+	database	= ('3DDataSources',
+				place= shared(
+					datastore,
+					"3DDataSources"));
+	graphic_window	= ('Canvas3D',
+				enable_scene_antialiasing='yes');
+	dialog		= ('MainDialog',
+				communicator=self,
+				graphic_window,
+				message_window=con);
+	buffer2D	= ('BufferedImage');
+	data_supplier	= ('CurrentDataSupplier');
+	thermal_data	= ('ThermalData');
+	con		= ('Console');
+	trap		= ('Trap',
+				world= self,
+				handler= self);
+--
+constant:
+--
+	main_label		= "Skeletons";
+	cylinder_radius		= 0.02;
+	joint_radius		= 0.03;
+	head_radius		= 0.05;
+	limb_transparency	= 0.1;
+	up_vector		= p(0,1,0);
+--
+[
+MODEL:
+--
+?new_frame(Skeletons,MappedImage).
+?reset.
+--
+CLAUSES:
+--
+goal:-!,
+	dialog ? show,
+	create_list_of_nodes(VisualScene),
+	graphic_window ? show(VisualScene),
+	set_period(3.0),
+	activate.
+--
+tick:-
+	con ? set_color('Orange'),
+	con ? write("OPENING THE DATA STORE... "),
+	datastore ? open,
+	con ? writeln("DONE."),
+	con ? set_color('Violet'),
+	con ? write("READING THE TABLE... "),
+	database ? begin_transaction('reading'),!,
+	read_table,
+	database ? end_transaction,
+	con ? writeln("DONE."),
+	con ? set_color('Orange'),
+	con ? write("CLOSING THE DATA STORE... "),
+	datastore ? close,
+	con ? writeln("DONE.").
+--
+read_table:-
+	database ? find(ExternalAgent),
+	-- con ? writeln("Found: ",ExternalAgent),
+	trap ? register_oneself(ExternalAgent),!,
+	remember_data_supplier(ExternalAgent).
+read_table.
+--
+register_oneself(ExternalAgent):-
+	-- con ? writeln("Send to: ",ExternalAgent),
+	[ExternalAgent] <- register_consumer(self).
+--
+remember_data_supplier(ExternalAgent):-
+	data_supplier ? retract_all,
+	data_supplier ? append(ExternalAgent).
+--
+unregister_oneself:-
+	suspend,
+	data_supplier ? find(ExternalAgent),
+	-- con ? writeln("Found: ",ExternalAgent),
+	trap ? unregister_oneself(ExternalAgent),!.
+unregister_oneself.
+--
+unregister_oneself(ExternalAgent):-
+	-- con ? writeln("Send to: ",ExternalAgent),
+	[ExternalAgent] <- forget_consumer(self).
+--
+new_frame(Skeletons,BinaryData):-
+	suspend,
+	buffer2D ? set_binary(BinaryData),
+	SkeletonFigures== ?form_skeletons(Skeletons,buffer2D),
+	graphic_window ? set_node(
+		main_label,
+		'BranchGroup'({
+			label: main_label,
+			allowDetach: 'yes',
+			compile: 'yes',
+			branches: SkeletonFigures
+		})).
+--
+reset:-
+	con ? set_color('Red'),
+	con ? writeln("RESET"),
+	con ? set_color('default'),
+	thermal_data ? retract_all.
+--
+alarm(_):-!.
+alarm(_,'register_oneself',_):-!.
+alarm(_,'unregister_oneself',_):-!.
+alarm(_,'new_frame',_,_):-!.
+-----------------------------------------------------------------------
+create_list_of_nodes(Nodes):-
+	Bounds== 'BoundingSphere'({radius:10.0}),
+	create_main_group(MainGroup),
+	Nodes == [
+		MainGroup,
+		'OrbitBehavior'({
+			rotationCenter: p(0.0,0.0,-2.1),
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			}),
+		'AmbientLight'({
+			lightOn: 'yes',
+			color: 'White',
+			influencingBounds: Bounds
+			})
+		].
+--
+create_main_group(MainGroup):-
+	MainGroup== 'TransformGroup'({
+		allowChildrenRead: 'yes',
+		allowChildrenWrite: 'yes',
+		branches: [
+			'BranchGroup'({
+				label: main_label,
+				allowDetach: 'yes',
+				compile: 'yes',
+				branches: []
+				})
+			]
+		}).
+-----------------------------------------------------------------------
+form_skeletons([Skeleton|Rest1],Buffer2D) = [Figure|Rest2] :-
+	Figure== ?form_skeleton(Skeleton,Buffer2D),!,
+	Rest2== ?form_skeletons(Rest1,Buffer2D).
+form_skeletons([_|Rest1],Buffer2D) = Rest2 :-!,
+	Rest2== ?form_skeletons(Rest1,Buffer2D).
+form_skeletons(_,_) = [].
+-----------------------------------------------------------------------
+form_skeleton(Skeleton,Buffer2D) = Figure :-
+	Skeleton == {
+		head: Head,
+		spine: Spine,
+		left_arm: LeftArm,
+		right_arm: RightArm,
+		left_leg: LeftLeg,
+		right_leg: RightLeg
+		|_},!,
+	HeadSpine== ?form_spine(Head,Spine,Buffer2D),
+	SpineLeftArm== ?form_arm(Spine,LeftArm,Buffer2D,"Left:"),
+	SpineRightArm== ?form_arm(Spine,RightArm,Buffer2D,"Right:"),
+	SpineLeftLeg== ?form_leg(Spine,LeftLeg,Buffer2D,"Left:"),
+	SpineRightLeg== ?form_leg(Spine,RightLeg,Buffer2D,"Right:"),
+	Figure== 'Group'({
+		branches: [
+			HeadSpine,
+			SpineLeftArm,
+			SpineRightArm,
+			SpineLeftLeg,
+			SpineRightLeg
+		]
+	}).
+--
+form_spine(Head,Spine,Buffer2D) = Figure :-
+	Spine == {
+		neck: Neck,
+		shoulder: Shoulder,
+		mid: Mid,
+		base: Base
+		|_},!,
+	HeadNeck==
+		?form_link(Head,Neck,Buffer2D,"Head,Neck"),
+	NeckShoulder==
+		?form_link(Neck,Shoulder,Buffer2D,"Neck,Shoulder"),
+	ShoulderMid==
+		?form_link(Shoulder,Mid,Buffer2D,"Shoulder,Mid"),
+	MidBase==
+		?form_link(Mid,Base,Buffer2D,"Mid,Base"),
+	Joint1== ?form_head(Head,Buffer2D),
+	Joint2== ?form_joint(Neck,Buffer2D,"Neck"),
+	Joint3== ?form_joint(Shoulder,Buffer2D,"Shoulder"),
+	Joint4== ?form_joint(Mid,Buffer2D,"Mid"),
+	Joint5== ?form_joint(Base,Buffer2D,"Base"),
+	Figure== 'Group'({
+		branches: [
+			HeadNeck,
+			NeckShoulder,
+			ShoulderMid,
+			MidBase,
+			Joint1,
+			Joint2,
+			Joint3,
+			Joint4,
+			Joint5
+		]
+	}).
+--
+form_arm(Spine,Arm,Buffer2D,Side) = Figure:-
+	Spine == {
+		-- neck: Neck,
+		shoulder: SpineShoulder
+		|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	SpineShoulderArmShoulder==
+		?form_link(
+			SpineShoulder,ArmShoulder,Buffer2D,
+			Side+"SpineShoulder,ArmShoulder"),
+	ArmShoulderElbow==
+		?form_link(
+			ArmShoulder,Elbow,Buffer2D,
+			Side+"ArmShoulder,Elbow"),
+	ElbowWrist==
+		?form_link(
+			Elbow,Wrist,Buffer2D,
+			Side+"Elbow,Wrist"),
+	WristHand==
+		?form_link(
+			Wrist,Hand,Buffer2D,
+			Side+"Elbow,Wrist"),
+	WristHandRest== ?form_hand(Wrist,Hand,Rest,Buffer2D,Side),
+	Joint1== ?form_joint(
+			ArmShoulder,Buffer2D,
+			Side+"ArmShoulder"),
+	Joint2== ?form_joint(
+			Elbow,Buffer2D,
+			Side+"Elbow"),
+	Joint3== ?form_joint(
+			Wrist,Buffer2D,
+			Side+"Wrist"),
+	Figure== 'Group'({
+		branches: [
+			SpineShoulderArmShoulder,
+			ArmShoulderElbow,
+			ElbowWrist,
+			WristHand,
+			WristHandRest,
+			Joint1,
+			Joint2,
+			Joint3
+		]
+	}).
+form_arm(Spine,Arm,Buffer2D,Side) = Figure :-
+	Spine == {
+		neck: Neck
+		|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	NeckArmShoulder==
+		?form_link(
+			Neck,ArmShoulder,Buffer2D,
+			Side+"Neck,ArmShoulder"),
+	ArmShoulderElbow==
+		?form_link(
+			ArmShoulder,Elbow,Buffer2D,
+			Side+"ArmShoulder,Elbow"),
+	ElbowWrist==
+		?form_link(
+			Elbow,Wrist,Buffer2D,
+			Side+"ArmShoulder,Elbow"),
+	WristHand==
+		?form_link(
+			Wrist,Hand,Buffer2D,
+			Side+"Wrist,Hand"),
+	Joint1== ?form_joint(
+			ArmShoulder,Buffer2D,
+			Side+"ArmShoulder"),
+	Joint2== ?form_joint(
+			Elbow,Buffer2D,
+			Side+"Elbow"),
+	Joint3== ?form_joint(Wrist,Buffer2D,
+			Side+"Wrist"),
+	WristHandRest== ?form_hand(Wrist,Hand,Rest,Buffer2D,Side),
+	Figure== 'Group'({
+		branches: [
+			NeckArmShoulder,
+			ArmShoulderElbow,
+			ElbowWrist,
+			WristHand,
+			WristHandRest,
+			Joint1,
+			Joint2,
+			Joint3
+		]
+	}).
+--
+form_hand(Wrist,Hand,Rest,Buffer2D,Side) = Figure :-
+	Rest == {
+		tip: Tip,
+		thumb: Thumb
+		|_},!,
+	WristThum== ?form_link(
+		Wrist,Thumb,Buffer2D,
+		Side+"Wrist,Thumb"),
+	HandTip== ?form_link(
+		Hand,Tip,Buffer2D,
+		Side+"Hand,Tip"),
+	Figure== 'Group'({
+		branches: [
+			WristThum,
+			HandTip
+		]
+	}).
+--
+form_leg(Spine,Leg,Buffer2D,Side) = Figure :-
+	Spine == {
+		base: Base
+		|_},
+	Leg == {
+		hip: Hip,
+		knee: Knee,
+		ankle: Ankle,
+		foot: Foot
+		|_},!,
+	BaseHip== ?form_link(
+		Base,Hip,Buffer2D,
+		Side+"Base,Hip"),
+	HipKnee== ?form_link(
+		Hip,Knee,Buffer2D,
+		Side+"Hip,Knee"),
+	KneeAnkle== ?form_link(
+		Knee,Ankle,Buffer2D,
+		Side+"Knee,Ankle"),
+	AnkleFoot== ?form_link(
+		Ankle,Foot,Buffer2D,
+		Side+"Ankle,Foot"),
+	Joint1== ?form_joint(
+		Hip,Buffer2D,
+		Side+"Hip"),
+	Joint2== ?form_joint(
+		Knee,Buffer2D,
+		Side+"Knee"),
+	Joint3== ?form_joint(
+		Ankle,Buffer2D,
+		Side+"Ankle"),
+	Figure== 'Group'({
+		branches: [
+			BaseHip,
+			HipKnee,
+			KneeAnkle,
+			AnkleFoot,
+			Joint1,
+			Joint2,
+			Joint3
+		]
+	}).
+--
+form_link(Joint1,Joint2,Buffer2D,TextLabel) = Figure :-
+	Joint1 == {
+		status:S1,
+		position:{point:p(J1X,J1Y,J1Z),
+		mapping1:M1|_}|_},
+	Joint2 == {
+		status:S2,
+		position:{point:p(J2X,J2Y,J2Z),
+		mapping1:M2|_}|_},!,
+	select_link_color(
+		S1,S2,M1,M2,Buffer2D,TextLabel,
+		AppearanceAttributes),
+	LengthVector== p(J1X-J2X,J2Y-J1Y,J1Z-J2Z),
+	Length== ?length(LengthVector),
+	Cylinder== 'Cylinder'({
+		radius: cylinder_radius,
+		height: Length,
+		generateNormals: 'yes',
+		xdivisions: 30,
+		ydivisions: 1,
+		appearance: 'Appearance'(AppearanceAttributes)
+		}),
+	BaseTG== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [0,Length/2,0]
+			}),
+		branches: [
+			Cylinder
+			]
+		}),
+	AxisAngle== ?calc_rotation(LengthVector),
+	Figure== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [-(J1X),J1Y,-(J1Z)],
+			rotation: AxisAngle
+			}),
+		branches: [
+			BaseTG
+			]
+		}).
+--
+form_joint(Joint,Buffer2D,TextLabel) = Figure :-
+	Joint == {
+		status:Status,
+		position:{point:p(X,Y,Z),mapping1:M|_}|_},!,
+	select_joint_color(Status,M,Buffer2D,TextLabel,MA),
+	Figure== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [-(X),Y,-(Z)]
+			}),
+		branches: [
+			'Sphere'({
+				radius: joint_radius,
+				generateNormals: 'yes',
+				divisions: 30,
+				appearance: 'Appearance'({
+					material: 'Material'(MA)
+					})
+				})
+			]
+		}).
+--
+form_head(Joint,Buffer2D) = Figure :-
+	Joint == {
+		status:Status,
+		position:{point:p(X,Y,Z),mapping1:M1|_}|_},!,
+	select_joint_color(Status,M1,Buffer2D,"Head",MA),
+	Figure== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [-(X),Y,-(Z)]
+			}),
+		branches: [
+			'Sphere'({
+				radius: head_radius,
+				generateNormals: 'yes',
+				divisions: 30,
+				appearance: 'Appearance'({
+					material: 'Material'(MA)
+					})
+				})
+			]
+		}).
+--
+select_link_color(
+		'TRACKED','TRACKED',
+		p(X1,Y1),p(X2,Y2),
+		Buffer2D,
+		TextLabel,
+		AppearanceAttributes):-!,
+	DeltaX== X2 - X1,
+	DeltaY== Y2 - Y1,
+	Distance== ?max(?abs(DeltaX),?abs(DeltaY)) + 1,
+	StepX== DeltaX / Distance,
+	StepY== DeltaY / Distance,
+	average_color(
+		1,Distance,
+		X1,Y1,
+		StepX,StepY,
+		Buffer2D,
+		0,0,0,
+		0,
+		R1,G1,B1),
+	thermal_data ? average(TextLabel,R1,G1,B1,R2,G2,B2),
+	Color== color3(R2/255,G2/255,B2/255),
+	AppearanceAttributes == {
+		material: 'Material'({
+			ambientColor: Color,
+			emissiveColor: Color
+			})
+		}.
+select_link_color(_,_,_,_,_,_,AppearanceAttributes):-
+	AppearanceAttributes == {
+		material: 'Material'({}),
+		transparencyAttributes: 'TransparencyAttributes'({
+			transparency: limb_transparency,
+			transparencyMode: 'FASTEST'
+			})
+		}.
+--
+average_color(	Position,Distance,
+		X,Y,
+		StepX,StepY,
+		Buffer2D,
+		R1,G1,B1,
+		N,
+		R2,G2,B2):-
+	Position <= Distance,
+	Buffer2D ? get_pixel(?round(X),?round(Y),Ri,Gi,Bi),!,
+	average_color(
+		Position+1,Distance,
+		X+StepX,Y+StepY,
+		StepX,StepY,
+		Buffer2D,R1+Ri,G1+Gi,B1+Bi,N+1,R2,G2,B2).
+average_color(_,_,_,_,_,_,_,R1,G1,B1,N,R2,G2,B2):-
+	N > 0,!,
+	R2== ?round(R1 / N),
+	G2== ?round(G1 / N),
+	B2== ?round(B1 / N).
+average_color(_,_,_,_,_,_,_,_,_,_,_,0,0,0).
+--
+select_joint_color('TRACKED',p(X,Y),Buffer2D,TextLabel,Attributes):-
+	Buffer2D ? get_pixel(X,Y,R1,G1,B1),!,
+	thermal_data ? average(TextLabel,R1,G1,B1,R2,G2,B2),
+	Color== color3(R2/255,G2/255,B2/255),
+	Attributes== {
+		ambientColor: Color,
+		emissiveColor: Color,
+		diffuseColor: Color,
+		specularColor: Color
+		}.
+select_joint_color('INFERRED',_,_,_,Attributes):-!,
+	Color == 'Black',
+	Attributes== {
+		ambientColor: Color,
+		emissiveColor: Color,
+		diffuseColor: Color,
+		specularColor: Color
+		}.
+select_joint_color(_,_,_,_,{}).
+-----------------------------------------------------------------------
+calc_rotation(LengthVector) = [X,Y,Z,AxisAngle] :-
+	NormalizedVector== ?normalize(LengthVector),
+	AxisVector== ?cross(up_vector,NormalizedVector),
+	AxisVector == p(X,Y,Z),!,
+	AxisAngle== ?angle(up_vector,LengthVector).
+calc_rotation(_) = [].
+--
+normalize(Vector) = ?scale(Vector,Norm) :-!,
+	Norm== 1.0 / ?length(Vector).
+normalize(_) = _ :-
+	break('CannotNormalize').
+--
+cross(p(X1,Y1,Z1),p(X2,Y2,Z2)) = p(X3,Y3,Z3) :-!,
+	X3== Y1*Z2 - Z1*Y2,
+	Y3== X2*Z1 - Z2*X1,
+	Z3== X1*Y2 - Y1*X2.
+cross(_,_) = _ :-
+	break('CannotCross').
+--
+angle(V1,V2) = V3 :-
+	VDot== ?dot(V1,V2) / (?length(V1)*?length(V2)),
+	V3== ?angle(VDot).
+--
+angle(VDot) = Angle :-
+	VDot < -1.0,!,
+	Angle== ?arccos(-1.0).
+angle(VDot) = Angle :-
+	VDot > 1.0,!,
+	Angle== ?arccos(1.0).
+angle(VDot) = Angle :-
+	Angle== ?arccos(VDot).
+--
+dot(p(X1,Y1,Z1),p(X2,Y2,Z2)) = X1*X2 + Y1*Y2 + Z1*Z2.
+--
+scale(p(X,Y,Z),N) = p(X*N,Y*N,Z*N).
+--
+length(p(X,Y,Z)) = Length :-!,
+	Length== ?sqrt(?power(X,2)+?power(Y,2)+?power(Z,2)).
+length(_) = 0.
+]
+-----------------------------------------------------------------------
+class 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	communicator;
+	graphic_window;
+	message_window;
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+action("play"):-!,
+	communicator ? set_period(1.0),
+	communicator ? activate.
+action("pause"):-!,
+	communicator ? unregister_oneself.
+]
+-----------------------------------------------------------------------
+class '3DDataSources' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------
+class 'CurrentDataSupplier' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------
+class 'ThermalData' (specialized 'HashMap'):
+[
+average(Label,R1,G1,B1,R4,G4,B4):-
+	Value== ?get(Label),!,
+	Value == value(N1,R2,G2,B2),
+	N2== N1 + 1,
+	R3== R1 + R2,
+	G3== G1 + G2,
+	B3== B1 + B2,
+	put(Label,value(N2,R3,G3,B3)),
+	R4== ?round(R3 / N2),
+	G4== ?round(G3 / N2),
+	B4== ?round(B3 / N2).
+average(Label,R,G,B,R,G,B):-
+	put(Label,value(1,R,G,B)).
+]
+-----------------------------------------------------------------------

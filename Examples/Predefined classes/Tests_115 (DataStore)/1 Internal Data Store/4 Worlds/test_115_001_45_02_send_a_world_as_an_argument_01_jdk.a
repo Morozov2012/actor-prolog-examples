@@ -1,0 +1,161 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute the receive_a_world_as_an_argument example in
+-- the first environment and this example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+MyDomainB		= ('TargetClassB').
+--
+MyMessageB		= ('TargetClassY').
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+store2		= ('DataStore',
+			name="MyDataStore.dat",
+			access_mode='reading');
+base2		= ('MyDatabaseB',
+			place=shared(store2,"MyTable"));
+--
+con		= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test03;
+--
+CLAUSES:
+--
+goal:-!,
+	test03.
+--
+test03:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store loading."),
+	con ? set_color('default'),
+	store2 ? begin_transaction('modifying'),!,
+	store2 ? load("File.dat"),
+	store2 ? end_transaction,
+	base2 ? test_database_find,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test03:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyDatabaseB' (specialized 'MyDatabase'):
+[
+DOMAINS:
+--
+Target		= MyDomainB.
+--
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+feedback_handler	= ('TargetClassY');
+--
+con			= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test_database_find;
+inspect_database;
+communicate_with_the_world(Target)	- (i);
+--
+CLAUSES:
+--
+test_database_find:-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest database inspection."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	inspect_database,
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test_database_find:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+inspect_database:-
+	con ? writeln("\tDatabase content:"),
+	con ? set_color('Blue'),
+	find(Item),
+		con ? writeln("\t\t",Item),
+		communicate_with_the_world(Item),
+		fail.
+inspect_database:-
+	con ? set_color('default'),
+	con ? writeln("\tNo more items.").
+--
+communicate_with_the_world(W):-
+	[W] << message(feedback_handler).
+]
+-----------------------------------------------------------------------
+class 'TargetClassB' (specialized 'Console'):
+[
+PREDICATES:
+--
+imperative:
+--
+message(MyMessageB)		- (i);
+--
+MODEL:
+--
+?message(Message).
+--
+CLAUSES:
+--
+message(Text):-
+	writeln("TargetClassB: I have got a message: ",Text).
+--
+goal:-!,
+	writeln("Hello from TargetClassB!").
+]
+-----------------------------------------------------------------------
+class 'TargetClassY' (specialized 'Console'):
+[
+PREDICATES:
+--
+imperative:
+--
+feedback_message(STRING)	- (i);
+--
+MODEL:
+--
+?feedback_message(Message).
+--
+CLAUSES:
+--
+feedback_message(Text):-
+	writeln("TargetClassY: I have got a message: ",Text).
+--
+goal:-!,
+	writeln("Hello from TargetClassY!").
+]
+-----------------------------------------------------------------------

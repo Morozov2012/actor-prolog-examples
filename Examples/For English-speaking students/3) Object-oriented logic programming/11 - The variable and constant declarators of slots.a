@@ -1,0 +1,46 @@
+-----------------------------------------------------
+--                                                 --
+--              Actor Prolog lessons               --
+--           (c) 2015 Alexei A. Morozov            --
+--                                                 --
+-- The topic: Object-oriented logic programming.   --
+-- The variable and constant declarators of slots. --
+--                                                 --
+-- Questions: What are classes and class instances --
+-- (the worlds)? What are slots of the class       --
+-- instances? What is the destination of the       --
+-- variable and constant declarators of the slots? --
+-- What is overriding of the slot declarators?     --
+--                                                 --
+-----------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+N	= INTEGER.
+
+class 'Main' (specialized 'DemoConsole'):
+
+-- constant:
+variable:
+
+a	: N;
+
+[
+PREDICATES:
+
+imperative:
+
+p;
+
+CLAUSES:
+
+goal:-
+	a == 100,
+	p.
+
+p:-
+	writeln(a).
+
+]

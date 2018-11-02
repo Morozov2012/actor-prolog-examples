@@ -1,0 +1,126 @@
+KIT ;
+  IDL VERSION 1.2.8 ;
+  TITLE 'SADT example 1. Direct messages. (1 sender, 1 receiver)' ;
+  AUTHOR 'Alexei A. Morozov' ;
+  CREATION DATE 19/11/1998 ;
+  PROJECT NAME 'Direct 1' ;
+
+  MODEL 'Direct 1'
+    {LWI
+    F 0 -13 0 0 0 400
+      0 0 0 0 3 2 1 34
+      100 'Arial'
+    F 1 -11 0 0 0 400
+      0 0 0 0 3 2 1 49
+      80 'Courier New'
+    F 2 -29 0 0 0 700
+      0 0 0 204 3 2 1 34
+      220 'Arial'
+    F 3 -21 0 0 0 700
+      0 0 0 204 3 2 1 34
+      160 'Arial'
+    F 4 -16 0 0 0 400
+      0 0 0 0 3 2 1 34
+      120 'Arial'
+    F 5 -19 0 0 0 700
+      0 0 0 204 3 2 1 34
+      140 'Arial'
+    F 6 -24 0 0 0 400
+      0 0 0 0 3 2 1 34
+      180 'Arial'
+    F 7 -13 0 900 900 400
+      0 0 0 0 3 2 1 34
+      100 'Arial'
+    F 8 -27 0 0 0 700
+      0 0 0 204 3 2 1 34
+      200 'Arial'
+    F 9 -16 0 0 0 400
+      0 0 0 204 3 2 1 34
+      120 'Arial'
+    D 2 3 8 4 5 0 0 9 1
+    G 0 6
+    T 'PUBLICATION'
+    R 60
+    M 0  }
+ ;
+    AUTHOR 'Alexei A. Morozov' ;
+    PROJECT NAME 'Direct 1' ;
+
+    DIAGRAM GRAPHIC A-0 ;
+      AUTHOR 'Alexei A. Morozov' ;
+      CREATION DATE 19/11/1998 ;
+      REVISION DATE 13/8/2002 ;
+      TITLE 'SADT example 1. Direct messages. (1 sender, 1 receiver)' ;
+      STATUS PUBLICATION ;
+
+      BOX 0 ;
+        NAME '{LWI I 2 255 255 255}SADT example 1.<CR>Direct messages.<CR>(1 s
+ender, 1 receiver)' ;
+        BOX COORDINATES (0,29944;0,79336) (0,74011;0,16605) ;
+        DETAIL REFERENCE N A0 ;
+      ENDBOX ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A0 ;
+      AUTHOR 'Alexei A. Morozov' ;
+      CREATION DATE 19/11/1998 ;
+      REVISION DATE 12/8/2002 ;
+      TITLE 'SADT example 1. Direct messages. (1 sender, 1 receiver)' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Sender' ;
+        BOX COORDINATES (0,18644;0,70111) (0,38983;0,36900)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Receiver' ;
+        BOX COORDINATES (0,62712;0,70111) (0,83051;0,36900)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,38983;0,55351) (0,62712;0,55351) ;
+        LABEL '{LWI I 4 7 2 }Direct messages' ;
+        LABEL COORDINATES (0,44859;0,25830) ;
+        SQUIGGLE COORDINATES (0,51638;0,26568) (0,50282;0,55351) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GLOSSARY A0G {LWI A 
+      TERM 'SADT example 1. Direct messages. (1 sender, 1 receiver)'
+      ''
+      A 'Alexei A. Morozov'
+      S 'PUBLICATION'
+      C 7 1 7
+      F 1.000000
+      TERM 'Sender'
+      ''
+      N 'This process sends direct messages.<CR>Use left mouse click to open co
+ntrol<CR>dialog of the process. Press the<CR>"Send message" button of the dial
+og.<CR>'
+      S 'PUBLICATION'
+      C 7 1 7
+      F 1.000000
+      TERM 'Receiver'
+      ''
+      N 'This process receives direct messages<CR>and writes them in a text win
+dow.<CR>Left mouse click shows<CR>the text window of the process.<CR>'
+      S 'PUBLICATION'
+      C 7 1 7
+      F 1.000000
+     ENDGLOSS } ;
+     GLOSSARY ;
+      TERM 'Direct messages'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+     ENDGLOSS ;
+    ENDDIAGRAM ;
+  ENDMODEL ;
+
+ENDKIT ;

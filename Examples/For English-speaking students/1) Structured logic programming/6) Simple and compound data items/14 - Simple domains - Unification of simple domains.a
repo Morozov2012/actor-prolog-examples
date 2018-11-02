@@ -1,0 +1,52 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- Unification.                          --
+--                                       --
+-- Questions: Why cannot the 1 integer   --
+-- number be unified with the 1.0 real   --
+-- number? Can data items of different   --
+-- simple domains be unified             --
+-- successfully?                         --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+MyDomain = INTEGER; REAL; STRING; SYMBOL.
+
+PREDICATES:
+
+compare_terms(MyDomain,MyDomain) - (i,i);
+
+CLAUSES:
+
+goal:-
+	compare_terms(1,1),
+	compare_terms(1,1.0),
+	compare_terms(1.0,1.0),
+	compare_terms("Hi!","H\10#105#!"),
+	compare_terms("Hi!",'Hi!'),
+	compare_terms('H\10#105#!','Hi!'),
+	compare_terms(1,"1"),
+	compare_terms('1.0',1.0),
+	compare_terms(1,'1'),
+	compare_terms("1.0",1.0).
+
+compare_terms(X,Y):-
+	X == Y,!,
+	set_color('DkGreen'),
+	write(	"These terms were ",
+		"unified successfully: "),
+	set_color('default'),
+	writeln([X,Y]).
+compare_terms(X,Y):-
+	set_color('Red'),
+	write(	"I cannot unify ",
+		"these terms: "),
+	set_color('default'),
+	writeln([X,Y]).

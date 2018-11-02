@@ -1,0 +1,11 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2011, IRE RAS, Alexei A. Morozov. --
+-------------------------------------------
+
+class 'Main' (specialized 'DemoConsole'):
+[
+goal:-
+	writeln("Hello World!"),
+	writeln("Hello World!").
+]

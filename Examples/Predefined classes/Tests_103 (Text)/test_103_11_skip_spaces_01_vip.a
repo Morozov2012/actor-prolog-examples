@@ -1,0 +1,194 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test11;
+test12;
+test13;
+test14;
+test15;
+test21;
+test22;
+test23;
+test24;
+test25;
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test11,
+	test12,
+	test13,
+	test14,
+	test15,
+	test21,
+	test22,
+	test23,
+	test24,
+	test25.
+--
+test11:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.1"),
+	Text== "10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Rest== ?skip_spaces(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test11.
+--
+test12:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.2"),
+	Text== "\b\t\n\v\f\r 10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Rest== ?skip_spaces(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test12.
+--
+test13:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.3"),
+	Text== " \1\2\3 10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Rest== ?skip_spaces(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test13.
+--
+test14:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.4"),
+	Text== " /* Comment */ 10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Rest== ?skip_spaces(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test14.
+--
+test15:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.5"),
+	Text== "",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Rest== ?skip_spaces(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test15.
+--
+test21:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.1"),
+	Text== "10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Rest== ?skip_spaces(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test21.
+--
+test22:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.2"),
+	Text== "\b\t\n\v\f\r 10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Rest== ?skip_spaces(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test22.
+--
+test23:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.3"),
+	Text== " \1\2\3 10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Rest== ?skip_spaces(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test23.
+--
+test24:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.4"),
+	Text== " /* Comment */ 10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Rest== ?skip_spaces(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test24.
+--
+test25:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.5"),
+	Text== "",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Rest== ?skip_spaces(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test25.
+]

@@ -1,0 +1,225 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+-- Setting the channel's position is not recommended when
+-- connected to a file, that is opened with the 'appending' option.
+-- When opened for append, the position is first advanced to
+-- the end before writing.
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3(STRING);
+test4;
+test5;
+test6;
+test7;
+test8;
+test9;
+test10;
+test11;
+test12;
+test13;
+test14;
+
+class 'Main':
+--
+internal:
+--
+	file1	= ('Test',
+			name= "test.asc");
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'File'):
+--
+constant:
+--
+	name	: FileName;
+--
+	random_access	= 'on';
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-
+	con ? writeln("=== File: ",name," ==="),
+	fail.
+goal:-
+	test5,
+	test14,
+	test6,
+	test1,		-- ?open('appending')
+	test3("34"),
+	test7,
+	test9,
+	test12,
+	test3("5"),
+	test7,
+	test9,
+	test10,
+	test3("67"),
+	test7,
+	test9,
+	test13,
+	test3("8"),
+	test7,
+	test9,
+	test10,
+	test11,
+	test7,
+	test9,
+	test3("9"),
+	test7,
+	test9,
+	test8,
+	test4,
+	test14,
+	fail.
+goal:-
+	test5,
+	test14,
+	test6,
+	test2,		-- ?open(name,'appending')
+	test3("34"),
+	test7,
+	test9,
+	test12,
+	test3("5"),
+	test7,
+	test9,
+	test10,
+	test3("67"),
+	test7,
+	test9,
+	test13,
+	test3("8"),
+	test7,
+	test9,
+	test10,
+	test11,
+	test7,
+	test9,
+	test3("9"),
+	test7,
+	test9,
+	test8,
+	test4,
+	test14,
+	fail.
+goal:-!.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln(
+		"\tI will try to open the file for the appending."),
+	?open('appending'),
+	con ? writeln("\tDone!").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln(
+		"\tI will try to open the file for the appending."),
+	?open(name,'appending'),
+	con ? writeln("\tDone!").
+--
+test3(Text):-
+	con ? writeln("Test 3"),
+	con ? writeln("\tI will try to write bytes: >>>",Text,"<<<"),
+	write(Text),
+	con ? writeln("\tDone.").
+--
+test4:-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to close the file."),
+	?close(),
+	con ? writeln("\tThe file was closed successfully.").
+--
+test5:-
+	con ? writeln("Test 5"),
+	con ? writeln("\tI will try to create the file."),
+	?set_string("012"),
+	con ? writeln("\tDone.").
+--
+test6:-
+	con ? writeln("Test 6"),
+	con ? writeln("\tDoes the file exist?"),
+	?does_exist(),!,
+	con ? writeln("\tYes, it does!").
+test6:-
+	con ? writeln("\tNo, it doesn't.").
+--
+test7:-
+	con ? writeln("Test 7"),
+	con ? writeln("\tIs this the end of the file?"),
+	?eof(),!,
+	con ? writeln("\tYes, it is!").
+test7:-
+	con ? writeln("\tNo, it is not.").
+--
+test8:-
+	con ? writeln("Test 8"),
+	con ? writeln("\tI will try to flush the file."),
+	?flush(),
+	con ? writeln("\tThe file was flushed successfully.").
+--
+test9:-
+	con ? writeln("Test 9"),
+	con ? writeln("\tI will try to get the file position."),
+	?get_position(),
+	P== ?get_position(),
+	con ? writeln("\tPosition = ",P).
+--
+test10:-
+	con ? writeln("Test 10"),
+	con ? writeln("\tI will try to set the file position"),
+	con ? writeln("\trelative to the start of the file."),
+	P== 5,
+	?set_position(P,'start'),
+	con ? writeln("\tPosition = ",P).
+--
+test11:-
+	con ? writeln("Test 11"),
+	con ? writeln("\tI will try to set the file position"),
+	con ? writeln("\trelative to the current position"),
+	con ? writeln("\tof the file."),
+	P== 2,
+	?set_position(P,'relative'),
+	con ? writeln("\tPosition = ",P).
+--
+test12:-
+	con ? writeln("Test 12"),
+	con ? writeln("\tI will try to set the file position"),
+	con ? writeln("\trelative to the end of the file."),
+	P== 3,
+	?set_position(P,'end'),
+	con ? writeln("\tPosition = ",P).
+--
+test13:-
+	con ? writeln("Test 13"),
+	con ? writeln("\tI will try to set the file position"),
+	con ? writeln("\tin the default mode."),
+	P== 9,
+	?set_position(P),
+	con ? writeln("\tPosition = ",P).
+--
+test14:-
+	con ? writeln("Test 14"),
+	con ? writeln("\tI will try to read the file."),
+	Text== ?get_string(),
+	con ? writeln("\t>>>",Text,"<<<").
+]

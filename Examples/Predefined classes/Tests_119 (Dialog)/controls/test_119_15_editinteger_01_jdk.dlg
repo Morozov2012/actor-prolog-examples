@@ -1,0 +1,74 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',14)
+
+dialog 'MyDialog'("EditInteger Demo",default,default,default,centered,centered,default)
+vbox(center)
+	groupbox("EditInteger")
+		editinteger(output_slot_1,10,1)
+	end_of_groupbox
+	grid
+		row
+			column
+				button("action11","Put 1000")
+			end_of_column
+			column
+				button("action12","Put ?pi()")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action21","Put \"1000\"")
+			end_of_column
+			column
+				button("action22","Put \"2.5\"")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action31","Put \"001000\"")
+			end_of_column
+			column
+				button("action32","Put \"2.500\"")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action41","Put text")
+			end_of_column
+			column
+				button("action42","Put long text")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action51","Put user-defined integer")
+			end_of_column
+			column
+				button("action52","Put user-defined text")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action61","Put 'unknown'")
+			end_of_column
+			column
+				button("action62","Put \"X\"")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action71","Put #")
+			end_of_column
+			column
+				button("action72","Put _")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action8","Get value")
+			end_of_column
+		end_of_row
+	end_of_grid
+end_of_vbox
+end_of_dialog

@@ -1,0 +1,101 @@
+---------------------------------------------------------------------
+--                                                                 --
+--                      Actor Prolog lessons                       --
+--                   (c) 2015 Alexei A. Morozov                    --
+--                                                                 --
+-- The topic: Basics of the structured logic programming.          --
+-- Combination of basic ideas.                                     --
+--                                                                 --
+-- The task: check whether a graph is a forest.                    --
+--                                                                 --
+-- Basic ideas to be used:                                         --
+-- 1) Input assembling a list.                                     --
+-- 2) Checking whether a term is an element of a list.             --
+-- 3) Increasing a counter.                                        --
+-- 4) An output argument.                                          --
+-- 5) Implementing negation using a cut.                           --
+--                                                                 --
+---------------------------------------------------------------------
+
+DOMAINS:
+
+Vertex		= INTEGER.
+Dart		= dart(Vertex,Vertex).
+Graph		= Dart*.
+
+Path		= DartNumber*.
+DartNumber	= INTEGER.
+
+PREDICATES:
+
+determ:
+
+contains_loops(Graph)			- (i);
+
+nondeterm:
+
+arbitrary_dart(
+	Graph,
+	Vertex,
+	Vertex,
+	DartNumber)		- (i,_,_,o);
+
+a_dart_belongs_to_the_graph(
+	Dart,
+	Graph,
+	DartNumber,
+	DartNumber)		- (o,i,i,o);
+
+is_a_circuit_in_the_graph(
+	Graph,
+	Vertex,
+	Vertex,
+	Path)			- (i,i,i,i);
+
+determ:
+
+is_not_an_element(DartNumber,Path)	- (i,i);
+element(DartNumber,Path)		- (i,i);
+
+CLAUSES:
+
+goal:-
+	-- G== [dart(1,2),dart(3,4),dart(2,3),dart(3,1),dart(4,1)],
+	-- G== [dart(1,2),dart(1,2)],
+	-- G== [dart(1,1)],
+	G== [dart(1,2),dart(3,4),dart(2,3),dart(3,10),dart(14,11)],
+	contains_loops(G),
+	writeln("The graph is not a forest!").
+goal:-
+	writeln("The graph is a forest!").
+
+contains_loops(Graph):-
+	arbitrary_dart(Graph,Vertex1,Vertex2,DartNumber),
+	is_a_circuit_in_the_graph(
+		Graph,Vertex1,Vertex2,[DartNumber]),!.
+
+arbitrary_dart(Graph,Vertex1,Vertex2,DartNumber):-
+	a_dart_belongs_to_the_graph(Dart,Graph,1,DartNumber),
+	Dart == dart(Vertex1,Vertex2).
+arbitrary_dart(Graph,Vertex1,Vertex2,DartNumber):-
+	a_dart_belongs_to_the_graph(Dart,Graph,1,DartNumber),
+	Dart == dart(Vertex2,Vertex1).
+
+a_dart_belongs_to_the_graph(Dart,[Dart|_],DartNumber,DartNumber).
+a_dart_belongs_to_the_graph(Dart,[_|Rest],N1,N2):-
+	a_dart_belongs_to_the_graph(Dart,Rest,N1+1,N2).
+
+is_a_circuit_in_the_graph(_,B,B,_).
+is_a_circuit_in_the_graph(Graph,A,C,Path):-
+	arbitrary_dart(Graph,A,B,DartNumber),
+	is_not_an_element(DartNumber,Path),
+	is_a_circuit_in_the_graph(Graph,B,C,[DartNumber|Path]).
+
+is_not_an_element(DartNumber,Path):-
+	element(DartNumber,Path),!,
+	fail.
+is_not_an_element(_,_).
+
+element(DartNumber,[DartNumber|_]):-!.
+element(DartNumber,[_|Rest]):-
+	element(DartNumber,Rest).

@@ -1,0 +1,171 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+IMPERATIVES:
+--
+change_font;
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+w11	= ('MyWindow',
+		new_font_name= 'system',
+		x= 0,
+		y= 0);
+w12	= ('MyWindow',
+		new_font_name= 'fixed',
+		x= 1,
+		y= 0);
+w13	= ('MyWindow',
+		new_font_name= 'times',
+		x= 2,
+		y= 0);
+w14	= ('MyWindow',
+		new_font_name= 'helvetica',
+		x= 3,
+		y= 0);
+w15	= ('MyWindow',
+		new_font_name= 'default',
+		x= 4,
+		y= 0);
+--
+w21	= ('MyWindow',
+		new_font_name= 'system',
+		font_style= 'bold',
+		x= 0,
+		y= 1);
+w22	= ('MyWindow',
+		new_font_name= 'fixed',
+		font_style= 'bold',
+		x= 1,
+		y= 1);
+w23	= ('MyWindow',
+		new_font_name= 'times',
+		font_style= 'bold',
+		x= 2,
+		y= 1);
+w24	= ('MyWindow',
+		new_font_name= 'helvetica',
+		font_style= 'bold',
+		x= 3,
+		y= 1);
+w25	= ('MyWindow',
+		new_font_name= 'default',
+		font_style= 'bold',
+		x= 4,
+		y= 1);
+--
+w31	= ('MyWindow',
+		new_font_name= 'system',
+		font_style= 'italic',
+		x= 0,
+		y= 2);
+w32	= ('MyWindow',
+		new_font_name= 'fixed',
+		font_style= 'italic',
+		x= 1,
+		y= 2);
+w33	= ('MyWindow',
+		new_font_name= 'times',
+		font_style= 'italic',
+		x= 2,
+		y= 2);
+w34	= ('MyWindow',
+		new_font_name= 'helvetica',
+		font_style= 'italic',
+		x= 3,
+		y= 2);
+w35	= ('MyWindow',
+		new_font_name= 'default',
+		font_style= 'italic',
+		x= 4,
+		y= 2);
+--
+w41	= ('MyWindow',
+		new_font_name= 'system',
+		font_style= 'underlined',
+		x= 0,
+		y= 3);
+w42	= ('MyWindow',
+		new_font_name= 'fixed',
+		font_style= 'underlined',
+		x= 1,
+		y= 3);
+w43	= ('MyWindow',
+		new_font_name= 'times',
+		font_style= 'underlined',
+		x= 2,
+		y= 3);
+w44	= ('MyWindow',
+		new_font_name= 'helvetica',
+		font_style= 'underlined',
+		x= 3,
+		y= 3);
+w45	= ('MyWindow',
+		new_font_name= 'default',
+		font_style= 'underlined',
+		x= 4,
+		y= 3);
+--
+w51	= ('MyWindow',
+		new_font_name= 'system',
+		font_style= ['bold','italic','underlined'],
+		x= 0,
+		y= 4);
+w52	= ('MyWindow',
+		new_font_name= 'fixed',
+		font_style= ['bold','italic','underlined'],
+		x= 1,
+		y= 4);
+w53	= ('MyWindow',
+		new_font_name= 'times',
+		font_style= ['bold','italic','underlined'],
+		x= 2,
+		y= 4);
+w54	= ('MyWindow',
+		new_font_name= 'helvetica',
+		font_style= ['bold','italic','underlined'],
+		x= 3,
+		y= 4);
+w55	= ('MyWindow',
+		new_font_name= 'default',
+		font_style= ['bold','italic','underlined'],
+		x= 4,
+		y= 4);
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	new_font_name		: FontName;
+--
+	font_size		= 12;
+	font_style;
+--
+	width			= 1;
+	height			= 1;
+	line_number		= 'window_height';
+--
+[
+goal:-!,
+	set_title(?format("%s",new_font_name)),
+	-- change_font,
+	writeln("++++++++"),
+	writeln("+ Test +"),
+	writeln("++++++++"),
+	change_font.
+--
+change_font:-
+	writeln(font_style),
+	set_font_name(new_font_name).
+]
+-----------------------------------------------------------------------

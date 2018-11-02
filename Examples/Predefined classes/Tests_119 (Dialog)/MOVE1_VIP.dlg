@@ -1,0 +1,28 @@
+mesh(80,25)
+failure_color('Fuchsia','default')
+
+dialog 'DemoPanel' ("Demo Panel",default,default,default,30,12,'Gold')
+vbox(center)
+	statictext("An example of dialog window")
+	hbox
+		vbox(center)
+			hbox
+				"X= "
+				text(x,10,1,"...")
+			end_of_hbox
+			hbox
+				"Y= "
+				text(y,10,1,"...")
+			end_of_hbox
+		end_of_vbox
+	end_of_hbox
+	hbox(center)
+		button("action","&Action")
+		scaling(1.2,1.3)
+			button(verify,"&Verify")
+			button(reset,"&Reset")
+		end_of_scaling
+		ok(close,"&Close")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

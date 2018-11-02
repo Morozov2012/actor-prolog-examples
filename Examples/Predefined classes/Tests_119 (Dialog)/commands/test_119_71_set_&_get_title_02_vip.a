@@ -1,0 +1,32 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	dialog	= ('DemoPanel',
+			x= 'centered',
+			y= 'centered');
+--
+	text	= ('Text');
+--
+[
+goal:-!,
+	dialog ? show,
+	set_period(0.5,0.0),
+	activate.
+--
+tick:-!,
+	time(Hours,Minutes,Seconds,Hundredths),
+	T== text?format(
+		"%d:%d:%d.%d",
+		Hours,Minutes,Seconds,Hundredths),
+	dialog ? set_title(T).
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+[
+]
+-----------------------------------------------------------------------

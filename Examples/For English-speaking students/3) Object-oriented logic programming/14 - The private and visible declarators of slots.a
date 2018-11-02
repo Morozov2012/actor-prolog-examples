@@ -1,0 +1,53 @@
+-----------------------------------------------------
+--                                                 --
+--              Actor Prolog lessons               --
+--           (c) 2015 Alexei A. Morozov            --
+--                                                 --
+-- The topic: Object-oriented logic programming.   --
+-- The private and visible declarators of slots.   --
+--                                                 --
+-- Questions: What are classes and class instances --
+-- (the worlds)? What are slots of the class       --
+-- instances? What is the destination of the       --
+-- private and visible declarators of the slots?   --
+-- What slot visibility declarators are used by    --
+-- default if there are no slot visibility         --
+-- declarators in a class? What slot visibility    --
+-- declarators are used by default if a visibility --
+-- declarator does exist in the class?             --
+--                                                 --
+-----------------------------------------------------
+
+project: (('Main',
+		slot_a=100))
+
+-----------------------------------------------------
+
+interface 'Main' (specialized 'DemoConsole'):
+--
+-- visible:
+-- private:
+--
+slot_a		: INTEGER;
+--
+private:
+--
+slot_b		: REAL;
+--
+[
+]
+
+-----------------------------------------------------
+
+class 'Main' (specialized 'DemoConsole'):
+--
+slot_a		= 1;
+slot_b		= 3.14;
+--
+[
+goal:-
+	writeln(slot_a),
+	writeln(slot_b).
+]
+
+-----------------------------------------------------

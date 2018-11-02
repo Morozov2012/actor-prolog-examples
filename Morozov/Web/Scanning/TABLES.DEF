@@ -1,0 +1,153 @@
+package "Morozov/Web/Scanning/Tables":
+---------------------------------------------------------------------
+--           The "SCANNING/TABLES" Actor Prolog package.           --
+--           (c) 2002-2005, IRE RAS, Alexei A. Morozov.            --
+---------------------------------------------------------------------
+import "Morozov/Web/Data/Keywords";
+import 'LogicProgrammingSites' from "Morozov/Web/Data/Prolog";
+import "Morozov/Web/Scanning/Analyser";
+import 'WebResourceRegistry' from "Morozov/Web/Scanning/Counter";
+import 'WebText' from "Morozov/Web/Scanning/Counter";
+---------------------------------------------------------------------
+--
+DOMAINS:
+--
+mixed:
+--
+TemporaryAttributesTable	= {list_of_keywords:KeywordList};
+				  RecentAttributes.
+--
+ground:
+--
+Report				= ('Report'); #.
+--
+---------------------------------------------------------------------
+interface 'AddressTable' (specialized 'Alpha'):
+--
+variable:
+--
+	keywords		: KeywordList;
+--
+internal:
+--
+	report_1		: 'Report';
+	report_2		: 'Report';
+--
+	list_of_target_sites	: 'LogicProgrammingSites';
+	temporary_table		: 'WebResourceRegistry';
+--
+	file_of_results		: 'TableOfResults';
+--
+	env			: 'Timer';
+--
+--	con			: 'Console';
+--
+constant:
+--
+	minimal_check_period	: INTEGER;	-- Days
+--
+[
+PREDICATES:
+--
+determ:
+--
+temporary_table_is_not_empty;
+--
+imperative:
+--
+delete_temporary_table_if_need;
+create_temporary_table;
+--
+report_sites_to_be_analyzed;
+--
+determ:
+--
+get_some_file= WebResourceAttributes;
+resource_was_not_inspected(WebResourceAttributes)	- (i);
+resource_was_inspected(WebResourceDate,Date)		- (i,i);
+--
+imperative:
+--
+reshuffle_file(WebResourceAttributes)			- (i);
+--
+save_results(WebResourceRecord)				- (i);
+--
+nondeterm:
+--
+find(WebResourceAttributes)				- (_);
+--
+imperative:
+--
+-- '-'(WebResourceDate,INTEGER) = Date			- (i,i);
+'-'(WebResourceDate,Date) = INTEGER			- (i,i);
+'-'(Date,WebResourceDate) = INTEGER			- (i,i);
+--
+determ:
+--
+'>'(WebResourceDate,Date)				- (i,i);
+--
+]
+---------------------------------------------------------------------
+interface 'TableOfResults' (specialized 'Database'):
+--
+constant:
+--
+	name			: STRING;
+	name_of_auxiliary_file	: FileName;
+--
+internal:
+--
+	file_test		: 'File';
+	auxiliary_output	: 'File';
+--
+constant:
+--
+	report			: Report;
+--
+internal:
+--
+	text_operations		: 'WebText';
+	env			: 'Timer';
+--
+	con			: 'Console';
+--
+[
+DOMAINS:
+--
+mixed:
+--
+Target		= TemporaryAttributesTable.
+--
+PREDICATES:
+--
+imperative:
+--
+update(	WebResourceAttributes,
+	WebResourceDate,
+	N,
+	Size,
+	N,
+	N,
+	N,
+	N,
+	N_List)			- (i,i,i,i,i,i,i,i,i);
+--
+save_results(KeywordList)				- (i);
+--
+update_list_of_keywords(KeywordList)			- (i);
+write_auxiliary_file(KeywordList)			- (i);
+--
+write_keywords(KeywordList)				- (i);
+write_name(Keyword)					- (i);
+write_character(STRING)					- (i);
+write_date(WebResourceDate)				- (i);
+write_NList(N_List)					- (i);
+--
+report_warning_if_need(WebResourceName,WebAddress,N)	- (i,i,i);
+--
+determ:
+--
+'<='(N,N)			- (i,i);
+--
+]
+---------------------------------------------------------------------

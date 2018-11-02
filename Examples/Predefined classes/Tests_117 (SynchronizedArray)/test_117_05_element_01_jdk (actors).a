@@ -1,0 +1,71 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+MyDomain	= STRING.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+link		= ('Link');
+sender		= ('Sender',link);
+receiver	= ('Receiver',link);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Timer'):
+--
+internal:
+--
+link;
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	delay(1).
+--
+tick:-
+	con ? writeln("Sender: I will send a message."),
+	link[100] == "Hello from the Sender class!",!.
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Console'):
+--
+internal:
+--
+link;
+--
+[
+IMPERATIVES:
+--
+write_value(MyDomain)	- (i);
+--
+CLAUSES:
+--
+goal:-
+	write_value(link[100]),!.
+--
+write_value(Value):-
+	writeln("Receiver: Value= ",Value).
+]
+-----------------------------------------------------------------------
+class 'Link' (specialized 'SynchronizedArray'):
+indices_range	= [[-10000,10000]];
+[
+DOMAINS:
+reference:
+Target	= MyDomain.
+PREDICATES:
+nondeterm:
+element(ArrayIndex*) = Target		- (_);
+]
+-----------------------------------------------------------------------

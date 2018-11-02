@@ -1,0 +1,63 @@
+package "Morozov/VRML/Vectors":
+-----------------------------------------------------------------------
+--                                                                   --
+--             The "VRML/VECTORS" Actor Prolog package.              --
+--            (c) 2002-2007, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package provides some vector operations for computing        --
+-- trajectory of flying viewpoint in VRML scenes.                    --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+Point		= p(PX,PY,PZ).
+PX, PY, PZ	= REAL.
+Angle		= REAL.
+--
+-----------------------------------------------------------------------
+interface 'Vector' (specialized 'Alpha'):
+[
+--
+PREDICATES:
+--
+imperative:
+--
+compute_orientation(Point,Point,PX,PY,PZ,Angle)	- (i,i,o,o,o,o);
+--
+scalar_square(Point) = REAL			- (i);
+vector_k(Point,REAL) = Point			- (i,i);
+scalar_mult(Point,Point) = REAL			- (i,i);
+--
+sub(Point,Point) = Point			- (i,i);
+mult(Point,Point) = Point			- (i,i);
+--
+gamma(Point,Point) = Angle			- (i,i);
+gamma(REAL) = Angle				- (i);
+normalized_gamma(Angle) = Angle			- (i);
+normalized_vector(Point) = Point		- (i);
+--
+'-'(PX,PX) = PX					- (i,i);
+'-'(PY,PY) = PY					- (i,i);
+'-'(PZ,PZ) = PZ					- (i,i);
+--
+'*'(PX,PX) = REAL				- (i,i);
+'*'(PY,PY) = REAL				- (i,i);
+'*'(PZ,PZ) = REAL				- (i,i);
+--
+'*'(PX,PY) = REAL				- (i,i);
+'*'(PY,PX) = REAL				- (i,i);
+'*'(PY,PZ) = REAL				- (i,i);
+'*'(PZ,PY) = REAL				- (i,i);
+'*'(PX,PZ) = REAL				- (i,i);
+'*'(PZ,PX) = REAL				- (i,i);
+--
+'*'(PX,REAL) = PX				- (i,i);
+'*'(PY,REAL) = PY				- (i,i);
+'*'(PZ,REAL) = PZ				- (i,i);
+--
+round(PX) = INTEGER				- (i);
+round(PY) = INTEGER				- (i);
+round(PZ) = INTEGER				- (i);
+]
+-----------------------------------------------------------------------

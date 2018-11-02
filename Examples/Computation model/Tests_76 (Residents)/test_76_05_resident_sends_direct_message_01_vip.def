@@ -1,0 +1,45 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N	= INTEGER.
+--
+reference:
+--
+Target	= STRING; ('Target'); #; Target*.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Console'):
+--
+variable:
+--
+	data	: Target;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+direct_message(STRING)		- (i);
+]
+-----------------------------------------------------------------------
+interface 'Target' (specialized 'Console'):
+--
+constant:
+--
+	receiver	: 'Main';
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+f = Target;
+--
+]
+-----------------------------------------------------------------------

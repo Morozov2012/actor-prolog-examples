@@ -1,0 +1,88 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(X,Y,Width,Height)	- (i,i,i,i);
+--
+class 'Main' (specialized 'Report'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2(57,15,47,12),
+	test1,
+	test2(-15.9,-11.3,-17.9,-9.3),
+	test1,
+	test2(0,0,0,0),
+	test1,
+	test2('centered','centered','default','default'),
+	test1,
+	test2('default','default','default','default'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	get_default_bounds(_,_,_,_),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	get_default_bounds(X,Y,W,H),!,
+	con ? write("X: "),
+	con ? set_color('Violet'),
+	con ? write(X),
+	con ? set_color('default'),
+	con ? write(", Y: "),
+	con ? set_color('Violet'),
+	con ? write(Y),
+	con ? set_color('default'),
+	con ? write(", Width: "),
+	con ? set_color('Violet'),
+	con ? write(W),
+	con ? set_color('default'),
+	con ? write(", Height: "),
+	con ? set_color('Violet'),
+	con ? writeln(H),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test2(X,Y,W,H):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	con ? writeln(
+		"I will set: X= ",X,", Y= ",Y,
+		", Width= ",W,", Height= ",H),
+	set_default_bounds(X,Y,W,H),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,32 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, IRE RAS, Alexei A. Morozov. --
+-- Concatenation of strings.             --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	concat("ABCDE","FGHIJ",Text),
+	writeln("Text:  ",Text),
+	fail.
+goal:-
+	concat(Front,"FGHIJ","ABCDEFGHIJ"),
+	writeln("Front: ",Front),
+	fail.
+goal:-
+	concat("ABCDE",End,"ABCDEFGHIJ"),
+	writeln("End:   ",End),
+	fail.
+goal:-
+	concat("ABCDE","FGHIJ","ANOTHER TEXT").
+goal:-
+	writeln("Failure"),
+	fail.
+goal:-
+	concat("ABCDE","FGHIJ","ABCDEFGHIJ"),
+	writeln("Success"),
+	fail.
+goal.
+]
+-------------------------------------------

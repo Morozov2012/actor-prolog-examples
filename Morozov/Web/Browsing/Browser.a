@@ -1,0 +1,23 @@
+package "Morozov/Web/Browsing/Browser":
+---------------------------------------------------------------
+--            The "BROWSER" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+class 'ExternalBrowser' (specialized 'Application'):
+--
+constant:
+--
+	command		= auto(".html");
+--
+variable:
+--
+	arguments;
+--
+constant:
+--
+	window_mode			= 'maximized';
+	enable_multiple_instances	= 'yes';
+--
+[
+]
+---------------------------------------------------------------

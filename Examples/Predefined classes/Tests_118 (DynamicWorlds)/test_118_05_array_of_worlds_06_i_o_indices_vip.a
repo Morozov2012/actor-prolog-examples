@@ -1,0 +1,24 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+
+class 'MyArray' (specialized 'DynamicWorlds'):
+[
+PREDICATES:
+nondeterm:
+element(ArrayIndex,ArrayIndex) = 'Report'	- (i,o);
+]
+
+class 'Main' (specialized 'Console'):
+--
+w	= 'MyArray'[0 .. 1, 2 .. 3] of ('Report');
+--
+[
+goal:-
+	writeln("INDEX TABLE:"),
+	w[1,Index2] ? writeln("Index2= ",Index2),
+	writeln("Index2= ",Index2),
+	fail.
+goal:-!.
+]

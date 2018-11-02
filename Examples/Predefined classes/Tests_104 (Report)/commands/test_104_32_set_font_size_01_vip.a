@@ -1,0 +1,62 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+IMPERATIVES:
+--
+change_font_size;
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= ('MyWindow',
+		font_size= 'default',
+		new_font_size= 34,
+		x= 0,
+		y= 0);
+w2	= ('MyWindow',
+		font_size= 12,
+		new_font_size= 34,
+		x= 0,
+		y= 1);
+w3	= ('MyWindow',
+		font_size= 34,
+		new_font_size= 'default',
+		x= 0,
+		y= 2);
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	new_font_size	: FontSize;
+--
+	width			= 1;
+	height			= 1;
+--
+	font_size;
+	maximal_line_number	= 'window_height';
+--
+[
+goal:-!,
+	set_title(?format("Font size: %s",new_font_size)),
+	-- change_font_size,
+	write("++++++++"),
+	write(" Initial font size: ",font_size),nl,
+	write("+ Test +"),
+	write(" New font size: ",new_font_size),nl,
+	write("++++++++"),nl,
+	change_font_size.
+--
+change_font_size:-
+	set_font_size(new_font_size).
+]
+-----------------------------------------------------------------------

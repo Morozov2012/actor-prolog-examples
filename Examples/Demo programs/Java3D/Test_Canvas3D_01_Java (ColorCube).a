@@ -1,0 +1,28 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+class 'Main' (specialized 'Canvas3D'):
+[
+goal:-!,
+	show([
+		'TransformGroup'({
+			allowTransformWrite: 'yes',
+			branches: [
+				'ColorCube'({
+					scale: 0.4
+					}),
+				'RotationInterpolator'({
+					alpha: 'Alpha3D'({
+						loopCount: -1,
+						increasingAlphaDuration: seconds(4)
+						}),
+					schedulingBounds: 'BoundingSphere'({})
+					})
+				]
+			})
+		]).
+]

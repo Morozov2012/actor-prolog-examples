@@ -1,0 +1,69 @@
+package "Morozov/VRML/Colors":
+-----------------------------------------------------------------------
+--                                                                   --
+--              The "VRML/COLORS" Actor Prolog package.              --
+--             (c) 2002-2007, IRE RAS, Alexei A. Morozov.            --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package is intended for generating RGB colors.               --
+-----------------------------------------------------------------------
+class 'Color_Table' (specialized 'Alpha'):
+--
+con	= ('Console');
+--
+[
+goal:-!.
+--
+make_gray_color(K,R2,G2,B2):-
+	make_color(0.0,0.0,K,Color),
+	Color == c(R1,G1,B1),
+	R2== ?round(R1 / 255 * 100.0) / 100.0,
+	G2== ?round(G1 / 255 * 100.0) / 100.0,
+	B2== ?round(B1 / 255 * 100.0) / 100.0.
+--
+make_special_color(Hue,K,R2,G2,B2):-
+	make_color(Hue,1.0,K,Color),
+	Color == c(R1,G1,B1),
+	R2== ?round(R1 / 255 * 100.0) / 100.0,
+	G2== ?round(G1 / 255 * 100.0) / 100.0,
+	B2== ?round(B1 / 255 * 100.0) / 100.0,!.
+make_special_color(_,_,_,_,_):-
+	break('Error in make_special_color.').
+make_special_color(_,_,0.0,0.0,0.0).
+--
+make_color(Hue,Saturation,Brightness,Color):-
+	Brightness <= 0.5,!,
+	MaxColor== Brightness * 510,
+	MinColor== 0.0,
+	make_color(Hue,Saturation,MaxColor,MinColor,Color).
+make_color(Hue,Saturation,Brightness,Color):-
+	MaxColor== 255.0,
+	MinColor== Brightness*510.0 - 255.0,
+	make_color(Hue,Saturation,MaxColor,MinColor,Color).
+--
+make_color(Hue,Saturation,MaxColor,Min1,Color):-
+	L== Saturation * (MaxColor - Min1),
+	Min2== (MaxColor + Min1 - L) / 2,
+	Sector== ?div(?round(Hue),60),
+	F== (Hue - Sector*60) / 60,
+	select_RGB(Sector,F,R1,G1,B1),
+	R2== Min2 + L*R1,
+	G2== Min2 + L*G1,
+	B2== Min2 + L*B1,
+	Color== c(R2,G2,B2).
+--
+select_RGB(0,F,1.0,F,0.0):-!.
+select_RGB(1,F,R,1.0,0.0):-!,
+	R== 1.0 - F.
+select_RGB(2,F,0.0,1.0,F):-!.
+select_RGB(3,F,0.0,G,1.0):-!,
+	G== 1.0 - F.
+select_RGB(4,F,F,0.0,1.0):-!.
+select_RGB(_,F,1.0,0.0,B):-
+	B== 1.0 - F.
+]
+-----------------------------------------------------------------------
+class 'ColorDatabase' (specialized 'Database'):
+[
+]
+-------------------------------------------------------------------

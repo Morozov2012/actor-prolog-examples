@@ -1,0 +1,90 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+SwitchingValue		= SYMBOL.
+Message			= STRING.
+--
+PREDICATES:
+--
+determ:
+--
+set_output(Seconds)		- (i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+p1	= (('Control',
+		output= V1));
+p4	= (('Receiver',
+		control= V1));
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Control' (specialized 'Timer'):
+--
+protecting:
+--
+	output		: SwitchingValue;
+--
+internal:
+--
+	con	= ('Report',
+			x= 0,
+			width= 40);
+--
+[
+goal:-!,
+	set_period(0.5),
+	activate.
+--
+tick:-
+	time(_,_,S),
+	set_output(S),!.
+tick:-!.
+--
+set_output(S):-
+	?mod(S,10) < 5,!,
+	output== 'Hi!',
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Control: I will send 'Hi!'."),
+	con ? set_color('default').
+set_output(_):-
+	output== #,
+	con ? set_color('Fuchsia'),
+	con ? writeln("Control: I will send '#'."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Timer'):
+--
+suspending:
+--
+	control;
+--
+internal:
+--
+	con	= ('Report',
+			x= 40,
+			width= 40);
+--
+[
+goal:-!,
+	set_period(0.3),
+	con ? set_color('DkGreen'),
+	con ? writeln("Receiver: I have received ",control),
+	con ? set_color('default'),
+	activate.
+--
+tick:-!,
+	con ? set_color('SkyBlue'),
+	con ? writeln("Receiver: TICK"),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

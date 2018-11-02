@@ -1,0 +1,50 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+D1	= INTEGER.
+D3	= STRING.
+--
+reference:
+--
+D2	= REAL.
+--
+-----------------------------------------------------------------------
+interface 'MyPredicates':
+[
+PREDICATES:
+nondeterm:
+p(D1,D2,D3)				- (i,o,i);
+]
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'MyPredicates', 'Console'):
+not	: 'MyPredicates';
+[
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+not	= ('Not',
+		world=self);
+--
+[
+CLAUSES:
+--
+goal:-
+	writeln("Main:: I will call p/3."),
+	not ? p(1,B1,"Hello World!"),!,
+	writeln("Success: B1=",B1).
+goal:-!,
+	writeln("Failure").
+--
+p(A,3.14,C):-
+	writeln("Main:: [1]p: A=",A,", C=\"",C,"\"").
+p(A,1.00,C):-
+	writeln("Main:: [2]p: A=",A,", C=\"",C,"\"").
+]
+-----------------------------------------------------------------------

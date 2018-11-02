@@ -1,0 +1,34 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',18)
+
+dialog 'MyDialog'("Custom Control Demo",default,default,default,centered,centered,default)
+vbox(center)
+	groupbox("Custom Control")
+		custom(main_slot,15,15,"Control3D")
+	end_of_groupbox
+	grid
+		row
+			column
+				button("action11","Put: Text3D")
+			end_of_column
+			column
+				button("action12","Put: PickCanvas")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action21","Put #")
+			end_of_column
+			column
+				button("action22","Put _")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action3","Get value")
+			end_of_column
+		end_of_row
+	end_of_grid
+end_of_vbox
+end_of_dialog

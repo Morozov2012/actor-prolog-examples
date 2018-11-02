@@ -1,0 +1,35 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Recursion.         --
+--                                       --
+-- Questions: What is a recursion with   --
+-- the input argument? How can one       --
+-- implement disassembling of a list     --
+-- with the help of the recursion with   --
+-- the input argument?                   --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+p(List)		- (i);
+
+CLAUSES:
+
+goal:-
+	p([1,2,3,4,5]).
+
+p([]).
+p([Head|Tail]):-
+	writeln(Head),
+	p(Tail).

@@ -1,0 +1,97 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Webcam";
+import .. from "morozov/Java3D";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	display	= ('Display');
+	buffer	= ('BufferedImage');
+--
+[
+goal:-!,
+	watch_webcam_state('yes'),
+	open.
+--
+webcam_image_obtained(_):-!,
+	get_image(buffer),
+	display ? set_appearance(
+		"TargetObject",
+		'Appearance'({
+			texture: 'Texture2D'({
+				image: buffer,
+				format: 'RGBA',
+				enableTextureMapping: 'yes',
+				magnificationFilter: 'BASE_LEVEL_LINEAR',
+				minificationFilter: 'BASE_LEVEL_LINEAR'
+				})
+			})).
+]
+-----------------------------------------------------------------------
+class 'Display' (specialized 'Canvas3D'):
+--
+constant:
+--
+	background_color		= 'Navy';
+	enable_scene_antialiasing	= 'yes';
+--
+[
+goal:-!,
+	MaximumAngle== ?pi()*2.0,
+	Bounds== 'BoundingSphere'({
+			center: p(0.0,0.0,0.0),
+			radius: 100.0
+			}),
+	show([
+		'TransformGroup'({
+			allowTransformWrite: 'yes',
+			allowTransformRead: 'yes',
+			branches: [
+				'Sphere'({
+					label: "TargetObject",
+					radius: 0.5,
+					generateNormals: 'yes',
+					divisions: 100,
+					generateTextureCoords: 'yes',
+					enableAppearanceModify: 'yes',
+					appearance: 'Appearance'({
+						material: 'Material'({
+							ambientColor: 'Navy'
+							})
+						})
+					}),
+				'RotationInterpolator'({
+					alpha: 'Alpha3D'({
+						loopCount: -1,
+						increasingEnable: 'yes',
+						increasingAlphaDuration: 4000
+						}),
+					transformAxis: 'Transform3D'({}),
+					minimumAngle: 0.0,
+					maximumAngle: MaximumAngle,
+					schedulingBounds: Bounds
+					})
+				]
+			}),
+		'Background'({
+			color: background_color,
+			applicationBounds: Bounds
+			}),
+		'AmbientLight'({
+			color: 'White',
+			influencingBounds: Bounds
+			}),
+		'OrbitBehavior'({
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			})
+		]).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,75 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute this example in the first environment and
+-- the separate_creator example in the second one.
+-- Warning: the VIP version does not support the activate and
+-- the update predicates of the Database and the DataStore classes.
+-- Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DataStore'):
+--
+constant:
+--
+	name		= "SharedDataStore.dat";
+	access_mode	= 'modifying';
+	sharing_mode	= 'shared_access';
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	-- store ? delete,
+	con ? set_color('Orange'),
+	con ? write("OPENING DATA STORE... "),
+	open,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	activate.
+--
+update:-!,
+	con ? set_color('Magenta'),
+	con ? writeln("DATASTORE IS UPDATED!"),
+	con ? set_color('default'),
+	report_whether_data_store_is_updated,
+	test_datastore.
+--
+report_whether_data_store_is_updated:-
+	is_updated,!,
+	con ? set_color('White','Magenta'),
+	con ? writeln("The data store is updated!"),
+	con ? set_color('default','default').
+report_whether_data_store_is_updated:-
+	con ? set_color('Navy','default'),
+	con ? writeln("The data store is NOT updated!"),
+	con ? set_color('default','default').
+--
+test_datastore:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test datastore inspection."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	inspect_datastore,
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test_datastore:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+inspect_datastore:-
+	get_entry(Name,Type),
+		con ? writeln("\t",Name," : ",Type),
+		fail.
+inspect_datastore.
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,37 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+[
+goal:-!,
+	test1,
+	test2.
+--
+test1:-
+	writeln("Test 1:"),
+	?input_font(Name,Size,Style),!,
+	writeln("\t",Name),
+	writeln("\t",Size),
+	writeln("\t",Style).
+test1:-
+	writeln("\tThe input was canceled by the user.").
+--
+test2:-
+	writeln("Test 2:"),
+	?input_font(Name,Size),!,
+	writeln("\t",Name),
+	writeln("\t",Size).
+test2:-
+	writeln("\tThe input was canceled by the user.").
+]
+-----------------------------------------------------------------------

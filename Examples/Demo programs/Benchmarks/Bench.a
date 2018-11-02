@@ -1,0 +1,287 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  BENCH : The classic Prolog benchmark                             --
+--                                                                   --
+--  January 25, 2009                                                 --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  Supplied by Quintus Computer Systems, Inc.                       --
+--  April 30th 1984                                                  --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  This benchmark gives the raw speed of a Prolog system.           --
+--                                                                   --
+--  The measure of logical inferences per second (Lips) used         --
+--  here is taken to be procedure calls per second over an           --
+--  example with not very complex procedure calls. The example       --
+--  used is that of "naive reversing" a list, which is an            --
+--  expensive, and therefore stupid, way of reversing a list.        --
+--  It does, however, produce a lot of procedure calls.              --
+--  (In theoretical terms, this algorithm is O(n^2) on the           --
+--  length of the list). The use of a single simple benchmark        --
+--  like this cannot, of course, be taken to signify a great         --
+--  deal. However, experience has shown that this benchmark          --
+--  does provide a very good measure of basic Prolog speed and       --
+--  produces figures which match more complex benchmarks. The        --
+--  reason for this is that the basic operations performed           --
+--  here: procedure calls with a certain amount of data              --
+--  structure access and construction; are absolutely                --
+--  fundamental to Prolog execution. If these are done right,        --
+--  then more complex benchmarks tend to scale accordingly.          --
+--  This particular benchmark has thus been used as a good rule      --
+--  of thumb by Prolog implementors for over a decade and forms      --
+--  a part of the unwritten Prolog folklore. So - use this           --
+--  benchmark, with this in mind, as a quick, but extremely          --
+--  useful, test of Prolog performance.                              --
+--                                                                   --
+--  In a complete evaluation of a Prolog system you should also      --
+--  be taking account speeds of asserting and compiling, tail        --
+--  recursion, memory utilisation, compactness of programs,          --
+--  storage management and garbage collection, debugging and         --
+--  editing facilities, program checking and help facilities,        --
+--  system provided predicates, interfaces to external               --
+--  capabilities, documentation and support, amongst other           --
+--  factors.                                                         --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+-- 2015.06.28 02:32                                                  --
+-- Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB          --
+-- Windows7 - PM.64 (RUS)                                            --
+-- ========================================================          --
+-- AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                            --
+--                                                                   --
+-- g:\temp1\jv>java -version                                         --
+-- java version "1.7.0_80"                                           --
+-- Java(TM) SE Runtime Environment (build 1.7.0_80-b15)              --
+-- Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)   --
+--                                                                   --
+-- java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation             --
+-- -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch        --
+--                                                                   --
+--  -992000 lips for      10 iterations taking    -5 msecs (6-11)    --
+--  2480000 lips for      20 iterations taking     4 msecs (4-0)     --
+--  4960000 lips for      50 iterations taking     5 msecs (6-1)     --
+--  4133333 lips for     100 iterations taking    12 msecs (17-5)    --
+--  8266667 lips for     200 iterations taking    12 msecs (13-1)    --
+-- 41333333 lips for     500 iterations taking     6 msecs (6-0)     --
+-- 62000000 lips for    1000 iterations taking     8 msecs (11-3)    --
+-- -49600000 lips for    2000 iterations taking   -20 msecs (20-40)  --
+-- 57674419 lips for    5000 iterations taking    43 msecs (46-3)    --
+-- 63589744 lips for   10000 iterations taking    78 msecs (83-5)    --
+-- 85223368 lips for   50000 iterations taking   291 msecs (308-17)  --
+-- 106666667 lips for  100000 iterations taking   465 msecs (472-7)  --
+-- 109251101 lips for  500000 iterations taking  2270 msecs (2296-26)--
+-- 109661729 lips for 1000000 iterations taking  4523 msecs (4572-49)--
+-- 109677895 lips for 3000000 iterations taking 13567 msecs (13708-141)
+--                                                                   --
+-- EXE-file:                                                         --
+--                                                                   --
+--        0 lips for      10 iterations taking     0 msecs (0-0)     --
+--        0 lips for      20 iterations taking     0 msecs (0-0)     --
+--        0 lips for      50 iterations taking     0 msecs (0-0)     --
+--        0 lips for     100 iterations taking     0 msecs (0-0)     --
+--        0 lips for     200 iterations taking     0 msecs (0-0)     --
+-- 24800000 lips for     500 iterations taking    10 msecs (10-0)    --
+--        0 lips for    1000 iterations taking     0 msecs (0-0)     --
+-- 99200000 lips for    2000 iterations taking    10 msecs (10-0)    --
+-- 62000000 lips for    5000 iterations taking    40 msecs (40-0)    --
+-- 70857143 lips for   10000 iterations taking    70 msecs (70-0)    --
+-- 75151515 lips for   50000 iterations taking   330 msecs (340-10)  --
+-- 74029851 lips for  100000 iterations taking   670 msecs (680-10)  --
+-- 73372781 lips for  500000 iterations taking  3380 msecs (3400-20) --
+-- 73481481 lips for 1000000 iterations taking  6750 msecs (6790-40) --
+-- 72691744 lips for 3000000 iterations taking 20470 msecs (20600-130)-
+--                                                                   --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+List		= INTEGER*.
+Count		= INTEGER.
+Lips		= REAL.
+--
+PREDICATES:
+--
+imperative:
+--
+nrev(List,List)					- (i,o);
+concatenate(List,List,List)			- (i,i,o);
+data(List)					- (o);
+--
+lots;
+--
+nondeterm:
+--
+eg_count(Count)					- (o);
+--
+imperative:
+--
+bench(Count)					- (i);
+--
+dobench(Count)					- (i);
+dodummy(Count)					- (i);
+dummy_nrev(List,List)				- (i,o);
+--
+nondeterm:
+--
+repeat(Count)					- (i);
+--
+imperative:
+--
+report(Count,Time,Time,Time)			- (i,i,i,i);
+calculate_lips(Count,INTEGER,Lips,STRING)	- (i,i,o,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+env	= ('Timer');
+--
+[
+goal:-
+	lots.
+-----------------------------------------------------------------------
+-- nrev(L1,L2)           - L2 is the list L1 reversed.               --
+-- concatenate(L1,L2,L3) - L1 appended to L2 is L3.                  --
+-- data(L)               - L is a thirty element list.               --
+-----------------------------------------------------------------------
+-- This is the program executed by the benchmark. It is called       --
+-- "naive reverse" because it is a very expensive way of             --
+-- reversing a list. Its advantage, for our purposes, is that        --
+-- it generates a lot of procedure calls. To reverse a thirty        --
+-- element list requires 496 Prolog procedure calls.                 --
+-----------------------------------------------------------------------
+nrev([],[]).
+nrev([X|Rest],Ans):-
+	nrev(Rest,L),
+	concatenate(L,[X],Ans).
+--
+concatenate([],L,L).
+concatenate([X|L1],L2,[X|L3]):-
+	concatenate(L1,L2,L3).
+--
+data([	 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+	11,12,13,14,15,16,17,18,19,20,
+	21,22,23,24,25,26,27,28,29,30]).
+-----------------------------------------------------------------------
+-- lots - Run benchmark with a variety of iteration counts.          --
+-----------------------------------------------------------------------
+-- Call this to run the benchmark with increasing numbers of         --
+-- iterations. The figures produced should be about the same -       --
+-- except that there may be inaccuracies at low iteration            --
+-- numbers if the time these examples take to execute on your        --
+-- machine are too small to be very precise (because of the          --
+-- accuracy the operating system itself is capable of                --
+-- providing). If the time taken for these examples is too long      --
+-- or short then you should adjust the eg_count(_) facts.            --
+-----------------------------------------------------------------------
+lots:-
+	eg_count(Count),
+	bench(Count),
+	fail.
+lots.
+--
+eg_count(10).
+eg_count(20).
+eg_count(50).
+eg_count(100).
+eg_count(200).
+eg_count(500).
+eg_count(1000).
+eg_count(2000).
+eg_count(5000).
+eg_count(10000).
+eg_count(50000).
+eg_count(100000).
+eg_count(500000).
+eg_count(1000000).
+eg_count(3000000).
+-----------------------------------------------------------------------
+-- bench(Count) - Run the benchmark for Count iterations.            --
+-----------------------------------------------------------------------
+-- bench provides a test harness for running the naive reverse       --
+-- benchmark. It is important to factor out the overhead of          --
+-- setting the test up and using repeat(_) to iterate the right      --
+-- number of times. This is done by running some dummy code as       --
+-- well to see how much time the extra operations take.              --
+-----------------------------------------------------------------------
+bench(Count):-
+	T0== env ? time(),
+	dodummy(Count),
+	T1== env ? time(),
+	dobench(Count),
+	T2== env ? time(),!,
+	report(Count,T0,T1,T2).
+bench(_).
+-----------------------------------------------------------------------
+-- dobench(Count) - nrev a 30 element list Count times.              --
+-- dodummy(Count) - Perform the overhead operations Count times.     --
+-- repeat(Count)  - Predicate which succeeds Count times.            --
+-----------------------------------------------------------------------
+-- This is the supporting code, which is reasonably clear.           --
+-----------------------------------------------------------------------
+dobench(Count):-
+	data(List),
+	repeat(Count),
+	nrev(List,_),
+	fail.
+dobench(_).
+--
+dodummy(Count):-
+	data(List),
+	repeat(Count),
+	dummy_nrev(List,_),
+	fail.
+dodummy(_).
+--
+dummy_nrev(_,[]).
+--
+repeat(_).
+repeat(N1):-
+	N1 > 1,
+	N2== ?dec(N1),
+	repeat(N2).
+-----------------------------------------------------------------------
+-- report(Count,T0,T1,T2) - Report the results of                    --
+--                        - the benchmark.                           --
+-- calculate_lips(Count,Time,Lips,Units)                             --
+--                        - Doing Count interations in Time          --
+--                        - implies Lips lips assuming that          --
+--                        - time is given in Units.                  --
+-----------------------------------------------------------------------
+-- This predicate calculates the logical inferences per second       --
+-- (lips) figure. Remember that it takes 496 procedure calls to      --
+-- naive reverse a thirty element list once. Lips, under this        --
+-- benchmark, thus means "Prolog procedure calls per second,         --
+-- where the procedure calls are not too complex (i.e. those         --
+-- for nrev and append)".                                            --
+-----------------------------------------------------------------------
+report(Count,T0,T1,T2):-
+	-- writeln("T0= ",T0),
+	-- writeln("T1= ",T1),
+	-- writeln("T2= ",T2),
+	Time1== T1 - T0,
+	Time2== T2 - T1,
+	-- writeln("Time1= ",Time1),
+	-- writeln("Time2= ",Time2),
+	Period== Time2 - Time1,
+	calculate_lips(Count,Period,Lips,Units),!,
+	writef("%8.0f lips ",Lips),
+	writef("for %7d iterations ",Count),
+	writef("taking %5d %s ",Period,Units),
+	writef("(%d-%d)\n",Time2,Time1).
+report(_,_,_,_).
+--
+calculate_lips(_,Time,Lips,"msecs"):-
+	Time==0,!,	-- Time can be 0 for small
+	Lips== 0.0.	-- values of Count!
+calculate_lips(Count,Time,Lips,"msecs"):-
+	R1== Count * 496,
+	R2== R1 * 1000.0,
+	Lips== R2 / Time.
+]
+-----------------------------------------------------------------------

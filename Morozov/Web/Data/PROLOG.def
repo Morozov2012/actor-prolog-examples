@@ -1,0 +1,20 @@
+package "Morozov/Web/Data/Prolog":
+---------------------------------------------------------------
+--            The "PROLOG" Actor Prolog package.             --
+--        (c) 2002-2011, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains the addresses of some Web resources --
+-- related to the logic programming and Prolog.              --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+---------------------------------------------------------------
+interface 'LogicProgrammingSites' (specialized 'Alpha'):
+[
+PREDICATES:
+--
+nondeterm:
+--
+{WebResourceAttributes};
+--
+]
+---------------------------------------------------------------

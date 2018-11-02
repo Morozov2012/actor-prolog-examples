@@ -1,0 +1,151 @@
+package "Morozov/Web/Scanning/Core":
+---------------------------------------------------------------
+--         The "SCANNING/CORE"Actor Prolog package.          --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This is a set of auxiliary classes that support           --
+-- implementation of Web scanners analyzing Web Sites.       --
+---------------------------------------------------------------
+import 'ReportWindow' from "Morozov/Web/Scanning/Messages";
+import 'ErrorMessages' from "Morozov/Web/Scanning/Messages";
+import 'Plain_Report' from "Morozov/Web/Scanning/Messages";
+---------------------------------------------------------------
+class 'Scanner' (specialized 'WebReceptor'):
+--
+constant:
+--
+	location		= "";
+--
+	case_sensitivity	= 'off';
+--
+	revision_period		= 'none';
+	attempt_period		= 'none';
+--
+internal:
+--
+	diary		= ('RunTimeMessages',
+				title="Auxiliary Messages",
+				y=17,
+				-- height=8,
+				maximal_line_number=50);
+--
+	messages	= ('ErrorMessages',
+				report=('Plain_Report',
+					output=report_window));
+--
+	report_window	= ('ReportWindow',
+				title="Debug Messages",
+				y=9,
+				height=7);
+	file_operations	= ('WebFile');
+--
+[
+goal:-!.
+---------------------------------------------------------------
+resource_has_unknown_type(Name):-
+	search(?val("STRING",Name),"mailto:"),!.
+resource_has_unknown_type(Name):-
+	search(?val("STRING",Name),"news:"),!.
+resource_has_unknown_type(Name):-
+	search(?val("STRING",Name),"https:"),!.
+---------------------------------------------------------------
+is_HTML_file(ShortName):-
+	FullName1== ?get_URL(ShortName),
+	delete_web_prefix(FullName1,FullName2),
+	report_window ? writeln("Without prefix: ",FullName2),
+	is_actul_file_name(FullName2),!,
+	file_operations ? extract_path(
+		?cast("STRING",FullName2),_,FileName),
+	report_window ? writeln("Without path: ",FileName),
+	file_operations ? extract_extension(
+		FileName,_,Extension),
+	report_window ? writeln("Extension: ",Extension),
+	check_HTML_file_name(Extension).
+is_HTML_file(_).
+/**/
+delete_web_prefix(FullName1,FullName2):-
+	concat("http://",FullName2,FullName1),!.
+delete_web_prefix(FullName1,FullName2):-
+	concat("https://",FullName2,FullName1),!.
+delete_web_prefix(FullName1,FullName2):-
+	concat("ftp://",FullName2,FullName1),!.
+delete_web_prefix(FullName1,FullName2):-
+	concat("file:///",FullName2,FullName1),!.
+delete_web_prefix(FullName1,FullName2):-
+	concat("file://",FullName2,FullName1),!.
+delete_web_prefix(FullName,FullName).
+--
+is_actul_file_name(FullName):-
+	concat("javascript:",_,FullName),!,
+	fail.
+is_actul_file_name(FullName):-
+	search(FullName,"/"),!.
+is_actul_file_name(FullName):-
+	search(FullName,"\\"),!.
+--
+check_HTML_file_name(""):-!.
+check_HTML_file_name(FileName):-
+	search(FileName,".htm"),!.
+check_HTML_file_name(FileName):-
+	search(FileName,".cgi"),!.
+check_HTML_file_name(FileName):-
+	search(FileName,".php"),!.
+check_HTML_file_name(FileName):-
+	search(FileName,".asp"),!.
+check_HTML_file_name(FileName):-
+	search(FileName,".txt"),!.
+check_HTML_file_name(FileName):-
+	search(FileName,".xml"),!.
+---------------------------------------------------------------
+is_picture(Name):-
+	search(?val("STRING",Name),".jpg"),!.
+is_picture(Name):-
+	search(?val("STRING",Name),".gif"),!.
+is_picture(Name):-
+	search(?val("STRING",Name),".png"),!.
+---------------------------------------------------------------
+is_non_empty_list([_|_]).
+--
+contains([Name|_],Name):-!.
+contains([_|Rest],Name):-
+	contains(Rest,Name).
+---------------------------------------------------------------
+produce_message(L,N,[Page,Mother|_],Message):-!,
+	messages ? append_message(L,N,Mother,Page,Message).
+produce_message(L,N,[Page|_],Message):-!,
+	messages ? append_message(
+		L,N,"Root address",Page,Message).
+produce_message(L,N,_,Message):-
+	messages ? append_message(
+		L,N,"Root address","",Message).
+]
+---------------------------------------------------------------
+-- The 'RunTimeMessages' class implements the output of      --
+-- auxiliary messages to the text window. This class is an   --
+-- descendant of the 'Report' predefined class that          --
+-- implements the text windows.                              --
+---------------------------------------------------------------
+class 'RunTimeMessages' (specialized 'Report'):
+--
+title			= "Auxiliary messages of the agent";
+y			= 0;
+height			= 10;
+maximal_line_number	= 'no_limit';
+--
+[
+writeln_green(Terms*):-!,
+	set_color('Black','Green'),
+	writeln(Terms*),
+	set_color('Black','White').
+--
+writeln_red(Terms*):-!,
+	set_color('Black','Red'),
+	writeln(Terms*),
+	set_color('Black','White').
+]
+---------------------------------------------------------------
+class 'WebFile' (specialized 'File'):
+extension	= "";
+[
+]
+---------------------------------------------------------------

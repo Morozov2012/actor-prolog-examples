@@ -1,0 +1,89 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+-- Sorry, the VIP version does not support the Division-by-Zero cases.
+
+PREDICATES:
+
+imperative:
+
+test1(REAL,Color,Color)		- (i,i,i);
+test2(REAL,Color,Color)		- (i,i,i);
+test3(REAL,Color,Color)		- (i,i,i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	test1(?not_a_number(),'DkGreen','Red'),
+	test1(?positive_infinity(),'DkGreen','Red'),
+	test1(?negative_infinity(),'DkGreen','Red'),
+	test2(?not_a_number(),'Red','DkGreen'),
+	test2(?positive_infinity(),'DkGreen','Red'),
+	test2(?negative_infinity(),'DkGreen','Red'),
+	test3(?not_a_number(),'Red','DkGreen'),
+	test3(?positive_infinity(),'Red','DkGreen'),
+	test3(?negative_infinity(),'Red','DkGreen'),
+	-- Sorry, the VIP version does not support
+	-- the Division-by-Zero cases:
+	test1(1.0/0.0,'DkGreen','Red'),
+	test2(1.0/0.0,'DkGreen','Red'),
+	test3(1.0/0.0,'Red','DkGreen'),
+	test1(1.0,'Red','DkGreen'),
+	test2(1.0,'Red','DkGreen'),
+	test3(1.0,'DkGreen','Red').
+--
+test1(R,Color1,_):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1:"),
+	con ? set_color('default'),
+	con ? writeln(
+		"\tCheck if this value is ",
+		"not a number: ",R),
+	nan(R),!,
+	con ? set_color(Color1),
+	con ? writeln("\tYes"),
+	con ? set_color('default').
+test1(_,_,Color2):-
+	con ? set_color(Color2),
+	con ? writeln("\tNo"),
+	con ? set_color('default').
+--
+test2(R,Color1,_):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2:"),
+	con ? set_color('default'),
+	con ? writeln(
+		"\tCheck if this value is ",
+		"infinitely large in magnitude: ",R),
+	infinite(R),!,
+	con ? set_color(Color1),
+	con ? writeln("\tYes"),
+	con ? set_color('default').
+test2(_,_,Color2):-
+	con ? set_color(Color2),
+	con ? writeln("\tNo"),
+	con ? set_color('default').
+--
+test3(R,Color1,_):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 3:"),
+	con ? set_color('default'),
+	con ? writeln(
+		"\tCheck if this value is ",
+		"finite quantity: ",R),
+	finite(R),!,
+	con ? set_color(Color1),
+	con ? writeln("\tYes"),
+	con ? set_color('default').
+test3(_,_,Color2):-
+	con ? set_color(Color2),
+	con ? writeln("\tNo"),
+	con ? set_color('default').
+]

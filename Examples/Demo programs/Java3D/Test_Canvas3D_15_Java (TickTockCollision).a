@@ -1,0 +1,210 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+DOMAINS:
+
+class 'Main' (specialized 'Canvas3D'):
+--
+constant:
+--
+usual_coloring : ColorSelectionAndShadingModel
+			= 'ColoringAttributes'({
+				color: color3(0.6,0.3,0.0)
+				});
+highlight_coloring : ColorSelectionAndShadingModel
+			= 'ColoringAttributes'({
+				color: color3(0.0,1.0,0.0),
+				shadeModel: 'SHADE_GOURAUD'
+				});
+bounds : Bounds		= 'BoundingSphere'({
+				center: p(0.0,0.0,0.0),
+				radius: 100.0
+				});
+--
+enable_scene_antialiasing	= 'yes';
+background_color		= color3(0.05,0.05,0.2);
+minimum_frame_cycle_time	= milliseconds(5);
+--
+internal:
+--
+text_operations			= ('Text');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+create_box(
+	NodeLabel,
+	Scale3D,
+	Translation) = Node	- (i,i,i);
+--
+CLAUSES:
+--
+goal:-!,
+	TwoPI== ?pi() * 2.0,
+	PI2== ?pi() / 2.0,
+	Box1== ?create_box(1,0.3,[-1.3,0.0,0.0]),
+	Box2== ?create_box(2,0.3,[1.3,0.0,0.0]),
+	show([	'TransformGroup'({
+			transform3D: 'Transform3D'({
+				scale: 0.4
+				}),
+			branches: [
+				Box1,
+				Box2,
+				'TransformGroup'({
+					allowTransformWrite: 'yes',
+					branches: [
+						'RotationInterpolator'({
+							alpha: 'Alpha3D'({
+								increasingEnable: 'yes',
+								decreasingEnable: 'yes',
+								increasingAlphaDuration: 5000,
+								increasingAlphaRampDuration: 2500,
+								alphaAtOneDuration: 200,
+								decreasingAlphaDuration: 5000,
+								decreasingAlphaRampDuration: 2500,
+								alphaAtZeroDuration: 200
+								}),
+							transformAxis: 'Transform3D'({
+								rotX: PI2
+								}),
+							minimumAngle: -(PI2),
+							maximumAngle: PI2,
+							schedulingBounds: bounds
+							}),
+						'TransformGroup'({
+							allowTransformWrite: 'yes',
+							branches: [
+								'RotationInterpolator'({
+									alpha: 'Alpha3D'({
+										increasingEnable: 'yes',
+										increasingAlphaDuration: 4000
+										}),
+									minimumAngle: 0.0,
+									maximumAngle: TwoPI,
+									schedulingBounds: bounds
+									}),
+								'TransformGroup'({
+									transform3D: 'Transform3D'({
+										scale: 0.3,
+										translation: [0.0,-1.5,0.0]
+										}),
+									branches: [
+										'ColorCube'({})
+										]
+									})
+								]
+							})
+						]
+					})
+				]
+			}),
+		'Background'({
+			color: background_color,
+			applicationBounds: bounds
+			})
+		]).
+--
+create_box(BoxLabel,Scale,Position) = Box :-
+	--
+	XSize== 0.5,
+	YSize== 5.0,
+	ZSize== 1.0,
+	--
+	Xmin== -(XSize/2.0),
+	Xmax== XSize/2.0,
+	Ymin== -(YSize/2.0),
+	Ymax== (YSize/2.0),
+	Zmin== -(ZSize/2.0),
+	Zmax== (ZSize/2.0),
+	--
+	Coordinates== [
+		-- front face
+		p(Xmax,Ymin,Zmax),
+		p(Xmax,Ymax,Zmax),
+		p(Xmin,Ymax,Zmax),
+		p(Xmin,Ymin,Zmax),
+		-- back face
+		p(Xmin,Ymin,Zmin),
+		p(Xmin,Ymax,Zmin),
+		p(Xmax,Ymax,Zmin),
+		p(Xmax,Ymin,Zmin),
+		-- right face
+		p(Xmax,Ymin,Zmin),
+		p(Xmax,Ymax,Zmin),
+		p(Xmax,Ymax,Zmax),
+		p(Xmax,Ymin,Zmax),
+		-- left face
+		p(Xmin,Ymin,Zmax),
+		p(Xmin,Ymax,Zmax),
+		p(Xmin,Ymax,Zmin),
+		p(Xmin,Ymin,Zmin),
+		-- top face
+		p(Xmax,Ymax,Zmax),
+		p(Xmax,Ymax,Zmin),
+		p(Xmin,Ymax,Zmin),
+		p(Xmin,Ymax,Zmax),
+		-- bottom face
+		p(Xmin,Ymin,Zmax),
+		p(Xmin,Ymin,Zmin),
+		p(Xmax,Ymin,Zmin),
+		p(Xmax,Ymin,Zmax)
+		],
+	--
+	BehaviorName1== text_operations?format(
+		"%s%d","CollisionEntry",BoxLabel),
+	BehaviorName2== text_operations?format(
+		"%s%d","CollisionExit",BoxLabel),
+	--
+	Box== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			scale: Scale,
+			translation: Position
+			}),
+		branches: [
+			'Shape3D'({
+				label: BoxLabel,
+				geometry: 'QuadArray'({
+					vertexCount: 24,
+					includeVertexPositions: 'yes',
+					coordinates: Coordinates
+					}),
+				appearance: 'Appearance'({
+					coloringAttributes: usual_coloring,
+					allowColoringAttributesWrite: 'yes'
+					}),
+				collisionDetectors: [
+					'CollisionDetector'({
+						name: BehaviorName1,
+						wakeupOn: 'ENTRY',
+						speedHint: 'USE_GEOMETRY',
+						schedulingBounds: bounds
+						}),
+					'CollisionDetector'({
+						name: BehaviorName2,
+						wakeupOn: 'EXIT',
+						speedHint: 'USE_GEOMETRY',
+						schedulingBounds: bounds
+						})
+					]
+				})
+			]
+		}).
+--
+action(BehaviorName):-
+	text_operations ? concat(
+		"CollisionEntry",Tail,?val("STRING",BehaviorName)),
+	N== ?convert_to_integer(Tail),!,
+	set_coloring_attributes(N,highlight_coloring).
+action(BehaviorName):-
+	text_operations ? concat(
+		"CollisionExit",Tail,?val("STRING",BehaviorName)),
+	N== ?convert_to_integer(Tail),!,
+	set_coloring_attributes(N,usual_coloring).
+]

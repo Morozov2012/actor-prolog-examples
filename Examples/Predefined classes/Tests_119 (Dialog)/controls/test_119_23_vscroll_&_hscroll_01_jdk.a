@@ -1,0 +1,192 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import 'ColoredReport' from "report_toolbox";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+w	= ('MyDialog');
+--
+[
+goal:-
+	w ? test2,
+	w ? test4,
+	w ? show.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	report1		= ('ColoredReport',
+				title= "Tests",
+				x= 0,
+				y= 0,
+				height= 17,
+				width= 32);
+	report2		= ('ScrollPositionWatch',
+				target_slot= output_slot_1,
+				title= "HScroll Position Watch",
+				x= 32,
+				y= 0,
+				height= 17,
+				width= 24);
+	report3		= ('ScrollPositionWatch',
+				target_slot= output_slot_2,
+				title= "VScroll Position Watch",
+				x= 56,
+				y= 0,
+				height= 17,
+				width= 24);
+	report4		= ('ColoredReport',
+				title= "Creation & Update Events",
+				y= 17);
+	con		= ('Console');
+--
+variable:
+--
+	output_slot_1;
+	output_slot_2;
+--
+[
+DOMAINS:
+--
+reference:
+--
+ScrollRange		= ScrollPosition*.
+ScrollPosition		= INTEGER; REAL.
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1(ScrollPosition)		- (i);
+test2;
+test3(ScrollRange)		- (i);
+test4;
+--
+create_term(ScrollPosition)	- (o);
+create_term(ScrollRange)	- (o);
+--
+CLAUSES:
+--
+action("action11"):-!,
+	test3([1,10]).
+action("action12"):-!,
+	test1(3).
+action("action21"):-!,
+	test3([-100,100]).
+action("action22"):-!,
+	test1(11.5).
+action("action31"):-!,
+	test3([0,7.3]).
+action("action32"):-!,
+	test1(0).	
+action("action41"):-!,
+	test3([]).
+action("action42"):-!,
+	test1(-1).
+action("action51"):-!,
+	test3(#).
+action("action52"):-!,
+	test1(#).
+action("action61"):-!,
+	create_term(FreeVariable),
+	test3(FreeVariable).
+action("action62"):-!,
+	create_term(FreeVariable),
+	test1(FreeVariable).
+action("action71"):-!,
+	test4.
+action("action72"):-!,
+	test2.
+action(Name):-!,
+	con ? note(Name).
+--
+created_control(Address):-!,
+	Value== ?get(Address),
+	report4 ? write("The "),
+	report4 ? write_colored_term(Address),
+	report4 ? write(
+		" control is created ",
+		"with initial value: "),
+	report4 ? write_colored_term(Value),
+	report4 ? nl.
+--
+modified_control(Address):-!,
+	Value== ?get(Address),
+	report4 ? write("The "),
+	report4 ? write_colored_term(Address),
+	report4 ? write(" control has a new value: "),
+	report4 ? write_colored_term(Value),
+	report4 ? nl.
+--
+goal:-!,
+	test0.
+--
+test0:-
+	report1 ? writeln("Test 0:"),
+	?get(1010),
+	?get(1020),
+	?get('output_slot_1'),
+	?get('output_slot_2'),!,
+	report1 ? writeln("\tDone.").
+test0:-
+	report1 ? write_error_message("\tFailure!").
+--
+test1(Value):-
+	report1 ? writeln("Test 1:"),
+	report1 ? writeln("\tI will put position:"),
+	report1 ? write_value("\t",Value),
+	put('output_slot_1',Value),
+	put('output_slot_2',Value),!,
+	report1 ? writeln("\tDone.").
+test1(_):-
+	report1 ? write_error_message("\tFailure!").
+--
+test2:-
+	report1 ? writeln("Test 2:"),
+	report1 ? writeln("\tI will get position:"),
+	report1 ? write_value(
+		"\tPosition: ",?get('output_slot_1')),
+	report1 ? write_value(
+		"\tPosition: ",?get('output_slot_2')),!.
+test2:-
+	report1 ? write_error_message("\tFailure!").
+--
+test3(Value):-
+	report1 ? writeln("Test 3:"),
+	report1 ? writeln("\tI will put range:"),
+	report1 ? write_value("\t",Value),
+	put(1010,Value),
+	put(1020,Value),!,
+	report1 ? writeln("\tDone.").
+test3(_):-
+	report1 ? write_error_message("\tFailure!").
+--
+test4:-
+	report1 ? writeln("Test 4:"),
+	report1 ? writeln("\tI will get range:"),
+	report1 ? write_value("\tItems: ",?get(1010)),
+	report1 ? write_value("\tItems: ",?get(1020)),!.
+test4:-
+	report1 ? write_error_message("\tFailure!").
+--
+create_term(_).
+]
+-----------------------------------------------------------------------
+class 'ScrollPositionWatch' (specialized 'ColoredReport'):
+--
+variable:
+--
+target_slot;
+--
+[
+goal:-!,
+	write_value("Slot value: ",target_slot).
+]
+-----------------------------------------------------------------------

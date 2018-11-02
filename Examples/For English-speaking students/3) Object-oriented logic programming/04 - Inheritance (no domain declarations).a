@@ -1,0 +1,42 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Object-oriented logic      --
+-- programming. Inheritance of classes   --
+-- and overriding of slot initializers.  --
+--                                       --
+-- Questions: What are classes and class --
+-- instances (the worlds)? What are      --
+-- slots of class instances? What is the --
+-- inheritance of the classes? Does the  --
+-- Actor Prolog language override the    --
+-- clauses of classes to be inherited?   --
+-- What is an initializer of a slot?     --
+-- What is overriding of slot            --
+-- initializers?                         --
+--                                       --
+-------------------------------------------
+
+class 'Main' (specialized 'A1'):
+
+n	= 100;
+
+[
+
+goal:-
+	p.
+
+]
+
+class 'A1' (specialized 'Report'):
+
+n	= 300;
+
+[
+
+p:-
+	writeln(n).
+
+]

@@ -1,0 +1,155 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+ground:
+
+A1	= s1(B1,C1,D1,E1,F1); s2(B1,C1).
+B1	= G1*.
+C1	= INTEGER.
+D1	= REAL.
+E1	= STRING.
+F1	= SYMBOL.
+G1	= {name1:C1,name2:D1,name3:E1,name4:F1,name5:A1}.
+
+DOMAINS:
+
+reference:
+
+A2	= s1(B2,C2,D2,E2,F2); s2(B2,C2).
+B2	= G2*.
+C2	= INTEGER.
+D2	= REAL.
+E2	= STRING.
+F2	= SYMBOL.
+G2	= {name1:C2,name2:D2,name3:E2,name4:F2,name5:A2}.
+
+DOMAINS:
+
+mixed:
+
+A3	= s1(B3,C2,D2,E2,F2); s2(B3,C2).
+B3	= G3*.
+G3	= {name1:C2,name2:D2,name3:E2,name4:F2,name5:A2}.
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+
+determ:
+
+eq1;
+eq2;
+eq3;
+
+class 'Main' (specialized 'DemoConsole'):
+--
+constant:
+--
+	x1	: A1	= s2([{	name1:500,
+				name2:3.14,
+				name3:"Text1",
+				name4:'Name1',
+				name5:s2([],300)}
+				],700);
+	y1	: A1	= s2([{	name5:s2([],300),
+				name2:3.14,
+				name1:500,
+				name4:'Name1',
+				name3:"Text1"}
+				],700);
+--
+variable:
+--
+	x2	: A2;
+	y2	: A2;
+--
+constant:
+--
+	x3	: A3	= s2([{	name1:500,
+				name2:3.14,
+				name3:"Text1",
+				name4:'Name1',
+				name5:s2([],300)}
+				],700);
+	y3	: A3	= s2([{	name5:s2([],300),
+				name2:3.14,
+				name1:500,
+				name4:'Name1',
+				name3:"Text1"}
+				],700);
+--
+[
+goal:-
+	test1,
+	test2,
+	test3.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test 1"),
+	set_color('default'),
+	writeln("X= ",x1),
+	writeln("Y= ",y1),
+	eq1,!,
+	set_color('Green'),
+	writeln("O.K.").
+test1:-
+	set_color('Red'),
+	writeln("Failure").
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("Test 2"),
+	set_color('default'),
+	x2== s2([{	name1:500,
+			name2:3.14,
+			name3:"Text1",
+			name4:'Name1',
+			name5:s2([],300)}
+		],700),
+	y2== s2([{	name5:s2([],300),
+			name2:3.14,
+			name1:500,
+			name4:'Name1',
+			name3:"Text1"}
+		],700),
+	writeln("X= ",x2),
+	writeln("Y= ",y2),
+	eq2,!,
+	set_color('Green'),
+	writeln("O.K.").
+test2:-
+	set_color('Red'),
+	writeln("Failure").
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("Test 3"),
+	set_color('default'),
+	writeln("X= ",x3),
+	writeln("Y= ",y3),
+	eq3,!,
+	set_color('Green'),
+	writeln("O.K.").
+test3:-
+	set_color('Red'),
+	writeln("Failure").
+
+--
+eq1:-
+	x1 == y1.
+--
+eq2:-
+	x2 == y2.
+--
+eq3:-
+	x3 == y3.
+]

@@ -1,0 +1,41 @@
+-----------------------------------------------------
+--                                                 --
+--              Actor Prolog lessons               --
+--           (c) 2015 Alexei A. Morozov            --
+--                                                 --
+-- The topic: Object-oriented logic programming.   --
+-- Constructors of class instances.                --
+--                                                 --
+-- Questions: What are classes and class instances --
+-- (the worlds)? What are constructors of the      --
+-- class instances? What are arguments of the      --
+-- constructors of the class instances? What is    --
+-- overriding of initializers of slots of the      --
+-- class instances?                                --
+--                                                 --
+-----------------------------------------------------
+
+class 'Main' (specialized 'DemoConsole'):
+
+w1	= ('A1');
+
+w2	= ('A1',
+		n= 500);
+
+[
+
+goal:-
+	writeln("Hello from the Main class.").
+
+]
+
+class 'A1' (specialized 'DemoConsole'):
+
+n	= 100;
+
+[
+
+goal:-
+	writeln(n).
+
+]

@@ -1,0 +1,178 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2011, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving and output of information from    --
+--       arbitrary number of Web resources by         --
+--       concurrent processes.                        --
+--------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+Target	= ('CheckPage'); Target*; STRING.
+--
+DOMAINS:
+--
+reference:
+--
+RefContentParameters	= entry(RefURL,
+				RefResourceDate,
+				RefResourceTime,
+				RefResourceSize);
+			  catalog(
+				RefURL,
+				RefResourceDate,
+				RefResourceTime,
+				RefResourceSize);
+			  RefAccessError.
+--
+RefAccessError		= failure(REF_INTEGER);
+			  'lateness';
+			  error(RefAccessErrorCode).
+--
+RefAccessErrorCode	= INTEGER;
+			  STRING;
+			  'unknown';
+			  'unreadable_answer'.
+--
+RefURL			= STRING.
+RefResourceDate		= RefDate; #.
+RefResourceTime		= RefTime; #.
+RefResourceSize		= INTEGER.
+--
+REF_INTEGER		= INTEGER.
+REF_REAL		= REAL.
+--
+RefDate			= date(RefYear,RefMonth,RefDay).
+RefYear			= INTEGER.
+RefMonth		= [1..12].
+RefDay			= [1..31].
+--
+RefTime			= time(	RefHours,
+				RefMinutes,
+				RefSeconds,
+				RefHundredths).
+--
+RefHours		= [0..23].
+RefMinutes		= [0..59].
+RefSeconds		= [0..59].
+RefHundredths		= [0..99].
+--
+--------------------------------------------------------
+interface 'Main' (specialized 'WebReceptor'):
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	target_list	: ReferenceList;
+--
+-- PRIVATE SLOTS:
+--
+variable:
+--
+	all_receptors	: Target;
+--
+constant:
+--
+	chain		: 'ReceptorChain';
+	out		: 'Output';
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_list(ReferenceList);
+]
+--------------------------------------------------------
+interface 'ReceptorChain':
+--
+-- PROCESS INPUTS:
+--
+suspending:
+--
+	target_list		: ReferenceList;
+--
+constant:
+--
+	previous_receptors	: Target;
+--
+variable:
+--
+	receptor_list		: Target;
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	all_receptors		: Target;
+	rest_of_list		: ReferenceList;
+--
+-- PRIVATE SLOTS:
+--
+variable:
+--
+	location		: STRING;
+--
+constant:
+--
+	chain			: 'ReceptorChain';
+	receiver		: Target;
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_list(ReferenceList,Target);
+]
+--------------------------------------------------------
+interface 'CheckPage' (specialized 'WebReceptor'):
+--
+-- PROCESS INPUTS:
+--
+suspending:
+--
+	location	: STRING;
+--
+-- PRIVATE SLOTS:
+--
+variable:
+--
+	parameters	: RefContentParameters;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+get_data= Target;
+--
+imperative:
+--
+date_to_string(RefDate) = STRING;
+--
+imperative:
+--
+get_parameters = RefContentParameters;
+]
+--------------------------------------------------------
+interface 'Output' (specialized 'Dialog'):
+--
+-- PROCESS INPUTS:
+--
+variable:
+--
+	all_receptors	: Target;
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	results		: Target;
+--
+[
+]
+--------------------------------------------------------

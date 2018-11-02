@@ -1,0 +1,64 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w01	= ('MyWindow',
+		x= 10);
+w02	= ('MyWindow',
+		x= 10.5);
+w03	= ('MyWindow',
+		x= 'centered');
+w04	= ('MyWindow',
+		x= 'default');
+--
+w05	= ('MyWindow',
+		x= -5);
+w06	= ('MyWindow',
+		x= -5.5);
+w07	= ('MyWindow',
+		x= 0);
+w08	= ('MyWindow',
+		x= 0.0);
+--
+w09	= ('MyWindow',
+		y= 1);
+w10	= ('MyWindow',
+		y= 1.5);
+w11	= ('MyWindow',
+		y= 'centered');
+w12	= ('MyWindow',
+		y= 'default');
+--
+w13	= ('MyWindow',
+		y= -5);
+w14	= ('MyWindow',
+		y= -5.5);
+w15	= ('MyWindow',
+		y= 0);
+w16	= ('MyWindow',
+		y= 0.0);
+--
+[
+goal.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	x;
+	y;
+	width= 25;
+	height= 15;
+--
+[
+goal:-!,
+	writeln("Hello world!"),
+	writeln("x= ",x),
+	writeln("y= ",y).
+]
+-----------------------------------------------------------------------

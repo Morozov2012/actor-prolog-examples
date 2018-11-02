@@ -1,0 +1,30 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+data= (('Target',
+	receiver=self))??f();
+--
+[
+direct_message(Text):-
+	set_color('RoyalBlue'),
+	writeln("I have received: ",Text),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Target' (specialized 'Console'):
+--
+receiver;
+--
+[
+f = "beta".
+f = "alpha":-
+	set_color('DkGreen'),
+	writeln("I will send a message."),
+	set_color('default'),
+	[receiver] << direct_message("Hi!").
+f = "gamma".
+]
+-----------------------------------------------------------------------

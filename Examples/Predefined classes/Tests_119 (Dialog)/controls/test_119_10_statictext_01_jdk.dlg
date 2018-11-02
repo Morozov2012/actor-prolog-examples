@@ -1,0 +1,63 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',18)
+-- padding(0,0)
+-- draft
+
+dialog 'MyDialog'("StaticText Demo",default,default,default,centered,centered,default)
+vbox(center)
+	groupbox("StaticText")
+		vbox(left)
+			statictext(1010,17,"Hello world!!!")
+		end_of_vbox
+		vbox(right)
+			statictext(1020,17,"Hello world!!!")
+		end_of_vbox
+		vbox(center)
+			statictext(1030,17,"Hello world!!!")
+		end_of_vbox
+		vbox(justify)
+			statictext(1040,17,"Hello world!!!")
+		end_of_vbox
+	end_of_groupbox
+	grid
+		row
+			column
+				button("action11","Put 'yes'")
+			end_of_column
+			column
+				button("action12","Put 'no'")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action21","Put long string")
+			end_of_column
+			column
+				button("action22","Put multiline text")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action31","Put 100")
+			end_of_column
+			column
+				button("action32","Put ?pi()")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action41","Put #")
+			end_of_column
+			column
+				button("action42","Put _")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action5","Get value")
+			end_of_column
+		end_of_row
+	end_of_grid
+end_of_vbox
+end_of_dialog

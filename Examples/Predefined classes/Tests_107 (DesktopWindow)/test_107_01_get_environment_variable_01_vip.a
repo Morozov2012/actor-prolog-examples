@@ -1,0 +1,16 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+	env	= ('DesktopWindow');
+--
+[
+goal:-!,
+	Value== env?get_environment_variable("JAVA_HOME"),
+	writeln(Value).
+]
+-----------------------------------------------------------------------

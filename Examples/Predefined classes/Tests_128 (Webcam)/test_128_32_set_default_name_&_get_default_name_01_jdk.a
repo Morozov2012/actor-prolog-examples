@@ -1,0 +1,78 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+write_name(WebcamName)		- (i);
+test2(WebcamName)		- (i);
+
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2("USB2.0 UVC VGA WebCam 1"),
+	test1,
+	test2('default'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_default_name(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	Name== ?get_default_name(),!,
+	con ? write("Webcam name: "),
+	con ? set_color('Violet'),
+	write_name(Name),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+write_name(Name):-
+	symbol(Name),!,
+	con ? writeln("'",Name,"'").
+write_name(Name):-
+	string(Name),!,
+	con ? writeln("\"",Name,"\"").
+write_name(Name):-
+	con ? writeln(Name).
+--
+test2(Name):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_default_name(Name),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]

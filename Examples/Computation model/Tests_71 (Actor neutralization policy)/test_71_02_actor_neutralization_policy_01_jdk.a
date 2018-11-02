@@ -1,0 +1,152 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+Value	= f(N).
+N	= INTEGER.
+--
+PREDICATES:
+--
+determ:
+--
+implement_action(DialogActionName)	- (i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Dialog'):
+--
+constant:
+--
+	process1	= (('TestBed'));
+--
+[
+
+--
+goal:-!,
+	show.
+--
+action(DialogActionName):-
+	implement_action(DialogActionName),!.
+action(_):-!.
+--
+implement_action("action1"):-!,
+	process1 << action("action1").
+implement_action("action2"):-!,
+	process1 << action("action2").
+implement_action("action3"):-!,
+	process1 << action("action3").
+implement_action("action4"):-!,
+	process1 <- action("action4").
+implement_action("action5"):-!,
+	process1 <- action("action5").
+implement_action("action6"):-!,
+	process1 <- action("action6").
+]
+-----------------------------------------------------------------------
+class 'TestBed' (specialized 'Alpha'):
+--
+variable:
+--
+	v	: Value;
+--
+internal:
+--
+w1	= ('ActorHolder2',
+		v);
+w2	= ('ActorHolder1',
+		v);
+--
+con	= ('Report',
+		title= "TestBed",
+		x= 0,
+		width= 20);
+--
+[
+PREDICATES:
+--
+imperative:
+--
+action(DialogActionName)	- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	con ? set_color('DkGreen'),
+	con ? writeln("goal: v= ",v).
+--
+action(DialogActionName):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("v= ",v),
+	implement_action(DialogActionName),!.
+action(_):-
+	con ? set_color('Red'),
+	con ? writeln("failure, v= ",v).
+--
+implement_action("action1"):-
+	v == f(100).
+implement_action("action2"):-!,
+	v == f(_).
+implement_action("action3"):-!,
+	v == f(300).
+implement_action("action4"):-!,
+	v == f(100).
+implement_action("action5"):-!,
+	v == f(_).
+implement_action("action6"):-!,
+	v == f(300).
+]
+-----------------------------------------------------------------------
+class 'ActorHolder1' (specialized 'Timer'):
+--
+variable:
+--
+	v	: Value;
+--
+internal:
+--
+	con	= ('Report',
+			title= "Actor Holder 1  [ v == f(100) ]",
+			x= 20,
+			width= 30);
+--
+[
+goal:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("try: v == f(100)"),
+	v == f(100),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("done: v == f(100)").
+goal:-!,
+	con ? set_color('Red'),
+	con ? writeln("failure, v= ",v).
+]
+-----------------------------------------------------------------------
+class 'ActorHolder2' (specialized 'Timer'):
+--
+variable:
+--
+	v	: Value;
+--
+internal:
+--
+	con	= ('Report',
+			title= "Actor Holder 2  [ v == f(_) ]",
+			x= 50,
+			width= 30);
+--
+[
+goal:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("try: v == f(_)"),
+	v == f(_),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("done: v == f(_)").
+goal:-!,
+	con ? set_color('Red'),
+	con ? writeln("failure, v= ",v).
+]
+-----------------------------------------------------------------------

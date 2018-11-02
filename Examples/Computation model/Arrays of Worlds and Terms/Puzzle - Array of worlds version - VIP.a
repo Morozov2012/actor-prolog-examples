@@ -1,0 +1,175 @@
+------------------------------------------------------------------------
+--               An example of Actor Prolog program.                  --
+--             (c) 2003-2012, IRE RAS, Alexei A. Morozov.             --
+------------------------------------------------------------------------
+-- There are five houses that have numbering from left to right:      --
+-- * The Englishman lives in the red house.                           --
+-- * The Swede holds a dog.                                           --
+-- * The Dane drinks tea.                                             --
+-- * The green house stands to the left of white one.                 --
+-- * The tenant of the green house drinks coffee.                     --
+-- * The person smoking Pall Mall holds a bird.                       --
+-- * The tenant from the middle house drinks milk.                    --
+-- * The tenant of the yellow house smokes Dunhill.                   --
+-- * The Norwegian lives in the first house.                          --
+-- * The Marlboro smoker lives about one who holds a cat.             --
+-- * The person, which one holds a horse, lives about one             --
+--   who smokes Dunhill.                                              --
+-- * The smoker of cigarettes Winfield drinks beer.                   --
+-- * The Norwegian lives about the blue house.                        --
+-- * The German smokes Rothmans.                                      --
+-- * The Marlboro smoker lives on a neighborhood with the person,     --
+--   which drinks water.                                              --
+-- Each person lives only in one house, smokes something one, drinks  --
+-- something one, and holds only one domestic animal.                 --
+-- THE PROBLEM: Who holds a goldfish?                                 --
+------------------------------------------------------------------------
+--
+class 'Main' (specialized 'Alpha'):
+--
+homes		= 'HomeArray'[1 .. 5] of ('Home');
+--
+con		= ('Console');
+timer		= ('Timer');
+--
+[
+goal:-
+	timer ? time(Hr1,Min1,Sec1,MSEC1),
+	goldfish(Who),
+	timer ? time(Hr2,Min2,Sec2,MSEC2),
+	con ? writeln("Solution: ",Who),
+	abstime(Hr1,Min1,Sec1,MSEC1,T1),
+	abstime(Hr2,Min2,Sec2,MSEC2,T2),
+	Delta== T2 - T1,
+	con ? writeln("Time: ",Delta," [sec]"),
+	fail.
+--
+abstime(Hr,Min,Sec,MSEC,Abs):-
+	Abs== Hr*3600.0 + Min*60 + Sec + MSEC/1000.0.
+--
+goldfish(Who):-
+	conditions1,
+	conditions2,
+	homes[_] ? {animal:'goldfish',nationality:Who|_}.
+goldfish('No more solutions').
+--
+conditions1:-
+	homes[_] ? {nationality:'Englishman',colour:'Red'|_},
+	homes[_] ? {nationality:'Swede',animal:'dog'|_},
+	homes[_] ? {nationality:'Dane',drink:'tea'|_},
+	homes[N4] ? {colour:'Green',number:N4|_},
+	homes[N5] ? {colour:'White',number:N5|_},
+	less(N4,N5),
+	homes[_] ? {colour:'Green',drink:'coffee'|_},
+	homes[_] ? {smoke:'Pall Mall',animal:'bird'|_},
+	homes[3] ? {number:3,drink:'milk'|_},
+	homes[_] ? {colour:'Yellow',smoke:'Dunhill'|_},
+	homes[1] ? {nationality:'Norwegian',number:1|_},
+	homes[N12] ? {smoke:'Marlboro',number:N12|_},
+	homes[N13] ? {animal:'cat',number:N13|_},
+	nearby(N12,N13).
+--
+conditions2:-
+	homes[N14] ? {animal:'horse',number:N14|_},
+	homes[N15] ? {smoke:'Dunhill',number:N15|_},
+	nearby(N14,N15),
+	homes[_] ? {smoke:'Winfield',drink:'beer'|_},
+	homes[N16] ? {nationality:'Norwegian',number:N16|_},
+	homes[N17] ? {colour:'Blue',number:N17|_},
+	nearby(N16,N17),
+	homes[_] ? {nationality:'German',smoke:'Rothmans'|_},
+	homes[N19] ? {smoke:'Marlboro',number:N19|_},
+	homes[N20] ? {drink:'water',number:N20|_},
+	nearby(N19,N20).
+--
+less(N1,N2):-
+	N2== N1 ? '+'(1),
+	N1== N2 ? '-'(1).
+--
+nearby(N1,N2):-
+	N1 ? near(N2),
+	N2 ? near(N1).
+--
+near(N1,N2):-
+	N2== N1 - 1.
+near(N1,N2):-
+	N2== N1 + 1.
+]
+------------------------------------------------------------------------
+class 'HomeArray' (specialized 'DynamicWorlds'):
+[
+]
+------------------------------------------------------------------------
+class 'Home' (specialized 'Alpha'):
+--
+variable:
+--
+	number;
+	nationality;
+	colour;
+	animal;
+	drink;
+	smoke;
+--
+[
+{number,nationality,colour,animal,drink,smoke}:-!.
+]
+------------------------------------------------------------------------
+--
+-- Solution: German.
+-- It's proved that there are no more solutions.
+--
+------------------------------------------------------------------------
+--
+-- Pentium Q9450, 2.67GHz, 3.25GB, Windows XP, SP3
+-- ===============================================
+-- Socket775 ASUS "P5K/EPU" (iP35, 4xDDR2, U133, SATA II, 2xPCI-E,
+-- SB, 1Gbit LAN, IEEE1394a, USB2.0, ATX)
+-- Intel "Core 2 Quad Q9450" (2.66GHz, 2x6MB, 1333MHz, EM64T)
+-- 2 x 2GB DDR2 SDRAM Kingston "ValueRAM" KVR800D2N5/2G (PC6400,
+-- 800MHz, CL5)
+--
+-- 2012.06.06:
+--
+-- ACTOR PROLOG INTERPRETER:
+--
+-- Solution: German
+-- Time: 2.5 [sec]
+-- Solution: No more solutions
+-- Time: 5.13 [sec]
+--
+-- ACTOR PROLOG COMPILER:
+--
+-- No set optimization:
+--
+-- Solution: German
+-- Time: 0.62 [sec]
+-- Solution: No more solutions
+-- Time: 1.28 [sec]
+--
+-- With set optimization:
+--
+-- Solution: German
+-- Time: 0.57 [sec]
+-- Solution: No more solutions
+-- Time: 1.14 [sec]
+--
+-- java version "1.7.0_03"
+-- Java(TM) SE Runtime Environment (build 1.7.0_03-b05)
+-- Java HotSpot(TM) Server VM (build 22.1-b02, mixed mode)
+--
+-- No set optimization:
+--
+-- Solution: German
+-- Time: 0.156 [sec]
+-- Solution: No more solutions
+-- Time: 1.359 [sec]
+--
+-- With set optimization:
+--
+-- Solution: German
+-- Time: 0.156 [sec]
+-- Solution: No more solutions
+-- Time: 1.0 [sec]
+--
+------------------------------------------------------------------------

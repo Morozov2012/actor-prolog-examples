@@ -1,0 +1,68 @@
+package "Morozov/Web/Engines/Control":
+---------------------------------------------------------------
+--            The "CONTROL" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package is intended for control of search engines.   --
+---------------------------------------------------------------
+import "Morozov/Web/Scanning/Counter";
+---------------------------------------------------------------
+class 'ControlDialog' (specialized 'Dialog'):
+--
+constant:
+--
+	engine;
+--
+-- constant:
+--
+--	identifier	= "SearchControl";
+--
+variable:
+--
+	limit_number_of_pages;
+	max_page;
+--
+internal:
+--
+	switch		= ('Switch',
+				limit_number_of_pages,
+				max_page,
+				engine);
+--
+[
+goal:-!.
+	/* Debug
+	put('limit_number_of_pages','yes'),
+	put('max_page',25).
+	*/
+--
+set_engine_mode(CountPages,MaxPage):-
+	put('limit_number_of_pages',CountPages),
+	put('max_page',MaxPage),!.
+set_engine_mode(_,_).
+]
+---------------------------------------------------------------
+class 'Switch':
+--
+variable:
+--
+	limit_number_of_pages;
+	max_page;
+--
+constant:
+--
+	engine;
+--
+[
+goal:-
+	-- con ? writeln(limit_number_of_pages,max_page),
+	check(limit_number_of_pages,max_page).
+--
+check(#,#):-!.
+check(CountPages,MaxPage):-
+	engine <- set_engine_mode(CountPages,MaxPage).
+--
+alarm(_):-
+	fail.
+]
+---------------------------------------------------------------

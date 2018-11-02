@@ -1,0 +1,53 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w01	= ('MyWindow', title="#1");
+w02	= ('MyWindow', title="#2");
+w03	= ('MyWindow', title="#3");
+w04	= ('MyWindow', title="#4");
+w05	= ('MyWindow', title="#5");
+w06	= ('MyWindow', title="#6");
+w07	= ('MyWindow', title="#7");
+w08	= ('MyWindow', title="#8");
+w09	= ('MyWindow', title="#9");
+w10	= ('MyWindow', title="#10");
+w11	= ('MyWindow', title="#11");
+w12	= ('MyWindow', title="#12");
+w13	= ('MyWindow', title="#13");
+w14	= ('MyWindow', title="#14");
+w15	= ('MyWindow', title="#15");
+w16	= ('MyWindow', title="#16");
+w17	= ('MyWindow', title="#17");
+w18	= ('MyWindow', title="#18");
+w19	= ('MyWindow', title="#19");
+w20	= ('MyWindow', title="#20");
+w21	= ('MyWindow', title="#21");
+w22	= ('MyWindow', title="#22");
+w23	= ('MyWindow', title="#23");
+w24	= ('MyWindow', title="#24");
+--
+[
+goal.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	x= 25; -- 'default';
+	y= 'default';
+	width= 25;
+	height= 15;
+--
+[
+goal:-!,
+	writeln("Hello world!"),
+	writeln("x= ",x),
+	writeln("y= ",y).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,38 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+N	= INTEGER.
+List	= N*.
+
+PREDICATES:
+
+imperative:
+
+test1(List,List)	- (i,o);
+test2(List)		- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	L1== [5,2,-4,-9,0,9,-2,-8,6,-5,1,-6,-3,4,7,-1,1,-7,3,8],
+	con ? writeln("L1= ",L1),
+	test1(L1,L2),
+	con ? writeln("L2= ",L2),
+	test2(L1),
+	con ? writeln("O.K.").
+--
+test1(L1,L2):-
+	L2== ?cast("List",?sort_list(L1)).
+--
+test2(L1):-
+	?sort_list(L1).
+]

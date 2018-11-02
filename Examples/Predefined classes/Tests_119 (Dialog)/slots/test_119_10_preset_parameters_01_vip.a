@@ -1,0 +1,80 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+--
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+dialogs	= 'DialogArray'[1 .. 10] of ('DemoPanel1');
+--
+[
+goal:-!,
+	test1,
+	test2.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test 1"),
+	set_color('default'),
+	dialogs[5] ? put('identifier','auto'),
+	dialogs[5] ? put('is_modal','no'),
+	dialogs[5] ? put('is_top_level_window','yes'),
+	dialogs[5] ? put('exit_on_close','yes'),
+	dialogs[5] ? put('title',"Modeless Dialog"),
+	dialogs[5] ? put('x',41),
+	writeln("\tIdentifier: ",dialogs[5]?get('identifier')),
+	writeln("\tIs modal dialog: ",dialogs[5]?get('is_modal')),
+	writeln("\tIs top level window: ",
+		dialogs[5]?get('is_top_level_window')),
+	writeln("\tDoes exit on close: ",
+		dialogs[5]?get('exit_on_close')),
+	writeln("\ttitle: ",dialogs[5]?get('title')),
+	writeln("\tx: ",dialogs[5]?get('x')),
+	writeln("\ty: ",dialogs[5]?get('y')),
+	dialogs[5] ? show.
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("Test 2"),
+	set_color('default'),
+	dialogs[7] ? put('identifier',"morozov.tests.MyDialog1"),
+	dialogs[7] ? put('is_modal','yes'),
+	dialogs[7] ? put('is_top_level_window','no'),
+	dialogs[7] ? put('exit_on_close','no'),
+	dialogs[7] ? put('title',"Modal Dialog"),
+	dialogs[7] ? put('x',1),
+	writeln("\tIdentifier: ",dialogs[7]?get('identifier')),
+	writeln("\tIs modal dialog: ",dialogs[7]?get('is_modal')),
+	writeln("\tIs top level window: ",
+		dialogs[7]?get('is_top_level_window')),
+	writeln("\tDoes exit on close: ",
+		dialogs[7]?get('exit_on_close')),
+	writeln("\ttitle: ",dialogs[7]?get('title')),
+	writeln("\tx: ",dialogs[7]?get('x')),
+	writeln("\ty: ",dialogs[7]?get('y')),
+	dialogs[7] ? show.
+]
+-----------------------------------------------------------------------
+class 'DialogArray' (specialized 'DynamicWorlds'):
+[
+PREDICATES:
+--
+imperative:
+--
+element(INTEGER*) = 'DemoPanel1'	- (i);
+
+]
+------------------------------------------------------------------------
+class 'DemoPanel1' (specialized 'Dialog'):
+[
+]
+-----------------------------------------------------------------------

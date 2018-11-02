@@ -1,0 +1,12 @@
+mesh(80,25)
+dialog_font('helvetica',18)
+
+modeless dialog 'Main'("Crystals 3D Demo",default,default,default,centered,centered,default)
+vbox(justify)
+	custom(main_slot,50,50,"Control3D")
+	hbox(center)
+		checkbox(show_billboards,"Show &Billboards",'no')
+		ok("remake","&Remake Scene")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

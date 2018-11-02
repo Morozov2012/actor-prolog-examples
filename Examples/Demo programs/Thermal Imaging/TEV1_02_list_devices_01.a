@@ -1,0 +1,66 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/TEV1";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TEV1'):
+--
+internal:
+--
+	main_window	= ('Canvas2D',
+				background_color='SystemControl');
+	image		= ('BufferedImage');
+	con		= ('Console');
+--
+[
+goal:-!,
+	List== ?get_device_list(),
+	list_devices(List),
+	initialize_data_acquisition(List).
+--
+initialize_data_acquisition([]):-!,
+	con ? error(
+		"Error",
+		"Sorry, the TE V1 device is not found!").
+initialize_data_acquisition(List):-
+	con ? select_item(
+		"Device Selection",
+		"Select device, please",
+		?cast("S_List",List),
+		1,
+		SelectedIdentifier,
+		_),!,
+	initialize_selected_device(SelectedIdentifier).
+initialize_data_acquisition(_).
+--
+initialize_selected_device(Identifier):-
+	open(Identifier),!,
+	start.
+initialize_selected_device(Identifier):-
+	con ? error(
+		"Error",
+		con?format(
+			"Sorry, I cannot open the\n%s\ndevice!",
+			Identifier)).
+--
+list_devices([Identifier|Rest]):-!,
+	con ? writeln(Identifier),
+	list_devices(Rest).
+list_devices(_).
+--
+frame_obtained:-
+	commit,!,
+	Identifier== ?get_actual_identifier(),
+	main_window ? set_title(Identifier),
+	get_recent_image(image),
+	main_window ? suspend_redrawing,
+	main_window ? clear,
+	main_window ? draw_image(image,0,0,1,1),
+	main_window ? draw_now.
+--
+data_transfer_error(ErrorName):-!,
+	con ? error("Data Transfer Error",ErrorName).
+]
+-----------------------------------------------------------------------

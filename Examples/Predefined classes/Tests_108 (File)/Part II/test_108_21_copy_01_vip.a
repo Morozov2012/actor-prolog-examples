@@ -1,0 +1,97 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1(FileName)		- (i);
+test2;
+test3;
+test4(FileName)		- (i);
+test5(FileName)		- (i);
+
+class 'Main':
+--
+internal:
+--
+	test1	= ('Test',
+			name= "test.asc",
+			newName= "new.txt");
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'File'):
+--
+constant:
+--
+	name	: FileName;
+	newName	: FileName;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("=== File: ",name," ==="),
+	test5(newName),
+	test1(name),
+	test4(name),
+	test4(newName),
+	-- fail,
+	test2,
+	test4(name),
+	test4(newName),
+	test5(newName),
+	test1(name),
+	test4(name),
+	test4(newName),
+	test3,
+	test4(name),
+	test4(newName).
+--
+test1(FileName):-
+	con ? writeln("Test 1"),
+	con ? writeln("\tI will try to create the file: ",FileName),
+	?set_string("012345678901234567890123456789"),
+	con ? writeln("\tDone.").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tI will try to copy the file."),
+	?copy(newName),
+	con ? writeln("\tDone!").
+--
+test3:-
+	con ? writeln("Test 3"),
+	con ? writeln("\tI will try to copy the file."),
+	?copy(name,newName),
+	con ? writeln("\tDone!").
+--
+test4(FileName):-
+	con ? writeln("Test 1"),
+	con ? writeln("\tDoes the ",FileName," file exist?"),
+	?does_exist(FileName),!,
+	con ? writeln("\tYes, it does!").
+test4(_):-
+	con ? writeln("\tNo, it doesn't.").
+--
+test5(FileName):-
+	con ? writeln("Test 8"),
+	con ? writeln(
+		"\tI will try to delete the ",FileName," file."),
+	?delete(FileName),!,
+	con ? writeln("\tThe file was deleted successfully.").
+test5(_):-
+	con ? writeln("\tI cannot delete it.").
+]

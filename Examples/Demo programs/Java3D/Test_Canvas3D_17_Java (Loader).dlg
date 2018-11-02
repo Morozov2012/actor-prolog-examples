@@ -1,0 +1,17 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',18)
+
+modeless dialog 'Main'("3D Loader Demo",default,default,default,centered,centered,default)
+vbox(justify)
+	custom(canvas,50,50,"Control3D")
+	hbox(center)
+		ok("load","Select and &Load 3D Model File")
+		button(close,"&Exit Program")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

@@ -1,0 +1,55 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- REAL.                                 --
+--                                       --
+-- Questions: What is a real range? How  --
+-- can one create a new domain that is a --
+-- kind of a real range? Does the        --
+-- compiler check whether a number of    --
+-- this domain belongs to the range      --
+-- during the translation of a program?  --
+-- Does the compiler check whether a     --
+-- number of this domain belongs to the  --
+-- range during the execution of the     --
+-- program? How can one declare that a   --
+-- built-in arithmetical operation is    --
+-- applicable for this domain? (The      --
+-- latter question is to be discussed    --
+-- after the study of arithmetical       --
+-- functions and the object-oriented     --
+-- syntax of Actor Prolog.               --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+Angle		= [0.0 .. 360.0].
+
+PREDICATES:
+
+p1(Angle)		- (i);
+p2(Angle)		- (i);
+
+class 'Main' (specialized 'DemoConsole'):
+[
+PREDICATES:
+
+'+'(Angle,Angle) = Angle	- (i,i);
+
+CLAUSES:
+
+goal:-
+	-- p1(361.0).
+	p1(360.0).
+
+p1(X):-
+	p2(X+1.0).
+
+p2(X):-
+	writeln(X).
+]

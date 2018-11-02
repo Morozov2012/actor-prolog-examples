@@ -1,0 +1,99 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+report_text_values;
+
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+w01	= ('DemoPanel',
+		x= 3,
+		y= 3);
+w02	= ('DemoPanel',
+		x= 27,
+		y= 7);
+--
+[
+goal:-!,
+	set_text_color('Blue'),
+	report_text_values,
+	w01 ? set_control_text(8000,"8000"),
+	w01 ? set_control_text(1000,"1000"),
+	w01 ? set_control_text(1010,"1010"),
+	w01 ? set_control_text(1020,"1020"),
+	w01 ? set_control_text(1030,"1030"),
+	w01 ? set_control_text(1040,"1040"),
+	w01 ? set_control_text(1050,"1050"),
+	w01 ? set_control_text(1060,"1060"),
+	w01 ? set_control_text(2000,"2000"),
+	w01 ? set_control_text(2010,"20&A10"),
+	w01 ? set_control_text(2020,"20&B20"),
+	w01 ? set_control_text(2030,"20&C30"),
+	w01 ? set_control_text(3000,"3000"),
+	w01 ? set_control_text(3010,"30&D10"),
+	w01 ? set_control_text(3020,"30&E20"),
+	w01 ? set_control_text(4000,"4000"),
+	w01 ? set_control_text(4011,"4011"),
+	w01 ? set_control_text(4012,"4012"),
+	w01 ? set_control_text(4021,"4021"),
+	w01 ? set_control_text(4022,"4022"),
+	w01 ? set_control_text(4031,"4031"),
+	w01 ? set_control_text(4032,"4032"),
+	w01 ? set_control_text(5011,"5011"),
+	w01 ? set_control_text(5012,"5012"),
+	w01 ? set_control_text(5021,"5021"),
+	w01 ? set_control_text(5022,"5022"),
+	w01 ? set_control_text("action","70&F10"),
+	w01 ? set_control_text('verify',"70&G20"),
+	w01 ? set_control_text('reset',"70&H30"),
+	w01 ? set_control_text('close',"70&I40"),
+	set_text_color('DkGreen'),
+	report_text_values.
+--
+report_text_values:-
+	writeln(w01?get_control_text(8000)),
+	writeln(w01?get_control_text(1000)),
+	writeln(w01?get_control_text(1010)),
+	writeln(w01?get_control_text(1020)),
+	writeln(w01?get_control_text(1030)),
+	writeln(w01?get_control_text(1040)),
+	writeln(w01?get_control_text(1050)),
+	writeln(w01?get_control_text(1060)),
+	writeln(w01?get_control_text(2000)),
+	writeln(w01?get_control_text(2010)),
+	writeln(w01?get_control_text(2020)),
+	writeln(w01?get_control_text(2030)),
+	writeln(w01?get_control_text(3000)),
+	writeln(w01?get_control_text(3010)),
+	writeln(w01?get_control_text(3020)),
+	writeln(w01?get_control_text(4000)),
+	writeln(w01?get_control_text(4011)),
+	writeln(w01?get_control_text(4012)),
+	writeln(w01?get_control_text(4021)),
+	writeln(w01?get_control_text(4022)),
+	writeln(w01?get_control_text(4031)),
+	writeln(w01?get_control_text(4032)),
+	writeln(w01?get_control_text(5011)),
+	writeln(w01?get_control_text(5012)),
+	writeln(w01?get_control_text(5021)),
+	writeln(w01?get_control_text(5022)),
+	writeln(w01?get_control_text("action")),
+	writeln(w01?get_control_text('verify')),
+	writeln(w01?get_control_text('reset')),
+	writeln(w01?get_control_text('close')).
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+[
+goal:-!,
+	show.
+]
+-----------------------------------------------------------------------

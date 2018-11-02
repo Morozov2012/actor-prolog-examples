@@ -1,0 +1,168 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	p1	= (('ProcessA',
+			data_store=store,
+			receiver=p2));
+	p2	= (('ProcessB',
+			data_store=store));
+--
+internal:
+--
+	store	= ('DataStore',
+			access_mode='modifying');
+--
+[
+goal:-!,
+	p1 <- implement_test.
+]
+-----------------------------------------------------------------------
+class 'ProcessA' (specialized 'Alpha'):
+--
+constant:
+--
+	data_store	: 'DataStore';
+	receiver	: 'ProcessB';
+--
+internal:
+--
+	data_base	= ('MyDatabase',
+				place=shared(data_store,"MyTable"));
+--
+	con		= ('Report',
+				title="PROCESS A",
+				x=0,
+				y=0,
+				width=25);
+--
+[
+IMPERATIVES:
+--
+implement_test;
+test_insertion;
+--
+CLAUSES:
+--
+goal:-!.
+--
+implement_test:-
+	test_insertion,
+	receiver <- implement_test.
+--
+test_insertion:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store insertion."),
+	con ? set_color('default'),
+	data_base ? test_database_insert,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'ProcessB' (specialized 'Alpha'):
+--
+constant:
+--
+	data_store	: 'DataStore';
+--
+internal:
+--
+	data_base	= ('MyDatabase',
+				place=shared(data_store,"MyTable"));
+--
+	con		= ('Report',
+				title="PROCESS B",
+				x=25,
+				y=0,
+				width=25);
+--
+[
+IMPERATIVES:
+--
+implement_test;
+--
+CLAUSES:
+--
+goal:-!.
+--
+implement_test:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store inspection."),
+	con ? set_color('default'),
+	data_base ? test_database_find,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	con	= ('Console',
+			title="COMMON DATABASE TABLE",
+			x=50,
+			y=0,
+			width=30);
+--
+[
+DOMAINS:
+--
+Target		= {x:REAL,y:REAL,z:REAL}.
+--
+IMPERATIVES:
+--
+test_database_insert;
+test_database_find;
+inspect_database;
+--
+CLAUSES:
+--
+test_database_insert:-
+	con ? set_color('Violet'),
+	con ? writeln("Test database insertion."),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	append({y:1000.0}),
+	append({z:3000.0}),
+	append({x:5000.0}),
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test_database_insert:-
+	con ? set_color('Red'),
+	con ? writeln("Transaction failed."),
+	con ? set_color('default').
+--
+test_database_find:-
+	con ? set_color('Violet'),
+	con ? writeln("Test database inspection."),
+	con ? set_color('default'),
+	begin_transaction('reading'),!,
+	inspect_database,
+	end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test_database_find:-
+	con ? set_color('Red'),
+	con ? writeln("Transaction failed."),
+	con ? set_color('default').
+--
+inspect_database:-
+	con ? writeln("Database content:"),
+	con ? set_color('Blue'),
+	find(Item),
+		con ? writeln("\t",Item),
+		fail.
+inspect_database:-
+	con ? set_color('default'),
+	con ? writeln("No more items.").
+]
+-----------------------------------------------------------------------

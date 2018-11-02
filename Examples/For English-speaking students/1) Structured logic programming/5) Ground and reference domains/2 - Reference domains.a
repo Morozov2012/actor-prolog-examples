@@ -1,0 +1,50 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Ground, reference, --
+-- and mixed domains.                    --
+--                                       --
+-- Questions: What are non-ground terms? --
+-- What are reference domains? What      --
+-- special data structures can be        --
+-- created during the processing of data --
+-- items of the reference domains? Why   --
+-- can the unification of terms of the   --
+-- reference domains be slower than the  --
+-- unification of terms of the ground    --
+-- domains? Is the trail used for the    --
+-- unification of the terms of the       --
+-- reference domains? What are reasons   --
+-- for using the reference domains? What --
+-- problems can happen during the        --
+-- processing of the data items of the   --
+-- reference domains because the 'occur  --
+-- check' is not implemented in this     --
+-- version of the Actor Prolog system?   --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+reference:
+
+D1	= f(N,N,N).
+N	= INTEGER.
+
+PREDICATES:
+
+nondeterm:
+
+p(D1)		- (o);
+
+CLAUSES:
+
+goal:-
+	p(X),
+	writeln(X).
+
+-- p(f(3,_,5)).
+p(_).

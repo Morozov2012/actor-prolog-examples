@@ -1,0 +1,78 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4.
+--
+test1:-
+	writeln("Test 1:"),
+	Name== ?input_new_file_name(
+		"*.a;*.def",
+		[
+		"*.a;*.def","Prolog",
+		"*.bak","Temporary",
+		"*.*","All files"
+		]),!,
+	writeln("\t",Name).
+test1:-
+	writeln("\tThe input was canceled by the user.").
+--
+test2:-
+	writeln("Test 2:"),
+	Name== ?input_new_file_name(
+		"Please enter a file name",
+		"*.a;*.def",
+		[
+		"*.a;*.def","Prolog",
+		"*.bak","Temporary",
+		"*.*","All files"
+		]),!,
+	writeln("\t",Name).
+test2:-
+	writeln("\tThe input was canceled by the user.").
+--
+test3:-
+	writeln("Test 3:"),
+	?input_new_file_name(
+		"*.a;*.def",
+		[
+		"*.a;*.def","Prolog",
+		"*.bak","Temporary",
+		"*.*","All files"
+		]),!,
+	writeln("\tThe user has entered something.").
+test3:-
+	writeln("\tThe input was canceled by the user.").
+--
+test4:-
+	writeln("Test 4:"),
+	?input_new_file_name(
+		"Please enter a file name",
+		"*.a;*.def",
+		[
+		"*.a;*.def","Prolog",
+		"*.bak","Temporary",
+		"*.*","All files"
+		]),!,
+	writeln("\tThe user has entered something.").
+test4:-
+	writeln("\tThe input was canceled by the user.").
+]
+-----------------------------------------------------------------------

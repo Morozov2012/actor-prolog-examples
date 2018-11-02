@@ -1,0 +1,32 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Console',
+			x= 15,
+			y= 5,
+			width= 50,
+			height= 15,
+			maximal_line_number= 'no_limit');
+--
+[
+goal:-!,
+	set_period(1.5),
+	activate.
+--
+tick:-
+	con ? is_visible(),!,
+	con ? writeln("I will hide the window."),
+	con ? hide.
+tick:-
+	con ? is_hidden(),!,
+	con ? writeln("I will show the window."),
+	con ? show.
+tick:-!,
+	con ? writeln("The window is created.").
+]
+-----------------------------------------------------------------------

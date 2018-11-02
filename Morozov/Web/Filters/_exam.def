@@ -1,0 +1,41 @@
+package "Morozov/Web/Filters/_Exam"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--        The "FILTERS/_EXAM" Actor Prolog package.          --
+--        (c) 2002-2011, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package checks given list of Web resources.          --
+---------------------------------------------------------------
+import 'WebAddressFilter' from "Morozov/Web/Data/Address";
+import "Morozov/Web/Engines/Control";
+import 'Check_Resources' from "Morozov/Web/Filters/Exam";
+import '_AnalyserControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+import '_EngineInput'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+---------------------------------------------------------------
+interface '_Check_Resources'
+(specialized
+	'WebAddressFilter', '_Block',
+	'_AnalyserControl', '_EngineInput'):
+--
+variable:
+--
+	value_i1	: SearchPattern;
+	value_o1	: WebAddressList;
+--
+internal:
+--
+	world		: 'Check_Resources';
+--
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+show(_*);
+--
+]
+---------------------------------------------------------------

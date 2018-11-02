@@ -1,0 +1,38 @@
+package "Morozov/Web/Links/_Mnfld"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--      The "WEB/LINKS/MANIFOLD" Actor Prolog package.       --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains a set of connectors for             --
+-- linking various program components.                       --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import "Morozov/Web/Data/Keywords";
+import "Morozov/Web/Engines/Control";
+import '_EngineControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+import '_EngineInput'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+import '_AnalyserControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+---------------------------------------------------------------
+interface '_Convert_Message_"Search"_to_"Show"_and_"Search"'
+(specialized '_Block', '_AnalyserControl', '_EngineInput'):
+--
+internal:
+--
+	entry_i1	: '_EngineInput';
+--
+variable:
+--
+	value_i1	: SearchPattern;
+--
+internal:
+--
+	entry_o1	: '_AnalyserControl';
+	entry_o2	: '_EngineInput';
+--
+[
+]
+---------------------------------------------------------------

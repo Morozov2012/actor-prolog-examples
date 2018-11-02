@@ -1,0 +1,422 @@
+mesh(80,40)
+failure_color('Red','White')
+diagram_font("Arial",23)
+dialog_font("Arial",14)
+window_font("Times New Roman",14)
+
+dialog '_Горная_порода' ("Горная порода",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(up)
+		column(left)
+			"Тип породы"
+		end_of_column
+		column(left)
+			radiobuttons(type_of_rock)
+			vbox(left)
+				radiobutton("терригенный")
+				radiobutton("карбонатный")
+			end_of_vbox
+			end_of_radiobuttons
+		end_of_column
+	end_of_row
+	row(up)
+		column(left)
+			"Тип коллектора"
+		end_of_column
+		column(left)
+			radiobuttons(type_of_collector)
+			vbox(left)
+				radiobutton("поровый")
+				radiobutton("трещинный")
+				radiobutton("смешанный")
+			end_of_vbox
+			end_of_radiobuttons
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Проницаемость (0.0001-20.0)"
+		end_of_column
+		column(left)
+			editreal(penetrability,10,1.5)
+		end_of_column
+		column(left)
+			"[мкм^2]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Пористость (0.0001-0.5)"
+		end_of_column
+		column(left)
+			editreal(porosity,10,0.3)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Нефтенасыщенность (0.0-1.0)"
+		end_of_column
+		column(left)
+			editreal(saturation,10,0.8)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Связанная вода (0.01-0.7)"
+		end_of_column
+		column(left)
+			editreal(water,10,0.1)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Средний угол смачивания (0-180)"
+		end_of_column
+		column(left)
+			editreal(moist,10,50)
+		end_of_column
+		column(left)
+			"[град.]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Закрыть диалог")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Пласт' ("Пласт",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Толщина пласта (0.0-100.0)"
+		end_of_column
+		column(left)
+			editreal(thickness,10,20)
+		end_of_column
+		column(left)
+			"[м]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Толщина водонасыщенной зоны (0.5-30.0)"
+		end_of_column
+		column(left)
+			editreal(water_thickness,10,0.05)
+		end_of_column
+		column(left)
+			"[м]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Толщина покрывающих пород (3.0-100.0)"
+		end_of_column
+		column(left)
+			editreal(rock_thickness,10,40)
+		end_of_column
+		column(left)
+			"[м]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Давление (1.0-60.0)"
+		end_of_column
+		column(left)
+			editreal(pressure,10,10.0)
+		end_of_column
+		column(left)
+			"[МПа]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Температура (0.0-200.0)"
+		end_of_column
+		column(left)
+			editreal(temperature,10,30.0)
+		end_of_column
+		column(left)
+			"[C]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Угол падения (0-90)"
+		end_of_column
+		column(left)
+			editreal(angle,10,3.0)
+		end_of_column
+		column(left)
+			"[град.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Глубина залегания (0.0-6000.0)"
+		end_of_column
+		column(left)
+			editreal(depth,10,1000.0)
+		end_of_column
+		column(left)
+			"[м]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Закрыть диалог")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Пластовая_нефть' ("Пластовая нефть",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Плотность (575-1100)"
+		end_of_column
+		column(left)
+			editreal(density,10,700)
+		end_of_column
+		column(left)
+			"[кг/м^3]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Вязкость (0.001-1500)"
+		end_of_column
+		column(left)
+			editreal(viscosity,10,10)
+		end_of_column
+		column(left)
+			"[мПа*с]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Кислотное число (0.01-10.0)"
+		end_of_column
+		column(left)
+			editreal(acid,10,0.1)
+		end_of_column
+		column(left)
+			"[мг/г]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Закрыть диалог")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Пластовая_вода' ("Пластовая вода",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Минерализация (0.0-210.0)"
+		end_of_column
+		column(left)
+			editreal(mineralization,10,100)
+		end_of_column
+		column(left)
+			"[г/л]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"pH (2.0-14.0)"
+		end_of_column
+		column(left)
+			editreal(pH,10,7.0)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Жёсткость (0-100)"
+		end_of_column
+		column(left)
+			editreal(hardness,10,10.0)
+		end_of_column
+		column(left)
+			"[г/л]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Закрыть диалог")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Пластовый_газ' ("Пластовый газ",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Азотистые соединения (0.0-0.02)"
+		end_of_column
+		column(left)
+			editreal(nitrogen,10,0.0)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Наличие свободного газа"
+		end_of_column
+		column(left)
+			checkbox(free_gas," Есть газ? ")
+		end_of_column
+		column(left)
+			"Да/Нет"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Закрыть диалог")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Пластовые_вещества' ("Пластовые вещества",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Парафин (0.0-0.3)"
+		end_of_column
+		column(left)
+			editreal(paraph,10,0.01)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Асфальтены (0.0-0.15)"
+		end_of_column
+		column(left)
+			editreal(asphalt,10,0.0)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Смолы (0.0-0.4)"
+		end_of_column
+		column(left)
+			editreal(resin,10,0.0)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Сера (0.0-0.08)"
+		end_of_column
+		column(left)
+			editreal(sulphur,10,0.0)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Температура насыщения нефти парафином (8-65)"
+		end_of_column
+		column(left)
+			editreal(t_paraph,10,12)
+		end_of_column
+		column(left)
+			"[C]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Закрыть диалог")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog '_Минеральный_состав' ("Минеральный состав",'White','Blue',default,centered,centered,default)
+vbox(center)
+grid
+	row(center)
+		column(left)
+			"Цемент (0.0-0.3)"
+		end_of_column
+		column(left)
+			editreal(cement,10,0.01)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Глины (0.0-0.25)"
+		end_of_column
+		column(left)
+			editreal(clay,10,0.01)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+	row(center)
+		column(left)
+			"Карбонатность (0.0-1.0)"
+		end_of_column
+		column(left)
+			editreal(carbon,10,0.03)
+		end_of_column
+		column(left)
+			"[д.ед.]"
+		end_of_column
+	end_of_row
+end_of_grid
+	hbox(center)
+		ok(close,"&Закрыть диалог")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog 'ДиалогПроверкиПараметров' ("Method",'White','Blue',default,centered,centered,default)
+	button(1000,"&Объяснить решение")
+	button(close,"&Закрыть диалог")
+end_of_dialog
+
+dialog '_Вывод_результатов' ("Рекомендуемые методы воздействия",'White','Blue',default,centered,centered,default)
+vbox(center)
+	listbox['Sort'](value_i1,3000,30,9,[],[])
+	button(close,"&Close")
+end_of_vbox
+end_of_dialog

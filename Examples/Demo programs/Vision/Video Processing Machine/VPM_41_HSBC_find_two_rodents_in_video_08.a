@@ -1,0 +1,725 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+import .. from "morozov/FFmpeg";
+-----------------------------------------------------------------------
+project: (('DialogHSBC'))
+-----------------------------------------------------------------------
+class 'DialogHSBC' (specialized 'Dialog'):
+--
+constant:
+--
+	data_directory =
+		/*
+		"L:/= Video =/W_L_Object 10 07 2017/"
+		"22 object/2 session";
+		*/
+		/*
+		"L:/= Video =/W_L_Subject 14 07 2017/"
+		"22 subject/1 session";
+		*/
+		/*
+		"F:/= Video =/W_L_Subject 14 07 2017/"
+		"25 subject/1 session";
+		*/
+		/*
+		"F:/= Video =/W_L_Subject 14 07 2017/"
+		"26 subject/2 session";
+		*/
+		"F:/= Video =/W_L_Subject 14 07 2017/"
+		"26 subject/1 session";
+--
+	file_name	=
+			-- "time 17-07-10 15-16-42.avi";
+			-- "time 17-07-14 14-59-10.avi";
+			-- "time 17-07-14 15-23-14.avi";
+			-- "time 17-07-14 16-05-43.avi";
+			"time 17-07-14 15-29-27.avi";
+	frame_rate	= 30.0;
+--
+constant:
+--
+-- Warning: This matrix corresponds to
+-- the "time 17-07-10 15-16-42.avi" data set only.
+--
+inverse_transformation_matrix	= [
+		[ 0.0011, 0.0000,0.0001],
+		[ 0.0000, 0.0010,0.0001],
+		[-0.0670,-0.0839,1.0000]];
+--
+internal:
+--
+	video		= ('VideoReader',
+				target_world= self);
+	vpm		= ('VideoProcessingMachine',
+				minimal_training_interval= -1,
+				-- maximal_training_interval= 100,
+				horizontal_blob_border= 5,
+				vertical_blob_border= 5,
+				horizontal_extra_border_coefficient= -1.0,
+				vertical_extra_border_coefficient= -1.0,
+				minimal_blob_intersection_area= 1,
+				minimal_blob_size= 100, -- 1000,
+				maximal_blob_invisibility_interval= 0, -- 30,
+				minimal_track_duration= 25, -- 50,
+				maximal_track_retention_interval= 50,
+				inverse_transformation_matrix,
+				apply_median_filtering_to_velocity= 'yes',
+				velocity_median_filter_halfwidth= 3,
+				synthesized_image_transparency= 210); -- 48);
+	timer		= ('Timer');
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	text		= ('Text');
+	image1		= ('BufferedImage');
+	image2		= ('BufferedImage');
+	state		= ('ProgramState');
+	model		= ('VisualSceneModel');
+	con		= ('Console');
+--
+variable:
+--
+	first_frame;
+	last_frame;
+	minimal_hue_1;
+	maximal_hue_1;
+	minimal_hue_2;
+	maximal_hue_2;
+	minimal_saturation;
+	maximal_saturation;
+	minimal_brightness;
+	maximal_brightness;
+	minimal_contrast;
+	maximal_contrast;
+--
+constant:
+--
+	big_circle_radius	= 0.05;
+	small_circle_radius	= 0.005;
+	maximal_distance	= 100.0;
+--
+[
+goal:-!,
+	maximize,
+	VideoToBeRead== data_directory + "/" + file_name,
+	video ? set_name(VideoToBeRead),
+	Time0== timer?milliseconds(),
+	state ? set_beginning_time(Time0),
+	detect_minimal_file_number(MinFileNumber),
+	detect_maximal_file_number(MaxFileNumber),
+	put(1002,[MinFileNumber,MaxFileNumber]),
+	put(1004,[MinFileNumber,MaxFileNumber]),
+	put('first_frame',MinFileNumber),
+	put('last_frame',MaxFileNumber),
+	-- put('minimal_hue_1',25),
+	-- put('maximal_hue_1',70),
+	-- put('minimal_hue_2',135),
+	-- put('maximal_hue_2',180),
+	--
+	-- put('minimal_saturation',0),
+	put('maximal_saturation',100),
+	put('minimal_brightness',55),
+	-- put('maximal_brightness',255),
+	put('minimal_contrast',100),
+	put('maximal_contrast',200),
+	modified_control(0),
+	video ? start.
+--
+detect_minimal_file_number(1).
+--
+detect_maximal_file_number(TotalFrameNumber):-
+	video ? get_video_sequence_size(TotalFrameNumber).
+--
+show_frame_range_if_necessary(Min,Max):-
+	?mod(Max,1000) == 0,!,
+	put(1004,[Min,Max]),
+	put('last_frame',Max).
+show_frame_range_if_necessary(_,_).
+--
+modified_control('first_frame'):-
+	FFN== ?val("INTEGER",?get('first_frame')),!,
+	video ? seek_frame_number(FFN),
+	T2== timer?milliseconds(),
+	state ? set_beginning_time(T2).
+modified_control(_):-
+	MinimalHue1== ?val("INTEGER",?get('minimal_hue_1')),
+	MaximalHue1== ?val("INTEGER",?get('maximal_hue_1')),
+	MinimalHue2== ?val("INTEGER",?get('minimal_hue_2')),
+	MaximalHue2== ?val("INTEGER",?get('maximal_hue_2')),
+	MinimalSaturation==
+		?val("INTEGER",?get('minimal_saturation')),
+	MaximalSaturation==
+		?val("INTEGER",?get('maximal_saturation')),
+	MinimalBrightness==
+		?val("INTEGER",?get('minimal_brightness')),
+	MaximalBrightness==
+		?val("INTEGER",?get('maximal_brightness')),
+	MinimalContrast==
+		?val("INTEGER",?get('minimal_contrast')),
+	MaximalContrast==
+		?val("INTEGER",?get('maximal_contrast')),!,
+	vpm ? suspend_processing,
+	vpm ? retract_all_instructions,
+	vpm ? img_resize_image(360,-1),
+	L11== [	p(70,88),p(153,83),p(298,79),p(357,72),
+		p(408,69),p(470,61),p(559,63),
+		p(656,58),p(671,154),p(674,240),
+		p(667,411),p(558,413),p(423,409),
+		p(176,422),p(64,418),p(64,305),p(63,204)],
+	divide_list(2,L11,L12),
+	vpm ? msk_select_polygon(L12),
+	vpm ? msk_push_foreground('SELECT_NOTHING'),
+	vpm ? msk_add_foreground(
+		'HUE',MinimalHue1,MaximalHue1),
+	vpm ? msk_add_foreground(
+		'HUE',MinimalHue2,MaximalHue2),
+	vpm ? msk_pop_foreground('AND'),
+	vpm ? msk_select_foreground(
+		'SATURATION',MinimalSaturation,MaximalSaturation),
+	vpm ? msk_select_foreground(
+		'BRIGHTNESS',MinimalBrightness,MaximalBrightness),
+	vpm ? pxl_select_image_channel('BRIGHTNESS'),
+	vpm ? pxl_compute_gradient('MODULUS'),
+	vpm ? pxl_normalize_pixels(0,10),
+	vpm ? pxl_smooth_image(7/*13*/),
+	vpm ? msk_select_foreground(MinimalContrast,MaximalContrast),
+	vpm ? msk_erode_foreground(5),
+	vpm ? msk_dilate_foreground(5),
+	vpm ? blb_extract_blobs('Rats','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_front_blobs(3,'FOREGROUND_AREA'),
+	-- vpm ? blb_fill_blobs,
+	-- vpm ? pxl_select_image_channel('HUE'),
+	-- vpm ? blb_compute_color_histograms(25),
+	vpm ? blb_track_blobs,
+	vpm ? trk_select_front_tracks(
+		3,'NUMBER_OF_FRAMES','DESCENDING_ORDER'),
+	vpm ? pxl_select_image_channel('ALL'),
+	vpm ? process_now.
+--
+divide_list(K,[p(X,Y)|R1],[p(X/K,Y/K)|R2]):-!,
+	divide_list(K,R1,R2).
+divide_list(_,_,[]).
+--
+frame_obtained:-
+	video ? commit,
+	video ? get_recent_frame_number(N),
+	LFN== ?val("INTEGER",?get('last_frame')),
+	N <= LFN,!,
+	state ? set_current_frame(N),
+	video ? get_recent_image(image1),
+	vpm ? process_realtime_frame(image1),
+	state ? increase_global_counter,
+	draw_scene.
+frame_obtained:-
+	FFN== ?val("INTEGER",?get('first_frame')),!,
+	video ? seek_frame_number(FFN),
+	T2== timer?milliseconds(),
+	state ? set_beginning_time(T2).
+frame_obtained:-!.
+--
+data_transfer_completion:-
+	FFN== ?val("INTEGER",?get('first_frame')),!,
+	video ? seek_frame_number(FFN),
+	-- con ? writeln("End of file!"),
+	T2== timer?milliseconds(),
+	state ? set_beginning_time(T2),
+	video ? start.
+data_transfer_completion:-!.
+--
+data_transfer_error(ErrorCode):-!,
+	con ? writeln("Error: ",ErrorCode).
+--
+draw_scene:-
+	vpm ? commit,
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	-- vpm ? get_recent_image(image2),
+	-- vpm ? get_preprocessed_image(image2),
+	-- vpm ? get_background_image(image2),
+	-- vpm ? get_sigma_image(image2),
+	-- vpm ? get_foreground_image(image2),
+	vpm ? get_synthesized_image(image2),
+	graphic_window ? draw_image(image2,0,0,1,1),
+	vpm ? get_recent_frame_number(FN),
+	vpm ? get_tracks(Tracks1),
+	image2 ? get_size_in_pixels(IW,IH),
+	-- con ? writeln("===== FN: ",FN," ====="),
+	draw_existing_tracks(Tracks1,Tracks2,FN,IW,IH),
+	draw_new_tracks(Tracks2,FN,IW,IH),
+	draw_invisible_objects(FN,IW,IH),
+	draw_legend,
+	graphic_window ? draw_now.
+--
+draw_existing_tracks([Track|Rest1],Rest2,FN,IW,IH):-
+	-- con ? writeln(FN,") Track: ",Track),
+	draw_existing_track(Track,FN,IW,IH),!,
+	-- con ? writeln(FN,") Track: ",Track),
+	draw_existing_tracks(Rest1,Rest2,FN,IW,IH).
+draw_existing_tracks([Track|Rest1],[Track|Rest2],FN,IW,IH):-!,
+	draw_existing_tracks(Rest1,Rest2,FN,IW,IH).
+draw_existing_tracks(Tracks,Tracks,_,_,_).
+--
+draw_existing_track({
+		identifier:BlobId,
+		frame2:FN,
+		is_mature:IsMature,
+		total_distance:BlobPath,
+		segments:Segments|_},
+		FN,IW,IH):-
+	get_current_coordinates(Segments,X1,Y1),
+	model ? set_blob_position(BlobId,X1,Y1,FN,BlobPath),
+	/*
+	con ? writeln(FN,": Exist? ",BlobId," ",X1," ",Y1),
+	*/
+	model ? get_object_position(
+		BlobId,ObjectId,X2,Y2,ObjectPath1),
+	Distance== ?hypot(X1-X2,Y1-Y2),
+	Distance < maximal_distance,!,
+	/*
+	con ? writeln(
+		"Yes! ",BlobId,"->",ObjectId,
+		" ",X1," ",Y1," IsMature:",IsMature,
+		" Distance:",TraversedPath),
+	*/
+	ObjectPath2== ?max(ObjectPath1,BlobPath),
+	model ? set_object_position(
+		BlobId,ObjectId,X1,Y1,FN,ObjectPath2),
+	draw_track(ObjectId,Segments,IsMature,ObjectPath2,IW,IH).
+/*
+draw_existing_track(
+		{identifier:BlobId|_},
+		_,_,_):-
+	con ? writeln("No ",BlobId),
+	fail.
+*/
+--
+draw_new_tracks([Track|Rest1],FN,IW,IH):-
+	draw_new_track(Track,FN,IW,IH),!,
+	draw_new_tracks(Rest1,FN,IW,IH).
+draw_new_tracks(_,_,_,_).
+--
+draw_new_track({
+		identifier:BlobId,
+		frame2:FN1,
+		is_mature:IsMature,
+		total_distance:BlobPath,
+		segments:Segments|_},
+		FN1,IW,IH):-
+	get_current_coordinates(Segments,X1,Y1),
+	model ? find_nearest_object(
+		X1,Y1,FN1,maximal_distance,ObjectId,ObjectPath1),!,
+	/*
+	con ? writeln(
+		"Nearst: ",BlobId,"->",ObjectId,
+		" ",X1," ",Y1,
+		" IsMature:",IsMature," Distance:",TraversedPath),
+	*/
+	ObjectPath2== ?max(ObjectPath1,BlobPath),
+	model ? set_object_position(
+		BlobId,ObjectId,X1,Y1,FN1,ObjectPath2),
+	draw_track(ObjectId,Segments,IsMature,ObjectPath2,IW,IH).
+draw_new_track({
+		identifier:BlobId,
+		frame2:FN,
+		is_mature:IsMature,
+		total_distance:BlobPath,
+		segments:Segments|_},
+		FN,IW,IH):-
+	IsMature == 'yes',
+	get_current_coordinates(Segments,X,Y),!,
+	model ? register_new_object(
+		BlobId,X,Y,FN,BlobPath,ObjectId),
+	/*
+	con ? writeln(
+		"New: ",BlobId,"->",ObjectId,
+		" ",X," ",Y,
+		" IsMature:",IsMature," Distance:",BlobPath),
+	*/
+	draw_track(ObjectId,Segments,IsMature,BlobPath,IW,IH).
+draw_new_track(_,_,_,_).
+--
+get_current_coordinates([Segment],X,Y):-!,
+	Segment == {coordinates:BlobCoordinates|_},
+	get_current_blob_coordinates(BlobCoordinates,X,Y).
+get_current_coordinates([_|Rest],X,Y):-
+	get_current_coordinates(Rest,X,Y).
+--
+get_current_blob_coordinates([BlobCoordinates],X,Y):-!,
+	BlobCoordinates == {	centroid_x:X,
+				centroid_y:Y
+				|_}.
+get_current_blob_coordinates([_|Rest],X,Y):-
+	get_current_blob_coordinates(Rest,X,Y).
+--
+draw_invisible_objects(FN1,IW,IH):-
+	model ? find_object(ObjectId,X1,Y1,FN2,ObjectPath),
+		FN1 > FN2,
+		model ? find_nearest_blob(
+			X1,Y1,FN1,maximal_distance,
+			BlobId,X2,Y2,_),
+		-- con ? writeln(
+		--	"Nearst: ",BlobId,"<-",ObjectId,
+		--	" ",X2," ",Y2," Dist:",Distance),
+		-- ObjectPath2== ?max(ObjectPath1,BlobPath),
+		model ? set_object_position(
+			BlobId,ObjectId,X2,Y2,FN1,ObjectPath),
+		draw_invisible_object(
+			ObjectId,ObjectPath,X2,Y2,{},IW,IH),
+		fail.
+draw_invisible_objects(FN1,IW,IH):-
+	model ? find_object(ObjectId,Xp,Yp,FN2,Path),
+		FN1 > FN2,
+		-- con ? writeln("Invisible: ",ObjectId," (",FN2,"): ",Xp," ",Yp),
+		draw_invisible_object(
+			ObjectId,Path,Xp,Yp,{dashArray:[3,5]},IW,IH),
+		fail.
+/*
+draw_invisible_objects(_,_,_):-
+	model ? find_object(ObjectId,X0,Y0,FN2),
+		con ? writeln("STATE: ",ObjectId," (",FN2,"): ",X0," ",Y0),
+		fail.
+*/
+draw_invisible_objects(_,_,_).
+--
+draw_invisible_object(ObjectId,Path,Xp,Yp,Attributes,IW,IH):-
+	NC== ?mod(ObjectId,26)+1,
+	select_color(NC,Color),
+	graphic_window ? set_brush('off'),
+	graphic_window ? set_pen(
+		{color:Color,lineWidth:1|Attributes}),!,
+	Xs== Xp / IW - big_circle_radius,
+	Ys== Yp / IH - big_circle_radius,
+	Width== big_circle_radius * 2,
+	Height== big_circle_radius * 2,
+	graphic_window ? draw_ellipse(Xs,Ys,Width,Height),
+	draw_blob_label(ObjectId,Path,Xp,Yp,IW,IH).
+draw_invisible_object(_,_,_,_,_,_,_).
+--
+draw_track(ObjectId,Segments,IsMature,Distance,IW,IH):-
+	NC== ?mod(ObjectId,26)+1,
+	select_color(NC,Color),
+	draw_first_blob_rectangle(
+		Segments,ObjectId,IsMature,Distance,Color,IW,IH),
+	draw_track_segments(Segments,{},IsMature,Color,IW,IH).
+--
+draw_first_blob_rectangle([Segment|_],Id,IsMature,D,C,IW,IH):-
+	Segment == {coordinates:[Blob|_]|_},!,
+	draw_blob_rectangle(Blob,IsMature,Id,D,C,1,IW,IH).
+draw_first_blob_rectangle(_,_,_,_,_,_,_).
+--
+draw_track_segments([Segment2],Segment1,IsMature,C,IW,IH):-!,
+	draw_track_segment(
+		Segment2,Segment1,'yes',IsMature,C,IW,IH).
+draw_track_segments([Segment2|Rest],Segment1,IsMature,C,IW,IH):-
+	draw_track_segment(
+		Segment2,Segment1,'no',IsMature,C,IW,IH),
+	draw_track_segments(Rest,Segment2,IsMature,C,IW,IH).
+draw_track_segments([],_,_,_,_,_).
+--
+draw_track_segment(Segment2,Segment1,IsLast,IsMature,C,IW,IH):-
+	Segment2 == {coordinates:TrackOfBlob|_},!,
+	draw_track_of_blob(TrackOfBlob,{},IsLast,IsMature,C,IW,IH),
+	draw_segment_link(Segment2,Segment1,IW,IH).
+draw_track_segment(_,_,_,_,_,_,_).
+--
+draw_track_of_blob([Blob2],Blob1,'yes',IsMature,C,IW,IH):-!,
+	draw_blob_rectangle(Blob2,IsMature,-1,0.0,C,3,IW,IH),
+	draw_blob_link(Blob2,Blob1,C,IW,IH).
+draw_track_of_blob([Blob2|Rest],Blob1,IsLast,IsMature,C,IW,IH):-!,
+	draw_blob_link(Blob2,Blob1,C,IW,IH),
+	draw_track_of_blob(Rest,Blob2,IsLast,IsMature,C,IW,IH).
+draw_track_of_blob(_,_,_,_,_,_,_).
+--
+draw_blob_rectangle(Blob,IsMature,Id,Distance,Color,LW,IW,IH):-
+	Blob == {x:X0,y:Y0,width:W1,height:H1|_},
+	select_dash_array(IsMature,DashArray),
+	graphic_window ? set_pen(
+		{color:Color,lineWidth:LW|DashArray}),!,
+	graphic_window ? set_brush('off'),
+	X2== (X0 - W1 / 2) / IW,
+	Y2== (Y0 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	draw_blob_label(Id,Distance,X0,Y0,IW,IH).
+draw_blob_rectangle(_,_,_,_,_,_,_,_).
+--
+select_dash_array('no',{dashArray:[3,5]}):-!.
+select_dash_array(_,{}).
+--
+draw_blob_label(Id,_,_,_,_,_):-
+	Id < 0,!.
+draw_blob_label(Id,Distance,X0,Y0,IW,IH):-!,
+	Label== text?format("%s: %3.2f",Id,Distance),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? draw_text(X0/IW,Y0/IH,Label).
+--
+draw_blob_link(Blob2,Blob1,Color,IW,IH):-
+	Blob2== {centroid_x:X2a,centroid_y:Y2a|_},
+	Blob1== {centroid_x:X1a,centroid_y:Y1a|_},!,
+	X1b== X1a / IW,
+	Y1b== Y1a / IH,
+	X2b== X2a / IW,
+	Y2b== Y2a / IH,
+	graphic_window ? set_brush('off'),
+	graphic_window ? set_pen({color:Color,lineWidth:1}),
+	graphic_window ? draw_line(X1b,Y1b,X2b,Y2b).
+draw_blob_link(_,_,_,_,_).
+--
+draw_segment_link(Segment2,Segment1,IW,IH):-
+	Segment2== {centroid_x1:X2a,centroid_y1:Y2a|_},
+	Segment1== {centroid_x2:X1a,centroid_y2:Y1a|_},!,
+	X1r== X1a / IW,
+	Y1r== Y1a / IH,
+	X2r== X2a / IW,
+	Y2r== Y2a / IH,
+	graphic_window ? set_brush('Green'),
+	graphic_window ? set_pen({color:'Black',lineWidth:1}),
+	graphic_window ? draw_line(X1r,Y1r,X2r,Y2r),
+	draw_circle(X1r,Y1r),
+	draw_circle(X2r,Y2r).
+draw_segment_link(_,_,_,_).
+--
+draw_circle(X0,Y0):-
+	X1== X0 - small_circle_radius,
+	Y1== Y0 - small_circle_radius,
+	Width== small_circle_radius * 2,
+	Height== small_circle_radius * 2,
+	graphic_window ? draw_ellipse(X1,Y1,Width,Height).
+--
+select_color(1,'Green'):-!.
+select_color(2,'DkGreen'):-!.
+select_color(3,'Blue'):-!.
+select_color(4,'Cyan'):-!.
+select_color(5,'Magenta'):-!.
+select_color(6,'Yellow'):-!.
+select_color(7,'Orange'):-!.
+select_color(8,'Pink'):-!.
+select_color(9,'Violet'):-!.
+select_color(10,'Brown'):-!.
+select_color(11,'Maroon'):-!.
+select_color(12,'Purple'):-!.
+select_color(13,'Fuchsia'):-!.
+select_color(14,'Lime'):-!.
+select_color(15,'Olive'):-!.
+select_color(16,'Navy'):-!.
+select_color(17,'Teal'):-!.
+select_color(18,'Aqua'):-!.
+select_color(19,'Terracotta'):-!.
+select_color(20,'Lilac'):-!.
+select_color(21,'Gold'):-!.
+select_color(22,'Indigo'):-!.
+select_color(23,'RoyalBlue'):-!.
+select_color(24,'Lemon'):-!.
+select_color(25,'Emerald'):-!.
+select_color(_,'SkyBlue').
+--
+draw_legend:-
+	state ? get_current_frame(FrameNumber),!,
+	state ? get_stopwatch_time(Delay),
+	state ? get_frame_counter(FrameQuantity),
+	state ? get_global_counter(GlobalCounter),
+	Time== Delay / 1000.0,
+	FrameRate== FrameQuantity / Time,
+	graphic_window ? set_brush('Red'),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('LEFT','TOP'),
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %3.2f [sec]; Frame: %d (%d)",
+			Time,FrameNumber,GlobalCounter)),
+	graphic_window ? set_text_alignment('RIGHT','TOP'),
+	graphic_window ? draw_text(
+		0.98, 0.02,
+		text?format(
+			"Frame Rate: %3.2f [Hz]",
+			FrameRate)).
+draw_legend.
+]
+-----------------------------------------------------------------------
+class 'VideoReader' (specialized 'FFmpeg'):
+--
+constant:
+--
+	operating_mode		= 'PLAYING';
+	-- operating_mode	= 'READING';
+--
+internal:
+--
+target_world;
+--
+[
+frame_obtained:-!,
+	target_world ? frame_obtained.
+--
+data_transfer_completion:-!,
+	target_world ? data_transfer_completion.
+--
+data_transfer_error(ErrorCode):-!,
+	target_world ? data_transfer_error(ErrorCode).
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		= ('Timer');
+--
+[
+get_beginning_time(Time):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(Time),!.
+--
+set_beginning_time(Time):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(Time)),
+	reset_stopwatch,
+	reset_frame_counter.
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)),
+	increase_frame_counter.
+--
+reset_stopwatch:-
+	retract_all(stop_watch_time(_)),
+	append(stop_watch_time(timer?milliseconds())).
+--
+get_stopwatch_time(Delay):-
+	T2== timer?milliseconds(),
+	Item== ?match(stop_watch_time(_)),
+	Item == stop_watch_time(T1),!,
+	Delay== T2 - T1.
+get_stopwatch_time(0).
+--
+reset_frame_counter:-
+	retract_all(frame_counter(_)).
+--
+increase_frame_counter:-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!,
+	retract_all(frame_counter(_)),
+	append(frame_counter(N+1)).
+increase_frame_counter:-
+	append(frame_counter(1)).
+--
+get_frame_counter(N):-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!.
+get_frame_counter(0).
+--
+increase_global_counter:-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!,
+	retract_all(global_counter(_)),
+	append(global_counter(N+1)).
+increase_global_counter:-
+	append(global_counter(1)).
+--
+get_global_counter(N):-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!.
+get_global_counter(0).
+]
+-----------------------------------------------------------------------
+class 'VisualSceneModel' (specialized 'Database'):
+--
+internal:
+--
+con		= ('Console');
+--
+[
+set_blob_position(BlobId,X,Y,FN,BlobPath):-
+	Item== ?match(blob(BlobId,_,_,_,_)),!,
+	retract_all(Item),
+	append(blob(BlobId,X,Y,FN,BlobPath)).
+set_blob_position(BlobId,X,Y,FN,BlobPath):-
+	append(blob(BlobId,X,Y,FN,BlobPath)).
+--
+set_object_position(BlobId,ObjectId,X,Y,FN,ObjectPath):-
+	Item== ?match(object(_,ObjectId,_,_,_,_)),!,
+	retract_all(Item),
+	append(object(BlobId,ObjectId,X,Y,FN,ObjectPath)).
+set_object_position(BlobId,ObjectId,X,Y,FN,ObjectPath):-
+	append(object(BlobId,ObjectId,X,Y,FN,ObjectPath)).
+--
+get_object_position(BlobId,ObjectId,X,Y,ObjectPath):-
+	Item== ?match(object(BlobId,_,_,_,_,_)),
+	Item == object(BlobId,ObjectId,X,Y,_,ObjectPath),!.
+--
+/*
+get_object_path(ObjectId,ObjectPath):-
+	Item== ?match(object(_,ObjectId,_,_,_,_)),
+	Item == object(_,ObjectId,_,_,_,ObjectPath),!.
+get_object_path(_,0.0).
+*/
+--
+find_object(ObjectId,X,Y,FN,ObjectPath):-
+	Item== ?match(object(_,_,_,_,_,_)),
+	Item == object(_,ObjectId,X,Y,FN,ObjectPath).
+--
+register_new_object(BlobId,X,Y,FN,BlobPath,ObjectId):-
+	crerate_new_identifier(ObjectId),
+	append(object(BlobId,ObjectId,X,Y,FN,BlobPath)).
+--
+crerate_new_identifier(N2):-
+	Item== ?match(object_counter(_)),
+	Item == object_counter(N1),!,
+	retract_all(object_counter(_)),
+	N2== N1 + 1,
+	append(object_counter(N2)).
+crerate_new_identifier(1):-
+	append(object_counter(1)).
+--
+find_nearest_object(X1,Y1,FN1,MaximalDistance,_,_):-
+	reset_nearest_point,
+	find_object(ObjectId,X2,Y2,FN2,ObjectPath),
+		FN1 > FN2,
+		Distance== ?hypot(X1-X2,Y1-Y2),
+		-- con ? writeln("Dist?: ",Distance," Obj:",ObjectId),
+		Distance < MaximalDistance,
+		update_nearest_point(
+			ObjectId,Distance,X2,Y2,ObjectPath),
+		fail.
+find_nearest_object(_,_,_,_,ObjectId,ObjectPath):-
+	get_nearest_point(ObjectId,_,_,_,ObjectPath).
+--
+find_nearest_blob(X1,Y1,FN,MaximalDistance,_,_,_,_):-
+	reset_nearest_point,
+	Item== ?match(blob(_,_,_,FN,_)),
+		Item == blob(BlobId,X2,Y2,FN,BlobPath),
+		Distance== ?hypot(X1-X2,Y1-Y2),
+		Distance < MaximalDistance,
+		update_nearest_point(
+			BlobId,Distance,X2,Y2,BlobPath),
+		fail.
+find_nearest_blob(_,_,_,_,BlobId,X2,Y2,BlobPath):-
+	get_nearest_point(BlobId,_,X2,Y2,BlobPath).
+--
+reset_nearest_point:-
+	retract_all(nearest_point(_,_,_,_,_)).
+--
+update_nearest_point(_,Distance2,_,_,Path):-
+	Item== ?match(nearest_point(_,_,_,_,_)),
+	Item == nearest_point(_,Distance1,_,_,Path),
+	Distance1 <= Distance2,!.
+update_nearest_point(Id,Distance,X,Y,Path):-
+	retract_all(nearest_point(_,_,_,_,_)),
+	append(nearest_point(Id,Distance,X,Y,Path)).
+--
+get_nearest_point(Id,Distance,X,Y,Path):-
+	Item== ?match(nearest_point(_,_,_,_,_)),!,
+	Item == nearest_point(Id,Distance,X,Y,Path).
+]
+-----------------------------------------------------------------------

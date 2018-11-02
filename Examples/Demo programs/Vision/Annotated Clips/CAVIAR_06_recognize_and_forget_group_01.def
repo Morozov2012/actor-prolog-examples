@@ -1,0 +1,261 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+--
+DOMAINS:
+--
+ground:
+--
+N		= INTEGER.
+--
+IsCurrentTime	= 'yes'; 'no'.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+data_directory		: STRING;
+target_directory	: STRING;
+sampling_rate		: INTEGER;
+--
+sender		: 'Sender';
+receiver	: 'Receiver';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Sender' (specialized 'Timer'):
+--
+constant:
+--
+	target			: 'Receiver';
+--
+constant:
+--
+	data_directory		: STRING;
+	target_directory	: STRING;
+	sampling_rate		: INTEGER;
+--
+	target_CVML_description	: STRING;
+--
+internal:
+--
+	description	: 'CVML_Resource';
+	store		: 'CVML_Store';
+	state		: 'ProgramState';
+--
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+save_frames(TreeContent)			- (i);
+save_frame(ContentItem)				- (i);
+save_frame_content(ContentList,ContentList)	- (i,i);
+save_frame_number_and_content
+	(STRING,ContentList)			- (i,i);
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+--
+extract_object_list(ContentList,ContentList)	- (i,o);
+]
+-----------------------------------------------------------------------
+interface 'Receiver' (specialized 'Alpha'):
+--
+constant:
+--
+	data_directory		: STRING;
+	target_directory	: STRING;
+	sampling_rate		: INTEGER;
+--
+	history_length			: INTEGER;
+	minimal_group_duration		: INTEGER;
+	maximal_group_distance		: INTEGER;
+	minimal_independence_distance	: INTEGER;
+--
+internal:
+--
+	store		: 'RecentHistory';
+--
+	image		: 'BufferedImage';
+	graphic_window	: 'Canvas2D';
+	prompt_window	: 'Report';
+	con		: 'Console';
+--
+[
+--
+PREDICATES:
+--
+imperative:
+--
+process_frame(N,ContentList)			- (i,i);
+--
+recognize_groups(N)				- (i);
+--
+determ:
+--
+object_has_pair(
+		N,		-- Time
+		STRING,		-- Id1
+		PointX,		-- X1
+		PointY,		-- Y1,
+		STRING)		-- Id2
+		- (i,i,i,i,o);
+is_group(
+		STRING,		-- Id1
+		STRING,		-- Id2
+		N,		-- Time
+		N);		-- Duration
+--
+imperative:
+--
+forget_groups(N)				- (i);
+--
+draw_scene(N)					- (i);
+show_recent_history
+	(N,PointX,PointY,IsCurrentTime)		- (i,i,i,i);
+select_line_attributes
+	(IsCurrentTime,PenAttributes)		- (i,o);
+--
+show_object_list(
+		N,
+		PointX,
+		PointY,
+		IsCurrentTime,
+		PenAttributes)	- (i,i,i,i,i);
+--
+draw_object_name(
+		IsCurrentTime,
+		PointX,
+		PointY,
+		PointX,
+		PointY,
+		STRING)		- (i,i,i,i,i,i);
+--
+show_groups(N,PointX,PointY)			- (i,i,i);
+--
+reset;
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'+'(PointX,PointY) = REAL			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+--
+power(PointX,INTEGER) = PointX			- (i,i);
+power(PointY,INTEGER) = PointY			- (i,i);
+--
+min(PointX*) = PointX				- (i);
+min(PointY*) = PointY				- (i);
+max(PointX*) = PointX				- (i);
+max(PointY*) = PointY				- (i);
+]
+-----------------------------------------------------------------------
+interface 'CVML_Resource' (specialized 'WebReceptor'):
+[
+]
+-----------------------------------------------------------------------
+interface 'CVML_Store' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+TargetKey	= INTEGER.
+TargetValue	= ContentList.
+--
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)		- (o);
+get_current_frame(INTEGER)		- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)		- (i);
+set_current_frame(INTEGER)		- (i);
+]
+-----------------------------------------------------------------------
+interface 'RecentHistory' (specialized 'HashSet'):
+[
+DOMAINS:
+--
+Target		= object(
+			N,		-- Time
+			STRING,		-- Id
+			PointX, 	-- X
+			PointY,		-- Y
+			PointX,		-- Width
+			PointY);	-- Height
+		  group(STRING,		-- Id1
+			STRING).	-- Id2
+--
+PREDICATES:
+--
+imperative:
+--
+store_object_list(ContentList,N)		- (i,i);
+store_object(ContentItem,N)			- (i,i);
+store_object_attributes(ContentList,N,STRING)	- (i,i,i);
+store_object_attribute(ContentItem,N,STRING)	- (i,i,i);
+--
+store_box_attributes(
+		ContentList,
+		N,
+		STRING,
+		STRING,
+		STRING,
+		STRING,
+		STRING)		- (i,i,i,i,i,i,i);
+--
+register_coordinates(
+		N,		-- Time
+		STRING,		-- Id
+		PointX, 	-- X
+		PointY,		-- Y
+		PointX,		-- Width
+		PointY);	-- Height
+--
+determ:
+--
+is_unknown_group(STRING,STRING)			- (i,i);
+--
+imperative:
+--
+register_group(	STRING,		-- Id1
+		STRING);	-- Id2
+--
+shorten_history(N,N)				- (i,i);
+--
+determ:
+--
+retrieve_coordinates(
+		N,		-- Time
+		STRING,		-- Id
+		PointX,		-- X
+		PointY,		-- Y
+		PointX,		-- W,
+		PointY)		-- H
+		- (i,i,o,o,o,o);
+]
+-----------------------------------------------------------------------

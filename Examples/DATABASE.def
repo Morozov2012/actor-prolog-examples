@@ -1,0 +1,39 @@
+------------------------------------------------------------------------
+--                                                                    --
+--              An example of Actor Prolog program.                   --
+--              (c) 2007, IRE RAS, Alexei A. Morozov.                 --
+--                                                                    --
+--            Use of the 'Database' predefined class.                 --
+--                                                                    --
+------------------------------------------------------------------------
+DOMAINS:
+--
+MyData	= INTEGER; {n:INTEGER,i:INTEGER,l:MyList}.
+N	= INTEGER.
+--
+MyList	= INTEGER*.
+------------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+Target	= MyData.
+]
+------------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+db	: 'MyDatabase';
+w1	: 'Report';
+w2	: 'Report';
+w3	: 'Report';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+insert_terms(INTEGER)		- (i);
+append_terms(INTEGER,MyList)	- (i,i);
+list_database('Report')		- (i);
+retract_terms;
+]
+------------------------------------------------------------------------

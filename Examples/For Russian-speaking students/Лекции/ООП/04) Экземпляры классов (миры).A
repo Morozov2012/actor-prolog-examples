@@ -1,0 +1,25 @@
+
+class 'Main' (specialized 'DemoConsole'):
+
+w1	= ('A1');
+
+w2	= ('A1',
+		n= 500);
+
+[
+
+goal:-
+	writeln("Hello from the Main class.").
+
+]
+
+class 'A1' (specialized 'DemoConsole'):
+
+n	= 100;
+
+[
+
+goal:-
+	writeln(n).
+
+]

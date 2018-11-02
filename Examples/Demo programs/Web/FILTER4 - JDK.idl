@@ -1,0 +1,282 @@
+KIT ;
+  IDL VERSION 1.2.8 ;
+  TITLE 'Use Search Engine and Preliminary Filtering' ;
+  CREATION DATE 26/7/2002 ;
+  PROJECT NAME 'Complex Search' ;
+
+  MODEL 'Complex Search'
+    {LWI
+    F 0 -13 0 0 0 400
+      0 0 0 204 3 2 1 34
+      100 'Arial'
+    F 1 -24 0 0 0 400
+      0 0 0 0 3 2 1 34
+      180 'Arial'
+    F 2 -11 0 0 0 400
+      0 0 0 0 3 2 1 49
+      80 'Courier New'
+    F 3 -13 0 900 900 400
+      0 0 0 0 3 2 1 34
+      100 'Arial'
+    D 0 0 0 0 0 1 0 0 2
+    G 0 1
+    T 'WORKING'
+    R 60
+    M 0  }
+ ;
+    PROJECT NAME 'Complex Search' ;
+
+    DIAGRAM GRAPHIC A-0 ;
+      CREATION DATE 27/7/2002 ;
+      REVISION DATE 6/9/2012 ;
+      TITLE 'Use Search Engine and Preliminary Filtering' ;
+      STATUS PUBLICATION ;
+
+      BOX 0 ;
+        NAME '{LWI I 0 255 255 255}Use Search Engine<CR>and Preliminary Filter
+ing' ;
+        BOX COORDINATES (0,32462;0,61789) (0,64923;0,30894) ;
+        DETAIL REFERENCE N A0 ;
+      ENDBOX ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A0 ;
+      CREATION DATE 27/7/2002 ;
+      REVISION DATE 6/9/2012 ;
+      TITLE 'Use Search Engine and Preliminary Filtering' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Enter Request' ;
+        BOX COORDINATES (0,03156;0,29268) (0,17583;0,09756)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Convert Message<CR>"Search" to "Show"<CR>an
+d "Search"' ;
+        BOX COORDINATES (0,28404;0,46341) (0,47340;0,26829)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Collect Data' ;
+        BOX COORDINATES (0,55906;0,71545) (0,69432;0,52033) ;
+        DETAIL REFERENCE N A3 ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Browse List' ;
+        BOX COORDINATES (0,79351;0,90244) (0,94680;0,67480)  ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,17583;0,14634) (0,24797;0,14634) (0,24797;0,36585) (0,28404;0,
+36585) ;
+        LABEL '{LWI I 0 255 255 }Message "Search"' ;
+        LABEL COORDINATES (0,20469;0,11870) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BOX 1O2 ;
+        PATH (0,17583;0,23577) (0,21190;0,23577) (0,21190;0,65854) (0,55906;0,
+65854) ;
+        LABEL '{LWI I 0 255 255 }Search Pattern' ;
+        LABEL COORDINATES (0,23805;0,71545) ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,47340;0,31707) (0,87015;0,31707) (0,87015;0,67480) ;
+        LABEL '{LWI I 0 255 255 }Message "Show"' ;
+        LABEL COORDINATES (0,57800;0,28130) ;
+        SINK BOX 4C1 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 2O2 ;
+        PATH (0,47340;0,40650) (0,50496;0,40650) (0,50496;0,56911) (0,55906;0,
+56911) ;
+        LABEL '{LWI I 0 255 255 }Message "Search"' ;
+        LABEL COORDINATES (0,52390;0,45203) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,69432;0,61789) (0,73039;0,61789) (0,73039;0,78862) (0,79351;0,
+78862) ;
+        LABEL '{LWI I 0 255 255 }URL List' ;
+        LABEL COORDINATES (0,73219;0,60000) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A3 ;
+      CREATION DATE 27/7/2002 ;
+      REVISION DATE 6/9/2012 ;
+      TITLE 'Collect Data' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Control<CR>Engine' ;
+        BOX COORDINATES (0,06763;0,20325) (0,19387;0,05691)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Consult<CR>Rambler' ;
+        BOX COORDINATES (0,33814;0,47967) (0,44635;0,33333)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Check<CR>Resources' ;
+        BOX COORDINATES (0,49143;0,88618) (0,59964;0,75610)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Filter List' ;
+        BOX COORDINATES (0,74391;0,65041) (0,85212;0,52033)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00451;0,41463) ;
+        PATH (0,01803;0,40650) (0,33814;0,40650) ;
+        LABEL '{LWI I 0 255 255 }Message "Search"' ;
+        LABEL COORDINATES (0,11722;0,37073) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BORDER I2 (0,00451;0,82927) ;
+        PATH (0,01803;0,82114) (0,49143;0,82114) ;
+        LABEL '{LWI I 0 255 255 }Search Pattern' ;
+        LABEL COORDINATES (0,09017;0,78699) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,19387;0,13008) (0,39225;0,13008) (0,39225;0,33333) ;
+        LABEL '{LWI I 0 255 255 }Control Message' ;
+        LABEL COORDINATES (0,33904;0,09106) ;
+        SINK BOX 2C1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,44635;0,40650) (0,59964;0,40650) (0,59964;0,58537) (0,74391;0,
+58537) ;
+        LABEL '{LWI I 0 255 255 }URL List' ;
+        LABEL COORDINATES (0,58521;0,36911) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,85212;0,58537) (0,97836;0,58537) ;
+        LABEL '{LWI I 0 255 255 }URL List' ;
+        LABEL COORDINATES (0,87106;0,56098) ;
+        SINK BORDER O1 (0,98106;0,59350) ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,59964;0,82114) (0,79802;0,82114) (0,79802;0,65041) ;
+        SINK BOX 4M1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GLOSSARY A0G {LWI A 
+      TERM 'Use Search Engine and Preliminary Filtering'
+      ''
+      S 'WORKING'
+      C 255 5 255
+      F 1.000000
+      TERM 'Enter Request'
+      ''
+      N '#package "Morozov/Web/Engines/_Request"'
+      S 'WORKING'
+      C 255 3 255
+      F 1.000000
+      TERM 'Convert Message "Search" to "Show" and "Search"'
+      ''
+      N '#package "Morozov/Web/Links/_Mnfld"'
+      S 'WORKING'
+      C 255 5 255
+      F 1.000000
+      TERM 'Consult Rambler'
+      ''
+      N '#package "Morozov/Web/Engines/_Rambler"'
+      S 'WORKING'
+      C 255 1 255
+      F 1.000000
+      TERM 'Browse List'
+      ''
+      N '#package "Morozov/Web/Browsing/_List"'
+      S 'WORKING'
+      C 255 3 255
+      F 1.000000
+      TERM 'Collect Data'
+      ''
+      S 'WORKING'
+      C 255 1 255
+      F 1.000000
+      TERM 'Control Engine'
+      ''
+      N '#package "Morozov/Web/Engines/_Control"'
+      S 'WORKING'
+      C 255 3 255
+      F 1.000000
+      TERM 'Check Resources'
+      ''
+      N '#package "Morozov/Web/Filters/_Exam"'
+      S 'WORKING'
+      C 255 4 255
+      F 1.000000
+      TERM 'Filter List'
+      ''
+      N '#package "Morozov/Web/Filters/_Engine"'
+      S 'WORKING'
+      C 255 5 255
+      F 1.000000
+     ENDGLOSS } ;
+     GLOSSARY ;
+      TERM 'List of Addresses'
+      ''
+      {LWI S 'WORKING'
+      C 255 255
+ } ;
+      TERM 'Search Pattern'
+      ''
+      {LWI S 'WORKING'
+      C 255 255
+ } ;
+      TERM 'Message "Search"'
+      ''
+      {LWI S 'WORKING'
+      C 255 255
+ } ;
+      TERM 'Message "Show"'
+      ''
+      {LWI S 'WORKING'
+      C 255 255
+ } ;
+      TERM 'Control Message'
+      ''
+      {LWI S 'WORKING'
+      C 255 255
+ } ;
+      TERM 'URL List'
+      ''
+      {LWI S 'WORKING'
+      C 255 255
+ } ;
+     ENDGLOSS ;
+    ENDDIAGRAM ;
+  ENDMODEL ;
+
+ENDKIT ;

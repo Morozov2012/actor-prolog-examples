@@ -1,0 +1,37 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, IRE RAS, Alexei A. Morozov. --
+-- Underdetermined sets.                 --
+-------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+variable:
+--
+	value_A;
+	value_B;
+--
+[
+goal:-
+	value_A == {
+		region:X,
+		name:"Baikal"
+		|Rest},
+	writeln("A:      ",value_A),
+	--
+	value_B == {
+		name:Y,
+		object:'lake',
+		region:"Siberia"},
+	writeln("B:      ",value_B),
+	--
+	writeln("A == B"),
+	--
+	value_A == value_B,
+	--
+	writeln("A:      ",value_A),
+	writeln("B:      ",value_B),
+	writeln("Region: ",X),
+	writeln("Name:   ",Y),
+	writeln("Rest:   ",Rest).
+]
+-------------------------------------------

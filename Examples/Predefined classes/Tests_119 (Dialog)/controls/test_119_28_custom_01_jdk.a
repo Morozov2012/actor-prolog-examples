@@ -1,0 +1,556 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support custom controls.
+--
+-----------------------------------------------------------------------
+import 'ColoredReport' from "report_toolbox";
+import .. from "morozov/Java3D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	w	= ('MyDialog');
+--
+[
+goal:-
+	w ? test2,
+	w ? show.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	report1		= ('ColoredReport',
+				title= "Tests",
+				x= 0,
+				y= 0,
+				height= 17,
+				width= 80);
+	report2		= ('ColoredReport',
+				title= "Creation & Update Events",
+				y= 17);
+	con		= ('Console');
+--
+constant:
+--
+	main_slot	= slot1;
+	slot1		= ('FirstTest3D');
+	slot2		= ('SecondTest3D');
+	slot3		= ('ThirdTest3D');
+--
+[
+DOMAINS:
+--
+reference:
+--
+CustomValue	= ('Canvas3D'); #.
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1(CustomValue)		- (i);
+test2;
+create_term(CustomValue)	- (o);
+--
+CLAUSES:
+--
+action("action11"):-!,
+	test1(slot2).
+action("action12"):-!,
+	test1(slot3).
+action("action21"):-!,
+	test1(#).
+action("action22"):-!,
+	create_term(FreeVariable),
+	test1(FreeVariable).
+action("action3"):-!,
+	test2.
+action(Name):-!,
+	con ? note(Name).
+--
+created_control(Address):-!,
+	Value== ?get(Address),
+	report2 ? write("The "),
+	report2 ? write_colored_term(Address),
+	report2 ? write(
+		" control is created ",
+		"with initial value: "),
+	report2 ? write_colored_term(Value),
+	report2 ? nl.
+--
+modified_control(Address):-!,
+	Value== ?get(Address),
+	report2 ? write("The "),
+	report2 ? write_colored_term(Address),
+	report2 ? write(" control has a new value: "),
+	report2 ? write_colored_term(Value),
+	report2 ? nl.
+--
+goal:-!,
+	test0.
+--
+test0:-
+	report1 ? writeln("Test 0:"),
+	report1 ? writeln("\tI will get value."),
+	?get('main_slot'),!,
+	report1 ? writeln("\tDone.").
+test0:-
+	report1 ? write_error_message("\tFailure!").
+--
+test1(Value):-
+	report1 ? writeln("Test 1:"),
+	report1 ? writeln("\tI will put value:"),
+	report1 ? write_value("\t",Value),
+	put('main_slot',Value),!,
+	report1 ? writeln("\tDone.").
+test1(_):-
+	report1 ? write_error_message("\tFailure!").
+--
+test2:-
+	report1 ? writeln("Test 2:"),
+	report1 ? writeln("\tI will get values:"),
+	report1 ? write_value("\tValue: ",?get('main_slot')),!.
+test2:-
+	report1 ? write_error_message("\tFailure!").
+--
+create_term(_).
+]
+-----------------------------------------------------------------------
+class 'FirstTest3D' (specialized 'Canvas3D'):
+[
+goal:-!.
+--
+initialize:-!,
+	show([
+		'TransformGroup'({
+			allowTransformWrite: 'yes',
+			branches: [
+				'ColorCube'({
+					scale: 0.4
+					}),
+				'RotationInterpolator'({
+					alpha: 'Alpha3D'({
+						loopCount: -1,
+						increasingAlphaDuration: seconds(4)
+						}),
+					schedulingBounds: 'BoundingSphere'({})
+					})
+				]
+			})
+		]).
+]
+-----------------------------------------------------------------------
+class 'SecondTest3D' (specialized 'Canvas3D'):
+--
+internal:
+--
+	text_tools			= ('Text');
+--
+constant:
+--
+	enable_scene_antialiasing	= 'yes';
+--
+[
+goal:-!.
+--
+start:-!,
+	Text== "Actor Prolog",
+	SL== text_tools?length(Text),
+	Scale== 1.2 / SL,
+	X== - (SL) / 2.0,
+	MaximumAngle== ?pi()*2.0,
+	Bounds== 'BoundingSphere'({
+			center: p(0.0,0.0,0.0),
+			radius: 100.0
+			}),
+	show([
+		'TransformGroup'({
+			transform3D: 'Transform3D'({
+				scale: Scale
+				}),
+			branches: [
+				'TransformGroup'({
+					allowTransformWrite: 'yes',
+					allowTransformRead: 'yes',
+					branches: [
+						'Shape3D'({
+							geometry: 'Text3D'({
+								font3D: 'Font3D'({
+									fontName: 'helvetica',
+									fontSize: 2,
+									fontStyle: [],
+									extrudePath: 'FontExtrusion'({})
+									}),
+								string: Text,
+								position: p(X,-1,-1),
+								horizontalAlignment: 'ALIGN_FIRST',
+								path: 'PATH_RIGHT',
+								characterSpacing: 0.0
+								}),
+							appearance: 'Appearance'({
+								material: 'Material'({
+									lightingEnable: 'yes'
+									})
+								})
+							}),
+						'RotationInterpolator'({
+							alpha: 'Alpha3D'({
+								loopCount: -1,
+								increasingEnable: 'yes',
+								increasingAlphaDuration: 4000
+								}),
+							transformAxis: 'Transform3D'({}),
+							minimumAngle: 0.0,
+							maximumAngle: MaximumAngle,
+							schedulingBounds: Bounds
+							})
+						]
+					})
+				]
+			}),
+		'Background'({
+			color: color3(0.05,0.05,0.5),
+			applicationBounds: Bounds
+			}),
+		'AmbientLight'({
+			color: color3(0.3,0.3,0.3),
+			influencingBounds: Bounds
+			}),
+		'DirectionalLight'({
+			color: color3(1.0,1.0,0.9),
+			direction: [1.0,1.0,1.0],
+			influencingBounds: Bounds
+			}),
+		'DirectionalLight'({
+			color: color3(1.0,1.0,0.9),
+			direction: [-1.0,-1.0,-1.0],
+			influencingBounds: Bounds
+			}),
+		'OrbitBehavior'({
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			})
+		]).
+]
+-----------------------------------------------------------------------
+class 'ThirdTest3D' (specialized 'Canvas3D'):
+--
+bounds		: BoundingSphere
+			= 'BoundingSphere'({});
+--
+wireframe	: Appearance
+			= 'Appearance'({
+				polygonAttributes: 'PolygonAttributes'({
+					rasterizationMode: 'POLYGON_LINE',
+					cullFace: 'CULL_BACK',
+					polygonOffsetBias: 0
+					}),
+				coloringAttributes: 'ColoringAttributes'({
+					color: color3(0,0,0),
+					shadeModel: 'SHADE_FLAT'
+					})
+				});
+solid		: Appearance
+			= 'Appearance'({
+				material: 'Material'({})
+				});
+glass		: Appearance
+			= 'Appearance'({
+				material: 'Material'({}),
+				transparencyAttributes: 'TransparencyAttributes'({
+					transparency: 0.5,
+					transparencyMode: 'NICEST'
+					})
+				});
+--
+background_color		= 'White';
+enable_scene_antialiasing	= 'yes';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+create_tetrahedron = Shape3D;
+--
+create_dodecahedron = Shape3D;
+dodecahedron_vertices(Vertices)			- (o);
+dodecahedron_phi(Numerical)			- (o);
+--
+update_appearance(NodeLabels,Appearance)	- (i,i);
+--
+'/'(Numerical,Numerical) = Numerical		- (i,i);
+'-'(Numerical) = Numerical			- (i);
+--
+CLAUSES:
+--
+goal:-!.
+--
+initialize:-!,
+	SimpleNodes== [
+		'Sphere'({
+			label: "MySphere1",
+			radius: 0.7,
+			divisions: 100,
+			enableGeometryPicking: 'yes',
+			enableAppearanceModify: 'yes',
+			generateNormals: 'yes',
+			appearance: wireframe
+			}),
+		'Box'({
+			label: "MyBox",
+			xdim: 1.2,
+			ydim: 0.3,
+			zdim: 0.8,
+			enableGeometryPicking: 'yes',
+			enableAppearanceModify: 'yes',
+			generateNormals: 'yes',
+			appearance: wireframe
+			}),
+		'TransformGroup'({
+			transform3D: 'Transform3D'({
+				translation: [0,1.5,0]
+				}),
+			branches: [
+				'Sphere'({
+					label: "MySphere2",
+					radius: 1.0,
+					divisions: 100,
+					enableGeometryPicking: 'yes',
+					enableAppearanceModify: 'yes',
+					generateNormals: 'yes',
+					appearance: wireframe
+					})
+				]
+			}),
+		'TransformGroup'({
+			transform3D: 'Transform3D'({
+				translation: [-1,-1.5,0]
+					}),
+			branches: [
+				'Cylinder'({
+					label: "MyCylinder",
+					radius: 1.0,
+					height: 2.0,
+					xdivisions: 100,
+					ydivisions: 1,
+					enableGeometryPicking: 'yes',
+					enableAppearanceModify: 'yes',
+					generateNormals: 'yes',
+					appearance: wireframe
+					})
+				]
+			}),
+		'TransformGroup'({
+			transform3D: 'Transform3D'({
+				translation: [1,-1.5,0]
+				}),
+			branches: [
+				'Cone'({
+					label: "MyCone",
+					radius: 1.0,
+					height: 2.0,
+					xdivisions: 100,
+					ydivisions: 1,
+					enableGeometryPicking: 'yes',
+					enableAppearanceModify: 'yes',
+					generateNormals: 'yes',
+					appearance: wireframe
+					})
+				]
+			})
+		],
+	Tetrahedron== ?create_tetrahedron(),
+	Dodecahedron== ?create_dodecahedron(),
+	show([
+		'TransformGroup'({
+			allowTransformWrite: 'yes',
+			branches: [
+				'TransformGroup'({
+					transform3D: 'Transform3D'({
+						scale: 0.2
+						}),
+					branches: SimpleNodes
+					}),
+				'TransformGroup'({
+					transform3D: 'Transform3D'({
+						scale: 0.12,
+						translation: [0,0,-0.4]
+						}),
+					branches: [
+						Tetrahedron
+						]
+					}),
+				'TransformGroup'({
+					transform3D: 'Transform3D'({
+						scale: 0.12,
+						translation: [0,0,0.4]
+						}),
+					branches: [
+						Dodecahedron
+						]
+					}),
+				'RotationInterpolator'({
+					alpha: 'Alpha3D'({
+						loopCount: -1,
+						increasingAlphaDuration: 4000
+						}),
+					schedulingBounds: bounds
+					})
+				]
+			}),
+		'Background'({
+			color: color3(1.0,1.0,1.0),
+			applicationBounds: bounds
+			}),
+		'AmbientLight'({
+			lightOn: 'yes',
+			color: 'Red',
+			influencingBounds: bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(3,3,3),
+			attenuation: a(1,0,0),
+			influencingBounds: bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(-2,2,2),
+			attenuation: a(1,0,0),
+			influencingBounds: bounds
+			}),
+		'PickCanvas'({
+			handleMouseClicked: 'yes',
+			handleMouseEntered: 'yes',
+			handleMouseExited: 'yes',
+			handleMousePressed: 'no',
+			handleMouseReleased: 'no',
+			handleMouseDragged: 'no',
+			handleMouseMoved: 'no',
+			isPassive: 'no',
+			period: 150,
+			tolerance: 3,
+			mode: 'GEOMETRY'
+			})
+		]).
+--
+create_tetrahedron =
+	'Shape3D'({
+		label: "MyTetrahedron",
+		geometry: 'IndexedTriangleArray'({
+			vertexCount: 4,
+			includeVertexPositions: 'yes',	-- COORDINATES
+			includePerVertexNormals: 'yes',	-- NORMALS
+			indexCount: 12,
+			coordinates: [
+				p(1,1,1),
+				p(1,-1,-1),
+				p(-1,1,-1),
+				p(-1,-1,1)
+				],
+			coordinateIndices: [
+				0,1,2,0,3,1,
+				1,3,2,2,3,0
+				],
+			normals: [
+				[N,N,-(N)],
+				[N,-(N),N],
+				[-(N),-(N),-(N)],
+				[-(N),N,N]
+				],
+			normalIndices: [
+				0,0,0,1,1,1,
+				2,2,2,3,3,3
+				]
+			}),
+		appearance: wireframe,
+		allowAppearanceWrite: 'yes',
+		pickingDetailLevel: 'INTERSECT_TEST'
+		}) :-
+	N== 1.0/?sqrt(3).
+--
+create_dodecahedron =
+	'Shape3D'({
+		label: "MyDodecahedron",
+		geometry: geometryArray(
+			'GeometryInfo'({
+				primitive: 'POLYGON_ARRAY',
+				coordinates: Vertices,
+				coordinateIndices: Indices,
+				stripCounts: StripCounts,
+				generateNormals: 'yes'
+				})
+			),
+		appearance: wireframe,
+		allowAppearanceWrite: 'yes',
+		pickingDetailLevel: 'INTERSECT_TEST'
+		}) :-
+	dodecahedron_vertices(Vertices),
+	Indices== [
+		00,01,05,06,02, 00,02,07,08,03, 00,03,09,04,01,
+		01,04,10,11,05, 02,06,12,13,07, 03,08,14,15,09,
+		05,11,16,12,06, 07,13,18,14,08, 09,15,17,10,04,
+		19,16,11,10,17, 19,17,15,14,18, 19,18,13,12,16],
+	StripCounts== [5,5,5,5,5,5,5,5,5,5,5,5].
+--
+dodecahedron_vertices(Vertices):-
+	dodecahedron_phi(Phi),
+	Vertices== [
+		p(1,1,1),
+		p(0,1/Phi,Phi),
+		p(Phi,0,1/Phi),
+		p(1/Phi,Phi,0),
+		p(-1,1,1),
+		p(0,-1/Phi,Phi),
+		p(1,-1,1),
+		p(Phi,0,-1/Phi),
+		p(1,1,-1),
+		p(-1/Phi,Phi,0),
+		p(-(Phi),0,1/Phi),
+		p(-1,-1,1),
+		p(1/Phi,-(Phi),0),
+		p(1,-1,-1),
+		p(0,1/Phi,-(Phi)),
+		p(-1,1,-1),
+		p(-1/Phi,-(Phi),0),
+		p(-(Phi),0,-1/Phi),
+		p(0,-1/Phi,-(Phi)),
+		p(-1,-1,-1)
+		].
+--
+dodecahedron_phi(Value):-
+	Value== 0.5*(?sqrt(5)+1).
+--
+mouse_clicked(NodeLabels):-!,
+	update_appearance(NodeLabels,solid).
+--
+mouse_entered(NodeLabels):-!,
+	update_appearance(NodeLabels,glass).
+--
+mouse_exited(NodeLabels):-!,
+	update_appearance(NodeLabels,wireframe).
+--
+mouse_pressed(_):-!.
+--
+mouse_released(_):-!.
+--
+mouse_dragged(_):-!.
+--
+mouse_moved(_):-!.
+--
+update_appearance([NodeLabel|Rest],Appearance):-
+	set_appearance(NodeLabel,Appearance),
+	update_appearance(Rest,Appearance).
+update_appearance([],_).
+]
+-----------------------------------------------------------------------

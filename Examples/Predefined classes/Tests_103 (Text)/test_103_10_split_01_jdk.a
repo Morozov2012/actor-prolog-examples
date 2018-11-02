@@ -1,0 +1,118 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+test9;
+test10;
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6,
+	test7,
+	test8,
+	test9,
+	test10.
+--
+test1:-
+	con ? writeln("Test 1"),
+	split(3,"ABCDE",X,Y),
+	con ? writeln("\t>>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test1.
+--
+test2:-
+	con ? writeln("Test 2"),
+	split(0,"ABCDE",X,Y),
+	con ? writeln("\t>>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test2.
+--
+test3:-
+	con ? writeln("Test 3"),
+	split(5,"ABCDE",X,Y),
+	con ? writeln("\t>>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test3.
+--
+test4:-
+	con ? writeln("Test 4"),
+	split(-1,"ABCDE",X,Y),
+	con ? writeln("Failure: >>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test4:-
+	con ? writeln("\tO.K.: No solutions").
+--
+test5:-
+	con ? writeln("Test 5"),
+	split(6,"ABCDE",X,Y),
+	con ? writeln("Failure: >>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test5:-
+	con ? writeln("\tO.K.: No solutions").
+--
+test6:-
+	con ? writeln("Test 6"),
+	set_string("ABCDE"),
+	split(3,X,Y),
+	con ? writeln("\t>>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test6.
+--
+test7:-
+	con ? writeln("Test 7"),
+	set_string("ABCDE"),
+	split(0,X,Y),
+	con ? writeln("\t>>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test7.
+--
+test8:-
+	con ? writeln("Test 8"),
+	set_string("ABCDE"),
+	split(5,X,Y),
+	con ? writeln("\t>>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test8.
+--
+test9:-
+	con ? writeln("Test 9"),
+	set_string("ABCDE"),
+	split(-1,X,Y),
+	con ? writeln("Failure: >>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test9:-
+	con ? writeln("\tO.K.: No solutions").
+--
+test10:-
+	con ? writeln("Test 10"),
+	set_string("ABCDE"),
+	split(6,X,Y),
+	con ? writeln("Failure: >>>",X,"<<< >>>",Y,"<<<"),
+	fail.
+test10:-
+	con ? writeln("\tO.K.: No solutions").
+]

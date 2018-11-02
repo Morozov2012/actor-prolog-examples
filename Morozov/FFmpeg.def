@@ -1,0 +1,1783 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2017 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/FFmpeg":
+
+import 'WritableImageProducer' from "Morozov/Java2D";
+import 'BufferedImage' from "Morozov/Java2D";
+import "Morozov/Vision";
+
+DOMAINS:
+
+FFmpegOperatingMode	= 'PLAYING'; 'READING'; 'WRITING'.
+--
+FFmpegInputFormats	= FFmpegInputFormat*.
+--
+FFmpegInputFormat = {	-- A comma separated list of
+			-- short names for the format:
+			name: STRING,
+			-- Descriptive name for the format,
+			-- meant to be more human-readable
+			-- than name:
+			long_name: STRING,
+			-- Comma-separated list of mime
+			-- types:
+			mime_type: STRING,
+			-- If extensions are defined,
+			-- then no probe is done:
+			extensions: S_List,
+			-- Can use flags: AVFMT_NOFILE,
+			-- AVFMT_NEEDNUMBER,
+			-- AVFMT_SHOW_IDS,
+			-- AVFMT_GENERIC_INDEX,
+			-- AVFMT_TS_DISCONT,
+			-- AVFMT_NOBINSEARCH,
+			-- AVFMT_NOGENSEARCH,
+			-- AVFMT_NO_BYTE_SEEK,
+			-- AVFMT_SEEK_TO_PTS.
+			flags: FFmpegFormatFlags,
+			-- List of supported
+			-- codec_id-codec_tag pairs,
+			-- ordered by "better choice
+			-- first":
+			tags: FFmpegFormatTags
+			}.
+--
+FFmpegOutputFormats	= FFmpegOutputFormat*.
+--
+FFmpegOutputFormat = {	-- A comma separated list of short
+			-- names for the format:
+			name: STRING,
+			-- Descriptive name for the format,
+			-- meant to be more human-readable
+			-- than name:
+			long_name: STRING,
+			-- Comma-separated list of mime
+			-- types:
+			mime_type: STRING,
+			-- Comma-separated filename
+			-- extensions:
+			extensions: S_List,
+			-- Default audio codec:
+			audio_codec: FFmpegCodec,
+			-- Default video codec:
+			video_codec: FFmpegCodec,
+			-- Default subtitle codec:
+			subtitle_codec: FFmpegCodec,
+			-- Can use flags: AVFMT_NOFILE,
+			-- AVFMT_NEEDNUMBER,
+			-- AVFMT_RAWPICTURE,
+			-- AVFMT_GLOBALHEADER,
+			-- AVFMT_NOTIMESTAMPS,
+			-- AVFMT_VARIABLE_FPS,
+			-- AVFMT_NODIMENSIONS,
+			-- AVFMT_NOSTREAMS,
+			-- AVFMT_ALLOW_FLUSH,
+			-- AVFMT_TS_NONSTRICT.
+			flags: FFmpegFormatFlags,
+			-- List of supported
+			-- codec_id-codec_tag pairs,
+			-- ordered by "better choice
+			-- first":
+			tags: FFmpegFormatTags
+			}.
+--
+FFmpegFormatTags	= FFmpegFormatTag*.
+--
+FFmpegFormatTag		= tag(	INTEGER/*Identifier*/,
+				INTEGER/*Tag*/,
+				FFmpegMediaType).
+--
+FFmpegFormatFlags	= INTEGER; FFmpegFormatFlag*.
+--
+FFmpegFormatFlag	=
+			'AVFMT_NOFILE';
+			-- Needs '%d' in filename:
+			'AVFMT_NEEDNUMBER';
+			-- Show format stream IDs numbers:
+			'AVFMT_SHOW_IDS';
+			-- Format wants AVPicture structure for
+			-- raw picture data. This flag is
+			-- deprecated and not used anymore:
+			'AVFMT_RAWPICTURE';
+			-- Format wants global header:
+			'AVFMT_GLOBALHEADER';
+			-- Format does not need / have any
+			-- timestamps:
+			'AVFMT_NOTIMESTAMPS';
+			-- Use generic index building code:
+			'AVFMT_GENERIC_INDEX';
+			-- Format allows timestamp discontinuities.
+			-- Note, muxers always require valid
+			-- (monotone) timestamps:
+			'AVFMT_TS_DISCONT';
+			-- Format allows variable fps:
+			'AVFMT_VARIABLE_FPS';
+			-- Format does not need width/height:
+			'AVFMT_NODIMENSIONS';
+			-- Format does not require any streams:
+			'AVFMT_NOSTREAMS';
+			-- Format does not allow to fall back on
+			-- binary search via read_timestamp:
+			'AVFMT_NOBINSEARCH';
+			-- Format does not allow to fall back on
+			-- generic search:
+			'AVFMT_NOGENSEARCH';
+			-- Format does not allow seeking by bytes:
+			'AVFMT_NO_BYTE_SEEK';
+			-- Format allows flushing. If not set,
+			-- the muxer will not receive a NULL packet
+			-- in the write_packet function:
+			'AVFMT_ALLOW_FLUSH';
+			-- Format does not require strictly
+			-- increasing timestamps, but they must
+			-- still be monotonic:
+			'AVFMT_TS_NONSTRICT';
+			-- Format allows muxing negative timestamps.
+			-- If not set the timestamp will be shifted
+			-- in av_write_frame and
+			-- av_interleaved_write_frame so they start
+			-- from 0. The user or muxer can override
+			-- this through
+			-- AVFormatContext.avoid_negative_ts:
+			'AVFMT_TS_NEGATIVE';
+			-- Seeking is based on PTS:
+			'AVFMT_SEEK_TO_PTS';
+			-- Other formats:
+			INTEGER.
+--
+FFmpegCodec	= {	-- Name of the codec implementation.
+			-- The name is globally unique among
+			-- encoders and among decoders (but
+			-- an encoder and a decoder can share
+			-- the same name). This is the primary
+			-- way to find a codec from the user
+			-- perspective.
+			name: STRING,
+			-- Descriptive name for the codec,
+			-- meant to be more human readable
+			-- than name. You should use the
+			-- NULL_IF_CONFIG_SMALL() macro to
+			-- define it.
+			long_name: STRING,
+			-- Codec media type:
+			type: FFmpegMediaType,
+			-- Codec identifier:
+			id: INTEGER,
+			-- Array of supported pixel formats,
+			-- or NULL if unknown, array is terminated
+			-- by -1:
+			pix_fmts: FFmpegPixelFormats,
+			-- Array of supported audio samplerates,
+			-- or NULL if unknown, array is terminated
+			-- by 0:
+			supported_samplerates: I_List,
+			-- Array of supported sample formats,
+			-- or NULL if unknown, array is
+			-- terminated by -1:
+			sample_fmts: FFmpegAudioSampleFormats,
+			-- Array of support channel layouts, or
+			-- NULL if unknown. array is terminated
+			-- by 0:
+			channel_layouts: FFmpegChannelLayouts,
+			-- Number of audio samples (per channel)
+			-- in a frame:
+			nb_samples: INTEGER
+			}.
+--
+FFmpegStreams		= FFmpegStream*; FFmpegStream.
+--
+FFmpegStream	= {	-- Codec media type:
+			codec_type: FFmpegMediaType,
+			-- Specific type of the encoded
+			-- data (the codec used):
+			codec_id: INTEGER,
+			-- A demuxer should set this to
+			-- what is stored in the field used
+			-- to identify the codec.
+			-- Encoding: set by user, if not
+			-- then the default based on
+			-- codec_id will be used.
+			-- Decoding: set by user, will be
+			-- converted to uppercase by
+			-- libavcodec during init.
+			codec_tag: INTEGER,
+			-- The average bitrate.
+			-- Encoding: set by user; unused for
+			-- constant quantizer encoding.
+			-- Decoding: Set by user, may be
+			-- overwritten by libavcodec if this
+			-- info is available in the stream.
+			bit_rate: INTEGER,
+			-- Number of bits the bitstream is
+			-- allowed to diverge from the
+			-- reference. The reference can be
+			-- CBR (for CBR pass1) or VBR (for
+			-- pass2. Encoding: set by user;
+			-- unused for constant quantizer
+			-- encoding. Decoding: unused.
+			bit_rate_tolerance: INTEGER,
+			-- Global quality for codecs which
+			-- cannot change it per frame.
+			-- This should be proportional to
+			-- MPEG-1/2/4 qscale.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			global_quality: INTEGER,
+			-- Compression level.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			-- Typical values: 0,1,2,...,9,10.
+			-- Default value: -1.
+			compression_level: INTEGER,
+			-- This is the fundamental unit of
+			-- time (in seconds) in terms of
+			-- which frame timestamps are
+			-- represented. For fixed-fps
+			-- content, timebase should be
+			-- 1/framerate and timestamp
+			-- increments should be
+			-- identically 1. This often, but
+			-- not always is the inverse of
+			-- the frame rate or field rate
+			-- for video. 1/time_base is not
+			-- the average frame rate if the
+			-- frame rate is not constant.
+			-- Encoding: must be set by user.
+			-- Decoding: the use of this field
+			-- for decoding is deprecated. Use
+			-- framerate instead.
+			time_base: Rational,
+			-- Source picture width / height
+			-- (video only). Encoding: may be
+			-- set by user. Decoding: may be set
+			-- by the user before opening the
+			-- decoder if known e.g. from the
+			-- container. Some decoders will
+			-- require the dimensions to be set
+			-- by the caller. During decoding,
+			-- the decoder may overwrite those
+			-- values as required while parsing
+			-- the data. Resolution must be
+			-- a multiple of two:
+			source_image_width: INTEGER,
+			source_image_height: INTEGER,
+			-- Destination picture width / height
+			-- (video only). Encoding: must be
+			-- set by user. Decoding: may be set
+			-- by the user if it is necessary to
+			-- decrease the size of the decoded
+			-- frames.
+			destination_image_width: INTEGER,
+			destination_image_height: INTEGER,
+			-- The number of pictures in a group
+			-- of pictures, or 0 for intra_only.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			gop_size: INTEGER,
+			-- Pixel format.
+			-- Encoding: set by user.
+			-- Decoding: set by user if known,
+			-- overridden by libavcodec while
+			-- parsing the data.
+			pix_fmt: FFmpegPixelFormat,
+			-- Maximum number of B-frames between
+			-- non-B-frames. Note: The output will
+			-- be delayed by max_b_frames+1
+			-- relative to the input.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			max_b_frames: INTEGER,
+			-- Qscale factor between IP and
+			-- B-frames.
+			-- If > 0 then the last P-frame
+			-- quantizer will be used (q=
+			-- lastp_q*factor+offset).
+			-- If < 0 then normal ratecontrol
+			-- will be done (q=
+			-- -normal_q*factor+offset).
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			b_quant_factor: REAL,
+			-- Qscale offset between IP and
+			-- B-frames.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			b_quant_offset: REAL,
+			-- Qscale factor between P- and
+			-- I-frames.
+			-- If > 0 then the last P-frame
+			-- quantizer will be used (q=
+			-- lastp_q * factor + offset).
+			-- If < 0 then normal ratecontrol
+			-- will be done (q=
+			-- -normal_q*factor+offset).
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			i_quant_factor: REAL,
+			-- Qscale offset between P and
+			-- I-frames.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			i_quant_offset: REAL,
+			-- Luminance masking
+			-- (0 -> disabled).
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			lumi_masking: REAL,
+			-- Temporary complexity masking
+			-- (0 -> disabled).
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			temporal_cplx_masking: REAL,
+			-- Spatial complexity masking
+			-- (0 -> disabled).
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			spatial_cplx_masking: REAL,
+			-- P block masking (0 -> disabled).
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			p_masking: REAL,
+			-- Darkness masking (0 -> disabled).
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			dark_masking: REAL,
+			-- Sample aspect ratio (0 if unknown).
+			-- That is the width of a pixel divided
+			-- by the height of the pixel.
+			-- Numerator and denominator must be
+			-- relatively prime and smaller than 256
+			-- for some video standards.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			sample_aspect_ratio: Rational,
+			-- Motion estimation comparison function.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			me_cmp: FFmpegComparisonFunction,
+			-- Subpixel motion estimation comparison
+			-- function.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			me_sub_cmp: FFmpegComparisonFunction,
+			-- Macroblock comparison function
+			-- (not supported yet?).
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			mb_cmp: FFmpegComparisonFunction,
+			-- Interlaced DCT comparison function.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			ildct_cmp: FFmpegComparisonFunction,
+			-- ME diamond size & shape.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			dia_size: INTEGER,
+			-- Amount of previous MV predictors
+			-- (2a+1 x 2a+1 square).
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			last_predictor_count: INTEGER,
+			-- Motion estimation prepass comparison
+			-- function.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			me_pre_cmp: FFmpegComparisonFunction,
+			-- ME prepass diamond size & shape.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			pre_dia_size: INTEGER,
+			-- Subpel ME quality.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			me_subpel_quality: INTEGER,
+			-- Maximum motion estimation search
+			-- range in subpel units.
+			-- If 0 then no limit.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			me_range: INTEGER,
+			-- Macroblock decision mode.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			mb_decision: FFmpegMacroblockDecisionMode,
+			-- Precision of the intra DC
+			-- coefficient - 8.
+			-- Encoding: set by user.
+			-- Decoding: Set by libavcodec.
+			intra_dc_precision: INTEGER,
+			-- Minimum MB Lagrange multiplier.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			mb_lmin: INTEGER,
+			-- Maximum MB Lagrange multiplier.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			mb_lmax: INTEGER,
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			bidir_refine: INTEGER,
+			-- Minimum GOP size.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			keyint_min: INTEGER,
+			-- Number of reference frames.
+			-- Encoding: set by user.
+			-- Decoding: set by lavc.
+			refs: INTEGER,
+			-- Note: value depends upon the
+			-- compare function used for
+			-- fullpel ME.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			mv0_threshold: INTEGER,
+			-- Chromaticity coordinates of the
+			-- source primaries.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			color_primaries: INTEGER,
+			-- Color Transfer Characteristic.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			color_trc: INTEGER,
+			-- YUV colorspace type.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			colorspace: INTEGER,
+			-- MPEG vs JPEG YUV range.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			color_range: INTEGER,
+			-- This defines the location of chroma
+			-- samples.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			chroma_sample_location: INTEGER,
+			-- Number of slices. Indicates number
+			-- of picture subdivisions. Used for
+			-- parallelized decoding.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			slices: INTEGER,
+			-- Samples per second (audio only):
+			sample_rate: INTEGER,
+			-- Number of audio channels.
+			channels: INTEGER,
+			-- Audio sample format.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			sample_fmt: FFmpegAudioSampleFormat,
+			-- Audio cutoff bandwidth (0 means
+			-- "automatic").
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			cutoff: INTEGER,
+			-- Audio channel layout.
+			-- Encoding: set by user.
+			-- Decoding: set by user, may be
+			-- overwritten by libavcodec.
+			channel_layout: FFmpegChannelLayout,
+			-- Type of service that the audio
+			-- stream conveys.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			audio_service_type: INTEGER,
+			-- Amount of qscale change between easy
+			-- & hard scenes (0.0-1.0):
+			qcompress: REAL,
+			-- Amount of qscale smoothing over
+			-- time (0.0-1.0):
+			qblur: REAL,
+			-- Minimum quantizer.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			qmin: INTEGER,
+			-- Maximum quantizer.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			qmax: INTEGER,
+			-- Maximum quantizer difference between
+			-- frames.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			max_qdiff: INTEGER,
+			-- Decoder bitstream buffer size.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			rc_buffer_size: INTEGER,
+			-- Maximum bitrate.
+			-- Encoding: set by user.
+			-- Decoding: set by user, may be overwritten
+			-- by libavcodec.
+			rc_max_rate: INTEGER,
+			-- Minimum bitrate.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			rc_min_rate: INTEGER,
+			-- Ratecontrol attempt to use, at maximum,
+			-- <value> of what can be used without an
+			-- underflow.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			rc_max_available_vbv_use: REAL,
+			-- Ratecontrol attempt to use, at least,
+			-- <value> times the amount needed to
+			-- prevent a vbv overflow.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			rc_min_vbv_overflow_use: REAL,
+			-- Number of bits which should be loaded
+			-- into the rc buffer before decoding
+			-- starts.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			rc_initial_buffer_occupancy: INTEGER,
+			-- Trellis RD quantization.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			trellis: INTEGER,
+			-- Work around bugs in encoders
+			-- which sometimes cannot be
+			-- detected automatically.
+			-- Encoding: set by user.
+			-- Decoding: Set by user.
+			workaround_bugs: FFmpegWorkAroundBugs,
+			-- Strictly follow the standard
+			-- (MPEG-4, ...).
+			-- Encoding: set by user.
+			-- Decoding: Set by user.
+			-- Setting this to STRICT or higher means
+			-- the encoder and decoder will generally
+			-- do stupid things, whereas setting it
+			-- to unofficial or lower will mean the
+			-- encoder might produce output that is
+			-- not supported by all spec-compliant
+			-- decoders. Decoders don't differentiate
+			-- between normal, unofficial and
+			-- experimental (that is, they always try
+			-- to decode things when they can) unless
+			-- they are explicitly asked to behave
+			-- stupidly (=strictly conform to the
+			-- specs).
+			strict_std_compliance:
+				FFmpegStandardCompliance,
+			-- Debug.
+			-- Encoding: set by user.
+			-- Decoding: set by user.
+			debug: FFmpegDebugOptions,
+			-- DCT algorithm, see FF_DCT_* below.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			dct_algo: FFmpeg_DCT_Algorithm,
+			-- IDCT algorithm, see FF_IDCT_* below.
+			-- Encoding: set by user.
+			-- Decoding: set by user.
+			idct_algo: FFmpeg_IDCT_Algorithm,
+			-- Bits per sample/pixel of internal
+			-- libavcodec pixel/sample format.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			bits_per_raw_sample: INTEGER,
+			-- Thread count is used to decide how many
+			-- independent tasks should be passed to
+			-- execute().
+			-- Encoding: set by user.
+			-- Decoding: set by user.
+			thread_count: INTEGER,
+			-- Which multithreading methods to use.
+			-- Use of FF_THREAD_FRAME will increase
+			-- decoding delay by one frame per thread,
+			-- so clients which cannot provide future
+			-- frames should not use it.
+			-- Encoding: set by user, otherwise the
+			-- default is used.
+			-- Decoding: set by user, otherwise the
+			-- default is used.
+			thread_type: FFmpegThreadType,
+			-- Set by the client if its custom
+			-- get_buffer() callback can be called
+			-- synchronously from another thread,
+			-- which allows faster multithreaded
+			-- decoding. draw_horiz_band() will be
+			-- called from other threads regardless
+			-- of this setting. Ignored if the default
+			-- get_buffer() is used.
+			-- Encoding: set by user.
+			-- Decoding: set by user.
+			thread_safe_callbacks: INTEGER,
+			-- Noise vs. sse weight for the nsse
+			-- comparison function.
+			-- Encoding: set by user.
+			-- Decoding: unused.
+			nsse_weight: INTEGER,
+			-- Profile.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			profile: FFmpegProfile,
+			-- Level.
+			-- Encoding: set by user.
+			-- Decoding: set by libavcodec.
+			-- FF_LEVEL_UNKNOWN = -99.
+			level: FFmpegLevel,
+			-- Control the form of
+			-- AVSubtitle.rects[N]->ass.
+			-- Decoding: set by user.
+			-- Encoding: unused.
+			sub_text_format: FFmpegSubtitleTextFormat,
+			-- Number of audio samples (per channel)
+			-- in a frame:
+			nb_samples: INTEGER
+			}.
+--
+FFmpegMediaType =	-- Usually treated as
+			-- AVMEDIA_TYPE_DATA:
+			'AVMEDIA_TYPE_UNKNOWN';
+			'AVMEDIA_TYPE_VIDEO';
+			'AVMEDIA_TYPE_AUDIO';
+			-- Opaque data information usually
+			-- continuous:
+			'AVMEDIA_TYPE_DATA';
+			'AVMEDIA_TYPE_SUBTITLE';
+			-- Opaque data information usually
+			-- sparse:
+			'AVMEDIA_TYPE_ATTACHMENT';
+			'AVMEDIA_TYPE_NB';
+			-- Other types:
+			INTEGER.
+--
+Rational	= q(INTEGER/*Numerator*/,INTEGER/*Denominator*/); REAL.
+--
+FFmpegPixelFormats	= FFmpegPixelFormat*.
+--
+FFmpegPixelFormat =	'AV_PIX_FMT_NONE';
+			-- Planar YUV 4:2:0, 12bpp, (1 Cr &
+			-- Cb sample per 2x2 Y samples):
+			'AV_PIX_FMT_YUV420P';
+			-- Packed YUV 4:2:2, 16bpp,
+			-- Y0 Cb Y1 Cr:
+			'AV_PIX_FMT_YUYV422';
+			-- Packed RGB 8:8:8, 24bpp,
+			-- RGBRGB...:
+			'AV_PIX_FMT_RGB24';
+			-- Packed RGB 8:8:8, 24bpp,
+			-- BGRBGR...:
+			'AV_PIX_FMT_BGR24';
+			-- Planar YUV 4:2:2, 16bpp,
+			-- (1 Cr & Cb sample per 2x1 Y
+			-- samples):
+			'AV_PIX_FMT_YUV422P';
+			-- Planar YUV 4:4:4, 24bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples):
+			'AV_PIX_FMT_YUV444P';
+			-- Planar YUV 4:1:0,  9bpp, (1 Cr &
+			-- Cb sample per 4x4 Y samples):
+			'AV_PIX_FMT_YUV410P';
+			-- planar YUV 4:1:1, 12bpp, (1 Cr &
+			-- Cb sample per 4x1 Y samples):
+			'AV_PIX_FMT_YUV411P';
+			-- Y, 8bpp:
+			'AV_PIX_FMT_GRAY8';
+			-- Y, 1bpp, 0 is white, 1 is black,
+			-- in each byte pixels are ordered
+			-- from the msb to the lsb:
+			'AV_PIX_FMT_MONOWHITE';
+			-- Y, 1bpp, 0 is black, 1 is white,
+			-- in each byte pixels are ordered
+			-- from the msb to the lsb:
+			'AV_PIX_FMT_MONOBLACK';
+			-- 8 bits with AV_PIX_FMT_RGB32
+			-- palette:
+			'AV_PIX_FMT_PAL8';
+			-- Planar YUV 4:2:0, 12bpp, full
+			-- scale (JPEG), deprecated in
+			-- favor of AV_PIX_FMT_YUV420P and
+			-- setting color_range:
+			'AV_PIX_FMT_YUVJ420P';
+			-- Planar YUV 4:2:2, 16bpp, full
+			-- scale (JPEG), deprecated in favor
+			-- of AV_PIX_FMT_YUV422P and
+			-- setting color_range:
+			'AV_PIX_FMT_YUVJ422P';
+			-- Planar YUV 4:4:4, 24bpp, full
+			-- scale (JPEG), deprecated in favor
+			-- of AV_PIX_FMT_YUV444P and setting
+			-- color_range:
+			'AV_PIX_FMT_YUVJ444P';
+			-- XVideo Motion Acceleration via
+			-- common packet passing:
+			'AV_PIX_FMT_XVMC_MPEG2_MC';
+			'AV_PIX_FMT_XVMC_MPEG2_IDCT';
+			-- Packed YUV 4:2:2, 16bpp, Cb Y0
+			-- Cr Y1:
+			'AV_PIX_FMT_UYVY422';
+			-- Packed YUV 4:1:1, 12bpp, Cb Y0
+			-- Y1 Cr Y2 Y3:
+			'AV_PIX_FMT_UYYVYY411';
+			-- Packed RGB 3:3:2, 8bpp,
+			-- (msb)2B 3G 3R(lsb):
+			'AV_PIX_FMT_BGR8';
+			-- Packed RGB 1:2:1 bitstream,
+			-- 4bpp, (msb)1B 2G 1R(lsb),
+			-- a byte contains two pixels,
+			-- the first pixel in the byte
+			-- is the one composed by the 4
+			-- msb bits:
+			'AV_PIX_FMT_BGR4';
+			-- Packed RGB 1:2:1, 8bpp,
+			-- (msb)1B 2G 1R(lsb):
+			'AV_PIX_FMT_BGR4_BYTE';
+			-- Packed RGB 3:3:2, 8bpp,
+			-- (msb)2R 3G 3B(lsb):
+			'AV_PIX_FMT_RGB8';
+			-- Packed RGB 1:2:1 bitstream,
+			-- 4bpp, (msb)1R 2G 1B(lsb),
+			-- a byte contains two pixels,
+			-- the first pixel in the byte
+			-- is the one composed by the 4
+			-- msb bits:
+			'AV_PIX_FMT_RGB4';
+			-- Packed RGB 1:2:1, 8bpp,
+			-- (msb)1R 2G 1B(lsb):
+			'AV_PIX_FMT_RGB4_BYTE';
+			-- Planar YUV 4:2:0, 12bpp, 1
+			-- plane for Y and 1 plane for
+			-- the UV components, which are
+			-- interleaved (first byte U and
+			-- the following byte V):
+			'AV_PIX_FMT_NV12';
+			-- As above, but U and V bytes
+			-- are swapped:
+			'AV_PIX_FMT_NV21';
+			-- Packed ARGB 8:8:8:8, 32bpp,
+			-- ARGBARGB...:
+			'AV_PIX_FMT_ARGB';
+			-- Packed RGBA 8:8:8:8, 32bpp,
+			-- RGBARGBA...:
+			'AV_PIX_FMT_RGBA';
+			-- Packed ABGR 8:8:8:8, 32bpp,
+			-- ABGRABGR...:
+			'AV_PIX_FMT_ABGR';
+			-- Packed BGRA 8:8:8:8, 32bpp,
+			-- BGRABGRA...:
+			'AV_PIX_FMT_BGRA';
+			-- Y, 16bpp, big-endian:
+			'AV_PIX_FMT_GRAY16BE';
+			-- Y, 16bpp, little-endian:
+			'AV_PIX_FMT_GRAY16LE';
+			-- Planar YUV 4:4:0 (1 Cr & Cb
+			-- sample per 1x2 Y samples):
+			'AV_PIX_FMT_YUV440P';
+			-- Planar YUV 4:4:0 full scale
+			-- (JPEG), deprecated in favor
+			-- of AV_PIX_FMT_YUV440P and
+			-- setting color_range:
+			'AV_PIX_FMT_YUVJ440P';
+			-- Planar YUV 4:2:0, 20bpp, (1 Cr &
+			-- Cb sample per 2x2 Y & A samples):
+			'AV_PIX_FMT_YUVA420P';
+			-- H.264 HW decoding with VDPAU,
+			-- data[0] contains a
+			-- vdpau_render_state struct which
+			-- contains the bitstream of the
+			-- slices as well as various fields
+			-- extracted from headers:
+			'AV_PIX_FMT_VDPAU_H264';
+			-- MPEG-1 HW decoding with VDPAU,
+			-- data[0] contains a
+			-- vdpau_render_state struct which
+			-- contains the bitstream of the
+			-- slices as well as various fields
+			-- extracted from headers:
+			'AV_PIX_FMT_VDPAU_MPEG1';
+			-- MPEG-2 HW decoding with VDPAU,
+			-- data[0] contains a
+			-- vdpau_render_state struct which
+			-- contains the bitstream of the
+			-- slices as well as various fields
+			-- extracted from headers:
+			'AV_PIX_FMT_VDPAU_MPEG2';
+			-- WMV3 HW decoding with VDPAU,
+			-- data[0] contains a
+			-- vdpau_render_state struct which
+			-- contains the bitstream of the
+			-- slices as well as various fields
+			-- extracted from headers:
+			'AV_PIX_FMT_VDPAU_WMV3';
+			-- VC-1 HW decoding with VDPAU,
+			-- data[0] contains a
+			-- vdpau_render_state struct which
+			-- contains the bitstream of the
+			-- slices as well as various fields
+			-- extracted from headers:
+			'AV_PIX_FMT_VDPAU_VC1';
+			-- Packed RGB 16:16:16, 48bpp, 16R,
+			-- 16G, 16B, the 2-byte value for
+			-- each R/G/B component is stored as
+			-- big-endian:
+			'AV_PIX_FMT_RGB48BE';
+			-- Packed RGB 16:16:16, 48bpp, 16R,
+			-- 16G, 16B, the 2-byte value for
+			-- each R/G/B component is stored as
+			-- little-endian:
+			'AV_PIX_FMT_RGB48LE';
+			-- Packed RGB 5:6:5, 16bpp, (msb)
+			-- 5R 6G 5B(lsb), big-endian:
+			'AV_PIX_FMT_RGB565BE';
+			-- Packed RGB 5:6:5, 16bpp, (msb)
+			-- 5R 6G 5B(lsb), little-endian:
+			'AV_PIX_FMT_RGB565LE';
+			-- Packed RGB 5:5:5, 16bpp,
+			-- (msb)1X 5R 5G 5B(lsb), big-endian,
+			-- X=unused/undefined:
+			'AV_PIX_FMT_RGB555BE';
+			-- Packed RGB 5:5:5, 16bpp,
+			-- (msb)1X 5R 5G 5B(lsb),
+			-- little-endian,
+			-- X=unused/undefined:
+			'AV_PIX_FMT_RGB555LE';
+			-- Packed BGR 5:6:5, 16bpp, (msb)
+			-- 5B 6G 5R(lsb), big-endian:
+			'AV_PIX_FMT_BGR565BE';
+			-- Packed BGR 5:6:5, 16bpp, (msb)
+			-- 5B 6G 5R(lsb), little-endian:
+			'AV_PIX_FMT_BGR565LE';
+			-- Packed BGR 5:5:5, 16bpp,
+			-- (msb)1X 5B 5G 5R(lsb), big-endian,
+			-- X=unused/undefined:
+			'AV_PIX_FMT_BGR555BE';
+			-- Packed BGR 5:5:5, 16bpp,
+			-- (msb)1X 5B 5G 5R(lsb),
+			-- little-endian, X=unused/undefined:
+			'AV_PIX_FMT_BGR555LE';
+			-- HW acceleration through VA API at
+			-- motion compensation entry-point,
+			-- Picture.data[3] contains a
+			-- vaapi_render_state struct which
+			-- contains macroblocks as well as
+			-- various fields extracted from
+			-- headers. This pixel format is
+			-- deprecated:
+			'AV_PIX_FMT_VAAPI_MOCO';
+			-- HW acceleration through VA API
+			-- at IDCT entry-point,
+			-- Picture.data[3] contains a
+			-- vaapi_render_state struct which
+			-- contains fields extracted from
+			-- headers. This pixel format is
+			-- deprecated:
+			'AV_PIX_FMT_VAAPI_IDCT';
+			-- HW decoding through VA API,
+			-- Picture.data[3] contains
+			-- a VASurfaceID. This pixel format
+			-- is deprecated:
+			'AV_PIX_FMT_VAAPI_VLD';
+			-- Hardware acceleration through VA-API,
+			-- data[3] contains a VASurfaceID:
+			'AV_PIX_FMT_VAAPI';
+			-- Planar YUV 4:2:0, 24bpp, (1 Cr &
+			-- Cb sample per 2x2 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV420P16LE';
+			-- planar YUV 4:2:0, 24bpp, (1 Cr &
+			-- Cb sample per 2x2 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV420P16BE';
+			-- Planar YUV 4:2:2, 32bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV422P16LE';
+			-- Planar YUV 4:2:2, 32bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV422P16BE';
+			-- Planar YUV 4:4:4, 48bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV444P16LE';
+			-- Planar YUV 4:4:4, 48bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV444P16BE';
+			-- MPEG-4 HW decoding with VDPAU,
+			-- data[0] contains a
+			-- vdpau_render_state struct which
+			-- contains the bitstream of the
+			-- slices as well as various fields
+			-- extracted from headers:
+			'AV_PIX_FMT_VDPAU_MPEG4';
+			-- HW decoding through DXVA2,
+			-- Picture.data[3] contains a
+			-- LPDIRECT3DSURFACE9 pointer:
+			'AV_PIX_FMT_DXVA2_VLD';
+			-- Packed RGB 4:4:4, 16bpp,
+			-- (msb)4X 4R 4G 4B(lsb),
+			-- little-endian, X=unused/undefined:
+			'AV_PIX_FMT_RGB444LE';
+			-- Packed RGB 4:4:4, 16bpp,
+			-- (msb)4X 4R 4G 4B(lsb), big-endian,
+			-- X=unused/undefined:
+			'AV_PIX_FMT_RGB444BE';
+			-- Packed BGR 4:4:4, 16bpp,
+			-- (msb)4X 4B 4G 4R(lsb),
+			-- little-endian, X=unused/undefined:
+			'AV_PIX_FMT_BGR444LE';
+			-- Packed BGR 4:4:4, 16bpp,
+			-- (msb)4X 4B 4G 4R(lsb), big-endian,
+			-- X=unused/undefined:
+			'AV_PIX_FMT_BGR444BE';
+			-- 8 bits gray, 8 bits alpha:
+			'AV_PIX_FMT_YA8';
+			-- Alias for AV_PIX_FMT_YA8:
+			'AV_PIX_FMT_Y400A';
+			-- Alias for AV_PIX_FMT_YA8:
+			'AV_PIX_FMT_GRAY8A';
+			-- Packed RGB 16:16:16, 48bpp, 16B,
+			-- 16G, 16R, the 2-byte value for
+			-- each R/G/B component is stored
+			-- as big-endian:
+			'AV_PIX_FMT_BGR48BE';
+			-- Packed RGB 16:16:16, 48bpp, 16B,
+			-- 16G, 16R, the 2-byte value for
+			-- each R/G/B component is stored
+			-- as little-endian:
+			'AV_PIX_FMT_BGR48LE';
+			--
+			-- The following 12 formats have
+			-- the disadvantage of needing 1
+			-- format for each bit depth.
+			-- Notice that each 9/10 bits
+			-- sample is stored in 16 bits
+			-- with extra padding.
+			-- If you want to support multiple
+			-- bit depths, then using
+			-- AV_PIX_FMT_YUV420P16* with the
+			-- bpp stored separately is better.
+			--
+			-- Planar YUV 4:2:0, 13.5bpp, (1 Cr
+			-- & Cb sample per 2x2 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV420P9BE';
+			-- Planar YUV 4:2:0, 13.5bpp, (1 Cr
+			-- & Cb sample per 2x2 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV420P9LE';
+			-- Planar YUV 4:2:0, 15bpp, (1 Cr &
+			-- Cb sample per 2x2 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV420P10BE';
+			-- Planar YUV 4:2:0, 15bpp, (1 Cr &
+			-- Cb sample per 2x2 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV420P10LE';
+			-- Planar YUV 4:2:2, 20bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV422P10BE';
+			-- Planar YUV 4:2:2, 20bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV422P10LE';
+			-- Planar YUV 4:4:4, 27bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV444P9BE';
+			-- planar YUV 4:4:4, 27bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV444P9LE';
+			-- Planar YUV 4:4:4, 30bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV444P10BE';
+			-- Planar YUV 4:4:4, 30bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV444P10LE';
+			-- Planar YUV 4:2:2, 18bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV422P9BE';
+			-- Planar YUV 4:2:2, 18bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV422P9LE';
+			-- Hardware decoding through VDA:
+			'AV_PIX_FMT_VDA_VLD';
+			-- Planar GBR 4:4:4 24bpp:
+			'AV_PIX_FMT_GBRP';
+			-- Alias for AV_PIX_FMT_GBRP:
+			'AV_PIX_FMT_GBR24P';
+			-- Planar GBR 4:4:4 27bpp,
+			-- big-endian:
+			'AV_PIX_FMT_GBRP9BE';
+			-- Planar GBR 4:4:4 27bpp,
+			-- little-endian:
+			'AV_PIX_FMT_GBRP9LE';
+			-- Planar GBR 4:4:4 30bpp,
+			-- big-endian:
+			'AV_PIX_FMT_GBRP10BE';
+			-- Planar GBR 4:4:4 30bpp,
+			-- little-endian:
+			'AV_PIX_FMT_GBRP10LE';
+			-- Planar GBR 4:4:4 48bpp,
+			-- big-endian:
+			'AV_PIX_FMT_GBRP16BE';
+			-- Planar GBR 4:4:4 48bpp,
+			-- little-endian:
+			'AV_PIX_FMT_GBRP16LE';
+			-- Planar YUV 4:2:2 24bpp, (1 Cr
+			-- & Cb sample per 2x1 Y & A
+			-- samples):
+			'AV_PIX_FMT_YUVA422P';
+			-- Planar YUV 4:4:4 32bpp, (1 Cr
+			-- & Cb sample per 1x1 Y & A
+			-- samples):
+			'AV_PIX_FMT_YUVA444P';
+			-- Planar YUV 4:2:0 22.5bpp,
+			-- (1 Cr & Cb sample per 2x2 Y &
+			-- A samples), big-endian:
+			'AV_PIX_FMT_YUVA420P9BE';
+			-- Planar YUV 4:2:0 22.5bpp, (1 Cr
+			-- & Cb sample per 2x2 Y & A
+			-- samples), little-endian:
+			'AV_PIX_FMT_YUVA420P9LE';
+			-- Planar YUV 4:2:2 27bpp, (1 Cr &
+			-- Cb sample per 2x1 Y & A samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUVA422P9BE';
+			-- Planar YUV 4:2:2 27bpp, (1 Cr &
+			-- Cb sample per 2x1 Y & A samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUVA422P9LE';
+			-- Planar YUV 4:4:4 36bpp, (1 Cr &
+			-- Cb sample per 1x1 Y & A samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUVA444P9BE';
+			-- Planar YUV 4:4:4 36bpp, (1 Cr &
+			-- Cb sample per 1x1 Y & A samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUVA444P9LE';
+			-- Planar YUV 4:2:0 25bpp, (1 Cr &
+			-- Cb sample per 2x2 Y & A samples,
+			-- big-endian):
+			'AV_PIX_FMT_YUVA420P10BE';
+			-- Planar YUV 4:2:0 25bpp, (1 Cr &
+			-- Cb sample per 2x2 Y & A samples,
+			-- little-endian):
+			'AV_PIX_FMT_YUVA420P10LE';
+			-- Planar YUV 4:2:2 30bpp, (1 Cr &
+			-- Cb sample per 2x1 Y & A samples,
+			-- big-endian):
+			'AV_PIX_FMT_YUVA422P10BE';
+			-- Planar YUV 4:2:2 30bpp, (1 Cr &
+			-- Cb sample per 2x1 Y & A samples,
+			-- little-endian):
+			'AV_PIX_FMT_YUVA422P10LE';
+			-- Planar YUV 4:4:4 40bpp, (1 Cr &
+			-- Cb sample per 1x1 Y & A samples,
+			-- big-endian):
+			'AV_PIX_FMT_YUVA444P10BE';
+			-- Planar YUV 4:4:4 40bpp, (1 Cr &
+			-- Cb sample per 1x1 Y & A samples,
+			-- little-endian):
+			'AV_PIX_FMT_YUVA444P10LE';
+			-- Planar YUV 4:2:0 40bpp, (1 Cr &
+			-- Cb sample per 2x2 Y & A samples,
+			-- big-endian):
+			'AV_PIX_FMT_YUVA420P16BE';
+			-- Planar YUV 4:2:0 40bpp, (1 Cr &
+			-- Cb sample per 2x2 Y & A samples,
+			-- little-endian):
+			'AV_PIX_FMT_YUVA420P16LE';
+			-- Planar YUV 4:2:2 48bpp, (1 Cr &
+			-- Cb sample per 2x1 Y & A samples,
+			-- big-endian):
+			'AV_PIX_FMT_YUVA422P16BE';
+			-- Planar YUV 4:2:2 48bpp, (1 Cr &
+			-- Cb sample per 2x1 Y & A samples,
+			-- little-endian):
+			'AV_PIX_FMT_YUVA422P16LE';
+			-- Planar YUV 4:4:4 64bpp, (1 Cr &
+			-- Cb sample per 1x1 Y & A samples,
+			-- big-endian):
+			'AV_PIX_FMT_YUVA444P16BE';
+			-- Planar YUV 4:4:4 64bpp, (1 Cr &
+			-- Cb sample per 1x1 Y & A samples,
+			-- little-endian):
+			'AV_PIX_FMT_YUVA444P16LE';
+			-- HW acceleration through VDPAU,
+			-- Picture.data[3] contains
+			-- a VdpVideoSurface:
+			'AV_PIX_FMT_VDPAU';
+			-- Packed XYZ 4:4:4, 36 bpp, (msb)
+			-- 12X, 12Y, 12Z (lsb), the 2-byte
+			-- value for each X/Y/Z is stored
+			-- as little-endian, the 4 lower
+			-- bits are set to 0:
+			'AV_PIX_FMT_XYZ12LE';
+			-- Packed XYZ 4:4:4, 36 bpp, (msb)
+			-- 12X, 12Y, 12Z (lsb), the 2-byte
+			-- value for each X/Y/Z is stored
+			-- as big-endian, the 4 lower bits
+			-- are set to 0:
+			'AV_PIX_FMT_XYZ12BE';
+			-- Interleaved chroma YUV 4:2:2,
+			-- 16bpp, (1 Cr & Cb sample per 2x1
+			-- Y samples):
+			'AV_PIX_FMT_NV16';
+			-- Interleaved chroma YUV 4:2:2,
+			-- 20bpp, (1 Cr & Cb sample per 2x1
+			-- Y samples), little-endian:
+			'AV_PIX_FMT_NV20LE';
+			-- Interleaved chroma YUV 4:2:2,
+			-- 20bpp, (1 Cr & Cb sample per 2x1
+			-- Y samples), big-endian:
+			'AV_PIX_FMT_NV20BE';
+			-- Packed RGBA 16:16:16:16, 64bpp,
+			-- 16R, 16G, 16B, 16A, the 2-byte
+			-- value for each R/G/B/A component
+			-- is stored as big-endian:
+			'AV_PIX_FMT_RGBA64BE';
+			-- Packed RGBA 16:16:16:16, 64bpp,
+			-- 16R, 16G, 16B, 16A, the 2-byte
+			-- value for each R/G/B/A component
+			-- is stored as little-endian:
+			'AV_PIX_FMT_RGBA64LE';
+			-- Packed RGBA 16:16:16:16, 64bpp,
+			-- 16B, 16G, 16R, 16A, the 2-byte
+			-- value for each R/G/B/A component
+			-- is stored as big-endian:
+			'AV_PIX_FMT_BGRA64BE';
+			-- Packed RGBA 16:16:16:16, 64bpp,
+			-- 16B, 16G, 16R, 16A, the 2-byte
+			-- value for each R/G/B/A component
+			-- is stored as little-endian:
+			'AV_PIX_FMT_BGRA64LE';
+			-- Packed YUV 4:2:2, 16bpp,
+			-- Y0 Cr Y1 Cb:
+			'AV_PIX_FMT_YVYU422';
+			-- HW acceleration through VDA,
+			-- data[3] contains
+			-- a CVPixelBufferRef:
+			'AV_PIX_FMT_VDA';
+			-- 16 bits gray, 16 bits alpha
+			-- (big-endian):
+			'AV_PIX_FMT_YA16BE';
+			-- 16 bits gray, 16 bits alpha
+			-- (little-endian):
+			'AV_PIX_FMT_YA16LE';
+			-- Planar GBRA 4:4:4:4 32bpp:
+			'AV_PIX_FMT_GBRAP';
+			-- Planar GBRA 4:4:4:4 64bpp,
+			-- big-endian:
+			'AV_PIX_FMT_GBRAP16BE';
+			-- Planar GBRA 4:4:4:4 64bpp,
+			-- little-endian:
+			'AV_PIX_FMT_GBRAP16LE';
+			-- HW acceleration through QSV,
+			-- data[3] contains a pointer to the
+			-- mfxFrameSurface1 structure:
+			'AV_PIX_FMT_QSV';
+			-- HW acceleration though MMAL,
+			-- data[3] contains a pointer to the
+			-- MMAL_BUFFER_HEADER_T structure:
+			'AV_PIX_FMT_MMAL';
+			-- HW decoding through Direct3D11,
+			-- Picture.data[3] contains a
+			-- ID3D11VideoDecoderOutputView
+			-- pointer:
+			'AV_PIX_FMT_D3D11VA_VLD';
+			-- HW acceleration through CUDA.
+			-- data[i] contain CUdeviceptr
+			-- pointers exactly as for system
+			-- memory frames:
+			'AV_PIX_FMT_CUDA';
+			-- Packed RGB 8:8:8, 32bpp, XRGBXRGB...
+			-- X=unused/undefined:
+			'AV_PIX_FMT_0RGB';
+			-- Packed RGB 8:8:8, 32bpp, RGBXRGBX...
+			-- X=unused/undefined:
+			'AV_PIX_FMT_RGB0';
+			-- Packed BGR 8:8:8, 32bpp, XBGRXBGR...
+			-- X=unused/undefined:
+			'AV_PIX_FMT_0BGR';
+			-- Packed BGR 8:8:8, 32bpp, BGRXBGRX...
+			-- X=unused/undefined:
+			'AV_PIX_FMT_BGR0';
+			-- Planar YUV 4:2:0,18bpp, (1 Cr &
+			-- Cb sample per 2x2 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV420P12BE';
+			-- Planar YUV 4:2:0,18bpp, (1 Cr &
+			-- Cb sample per 2x2 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV420P12LE';
+			-- Planar YUV 4:2:0,21bpp, (1 Cr &
+			-- Cb sample per 2x2 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV420P14BE';
+			-- Planar YUV 4:2:0,21bpp, (1 Cr &
+			-- Cb sample per 2x2 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV420P14LE';
+			-- Planar YUV 4:2:2,24bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV422P12BE';
+			-- Planar YUV 4:2:2,24bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV422P12LE';
+			-- Planar YUV 4:2:2,28bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV422P14BE';
+			-- Planar YUV 4:2:2,28bpp, (1 Cr &
+			-- Cb sample per 2x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV422P14LE';
+			-- Planar YUV 4:4:4,36bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV444P12BE';
+			-- Planar YUV 4:4:4,36bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV444P12LE';
+			-- Planar YUV 4:4:4,42bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV444P14BE';
+			-- Planar YUV 4:4:4,42bpp, (1 Cr &
+			-- Cb sample per 1x1 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV444P14LE';
+			-- Planar GBR 4:4:4 36bpp, big-endian:
+			'AV_PIX_FMT_GBRP12BE';
+			-- Planar GBR 4:4:4 36bpp,
+			-- little-endian:
+			'AV_PIX_FMT_GBRP12LE';
+			-- Planar GBR 4:4:4 42bpp, big-endian:
+			'AV_PIX_FMT_GBRP14BE';
+			-- Planar GBR 4:4:4 42bpp,
+			-- little-endian:
+			'AV_PIX_FMT_GBRP14LE';
+			-- Planar YUV 4:1:1, 12bpp, (1 Cr &
+			-- Cb sample per 4x1 Y samples) full
+			-- scale (JPEG), deprecated in favor
+			-- of AV_PIX_FMT_YUV411P and setting
+			-- color_range:
+			'AV_PIX_FMT_YUVJ411P';
+			-- Bayer, BGBG..(odd line),
+			-- GRGR..(even line), 8-bit samples:
+			'AV_PIX_FMT_BAYER_BGGR8';
+			-- Bayer, RGRG..(odd line),
+			-- GBGB..(even line), 8-bit samples:
+			'AV_PIX_FMT_BAYER_RGGB8';
+			-- Bayer, GBGB..(odd line),
+			-- RGRG..(even line), 8-bit samples:
+			'AV_PIX_FMT_BAYER_GBRG8';
+			-- Bayer, GRGR..(odd line),
+			-- BGBG..(even line),
+			-- 8-bit samples:
+			'AV_PIX_FMT_BAYER_GRBG8';
+			-- Bayer, BGBG..(odd line),
+			-- GRGR..(even line), 16-bit samples,
+			-- little-endian:
+			'AV_PIX_FMT_BAYER_BGGR16LE';
+			-- Bayer, BGBG..(odd line),
+			-- GRGR..(even line), 16-bit samples,
+			-- big-endian:
+			'AV_PIX_FMT_BAYER_BGGR16BE';
+			-- Bayer, RGRG..(odd line),
+			-- GBGB..(even line), 16-bit samples,
+			-- little-endian:
+			'AV_PIX_FMT_BAYER_RGGB16LE';
+			-- Bayer, RGRG..(odd line),
+			-- GBGB..(even line), 16-bit samples,
+			-- big-endian:
+			'AV_PIX_FMT_BAYER_RGGB16BE';
+			-- Bayer, GBGB..(odd line),
+			-- RGRG..(even line), 16-bit samples,
+			-- little-endian:
+			'AV_PIX_FMT_BAYER_GBRG16LE';
+			-- Bayer, GBGB..(odd line),
+			-- RGRG..(even line), 16-bit samples,
+			-- big-endian:
+			'AV_PIX_FMT_BAYER_GBRG16BE';
+			-- Bayer, GRGR..(odd line),
+			-- BGBG..(even line), 16-bit samples,
+			-- little-endian:
+			'AV_PIX_FMT_BAYER_GRBG16LE';
+			-- Bayer, GRGR..(odd line),
+			-- BGBG..(even line), 16-bit samples,
+			-- big-endian:
+			'AV_PIX_FMT_BAYER_GRBG16BE';
+			-- XVideo Motion Acceleration via
+			-- common packet passing:
+			'AV_PIX_FMT_XVMC';
+			-- Planar YUV 4:4:0,20bpp, (1 Cr &
+			-- Cb sample per 1x2 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV440P10LE';
+			-- Planar YUV 4:4:0,20bpp, (1 Cr &
+			-- Cb sample per 1x2 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV440P10BE';
+			-- Planar YUV 4:4:0,24bpp, (1 Cr &
+			-- Cb sample per 1x2 Y samples),
+			-- little-endian:
+			'AV_PIX_FMT_YUV440P12LE';
+			-- Planar YUV 4:4:0,24bpp, (1 Cr &
+			-- Cb sample per 1x2 Y samples),
+			-- big-endian:
+			'AV_PIX_FMT_YUV440P12BE';
+			-- Packed AYUV 4:4:4,64bpp (1 Cr &
+			-- Cb sample per 1x1 Y & A samples),
+			-- little-endian:
+			'AV_PIX_FMT_AYUV64LE';
+			-- Packed AYUV 4:4:4,64bpp (1 Cr &
+			-- Cb sample per 1x1 Y & A samples),
+			-- big-endian:
+			'AV_PIX_FMT_AYUV64BE';
+			-- Hardware decoding through
+			-- Videotoolbox:
+			'AV_PIX_FMT_VIDEOTOOLBOX';
+			-- Like NV12, with 10bpp per
+			-- component, data in the high bits,
+			-- zeros in the low bits,
+			-- little-endian:
+			'AV_PIX_FMT_P010LE';
+			-- Like NV12, with 10bpp per
+			-- component, data in the high bits,
+			-- zeros in the low bits, big-endian:
+			'AV_PIX_FMT_P010BE';
+			-- Planar GBR 4:4:4:4 48bpp,
+			-- big-endian:
+			'AV_PIX_FMT_GBRAP12BE';
+			-- Planar GBR 4:4:4:4 48bpp,
+			-- little-endian:
+			'AV_PIX_FMT_GBRAP12LE';
+			-- Planar GBR 4:4:4:4 40bpp,
+			-- big-endian:
+			'AV_PIX_FMT_GBRAP10BE';
+			-- Planar GBR 4:4:4:4 40bpp,
+			-- little-endian:
+			'AV_PIX_FMT_GBRAP10LE';
+			-- Hardware decoding through
+			-- MediaCodec:
+			'AV_PIX_FMT_MEDIACODEC';
+			-- Y, 12bpp, big-endian:
+			-- 'AV_PIX_FMT_GRAY12BE';
+			-- Y, 12bpp, little-endian:
+			-- 'AV_PIX_FMT_GRAY12LE';
+			-- Y, 10bpp, big-endian:
+			-- 'AV_PIX_FMT_GRAY10BE';
+			-- Y, 10bpp, little-endian:
+			-- 'AV_PIX_FMT_GRAY10LE';
+			-- Like NV12, with 16bpp per
+			-- component, little-endian:
+			-- 'AV_PIX_FMT_P016LE';
+			-- Like NV12, with 16bpp per
+			-- component, big-endian:
+			-- 'AV_PIX_FMT_P016BE'.
+			-- Other formats:
+			INTEGER.
+--
+FFmpegAudioSampleFormats	= FFmpegAudioSampleFormat*.
+--
+FFmpegAudioSampleFormat	=
+			'AV_SAMPLE_FMT_NONE';
+			-- Unsigned 8 bits:
+			'AV_SAMPLE_FMT_U8';
+			-- Signed 16 bits:
+			'AV_SAMPLE_FMT_S16';
+			-- Signed 32 bits:
+			'AV_SAMPLE_FMT_S32';
+			-- Float:
+			'AV_SAMPLE_FMT_FLT';
+			-- Double:
+			'AV_SAMPLE_FMT_DBL';
+			-- Unsigned 8 bits, planar:
+			'AV_SAMPLE_FMT_U8P';
+			-- Signed 16 bits, planar:
+			'AV_SAMPLE_FMT_S16P';
+			-- Signed 32 bits, planar:
+			'AV_SAMPLE_FMT_S32P';
+			-- Float, planar:
+			'AV_SAMPLE_FMT_FLTP';
+			-- Double, planar:
+			'AV_SAMPLE_FMT_DBLP';
+			-- Signed 64 bits:
+			'AV_SAMPLE_FMT_S64';
+			-- Signed 64 bits, planar:
+			'AV_SAMPLE_FMT_S64P';
+			-- Other formats:
+			INTEGER.
+--
+FFmpegChannelLayouts	= FFmpegChannelLayout*.
+--
+-- Different layouts of audio channels. The value of these flags
+-- are ultimately a bitmask of different {#Type} flags.
+--
+FFmpegChannelLayout =	'AV_CH_LAYOUT_MONO';
+			'AV_CH_LAYOUT_STEREO';
+			'AV_CH_LAYOUT_2POINT1';
+			'AV_CH_LAYOUT_2_1';
+			'AV_CH_LAYOUT_SURROUND';
+			'AV_CH_LAYOUT_3POINT1';
+			'AV_CH_LAYOUT_4POINT0';
+			'AV_CH_LAYOUT_4POINT1';
+			'AV_CH_LAYOUT_2_2';
+			'AV_CH_LAYOUT_QUAD';
+			'AV_CH_LAYOUT_5POINT0';
+			'AV_CH_LAYOUT_5POINT1';
+			'AV_CH_LAYOUT_5POINT0_BACK';
+			'AV_CH_LAYOUT_5POINT1_BACK';
+			'AV_CH_LAYOUT_6POINT0';
+			'AV_CH_LAYOUT_6POINT0_FRONT';
+			'AV_CH_LAYOUT_HEXAGONAL';
+			'AV_CH_LAYOUT_6POINT1';
+			'AV_CH_LAYOUT_6POINT1_BACK';
+			'AV_CH_LAYOUT_6POINT1_FRONT';
+			'AV_CH_LAYOUT_7POINT0';
+			'AV_CH_LAYOUT_7POINT0_FRONT';
+			'AV_CH_LAYOUT_7POINT1';
+			'AV_CH_LAYOUT_7POINT1_WIDE';
+			'AV_CH_LAYOUT_7POINT1_WIDE_BACK';
+			'AV_CH_LAYOUT_OCTAGONAL';
+			'AV_CH_LAYOUT_HEXADECAGONAL';
+			'AV_CH_LAYOUT_STEREO_DOWNMIX';
+			INTEGER.
+--
+FFmpegComparisonFunction =
+			'FF_CMP_SAD';
+			'FF_CMP_SSE';
+			'FF_CMP_SATD';
+			'FF_CMP_DCT';
+			'FF_CMP_PSNR';
+			'FF_CMP_BIT';
+			'FF_CMP_RD';
+			'FF_CMP_ZERO';
+			'FF_CMP_VSAD';
+			'FF_CMP_VSSE';
+			'FF_CMP_NSSE';
+			'FF_CMP_W53';
+			'FF_CMP_W97';
+			'FF_CMP_DCTMAX';
+			'FF_CMP_DCT264';
+			'FF_CMP_MEDIAN_SAD';
+			'FF_CMP_CHROMA';
+			INTEGER.
+--
+FFmpegMacroblockDecisionMode =
+			-- Uses mb_cmp:
+			'FF_MB_DECISION_SIMPLE';
+			-- Chooses the one which needs
+			-- the fewest bits:
+			'FF_MB_DECISION_BITS';
+			-- Rate distortion:
+			'FF_MB_DECISION_RD';
+			INTEGER.
+--
+FFmpegWorkAroundBugs	= FFmpegWorkAroundBug*;
+			  FFmpegWorkAroundBug.
+--
+FFmpegWorkAroundBug	=
+			'FF_BUG_AUTODETECT';
+			'FF_BUG_OLD_MSMPEG4';
+			'FF_BUG_XVID_ILACE';
+			'FF_BUG_UMP4';
+			'FF_BUG_NO_PADDING';
+			'FF_BUG_AMV';
+			-- libavcodec can now
+			-- handle these non-compliant files
+			-- by default:
+			-- 'FF_BUG_AC_VLC';
+			'FF_BUG_QPEL_CHROMA';
+			'FF_BUG_STD_QPEL';
+			'FF_BUG_QPEL_CHROMA2';
+			'FF_BUG_DIRECT_BLOCKSIZE';
+			'FF_BUG_EDGE';
+			'FF_BUG_HPEL_CHROMA';
+			'FF_BUG_DC_CLIP';
+			-- Work around various bugs in Microsoft's
+			-- broken decoders:
+			'FF_BUG_MS';
+			'FF_BUG_TRUNCATED';
+			'FF_BUG_IEDGE';
+			INTEGER.
+--
+FFmpegStandardCompliance =
+			-- Strictly conform to an older more
+			-- strict version of the spec or
+			-- reference software:
+			'FF_COMPLIANCE_VERY_STRICT';
+			-- Strictly conform to all the things
+			-- in the spec no matter what
+			-- consequences:
+			'FF_COMPLIANCE_STRICT';
+			'FF_COMPLIANCE_NORMAL';
+			-- Allow unofficial extensions:
+			'FF_COMPLIANCE_UNOFFICIAL';
+			-- Allow nonstandardized experimental
+			-- things:
+			'FF_COMPLIANCE_EXPERIMENTAL';
+			INTEGER.
+--
+FFmpegDebugOptions	= FFmpegDebugOption*.
+--
+FFmpegDebugOption	=
+			'FF_DEBUG_PICT_INFO';
+			'FF_DEBUG_RC';
+			'FF_DEBUG_BITSTREAM';
+			'FF_DEBUG_MB_TYPE';
+			'FF_DEBUG_QP';
+			-- This option does nothing:
+			-- 'FF_DEBUG_MV';
+			'FF_DEBUG_DCT_COEFF';
+			'FF_DEBUG_SKIP';
+			'FF_DEBUG_STARTCODE';
+			'FF_DEBUG_PTS';
+			'FF_DEBUG_ER';
+			'FF_DEBUG_MMCO';
+			'FF_DEBUG_BUGS';
+			-- Only access through AVOptions from
+			-- outside libavcodec:
+			-- 'FF_DEBUG_VIS_QP';
+			-- 'FF_DEBUG_VIS_MB_TYPE';
+			'FF_DEBUG_BUFFERS';
+			'FF_DEBUG_THREADS';
+			'FF_DEBUG_GREEN_MD';
+			'FF_DEBUG_NOMC';
+			INTEGER.
+--
+FFmpeg_DCT_Algorithm	=
+			'FF_DCT_AUTO';
+			'FF_DCT_FASTINT';
+			'FF_DCT_INT';
+			'FF_DCT_MMX';
+			'FF_DCT_ALTIVEC';
+			'FF_DCT_FAAN';
+			INTEGER.
+--
+FFmpeg_IDCT_Algorithm	=
+			'FF_IDCT_AUTO';
+			'FF_IDCT_INT';
+			'FF_IDCT_SIMPLE';
+			'FF_IDCT_SIMPLEMMX';
+			'FF_IDCT_ARM';
+			'FF_IDCT_ALTIVEC';
+			'FF_IDCT_SH4';
+			'FF_IDCT_SIMPLEARM';
+			'FF_IDCT_IPP';
+			'FF_IDCT_XVID';
+			'FF_IDCT_XVIDMMX';
+			'FF_IDCT_SIMPLEARMV5TE';
+			'FF_IDCT_SIMPLEARMV6';
+			'FF_IDCT_SIMPLEVIS';
+			'FF_IDCT_FAAN';
+			'FF_IDCT_SIMPLENEON';
+			'FF_IDCT_SIMPLEALPHA';
+			'FF_IDCT_SIMPLEAUTO';
+			INTEGER.
+--
+FFmpegThreadType	=
+			-- Decode more than one frame at once:
+			'FF_THREAD_FRAME';
+			-- Decode more than one part of a single
+			-- frame at once:
+			'FF_THREAD_SLICE';
+			INTEGER.
+--
+FFmpegProfile		=
+			'FF_PROFILE_UNKNOWN';
+			'FF_PROFILE_RESERVED';
+			'FF_PROFILE_AAC_MAIN';
+			'FF_PROFILE_AAC_LOW';
+			'FF_PROFILE_AAC_SSR';
+			'FF_PROFILE_AAC_LTP';
+			'FF_PROFILE_AAC_HE';
+			'FF_PROFILE_AAC_HE_V2';
+			'FF_PROFILE_AAC_LD';
+			'FF_PROFILE_AAC_ELD';
+			'FF_PROFILE_MPEG2_AAC_LOW';
+			'FF_PROFILE_MPEG2_AAC_HE';
+			'FF_PROFILE_DNXHD';
+			'FF_PROFILE_DNXHR_LB';
+			'FF_PROFILE_DNXHR_SQ';
+			'FF_PROFILE_DNXHR_HQ';
+			'FF_PROFILE_DNXHR_HQX';
+			'FF_PROFILE_DNXHR_444';
+			'FF_PROFILE_DTS';
+			'FF_PROFILE_DTS_ES';
+			'FF_PROFILE_DTS_96_24';
+			'FF_PROFILE_DTS_HD_HRA';
+			'FF_PROFILE_DTS_HD_MA';
+			'FF_PROFILE_DTS_EXPRESS';
+			'FF_PROFILE_MPEG2_422';
+			'FF_PROFILE_MPEG2_HIGH';
+			'FF_PROFILE_MPEG2_SS';
+			'FF_PROFILE_MPEG2_SNR_SCALABLE';
+			'FF_PROFILE_MPEG2_MAIN';
+			'FF_PROFILE_MPEG2_SIMPLE';
+			'FF_PROFILE_H264_CONSTRAINED';
+			'FF_PROFILE_H264_INTRA';
+			'FF_PROFILE_H264_BASELINE';
+			'FF_PROFILE_H264_CONSTRAINED_BASELINE';
+			'FF_PROFILE_H264_MAIN';
+			'FF_PROFILE_H264_EXTENDED';
+			'FF_PROFILE_H264_HIGH';
+			'FF_PROFILE_H264_HIGH_10';
+			'FF_PROFILE_H264_HIGH_10_INTRA';
+			'FF_PROFILE_H264_MULTIVIEW_HIGH';
+			'FF_PROFILE_H264_HIGH_422';
+			'FF_PROFILE_H264_HIGH_422_INTRA';
+			'FF_PROFILE_H264_STEREO_HIGH';
+			'FF_PROFILE_H264_HIGH_444';
+			'FF_PROFILE_H264_HIGH_444_PREDICTIVE';
+			'FF_PROFILE_H264_HIGH_444_INTRA';
+			'FF_PROFILE_H264_CAVLC_444';
+			'FF_PROFILE_VC1_SIMPLE';
+			'FF_PROFILE_VC1_MAIN';
+			'FF_PROFILE_VC1_COMPLEX';
+			'FF_PROFILE_VC1_ADVANCED';
+			'FF_PROFILE_MPEG4_SIMPLE';
+			'FF_PROFILE_MPEG4_SIMPLE_SCALABLE';
+			'FF_PROFILE_MPEG4_CORE';
+			'FF_PROFILE_MPEG4_MAIN';
+			'FF_PROFILE_MPEG4_N_BIT';
+			'FF_PROFILE_MPEG4_SCALABLE_TEXTURE';
+			'FF_PROFILE_MPEG4_SIMPLE_FACE_ANIMATION';
+			'FF_PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE';
+			'FF_PROFILE_MPEG4_HYBRID';
+			'FF_PROFILE_MPEG4_ADVANCED_REAL_TIME';
+			'FF_PROFILE_MPEG4_CORE_SCALABLE';
+			'FF_PROFILE_MPEG4_ADVANCED_CODING';
+			'FF_PROFILE_MPEG4_ADVANCED_CORE';
+			'FF_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE';
+			'FF_PROFILE_MPEG4_SIMPLE_STUDIO';
+			'FF_PROFILE_MPEG4_ADVANCED_SIMPLE';
+			'FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_0';
+			'FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_1';
+			'FF_PROFILE_JPEG2000_CSTREAM_NO_RESTRICTION';
+			'FF_PROFILE_JPEG2000_DCINEMA_2K';
+			'FF_PROFILE_JPEG2000_DCINEMA_4K';
+			'FF_PROFILE_VP9_0';
+			'FF_PROFILE_VP9_1';
+			'FF_PROFILE_VP9_2';
+			'FF_PROFILE_VP9_3';
+			'FF_PROFILE_HEVC_MAIN';
+			'FF_PROFILE_HEVC_MAIN_10';
+			'FF_PROFILE_HEVC_MAIN_STILL_PICTURE';
+			'FF_PROFILE_HEVC_REXT';
+			INTEGER.
+--
+FFmpegLevel		=
+			'FF_LEVEL_UNKNOWN';
+			INTEGER.
+--
+FFmpegSubtitleTextFormat =
+			'FF_SUB_TEXT_FMT_ASS';
+			'FF_SUB_TEXT_FMT_ASS_WITH_TIMINGS';
+			INTEGER.
+--
+FFmpegCodecOptions	= {_}; FFmpegCodecOption*.
+FFmpegCodecOption	= option(STRING/*Name*/,STRING/*Value*/).
+
+--------------------------------------------------------------------
+-- The 'FFmpeg' class is specialized class 'DataAbstraction'.     --
+--------------------------------------------------------------------
+
+interface 'FFmpeg'
+
+(specialized
+	'DataAbstraction',
+	'OperatingSystemResource',
+	'DataResourceConsumer',
+	'WritableImageProducer'):
+
+operating_mode		: FFmpegOperatingMode;
+slow_motion_coefficient	: Numerical;
+
+[
+PREDICATES:
+--
+imperative:
+--
+open;
+open(FFmpegStreams)					- (i);
+open(FileName,FFmpegStreams)				- (i,i);
+--
+open(	FileName,
+	STRING/*FormatName*/,
+	FFmpegStreams)				- (i,i,i);
+open(	FileName,
+	STRING/*FormatName*/,
+	FFmpegStreams,
+	FFmpegCodecOptions)			- (i,i,i,i);
+--
+start;
+pause;
+--
+seek_frame_number(INTEGER)				- (i);
+seek_frame_time(REAL)					- (i);
+--
+get_video_sequence_size(INTEGER)			- (o);
+--
+close;
+--
+determ:
+--
+is_open;
+is_active;
+is_suspended;
+--
+eof;
+--
+commit;
+--
+imperative:
+--
+get_recent_frame_number(FrameNumber)			- (o);
+get_recent_frame_time(REAL)				- (o);
+get_recent_frame_rate(REAL)				- (o);
+get_average_frame_rate(REAL)				- (o);
+--
+get_recent_image('BufferedImage')			- (i);
+--
+get_image_size_in_pixels(INTEGER,INTEGER)		- (o,o);
+--
+write_image('BufferedImage')				- (i);
+--
+determ:
+--
+recent_reading_error(INTEGER,ExceptionName)		- (o,o);
+recent_writing_error(INTEGER,ExceptionName)		- (o,o);
+--
+imperative:
+--
+list_input_formats() = FFmpegInputFormats;
+list_output_formats() = FFmpegOutputFormats;
+--
+imperative:
+--
+set_operating_mode(FFmpegOperatingMode)			- (i);
+get_operating_mode() = FFmpegOperatingMode;
+--
+set_slow_motion_coefficient(Numerical)			- (i);
+get_slow_motion_coefficient() = Numerical;
+--
+-- These methods are to be implemented by the programmer:
+--
+frame_obtained;
+data_transfer_completion;
+--
+buffer_overflow;
+buffer_deallocation;
+--
+data_transfer_error(ExceptionName)			- (i);
+]

@@ -1,0 +1,359 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test11;
+test12;
+test13;
+test14;
+test15;
+test16;
+test17;
+test18;
+test19;
+test21;
+test22;
+test23;
+test24;
+test25;
+test26;
+test27;
+test28;
+test29;
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test11,
+	test12,
+	test13,
+	test14,
+	test15,
+	test16,
+	test17,
+	test18,
+	test19,
+	test21,
+	test22,
+	test23,
+	test24,
+	test25,
+	test26,
+	test27,
+	test28,
+	test29.
+--
+test11:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.1"),
+	Text== "10#100.0#e-2@",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test11.
+--
+test12:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.2"),
+	Text== "$10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test12.
+--
+test13:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.3"),
+	Text== "10#100.0#e-2@",
+	Token== "10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test13.
+--
+test14:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.4"),
+	Text== "10#100.0#e-2@",
+	Rest== "@",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	fail.
+test14.
+--
+test15:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.5"),
+	Text== "10#100.0#e-2@",
+	Token== "10#100.0#e-2",
+	Rest== "@",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tO.K."),
+	fail.
+test15.
+--
+test16:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.6"),
+	Text== "\b\t\n\v\f\r 10#100.0#e-2@",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test16.
+--
+test17:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.7"),
+	Text== "\t10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test17.
+--
+test18:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.8"),
+	Text== "10#100.0#e-2 ",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test18.
+--
+test19:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.9"),
+	Token== "Token",
+	Rest== "Rest",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	fail.
+test19.
+--
+test21:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.1"),
+	Text== "10#100.0#e-2@",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	extract_front_token(Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test21.
+--
+test22:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.2"),
+	Text== "$10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	extract_front_token(Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test22.
+--
+test23:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.3"),
+	Text== "10#100.0#e-2@",
+	Token== "10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	set_string(Text),
+	extract_front_token(Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test23.
+--
+test24:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.4"),
+	Text== "10#100.0#e-2@",
+	Rest== "@",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	set_string(Text),
+	extract_front_token(Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	fail.
+test24.
+--
+test25:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.5"),
+	Text== "10#100.0#e-2@",
+	Token== "10#100.0#e-2",
+	Rest== "@",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	set_string(Text),
+	extract_front_token(Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tO.K."),
+	fail.
+test25.
+--
+test26:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.6"),
+	Text== "\b\t\n\v\f\r 10#100.0#e-2@",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test26.
+--
+test27:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.7"),
+	Text== "\t10#100.0#e-2",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test27.
+--
+test28:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.8"),
+	Text== "10#100.0#e-2 ",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test28.
+--
+test29:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.9"),
+	Text== "",
+	con ? writeln("\tInput arguments:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	extract_front_token(Text,Token,Rest),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput arguments:"),
+	con ? set_color('Green'),
+	con ? writeln("\tToken: >>>",Token,"<<<"),
+	con ? writeln("\tRest: >>>",Rest,"<<<"),
+	fail.
+test29.
+]

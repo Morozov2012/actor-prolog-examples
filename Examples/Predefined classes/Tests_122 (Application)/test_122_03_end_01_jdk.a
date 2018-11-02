@@ -1,0 +1,61 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011-2015 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	command		=
+			"e:\\Program Files\\"
+			"Microsoft Office 1997\\Office\\"
+			"winword.exe";
+--
+internal:
+--
+	argument_file	= ('File',
+				name= "data/report2.rtf");
+--
+	external_editor	= ('ExternalEditor',
+				command);
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("I will invoke one external editor..."),
+	external_editor ? set_arguments(
+		"\"" + argument_file?get_full_name() + "\""),
+	external_editor ? activate(),
+	con ? writeln("Done."),
+	delay(10).
+--
+tick:-!,
+	con ? writeln("I will try to close this editor now."),
+	external_editor ? close().
+]
+-----------------------------------------------------------------------
+class 'ExternalEditor' (specialized 'Application'):
+--
+constant:
+--
+	window_mode			= 'maximized';
+	enable_multiple_instances	= 'no';
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+end(ExitValue)	- (i);
+--
+CLAUSES:
+--
+end(Code):-!,
+	con ? writeln("ExitCode: ",Code).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,85 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Report'):
+--
+p1	= (('MyProcess',
+		receiver=p2,
+		y=0));
+p2	= (('MyProcess',
+		receiver=p3,
+		y=5));
+p3	= (('MyProcess',
+		receiver=p4,
+		y=10));
+p4	= (('MyProcess',
+		receiver=p5,
+		y=15));
+p5	= (('MyProcess',
+		receiver=self,
+		y=20));
+--
+title	= "Main process";
+x	= 0;
+width	= 40;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+switching_message(STRING)		- (i);
+information_message(STRING)		- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	set_color('DkGreen'),
+	writeln("I will send a message."),
+	set_color('default'),
+	p1 << information_message("Hi!").
+--
+information_message(Text):-
+	set_color('RoyalBlue'),
+	writeln("I have received: ",Text),
+	set_color('default').
+--
+switching_message(Text):-
+	set_color('Fuchsia'),
+	writeln("I have received: ",Text),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyProcess' (specialized 'Report'):
+--
+	receiver;
+--
+	title	= "Transmitting process";
+	height	= 5;
+	x	= 40;
+	width	= 40;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+switching_message(STRING)		- (i);
+information_message(STRING)		- (i);
+--
+CLAUSES:
+--
+information_message(Text):-
+	set_color('RoyalBlue'),
+	writeln("I have received: ",Text),
+	set_color('default'),
+	receiver << information_message(Text),
+	receiver <- switching_message(Text).
+--
+switching_message(Text):-
+	set_color('Fuchsia'),
+	writeln("I have received: ",Text),
+	set_color('default').
+]
+-----------------------------------------------------------------------

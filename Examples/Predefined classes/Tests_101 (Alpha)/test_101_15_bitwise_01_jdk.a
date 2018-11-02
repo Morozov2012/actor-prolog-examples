@@ -1,0 +1,88 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+-- Note that the JDK and the VIP versions differently implement the %x
+-- format for integer values. Namely, if the number is negative then
+-- the result will be a signed value beginning with '-', because it is
+-- not possible to create an unsigned equivalent of the signed number
+-- without assuming an explicit data-type size.
+
+DOMAINS:
+
+Value	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+test0(Value)	- (i);
+test1(Value)	- (i);
+test2(Value)	- (i);
+test3(Value)	- (i);
+test4(Value)	- (i);
+test5(Value)	- (i);
+test6(Value)	- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	X== 16#00000103#,
+	con ? writef("x=%08x\n",X),
+	test0(X),
+	test1(X),
+	test2(X),
+	test3(X),
+	test4(X),
+	test5(X),
+	test6(X).
+--
+test0(X):-
+	con ? writeln("Test 0:"),
+	?bitnot(X),
+	?bitand(X,16#FF00#),
+	?bitor(X,16#FF00#),
+	?bitxor(X,16#FF00#),
+	?bitright(X,8),
+	?bitleft(X,8),
+	con ? writeln("   O.K.").
+--
+-- VIP: bitnot(x)=FFFFFEFC
+-- JDK: bitnot(x)=-0000104
+--
+test1(X):-
+	con ? writeln("Test 1:"),
+	A== ?bitnot(X),
+	con ? writef("   bitnot(x)=%08x\n",A).
+--
+test2(X):-
+	con ? writeln("Test 2:"),
+	E== ?bitand(X,16#FF00#),
+	con ? writef("   bitand(x,16#FF00#)=%08x\n",E).
+--
+test3(X):-
+	con ? writeln("Test 3:"),
+	E== ?bitor(X,16#FF00#),
+	con ? writef("   bitor(x,16#FF00#)=%08x\n",E).
+--
+test4(X):-
+	con ? writeln("Test 4:"),
+	E== ?bitxor(X,16#FF00#),
+	con ? writef("   bitxor(x,16#FF00#)=%08x\n",E).
+--
+test5(X):-
+	con ? writeln("Test 5:"),
+	E== ?bitright(X,8),
+	con ? writef("   bitright(x,8)=%08x\n",E).
+--
+test6(X):-
+	con ? writeln("Test 6:"),
+	E== ?bitleft(X,8),
+	con ? writef("   bitleft(x,8)=%08x\n",E).
+]

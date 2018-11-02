@@ -1,0 +1,108 @@
+---------------------------------------------------------------------
+--      An example of Actor Prolog program.                        --
+--      (c) 2008, IRE RAS, Alexei A. Morozov.                      --
+---------------------------------------------------------------------
+--      Implementation of constraints in Actor Prolog.             --
+---------------------------------------------------------------------
+pragma: REAL_ACCURACY= 4;
+---------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+con	= ('Console');
+[
+goal:-
+	Total== 30000.0,
+	NewHardware== 10000.0,
+	--
+	add(Useful,Overhead,Total),
+	mult(Total,0.1,Overhead),
+	add(Cash,Tax,Salary),
+	mult(Cash,0.358,Tax),
+	add(Equipment,Salary,Useful),
+	ge(Equipment,NewHardware),
+	ge(NewHardware * 1.2,Equipment),
+	Cash == ?natural_number(1.0,Total/100.0) * 100.0,
+	--
+	con ? writeln("Total=",Total),
+	con ? writeln("Cash=",Cash),
+	con ? writeln("Overhead=",Overhead),
+	con ? writeln("Tax=",Tax),
+	con ? writeln("Equipment=",Equipment),
+	con ? nl,
+	--
+	fail.
+goal:-!,
+	con ? writeln("No more solutions.").
+---------------------------------------------------------------------
+-- Summation
+---------------------------------------------------------------------
+add(Ax,Bx,Cx):-
+	Cx == Ax ? add_ix(Bx),
+	Cx == Bx ? add_ix(Ax),
+	Bx == Cx ? sub_ix(Ax).
+--
+add_ix(Ai,Bx)= Cx :-
+	Cx == Bx ? add_ii(Ai),
+	Bx == Cx ? sub_ii(Ai).
+--
+add_ii(Ai,Bi)= Ai + Bi.
+---------------------------------------------------------------------
+-- Subtraction
+---------------------------------------------------------------------
+sub_ix(Ai,Bx)= Cx :-
+	BN == Bx ? '-'(),
+	BN == Cx ? sub_ii(Ai),
+	add_negative_value_ix(Ai,Bx,BN,Cx).
+--
+sub_ii(Ai,Bi)= Ai - Bi.
+--
+add_negative_value_ix(Ai,Bx,BN,Cx):-
+	Bx == BN ? '-'(),
+	Cx == BN ? add_ii(Ai).
+---------------------------------------------------------------------
+-- Multiplication
+---------------------------------------------------------------------
+mult(Ax,Bx,Cx):-
+	Cx == Ax ? mult_ix(Bx),
+	Cx == Bx ? mult_ix(Ax),
+	Ax == Cx ? div_ix(Bx).
+--
+mult_ix(Ai,Bx)= Cx :-
+	Cx == Bx ? mult_ii(Ai),
+	Bx == Cx ? div_ii(Ai).
+--
+mult_ii(Ai,Bi)= Ai * Bi.
+---------------------------------------------------------------------
+-- Division
+---------------------------------------------------------------------
+div_ix(Ai,Bx)= Cx :-
+	BI == Bx ? inv(),
+	CI == Cx ? inv(),
+	multiply_inverse_values(Ai,Bx,BI,Cx,CI).
+--
+multiply_inverse_values(Ai,Bx,BI,Cx,CI):-
+	Cx == BI ? mult_ii(Ai),
+	Bx == CI ? mult_ii(Ai).
+--
+div_ii(Ai,Bi)= Ai / Bi :-
+	Bi <> 0.0.
+--
+inv(Ai)= 1.0 / Ai :- Ai <> 0.0.
+---------------------------------------------------------------------
+-- The "Greater or Equal" relation                                 --
+---------------------------------------------------------------------
+ge(Ax,Bx):-
+	Ax ? ge_ix(Bx).
+--
+ge_ix(Ai,Bx):-
+	Bx ? '<'(Ai).
+---------------------------------------------------------------------
+-- Natural Numbers
+---------------------------------------------------------------------
+natural_number(Min,_) = Min.
+natural_number(Min,Quantity)
+	= 1.0 + ?natural_number(Min,Quantity - 1.0)
+	:-
+	Quantity > 1.0.
+---------------------------------------------------------------------
+]
+---------------------------------------------------------------------

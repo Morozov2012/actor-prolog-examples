@@ -1,0 +1,118 @@
+package "Morozov/VRML/Toolbox":
+-----------------------------------------------------------------------
+--                                                                   --
+--             The "VRML/TOOLBOX" Actor Prolog package.              --
+--            (c) 2002-2007, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package provides procedures for creation of VRML reports.    --
+-----------------------------------------------------------------------
+import 'Report_Mode'	from "Morozov/VRML/Mode";
+import 'Color_Table'	from "Morozov/VRML/Colors";
+import "Morozov/Web/Data/Address";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ItemWidth, ItemHeight		= REAL.
+--
+Indentation			= INTEGER.
+CreateDashboardPyramid		= 'no'; 'yes'.
+UseWhiteLabels			= 'yes'; 'no'.
+--
+TextSize			= REAL.
+PointLightNumber		= INTEGER.
+CycleInterval			= INTEGER.
+--
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+write_type_of_navigation;
+--
+write_background_file_name(FileName);
+--
+write_dashboard(Indentation,STRING,CreateDashboardPyramid);
+write_dashboard_pyramid(Indentation);
+write_dashboard_pyramid_geometry(Indentation);
+write_dashboard_box(Indentation,STRING);
+write_dashboard_box_geometry(Indentation);
+--
+write_title_of_VBox(Indentation,WebResourceName);
+write_dummy_sphere(Indentation,UseWhiteLabels);
+write_name_lod(Indentation,WebResourceName);
+write_name_billboard(Indentation,WebResourceName,TextSize,FontName);
+write_name_text(Indentation,WebResourceName,TextSize,FontName);
+--
+write_PointLightPath(Indentation,PointLightNumber);
+--
+write_point_1(Indentation,STRING);
+write_point_2(Indentation,STRING);
+write_point_3(Indentation,STRING);
+write_point_4(Indentation,STRING);
+write_point_5(Indentation,STRING);
+write_point_6(Indentation,STRING);
+write_point_7(Indentation,STRING);
+write_point_8(Indentation,STRING);
+--
+write_point_X(Indentation,STRING,STRING);
+--
+-----------------------------------------------------------------------
+interface 'VRML_Toolbox' (specialized 'Alpha'):
+--
+internal:
+--
+	output			: 'File';
+	mode			: 'Report_Mode';
+--
+constant:
+--
+	background_picture	: STRING;
+--
+internal:
+--
+	text_operations		: 'Text';
+	colors			: 'Color_Table';
+	con			: 'Console';
+	env			: 'Timer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+write(_*)					- (i);
+writeln(_*)					- (i);
+nl;
+--
+shift(Indentation,Indentation,_*)		- (i,i,i);
+write_shift(Indentation)			- (i);
+--
+write_Heading;
+write_WorldInfo;
+write_NavigationInfo;
+write_Background;
+write_Fog;
+write_Dashboard;
+--
+write_Dashboard_Route;
+--
+write_shape_of_VBox(
+	Indentation,
+	WebResourceName,ItemWidth,ItemHeight,
+	Brightness,Hue);
+write_title_of_VBox(
+	Indentation,
+	WebResourceName,ItemWidth,ItemHeight,
+	UseWhiteLabels);
+--
+write_Viewpoint(Indentation);
+--
+write_PointLight(Indentation);
+write_PointLight(Indentation,PointLightNumber,Color,CycleInterval);
+--
+'+'(STRING,Color) = STRING;
+]
+-----------------------------------------------------------------------

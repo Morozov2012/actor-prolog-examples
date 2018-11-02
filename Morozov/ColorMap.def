@@ -1,0 +1,70 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/ColorMap":
+
+DOMAINS:
+--
+ground:
+--
+ColorMap		=	{
+				name: ColorMapName,
+				size: ColorMapSize,
+				palette: ColorPalette,
+				reverse_scale: YesNoDefault,
+				reverse_minimal_value: YesNoDefault,
+				reverse_maximal_value: YesNoDefault,
+				tincturing_coefficient: TincturingCoefficient
+				};
+				ColorMapName;
+				ColorPalette.
+--
+ColorMapName		=	'AQUA';
+				'AUTUMN';
+				'BLACKHOT';
+				'BLAZE';
+				'BLUERED';
+				'BONE';
+				'BRIGHT_RAINBOW';
+				'COOL';
+				'COPPER';
+				'GRAY';
+				'GREEN';
+				'HOT';
+				'HSV';
+				'IRON';
+				'JET';
+				'LIGHTJET';
+				'MEDICAL';
+				'OCEAN';
+				'PARULA';
+				'PINK';
+				'PRISM';
+				'PURPLE';
+				'RED';
+				'REPTILOID';
+				'SOFT_RAINBOW';
+				'SPRING';
+				'SUMMER';
+				'WINTER';
+				'OPTICAL';
+				'NONE'.
+--
+ColorMapSize		= 'default'; INTEGER.
+ColorPalette		= Color*.
+TincturingCoefficient	= 'default'; Numerical.
+
+--------------------------------------------------------------------
+-- The 'ColorMap' class is specialized class 'DataAbstraction'.   --
+--------------------------------------------------------------------
+
+interface 'ColorMap' (specialized 'DataAbstraction'):
+[
+PREDICATES:
+--
+imperative:
+--
+string_to_color_map_name(STRING) = ColorMapName		- (i);
+]

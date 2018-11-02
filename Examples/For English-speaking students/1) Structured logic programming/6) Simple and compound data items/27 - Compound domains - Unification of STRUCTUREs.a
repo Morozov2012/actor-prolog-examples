@@ -1,0 +1,141 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Structures.                           --
+--                                       --
+-- Questions: What are structures? What  --
+-- is the idea of structure unification? --
+-- Can one unify structures that have    --
+-- different names (functors)? Can one   --
+-- unify structures that are of          --
+-- different arity? Can one unify        --
+-- structures that include incompatible  --
+-- elements? Can one unify structures    --
+-- that have unbound elements? How can a --
+-- non-ground element of a structure be  --
+-- refined during the unification? Can   --
+-- two unbound variables be unified?     --
+-- What is a chaining of the variables?  --
+-- What is the difference between the    --
+-- pattern matching and the unification? --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+reference:
+
+Event	= lecture(R_Name,MyDate,MyTime);
+	  meeting(R_Name,MyDate,MyTime).
+--
+MyDate	= date(R_INT,R_INT,R_INT).
+MyTime	= time(R_INT,R_INT,R_INT).
+R_Name	= STRING.
+R_INT	= INTEGER.
+
+PREDICATES:
+
+create_variable(Event)		- (o);
+create_variable(R_Name)		- (o);
+create_variable(MyDate)		- (o);
+create_variable(MyTime)		- (o);
+create_variable(R_INT)		- (o);
+--
+compare_terms(Event,Event)	- (i,i);
+
+CLAUSES:
+
+goal:-
+	create_variable(Time1),
+	create_variable(Name2),
+	create_variable(Day2),
+	--
+	compare_terms(
+		lecture("LP & AI",
+			date(2015,04,21),
+			Time1),
+		lecture(Name2,
+			date(2015,04,Day2),
+			time(12,30,0))),
+	--
+	create_variable(Name3),
+	create_variable(Date3),
+	create_variable(Time4),
+	--
+	compare_terms(
+		lecture(Name3,
+			Date3,
+			time(10,0,0)),
+		meeting("Meditation",
+			date(2015,04,25),
+			Time4)),
+	--
+	create_variable(Date5),
+	create_variable(Time5),
+	create_variable(Day6),
+	create_variable(Time6),
+	--
+	compare_terms(
+		lecture("LP & AI",
+			Date5,
+			Time5),
+		lecture("LP & AI",
+			date(2015,04,Day6),
+			Time6)),
+	--
+	create_variable(Event7),
+	create_variable(Event8),
+	--
+	compare_terms(
+		Event7,
+		Event8),
+	--
+	create_variable(Event9),
+	create_variable(Year10),
+	--
+	compare_terms(
+		Event9,
+		lecture("LP & AI",
+			date(Year10,04,21),
+			time(10,0,0))),
+	--
+	set_color('RoyalBlue'),
+	writeln("Several variables were ",
+		"refined (substituted):"),
+	set_color('default'),
+	writeln("\tTime1 = ",Time1),
+	writeln("\tName2 = ",Name2),
+	writeln("\tDay2 = ",Day2),
+	writeln("\tName3 = ",Name3),
+	writeln("\tDate3 = ",Date3),
+	writeln("\tTime4 = ",Time4),
+	writeln("\tDate5 = ",Date5),
+	writeln("\tTime5 = ",Time5),
+	writeln("\tDay6 = ",Day6),
+	writeln("\tTime6 = ",Time6),
+	writeln("\tEvent7 = ",Event7),
+	writeln("\tEvent8 = ",Event8),
+	writeln("\tEvent9 = ",Event9),
+	writeln("\tYear10 = ",Year10).
+
+create_variable(_).
+
+compare_terms(X,Y):-
+	X == Y,!,
+	set_color('DkGreen'),
+	writeln("These terms were ",
+		"unified successfully:"),
+	set_color('default'),
+	writeln("\t",X),
+	writeln("\t",Y).
+compare_terms(X,Y):-
+	set_color('Red'),
+	writeln("I cannot unify ",
+		"these terms:"),
+	set_color('default'),
+	writeln("\t",X),
+	writeln("\t",Y).

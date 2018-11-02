@@ -1,0 +1,69 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: sort values of a list.      --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Disassembling a list.              --
+-- 2) Searching the maximum element of   --
+--    a list.                            --
+-- 3) Deletion of all instances of an    --
+--    element from a list.               --
+-- 4) Output assembling a list.          --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+p(List,List)			- (i,o);
+--
+maximum(List,INTEGER)		- (i,o);
+m(List,INTEGER,INTEGER)		- (i,i,o);
+--
+delete(INTEGER,List,List)	- (i,i,o);
+
+CLAUSES:
+
+goal:-
+	L1== [1,5,1,3,2,4,5,2],
+	writeln("L1=",L1),
+	p(L1,L2),
+	writeln("L2=",L2).
+
+p([],[]):-!.
+p(L1,[Max|Rest]):-
+	maximum(L1,Max),
+	delete(Max,L1,L2),
+	p(L2,Rest).
+
+maximum([Head|Rest],Result):-
+	m(Rest,Head,Result).
+maximum([],_):-
+	warning("The list is empty!"),
+	break.
+
+m([X|Rest],M,Result):-
+	X > M,!,
+	m(Rest,X,Result).
+m([X|Rest],M,Result):-
+	X <= M,!,
+	m(Rest,M,Result).
+m(_,Y,Y).
+
+delete(X,[X|Rest1],Rest2):-!,
+	delete(X,Rest1,Rest2).
+delete(X,[Head|Rest1],[Head|Rest2]):-!,
+	delete(X,Rest1,Rest2).
+delete(_,[],[]).

@@ -1,0 +1,73 @@
+dialog 'ControlDialog' (
+     "Parameters of analysis",default,default,default,
+     centered,centered,default)
+vbox(center)
+vbox(left)
+" Start point of analysis "
+editname(location,37,"")
+grid
+     row(center)
+          column(left)
+               " Output mode "
+          end_of_column
+          column(left)
+               vbox(left)
+                    radiobuttons(output_mode," create file ")
+                         radiobutton(" window output ")
+                         hbox
+                              radiobutton(" create file ")
+                              editname(output_file_name,12,"HOLES.HTM")
+                         end_of_hbox
+                    end_of_radiobuttons
+               end_of_vbox
+          end_of_column
+     end_of_row
+     row(center)
+          column(left)
+               " Maximal waiting time "
+          end_of_column
+          column(left)
+               editreal(maximal_waiting_time,3,5.0)
+               "[seconds]"
+          end_of_column
+     end_of_row
+     row(center)
+          column(left)
+               " Web domain to be analyzed "
+          end_of_column
+          column(left)
+               editname(domain,18,"")
+          end_of_column
+     end_of_row
+     row(center)
+          column(left)
+               " Search depth limit "
+          end_of_column
+          column(left)
+               checkbox(use_max_depth,
+                    " Do not exceed level ",'yes')
+               editinteger(max_depth,3,7)
+          end_of_column
+     end_of_row
+     row(center)
+          column(left)
+               vbox(center)
+                    statictext(" Do check only one of ")
+                    statictext(" the variants ")
+               end_of_vbox
+          end_of_column
+          column(left)
+               edittext(alternative_names,20,3,"")
+          end_of_column
+     end_of_row
+end_of_grid
+end_of_vbox
+vbox(center)
+     hbox(center)
+          ok("start","&Start analysis")
+          button("show_report","Show &report file")
+          button(close,"&Close dialog")
+     end_of_hbox
+end_of_vbox
+end_of_vbox
+end_of_dialog

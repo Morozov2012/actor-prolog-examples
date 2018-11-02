@@ -1,0 +1,37 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Predefined classes of the  --
+-- Actor Prolog system. The Dialog       --
+-- class.                                --
+--                                       --
+-- Questions: What are predefined        --
+-- classes? What is the destination of   --
+-- the Dialog predefined class? What is  --
+-- the destination and syntax of the     --
+-- .DLG file? What is the destination of --
+-- the scaling syntax construct in the   --
+-- .DLG file? How can one use the show   --
+-- and hide predicates of the Dialog     --
+-- class?                                --
+--                                       --
+-------------------------------------------
+
+class 'Main' (specialized 'Dialog'):
+
+internal:
+
+con	= ('Console');
+
+[
+goal:-!,
+	show.
+--
+action(0):-!,
+	hide.
+action(N):-!,
+	con ? note("Action",N).
+
+]

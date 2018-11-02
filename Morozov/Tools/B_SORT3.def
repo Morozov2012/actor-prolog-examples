@@ -1,0 +1,40 @@
+package "MOROZOV/TOOLS/B_SORT3"
+	(Item:=INTEGER,RefItem:=INTEGER,List:=ItemList):
+----------------------------------------------------------
+--                                                      --
+--      The "TOOLS/B_SORT3" Actor Prolog package.       --
+--     (c) 2005-2011, IRE RAS, Alexei A. Morozov.       --
+--                                                      --
+----------------------------------------------------------
+-- This package is intended for Binary Tree Sorting.    --
+----------------------------------------------------------
+--
+DOMAINS:
+--
+mixed:
+--
+ItemList	= Item*.
+--
+reference:
+--
+BTree		= b(RefItem,BTree,BTree); 'empty_BTree'.
+--
+----------------------------------------------------------
+interface 'B-Sorting':
+[
+PREDICATES:
+--
+imperative:
+--
+sort_list(List,List)			- (i,o);
+--
+PREDICATES:
+--
+determ:
+--
+'<'(RefItem,RefItem)			- (i,i);
+--
+can_be_refined(RefItem)			- (i);
+--
+]
+----------------------------------------------------------

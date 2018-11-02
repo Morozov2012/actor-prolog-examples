@@ -1,0 +1,56 @@
+-----------------------------------------------------
+--                                                 --
+--              Actor Prolog lessons               --
+--           (c) 2015 Alexei A. Morozov            --
+--                                                 --
+-- The topic: And-Or trees. Loop vs. Repeat.       --
+--                                                 --
+-- Questions: How can one implement the iterative  --
+-- execution of a logic program using a recursive  --
+-- call (a loop) in the program? What are          --
+-- advantages and disadvantages of using loops for --
+-- implementing the iterative execution of the     --
+-- logic program? What is the And-Or tree of the   --
+-- recursive logic program? How can one implement  --
+-- the iterative execution of the logic program    --
+-- using the backtracking (the repeat and the fail --
+-- predicates) in the program? What are advantages --
+-- and disadvantages of using backtracking for     --
+-- implementation of the iterative execution of    --
+-- the logic program? What is the And-Or tree of   --
+-- the backtrackable logic program?                --
+--                                                 --
+-- Recommendation: open the Task Manager of your   --
+-- computer to observe the memory consumption      --
+-- during the execution of the program.            --
+--                                                 --
+-----------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+loop;
+
+nondeterm:
+
+repeat;
+
+CLAUSES:
+
+goal:-
+	loop.
+/*
+goal:-
+	repeat,
+	writeln("Hello!"),
+	fail.
+*/
+
+loop:-
+	writeln("Hello!"),
+	loop.
+
+repeat.
+repeat:-
+	repeat.

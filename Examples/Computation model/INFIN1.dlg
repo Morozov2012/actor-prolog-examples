@@ -1,0 +1,24 @@
+mesh(80,25)
+
+dialog 'Main' (
+	"Number of Process",
+	'Black','Green',default,centered,4,default)
+vbox(center)
+	hbox
+		"Number of processes:"
+		editinteger(number_of_nodes,10,5)
+	end_of_hbox
+	button("display","Show all dialog boxes")
+end_of_vbox
+end_of_dialog
+
+dialog 'W' (
+	"Control Panel of Local Process",
+	'Black','Green',default,5,1,default)
+vbox(center)
+	hbox
+		"Target value:"
+		edittext(target_value,10,1,"")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

@@ -1,0 +1,112 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+
+DOMAINS:
+
+N		= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+test1(N)				- (i);
+test_image;
+test2;
+--
+test_view_sizes(ViewSizeList)		- (i);
+test_view_sizes(INTEGER,INTEGER)	- (i,i);
+--
+write_tabulation(N)			- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+	webcam	= ('Webcam');
+	buffer	= ('BufferedImage');
+--
+	panel	= ('Canvas2D',
+			x=30,
+			y=0,
+			width=50,
+			height=25);
+	con	= ('Console',
+			x=0,
+			y=0,
+			width=30,
+			height=25);
+--
+[
+goal:-!,
+	webcam ? open,
+	test1(0),
+	test2,
+	webcam ? close.
+--
+test1(T):-
+	webcam ? get_actual_resolution(Width,Height),
+	con ? set_color('RoyalBlue'),
+	write_tabulation(T),
+	con ? writeln("Current webcam view size:"),
+	con ? set_color('DkGreen'),
+	write_tabulation(T),
+	con ? writeln(" Width=",Width," Height=",Height),
+	test_image,
+	FrameRate== webcam?get_FPS(),
+	con ? set_color('Gray'),
+	write_tabulation(T),
+	con ? write(" Frame rate: "),
+	con ? writeln(FrameRate," [FPS]"),
+	con ? set_color('RoyalBlue'),
+	write_tabulation(T),
+	con ? writeln("O.K.").
+--
+test_image:-
+	webcam ? get_image(buffer),
+	panel ? show,
+	panel ? get_size_in_pixels(WP,HP),
+	buffer ? get_size_in_pixels(WI,HI),
+	X0== (WP - WI) / 2 / WP,
+	Y0== (HP - HI) / 2 / HP,
+	Width== WI / WP,
+	Height== HI / HP,
+	panel ? clear('no'),
+	panel ? draw_image(buffer,X0,Y0,Width,Height),
+	panel ? draw_now.
+--
+test2:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2"),
+	con ? set_color('default'),
+	List== webcam?get_view_sizes(),
+	con ? set_color('Violet'),
+	con ? writeln("Supported webcam view sizes:"),
+	con ? set_color('default'),
+	test_view_sizes(List),
+	con ? set_color('RoyalBlue'),
+	con ? writeln("O.K.").
+--
+test_view_sizes([size(W,H)|Rest]):-!,
+	test_view_sizes(W,H),
+	test_view_sizes(Rest).
+test_view_sizes(_).
+--
+test_view_sizes(Width,Height):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("I will set webcam view size:"),
+	con ? set_color('Fuchsia'),
+	con ? writeln(" Width=",Width," Height=",Height),
+	webcam ? set_actual_resolution(Width,Height),
+	test1(1).
+--
+write_tabulation(T):-
+	T > 0,!,
+	con ? write(" "),
+	write_tabulation(T-1).
+write_tabulation(_).
+]

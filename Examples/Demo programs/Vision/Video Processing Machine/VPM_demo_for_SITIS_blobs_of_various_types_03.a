@@ -1,0 +1,117 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+import .. from "morozov/FFmpeg";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'FFmpeg'):
+--
+constant:
+--
+name	=	"I:/= Video =/W_L_Object 10 07 2017/"
+		"22 object/2 session/"
+		"time 17-07-10 15-16-42.avi";
+--
+internal:
+--
+	vpm		= ('VideoProcessingMachine');
+	dialog		= ('DemoPanel',
+				graphic_window);
+	graphic_window	= ('Canvas2D');
+	image1		= ('BufferedImage');
+	image2		= ('BufferedImage');
+--
+[
+goal:-!,
+	store_VPM_program,
+	dialog ? maximize,
+	start.
+--
+store_VPM_program:-
+	vpm ? suspend_processing,
+	vpm ? retract_all_instructions,
+	--
+	vpm ? blb_set_blob_borders(15,15),
+	--
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('HUE',185,245),
+	vpm ? msk_select_foreground('SATURATION',50,255),
+	vpm ? msk_select_foreground('BRIGHTNESS',0,150),
+	vpm ? msk_erode_foreground(2),
+	vpm ? msk_dilate_foreground(2),
+	vpm ? blb_extract_blobs('cap','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? blb_set_blob_borders(1,1),
+	--
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('HUE',111,138),
+	vpm ? msk_select_foreground('SATURATION',50,255),
+	vpm ? msk_erode_foreground(2),
+	vpm ? msk_dilate_foreground(2),
+	vpm ? blb_extract_blobs('green_object','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? msk_push_foreground,
+	vpm ? msk_select_foreground('HUE',147,183),
+	vpm ? msk_select_foreground('SATURATION',103,255),
+	vpm ? msk_erode_foreground(2),
+	vpm ? msk_dilate_foreground(2),
+	vpm ? blb_extract_blobs('blue_object','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? blb_fill_blobs,
+	vpm ? msk_pop_foreground,
+	--
+	vpm ? process_now.
+--
+frame_obtained:-
+	commit,!,
+	get_recent_image(image1),
+	vpm ? process_realtime_frame(image1),
+	draw_scene.
+--
+draw_scene:-
+	vpm ? commit,
+	vpm ? get_recent_image(image2),
+	image2 ? get_size_in_pixels(IW,IH),
+	vpm ? get_blobs(BlobList),
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	graphic_window ? draw_image(image2,0,0,1,1),
+	draw_blob_list(BlobList,IW,IH),
+	graphic_window ? draw_now.
+--
+draw_blob_list([Blob|Rest],IW,IH):-
+	draw_blob(Blob,IW,IH),
+	draw_blob_list(Rest,IW,IH).
+draw_blob_list([],_,_).
+--
+draw_blob(Blob,IW,IH):-
+	Blob == {type:Type,x:X0,y:Y0,width:W1,height:H1|_},
+	X2== (X0 - W1/2) / IW,
+	Y2== (Y0 - H1/2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	select_blob_color(Type,Color),
+	graphic_window ? set_pen({color:Color,lineWidth:3}),
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	fail.
+draw_blob(_,_,_).
+--
+select_blob_color('cap','Cyan').
+select_blob_color('green_object','DkGreen').
+select_blob_color('blue_object','Navy').
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+internal:
+	graphic_window;
+[
+]
+-----------------------------------------------------------------------

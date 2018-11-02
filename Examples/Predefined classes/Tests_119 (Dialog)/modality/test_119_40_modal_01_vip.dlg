@@ -1,0 +1,25 @@
+mesh(80,25)
+-- failure_color('Red','White')
+failure_color('default','White')
+dialog_font("SansSerif",18)
+
+modal dialog 'MyDialog'("Demo Dialog",default,default,default,centered,centered,default)
+vbox(center)
+	button("action1","&An action")
+	hbox
+		button("action2","Call the show predicate &recursively")
+		button("action3","Change &font size")
+		button("action4","&Hide dialog")
+	end_of_hbox
+	hbox
+		editname(slot1,7,"Text one")
+		editname(slot2,7,"Text two")
+	end_of_hbox
+	hbox(center)
+		ok("default","&Default button")
+		button(reset,"&Reset")
+		button(verify,"&Verify")
+		button(close,"&Close")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

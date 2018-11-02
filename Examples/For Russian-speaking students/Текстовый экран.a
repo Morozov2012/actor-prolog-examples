@@ -1,0 +1,429 @@
+---------------------------------------------------------------
+--          The "TextScreen" Actor Prolog package.           --
+--          (c) 2011, IRE RAS, Alexei A. Morozov.            --
+---------------------------------------------------------------
+-- ѕакет предназначен дл€ имитации вывода текста на экран с  --
+-- возможностью перемещать текстовый курсор в произвольные   --
+-- позиции текстового окна. Ётот пакет создан, в основном,   --
+-- дл€ того чтобы перенести на јкторный ѕролог               --
+-- демонстрационную программу "—еквенциальное исчисление".   --
+---------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+write_colored_text(ColoredText)			- (i);
+write_colored_item(ColoredTextItem)		- (i);
+write_item(STRING)				- (i);
+item_length(ColoredTextItem) = INTEGER		- (i);
+minimum(Column,Column,Column)			- (i,i,o);
+loop1(Row,Row,Column)				- (i,i,i);
+print_row(Row,Column)				- (i,i);
+loop2(Column,RowItems)				- (i,i);
+print_text(Column,Column,Column,STRING,Color)	- (i,i,o,i,i);
+print_space(Column,Column)			- (i,i);
+--
+nondeterm:
+--
+for(Row,Row,Row)				- (i,i,o);
+--
+PREDICATES:
+--
+imperative:
+--
+insert_text(
+	RowItems,Column,STRING,Color,RowItems)	- (i,i,i,i,o);
+retrieve_row_item(Column,RowItems,STRING,Color)	- (i,i,o,o);
+--
+-- compute_minimal_row(Row)			- (o);
+update_minimal_row(Row)				- (i);
+update_minimal_row(Row,Row)			- (i,i);
+--
+-- compute_maximal_row(Row)			- (o);
+update_maximal_row(Row)				- (i);
+update_maximal_row(Row,Row)			- (i,i);
+--
+-- compute_minimal_column(Column)		- (o);
+look_for_minimal_column(RowItems)		- (i);
+update_minimal_column(Column)			- (i);
+update_minimal_column(Column,Column)		- (i,i);
+--
+-- compute_maximal_column(Row,Column)		- (i,o);
+look_for_maximal_column(RowItems,Column)	- (i,o);
+update_maximal_column(Column)			- (i);
+update_maximal_column(Column,Column)		- (i,i);
+--
+-- compute_nearest_text_item(Row,Column,Column)	- (i,i,o);
+--
+determ:
+--
+look_for_nearest_column(Column,RowItems,Column)	- (i,i,o);
+--
+imperative:
+--
+update_nearest_text_item(Column)		- (i);
+update_nearest_text_item(Column,Column)		- (i,i);
+--
+---------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+con	= ('TextScreen',
+		output= self);
+--
+[
+goal:-!,
+	con ? cursor(20,1),
+	con ? write(['Red',"A",['Green',"A"]]),
+	con ? cursor(20,3),
+	con ? write("B"),
+	con ? cursor(18,7),
+	con ? write(['Red',"G1"]),
+	con ? cursor(18,7),
+	con ? write(['Blue',"G"]),
+	con ? cursor(20,5),
+	con ? write("C"),
+	con ? cursor(19,7),
+	con ? write(['Orange',"D"]),
+	con ? cursor(17,2),
+	con ? write(['Magenta',"E",'Cyan',"E"]),
+	con ? set_color('Black'),
+	con ? cursor(18,3),
+	con ? write("FFF"),
+	con ? cursor(15,-1),
+	con ? write("G"),
+	con ? display.
+]
+---------------------------------------------------------------
+class 'TextScreen' (specialized 'Alpha'):
+--
+internal:
+--
+con		= ('Console');
+--
+memory		= ('TextController');
+--
+text_operations	= ('Text');
+--
+output;
+--
+-- debug	= ('Report',title="Debug",x=30,y=15);
+--
+[
+cursor(R,C):-
+	memory ? retract_all(current_position(_,_)),
+	memory ? insert(current_position(R,C)).
+--
+write(Item,Rest*):-!,
+	write_colored_text(Item),
+	write(Rest*).
+write(_*).
+--
+write_colored_text([Item|Rest]):-!,
+	write_colored_text(Item),
+	write_colored_text(Rest).
+write_colored_text([]):-!.
+write_colored_text(Item):-
+	write_colored_item(?cast("ColoredTextItem",Item)).
+--
+write_colored_item(Item):-
+	symbol(Item),
+	Color== ?val("Color",Item),!,
+	memory ? set_color(Color).
+write_colored_item(Item):-
+	Text== ?convert_to_string(Item),!,
+	write_item(Text).
+--
+write_item(Text):-
+	CP== memory ? match(current_position(_,_)),
+	CP == current_position(R,C),!,
+	memory ? get_color(Color),
+	memory ? append(R,C,Text,Color),
+	cursor(R,C+?string_length(Text)).
+write_item(Text):-
+	memory ? get_color(Color),
+	memory ? append(0,0,Text,Color).
+--
+length([H|R]) = ?length(H) + ?length(R) :-!.
+length([]) = 0 :-!.
+length(S) = ?item_length(?cast("ColoredTextItem",S)).
+--
+item_length(S) = 0 :-
+	symbol(S),!.
+item_length(S) =  ?string_length(?cast("STRING",S)) :-
+	string(S),!.
+item_length(_) = 0.
+--
+string_length(S) = 1 + ?string_length(Rest) :-
+	text_operations ? extract_front_code(S,_,Rest),!.
+string_length(_)= 0.
+--
+set_color(Color):-
+	memory ? set_color(Color).
+--
+get_color(Color):-
+	memory ? get_color(Color).
+--
+display:-
+	memory ? compute_minimal_row(MinRow),
+	memory ? compute_maximal_row(MaxRow),
+	memory ? compute_minimal_column(MinColumn),
+	minimum(0,MinColumn,LeftBound),
+	loop1(MinRow,MaxRow,LeftBound).
+--
+minimum(N1,N2,N1):-
+	N1 < N2,!.
+minimum(_,N,N).
+--
+loop1(MinRow,MaxRow,MinColumn):-
+	for(MinRow,MaxRow,R),
+		print_row(R,MinColumn),
+		fail.
+loop1(_,_,_).
+--
+print_row(R,MinColumn):-
+	memory ? retrieve(R,Items),
+	loop2(MinColumn,Items),
+	output ? nl.
+--
+loop2(C1,[text(C2,Text,Color)|Rest]):-!,
+	print_text(C1,C2,C3,Text,Color),
+	loop2(C3,Rest).
+loop2(_,_).
+--
+print_text(C1,C2,C3,Text,Color):-
+	C1 <= C2,!,
+	print_space(C1,C2),
+	output ? set_color(Color),
+	output ? write(Text),
+	C3== C2 + ?length(Text).
+print_text(C,_,C,_,_).
+--
+print_space(C1,C2):-
+	C1 < C2,!,
+	output ? write(" "),
+	print_space(C1+1,C2).
+print_space(_,_).
+--
+clear:-
+	memory ? clear,
+	output ? clear.
+--
+for(N,Max,N):-
+	N <= Max.
+for(N1,Max,N2):-
+	N1 < Max,
+	for(N1+1,Max,N2).
+]
+---------------------------------------------------------------
+class 'TextController' (specialized 'Database'):
+--
+internal:
+--
+text_store	= ('TextDatabase');
+--
+[
+clear:-
+	retract_all,
+	text_store ? retract_all.
+--
+append(Row,Column,String,Color):-
+	RL== text_store ? match(row(Row,_)),
+	RL == row(_,List1),!,
+	text_store ? retract_all(row(Row,_)),
+	insert_text(List1,Column,String,Color,List2),
+	text_store ? append(row(Row,List2)).
+append(Row,Column,String,Color):-
+	Head== text(Column,String,Color),
+	text_store ? append(row(Row,[Head])).
+--
+insert_text(List1,Column,String,Color,List2):-
+	List1 == [text(C2,_,_)|_],
+	Column > C2,!,
+	List2== [text(Column,String,Color)|List1].
+insert_text([H|Rest1],Column,String,Color,[H|Rest2]):-!,
+	insert_text(Rest1,Column,String,Color,Rest2).
+insert_text(_,Column,String,Color,List):-
+	List== [text(Column,String,Color)].
+--
+retrieve(Row,Items2):-
+	T== text_store ? match(row(Row,_)),
+	T == row(_,Items1),!,
+	reverse_row(Items1,[],Items2).
+retrieve(_,[]).
+--
+retrieve(Row,Column,Text,Color):-
+	T== text_store ? match(row(Row,_)),
+	T == row(_,Items),!,
+	retrieve_row_item(Column,Items,Text,Color).
+retrieve(_,_,_,_):-
+	break('Error:TextController::retrieve').
+--
+retrieve_row_item(C,[text(C,Text,Color)|_],Text,Color):-!.
+retrieve_row_item(C,[_|Items],Text,Color):-!,
+	retrieve_row_item(C,Items,Text,Color).
+retrieve_row_item(_,_,_,_):-
+	break('Error:TextController::retrieve_row_item').
+--
+reverse_row([H|Rest1],Rest2,L3):-!,
+	reverse_row(Rest1,[H|Rest2],L3).
+reverse_row(_,List,List).
+---------------------------------------------------------------
+compute_minimal_row(_):-
+	retract_all(minimal_row(_)),
+	fail.
+compute_minimal_row(_):-
+	T== text_store ? match(row(_,_)),
+		T == row(R,_),
+		update_minimal_row(R),
+		fail.
+compute_minimal_row(MinimalRow):-
+	MR== ?match(minimal_row(_)),
+	MR == minimal_row(MinimalRow),!.
+compute_minimal_row(0).
+--
+update_minimal_row(R):-
+	MR== ?match(minimal_row(_)),
+	MR == minimal_row(MinimalRow),!,
+	update_minimal_row(R,MinimalRow).
+update_minimal_row(R):-
+	insert(minimal_row(R)).
+--
+update_minimal_row(R,MinimalRow):-
+	R < MinimalRow,!,
+	retract_all(minimal_row(_)),
+	insert(minimal_row(R)).
+update_minimal_row(_,_).
+---------------------------------------------------------------
+compute_maximal_row(_):-
+	retract_all(maximal_row(_)),
+	fail.
+compute_maximal_row(_):-
+	T== text_store ? match(row(_,_)),
+		T == row(R,_),
+		update_maximal_row(R),
+		fail.
+compute_maximal_row(MaximalRow):-
+	MR== ?match(maximal_row(_)),
+	MR == maximal_row(MaximalRow),!.
+compute_maximal_row(0).
+--
+update_maximal_row(R):-
+	MR== ?match(maximal_row(_)),
+	MR == maximal_row(MaximalRow),!,
+	update_maximal_row(R,MaximalRow).
+update_maximal_row(R):-
+	insert(maximal_row(R)).
+--
+update_maximal_row(R,MaximalRow):-
+	R > MaximalRow,!,
+	retract_all(maximal_row(_)),
+	insert(maximal_row(R)).
+update_maximal_row(_,_).
+---------------------------------------------------------------
+compute_minimal_column(_):-
+	retract_all(minimal_column(_)),
+	fail.
+compute_minimal_column(_):-
+	T== text_store ? match(row(_,_)),
+		T == row(_,RowItems),
+		look_for_minimal_column(RowItems),
+		fail.
+compute_minimal_column(MinimalColumn):-
+	MC== ?match(minimal_column(_)),
+	MC == minimal_column(MinimalColumn),!.
+compute_minimal_column(0).
+--
+look_for_minimal_column([text(C,_,_)|Rest]):-!,
+	update_minimal_column(C),
+	look_for_minimal_column(Rest).
+look_for_minimal_column(_).
+--
+update_minimal_column(C):-
+	MC== ?match(minimal_column(_)),
+	MC == minimal_column(MinimalColumn),!,
+	update_minimal_column(C,MinimalColumn).
+update_minimal_column(C):-
+	insert(minimal_column(C)).
+--
+update_minimal_column(C,MinimalColumn):-
+	C < MinimalColumn,!,
+	retract_all(minimal_column(_)),
+	insert(minimal_column(C)).
+update_minimal_column(_,_).
+---------------------------------------------------------------
+compute_maximal_column(Row,_):-
+	retract_all(maximal_column(Row,_)),
+	fail.
+compute_maximal_column(Row,MaximalColumn):-
+	T== text_store ? match(row(Row,_)),
+	T == row(_,Items),!,
+	look_for_maximal_column(Items,MaximalColumn).
+compute_maximal_column(_,0).
+--
+look_for_maximal_column([text(C,_,_)|Rest],MC):-!,
+	update_maximal_column(C),
+	look_for_maximal_column(Rest,MC).
+look_for_maximal_column(_,MaximalColumn):-
+	MC== ?match(maximal_column(_)),
+	MC == maximal_column(MaximalColumn),!.
+look_for_maximal_column(_,0).
+--
+update_maximal_column(C):-
+	MC== ?match(maximal_column(_)),
+	MC == maximal_column(MaximalColumn),!,
+	update_maximal_column(C,MaximalColumn).
+update_maximal_column(C):-
+	insert(maximal_column(C)).
+--
+update_maximal_column(C,MaximalColumn):-
+	C > MaximalColumn,!,
+	retract_all(maximal_column(_)),
+	insert(maximal_column(C)).
+update_maximal_column(_,_).
+---------------------------------------------------------------
+compute_nearest_text_item(_,_,_):-
+	retract_all(nearest_text_item(_)),
+	fail.
+compute_nearest_text_item(Row,Column,NC):-
+	T== text_store ? match(row(Row,_)),
+	T == row(_,Items),!,
+	look_for_nearest_column(Column,Items,NC).
+--
+look_for_nearest_column(Column,[text(C,_,_)|Rest],NC):-
+	Column <= C,!,
+	update_nearest_text_item(C),
+	look_for_nearest_column(Column,Rest,NC).
+look_for_nearest_column(Column,[_|Rest],NC):-!,
+	look_for_nearest_column(Column,Rest,NC).
+look_for_nearest_column(_,_,NearestColumn):-
+	MC== ?match(nearest_text_item(_)),!,
+	MC == nearest_text_item(NearestColumn).
+--
+update_nearest_text_item(C):-
+	MC== ?match(nearest_text_item(_)),
+	MC == nearest_text_item(NearestColumn),!,
+	update_nearest_text_item(C,NearestColumn).
+update_nearest_text_item(C):-
+	insert(nearest_text_item(C)).
+--
+update_nearest_text_item(C,NearestColumn):-
+	C < NearestColumn,!,
+	retract_all(nearest_text_item(_)),
+	insert(nearest_text_item(C)).
+update_nearest_text_item(_,_).
+---------------------------------------------------------------
+set_color(Color):-
+	retract_all(current_color(_)),
+	insert(current_color(Color)).
+--
+get_color(Color):-
+	C== ?match(current_color(_)),
+	C == current_color(Color),!.
+get_color('Black').
+]
+---------------------------------------------------------------
+class 'TextDatabase' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------

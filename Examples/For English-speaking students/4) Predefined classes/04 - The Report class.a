@@ -1,0 +1,71 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Predefined classes of the  --
+-- Actor Prolog system. The Report       --
+-- class.                                --
+--                                       --
+-- Questions: What are predefined        --
+-- classes? What is the destination of   --
+-- the Report predefined class? How can  --
+-- one use the write, writeln, and nl    --
+-- predicates of the Report class?       --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+IsEven	= 'even'; 'odd'.
+
+PREDICATES:
+
+imperative:
+
+write_chess_board(INTEGER,IsEven)	- (i,i);
+write_row(INTEGER,IsEven)		- (i,i);
+
+class 'Main' (specialized 'Report'):
+
+x		= 18;
+y		= 1;
+width		= 44;
+height		= 21;
+
+font_name	= "Courier New";
+font_size	= 32;
+
+background_color	= 'Blue';
+
+[
+
+goal:-!,
+	writeln("Hello, world!"),
+	set_color('White'),
+	writeln("Hello, world!"),
+	set_color('White','Red'),
+	writeln("Hello, world!"),
+	nl,
+	write_chess_board(8,'even').
+
+write_chess_board(0,_):-!.
+write_chess_board(N,'even'):-
+	write_row(8,'even'),
+	nl,
+	write_chess_board(N-1,'odd').
+write_chess_board(N,'odd'):-
+	write_row(8,'odd'),
+	nl,
+	write_chess_board(N-1,'even').
+
+write_row(0,_):-!.
+write_row(N,'even'):-
+	set_color('White','Black'),
+	write("*"),
+	write_row(N-1,'odd').
+write_row(N,'odd'):-
+	set_color('Black','White'),
+	write("_"),
+	write_row(N-1,'even').
+]

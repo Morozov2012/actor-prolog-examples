@@ -1,0 +1,260 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	data_directory		= "F:/= Video =/20min";
+	file_name_format	= "20min%05d.jpg";
+	frame_rate		= 29.97;
+	subsampling		= 2;
+--
+constant:
+--
+-- Warning: This matrix corresponds to
+-- the 20min.mp4 data set only.
+--
+inverse_transformation_matrix	= [
+		[ 0.0009,-0.0001,0.0000],
+		[ 0.0000, 0.0009,0.0001],
+		[-0.2568,-0.0407,1.0000]];
+--
+internal:
+--
+	vpm		= ('VideoProcessingMachine',
+				minimal_training_interval= -1,
+				minimal_blob_size= -1,
+				horizontal_blob_border= 3,
+				vertical_blob_border= 3,
+				horizontal_extra_border_coefficient= -1.0,
+				vertical_extra_border_coefficient= -1.0,
+				minimal_track_duration= 0,
+				maximal_track_duration= 1000,
+				maximal_chronicle_length= 1.0,
+				maximal_blob_invisibility_interval= 10,
+				maximal_track_retention_interval= 30,
+				inverse_transformation_matrix,
+				sampling_rate= frame_rate,
+				synthesized_image_transparency= 48);
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	prompt_window	= ('Report',
+				y= 22,
+				height= 3);
+	text		= ('Text');
+	image1		= ('BufferedImage');
+	image2		= ('BufferedImage');
+	state		= ('ProgramState');
+--
+[
+goal:-!,
+	graphic_window ? show,
+	prompt_window ? write(
+		"The data are coming from "
+		"the Actor Prolog project."),
+	Time0== ?milliseconds(),
+	state ? set_beginning_time(Time0),
+	set_period(1/(frame_rate*2),0),
+	input_instructions,
+	activate.
+--
+input_instructions:-
+	vpm ? suspend_processing,
+	vpm ? retract_all_instructions,
+	vpm ? img_apply_gaussian_filter(1),
+	vpm ? msk_select_foreground('SATURATION',50,255),
+	vpm ? msk_select_foreground('HUE',205,235),
+	vpm ? blb_extract_blobs(
+		'MovingObjects',
+		'TWO_PASS_BLOB_EXTRACTION'),
+	-- vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	vpm ? msk_contour_foreground,
+	vpm ? blb_track_blobs,
+	vpm ? pxl_select_image_channel('ALL'),
+	vpm ? process_now.
+--
+divide_list(K,[p(X,Y)|R1],[p(X/K,Y/K)|R2]):-!,
+	divide_list(K,R1,R2).
+divide_list(_,_,[]).
+--
+tick:-
+	T2== ?milliseconds(),
+	state ? get_beginning_time(T1),
+	Delta== (T2 - T1) / 1000.0 * frame_rate,
+	N== ?convert_to_integer(?round(Delta)),!,
+	load_figure(N,T2).
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	state ? set_current_frame(N),
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	image1 ? load(	ImageToBeLoaded,
+			subsampling,subsampling,0,0),
+	vpm ? process_realtime_frame(image1),
+	state ? increase_global_counter,
+	draw_scene.
+load_figure(_,T2):-
+	state ? set_beginning_time(T2).
+--
+draw_scene:-
+	vpm ? commit,
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	-- vpm ? get_recent_image(image2),
+	-- vpm ? get_preprocessed_image(image2),
+	-- vpm ? get_background_image(image2),
+	-- vpm ? get_sigma_image(image2),
+	-- vpm ? get_foreground_image(image2),
+	vpm ? get_synthesized_image(image2),
+	graphic_window ? draw_image(image2,0,0,1,1),
+	vpm ? get_chronicle(Chronicle),
+	image2 ? get_size_in_pixels(IW,IH),
+	draw_chronicle(Chronicle,IW,IH),
+	draw_legend,
+	graphic_window ? draw_now.
+--
+draw_chronicle([{blobs:List|_}|Rest],IW,IH):-!,
+	draw_blob_list(List,IW,IH),
+	draw_chronicle(Rest,IW,IH).
+draw_chronicle(_,_,_).
+--
+draw_blob_list([Blob|Rest],IW,IH):-
+	draw_blob(Blob,IW,IH),
+	draw_blob_list(Rest,IW,IH).
+draw_blob_list([],_,_).
+--
+draw_blob(Blob,IW,IH):-
+	Blob == {identifier:Id,x:X0,y:Y0,width:W1,height:H1|_},
+	graphic_window ? set_brush('off'),
+	NC== ?mod(Id,6),
+	select_color(NC,Color),
+	graphic_window ? set_pen({color:Color,lineWidth:1}),
+	graphic_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	X2== (X0 - W1 / 2) / IW,
+	Y2== (Y0 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	-- draw_blob_identifier(Id,X0,Y0,IW,IH),
+	fail.
+draw_blob(_,_,_).
+--
+select_color(0,'Yellow'):-!.
+select_color(1,'Magenta'):-!.
+select_color(2,'Green'):-!.
+select_color(3,'Red'):-!.
+select_color(4,'Cyan'):-!.
+select_color(_,'Blue').
+--
+draw_blob_identifier(Id,X0,Y0,IW,IH):-!,
+	Text== text?format("%d",Id),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? draw_text(X0/IW,Y0/IH,Text).
+--
+draw_legend:-
+	state ? get_current_frame(FrameNumber),!,
+	state ? get_stopwatch_time(Delay),
+	state ? get_frame_counter(FrameQuantity),
+	state ? get_global_counter(GlobalCounter),
+	Time== Delay / 1000.0,
+	FrameRate== FrameQuantity / Time,
+	graphic_window ? set_brush('Red'),
+	graphic_window ? set_font({size:32}),
+	graphic_window ? set_text_alignment('LEFT','TOP'),
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %3.2f [sec]; Frame: %d (%d)",
+			Time,FrameNumber,GlobalCounter)),
+	graphic_window ? set_text_alignment('RIGHT','TOP'),
+	graphic_window ? draw_text(
+		0.98, 0.02,
+		text?format(
+			"Frame Rate: %3.2f [Hz]",
+			FrameRate)).
+draw_legend.
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		= ('Timer');
+--
+[
+CLAUSES:
+--
+get_beginning_time(Time):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(Time),!.
+--
+set_beginning_time(Time):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(Time)),
+	reset_stopwatch,
+	reset_frame_counter.
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)),
+	increase_frame_counter.
+--
+reset_stopwatch:-
+	retract_all(stop_watch_time(_)),
+	append(stop_watch_time(timer?milliseconds())).
+--
+get_stopwatch_time(Delay):-
+	T2== timer?milliseconds(),
+	Item== ?match(stop_watch_time(_)),
+	Item == stop_watch_time(T1),!,
+	Delay== T2 - T1.
+get_stopwatch_time(0).
+--
+reset_frame_counter:-
+	retract_all(frame_counter(_)).
+--
+increase_frame_counter:-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!,
+	retract_all(frame_counter(_)),
+	append(frame_counter(N+1)).
+increase_frame_counter:-
+	append(frame_counter(1)).
+--
+get_frame_counter(N):-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!.
+get_frame_counter(0).
+--
+increase_global_counter:-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!,
+	retract_all(global_counter(_)),
+	append(global_counter(N+1)).
+increase_global_counter:-
+	append(global_counter(1)).
+--
+get_global_counter(N):-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!.
+get_global_counter(0).
+]
+-----------------------------------------------------------------------

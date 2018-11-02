@@ -1,0 +1,14 @@
+
+dialog 'Main' ("Demo Dialog",'Red','White',20,10,4,'Green')
+
+style(classic)
+	checkbox(3010,"Checkbox 1",'yes')
+end_of_style
+
+style(modern)
+	checkbox(3020,"Checkbox 2",'yes')
+end_of_style
+
+button(1,"&Close")
+
+end_of_dialog

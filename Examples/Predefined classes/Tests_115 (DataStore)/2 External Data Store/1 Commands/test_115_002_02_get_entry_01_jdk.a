@@ -1,0 +1,217 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test10;
+test20;
+--
+test21_linked_hash_map_insert;
+--
+test30;
+--
+test31_data_store_get_entry;
+--
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+store1	= ('DataStore',
+		name="MyDataStore1.dat",
+		access_mode='modifying');
+--
+base1	= ('DatabaseTestbed',
+		database=('MyDatabase',
+			place=shared(store1,"MyTable1")));
+base2	= ('DatabaseTestbed',
+		database=('MyHashSet',
+			place=shared(store1,"MyTable2")));
+base3	= ('DatabaseTestbed',
+		database=('MyHashMap',
+			place=shared(store1,"MyTable3")));
+base4	= ('DatabaseTestbed',
+		database=linked_hash_map);
+--
+linked_hash_map	= ('MyLinkedHashMap',
+			place=shared(store1,"MyTable4"));
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test10,
+	test20,
+	test30.
+--
+test10:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store deletion."),
+	con ? set_color('default'),
+	store1 ? delete,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+test20:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test data store creation."),
+	con ? set_color('Orange'),
+	con ? write("OPENING DATA STORE... "),
+	store1 ? open,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	base1 ? test_database_insert,
+	base1 ? test_database_find,
+	base2 ? test_database_insert,
+	base2 ? test_database_find,
+	base3 ? test_database_insert,
+	base3 ? test_database_find,
+	base4 ? test_database_insert,
+	test21_linked_hash_map_insert,
+	base4 ? test_database_find,
+	test30,
+	con ? set_color('Orange'),
+	con ? write("CLOSING DATA STORE... "),
+	store1 ? close,
+	con ? writeln("DONE."),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+test21_linked_hash_map_insert:-
+	con ? set_color('Violet'),
+	con ? writeln("\tTest insertion to a linked hash map."),
+	con ? set_color('default'),
+	linked_hash_map ? begin_transaction('modifying'),
+	-- linked_hash_map ? put(300,"Text5"),
+	linked_hash_map ? retract_key(300),!,
+	linked_hash_map ? end_transaction,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default').
+test21_linked_hash_map_insert:-
+	con ? set_color('Red'),
+	con ? writeln("\tTransaction failed."),
+	con ? set_color('default').
+--
+test30:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test retrieving data store entries."),
+	con ? set_color('default'),
+	test31_data_store_get_entry,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+--
+test31_data_store_get_entry:-
+	con ? writeln("\tData store entries:"),
+	con ? set_color('Blue'),
+	store1 ? begin_transaction('reading'),
+	store1 ? get_entry(Name,Type),
+		con ? writeln("\t\t",Name," : ",Type),
+		fail.
+test31_data_store_get_entry:-
+	store1 ? end_transaction,
+	con ? set_color('default'),
+	con ? writeln("\tNo more items.").
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= map(INTEGER,STRING).
+--
+]
+-----------------------------------------------------------------------
+class 'MyHashSet' (specialized 'HashSet'):
+[
+DOMAINS:
+--
+Target		= map(INTEGER,STRING).
+--
+]
+-----------------------------------------------------------------------
+class 'MyHashMap' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+TargetKey	= INTEGER.
+TargetValue	= STRING.
+--
+]
+-----------------------------------------------------------------------
+class 'MyLinkedHashMap' (specialized 'LinkedHashMap'):
+[
+DOMAINS:
+--
+TargetValue	= STRING.
+--
+]
+-----------------------------------------------------------------------
+class 'DatabaseTestbed' (specialized 'Console'):
+--
+internal:
+--
+database;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test_database_insert;
+test_database_find;
+inspect_database;
+--
+CLAUSES:
+--
+test_database_insert:-
+	set_color('Violet'),
+	writeln("\tTest insertion to a database."),
+	set_color('default'),
+	database ? begin_transaction('modifying'),!,
+	database ? insert(map(300,"Text3")),
+	database ? append(map(500,"Text1")),
+	database ? insert(map(100,"Text2")),
+	database ? append(map(300,"Text1")),
+	database ? append(map(300,"Text3")),
+	database ? end_transaction,
+	set_color('DkGreen'),
+	writeln("\tO.K."),
+	set_color('default').
+test_database_insert:-
+	set_color('Red'),
+	writeln("\tTransaction failed."),
+	set_color('default').
+--
+test_database_find:-
+	set_color('Violet'),
+	writeln("\tTest database inspection."),
+	set_color('default'),
+	database ? begin_transaction('reading'),!,
+	inspect_database,
+	database ? end_transaction,
+	set_color('DkGreen'),
+	writeln("\tO.K."),
+	set_color('default').
+test_database_find:-
+	set_color('Red'),
+	writeln("\tTransaction failed."),
+	set_color('default').
+--
+inspect_database:-
+	writeln("\tDatabase content:"),
+	set_color('Blue'),
+	database ? find(Item),
+		writeln("\t\t",Item),
+		fail.
+inspect_database:-
+	set_color('default'),
+	writeln("\tNo more items.").
+]
+-----------------------------------------------------------------------

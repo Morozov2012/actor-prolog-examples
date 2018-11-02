@@ -1,0 +1,179 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  POLY_10                                                          --
+--                                                                   --
+--  Ralph Haygood (based on Prolog version by Rick McGeer            --
+--  based on Lisp version by R.P. Gabriel)                           --
+--                                                                   --
+--  Raise a polynomial (1+x+y+z) to the 10th power (symbolically)    --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  2015.06.28 02:32                                                 --
+--  Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB         --
+--  Windows7 - PM.64 (RUS)                                           --
+--  ========================================================         --
+--  AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                           --
+--                                                                   --
+--  g:\temp1\jv>java -version                                        --
+--  java version "1.7.0_80"                                          --
+--  Java(TM) SE Runtime Environment (build 1.7.0_80-b15)             --
+--  Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)  --
+--                                                                   --
+--  java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation            --
+--  -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch       --
+--                                                                   --
+--  10000 iterations take 37506 msec                                 --
+--  3.750600 milliseconds per iteration                              --
+--                                                                   --
+--  EXE file:                                                        --
+--                                                                   --
+--  10000 iterations take 24810 msec                                 --
+--  2.481 milliseconds per iteration                                 --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities'
+from "HARNESS"(TestData:=Polynomial,Result:=Polynomial);
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+Polynomial	= poly(Variable,Terms); Coefficient.
+Variable	= 'x'; 'y'; 'z'.
+Terms		= Term*.
+Term		= term(Exponent,Polynomial).
+Exponent	= INTEGER.
+Coefficient	= INTEGER.
+N		= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+test_poly_x(Polynomial)				- (o);
+test_poly_y(Polynomial)				- (o);
+test_poly_z(Polynomial)				- (o);
+test_poly_xyz(Polynomial)			- (o);
+poly_add(Polynomial,Polynomial,Polynomial)	- (i,i,o);
+term_add(Terms,Terms,Terms)			- (i,i,o);
+add_to_order_zero_term(Terms,Polynomial,Terms)	- (i,i,o);
+poly_exp(N,Polynomial,Polynomial)		- (i,i,o);
+poly_mul(Polynomial,Polynomial,Polynomial)	- (i,i,o);
+term_mul(Terms,Terms,Terms)			- (i,i,o);
+single_term_mul(Terms,Term,Terms)		- (i,i,o);
+mul_through(Terms,Polynomial,Terms)		- (i,i,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+[
+DOMAINS:
+--
+-- TestData	= Polynomial.
+-- Result	= Polynomial.
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(Polynomial,Polynomial) = Polynomial	- (i,i);
+'*'(Polynomial,Polynomial) = Polynomial	- (i,i);
+--
+determ:
+--
+'<'(Variable,Variable)			- (i,i);
+--
+CLAUSES:
+--
+data(Data):-
+	test_poly_xyz(Data).
+--
+benchmark(Data,Out):-
+	poly_exp(10,Data,Out).
+--
+test_poly_x(P):-
+	P== poly('x',[term(0,1),term(1,1)]).
+--
+test_poly_y(P):-
+	P== poly('y',[term(1,1)]).
+--
+test_poly_z(P):-
+	P== poly('z',[term(1,1)]).
+--
+test_poly_xyz(P):-
+	poly_add(
+		poly('x',[term(0,1),term(1,1)]),
+		poly('y',[term(1,1)]),
+		Q),
+	poly_add(poly('z',[term(1,1)]),Q,P).
+--
+poly_add(poly(Var,Terms1),poly(Var,Terms2),poly(Var,Terms3)):-!,
+	term_add(Terms1,Terms2,Terms3).
+poly_add(poly(Var1,Terms1),poly(Var2,Terms2),poly(Var1,Terms3)):-
+	Var1 < Var2,!,
+	add_to_order_zero_term(Terms1,poly(Var2,Terms2),Terms3).
+poly_add(Poly,poly(Var,Terms2),poly(Var,Terms3)):-!,
+	add_to_order_zero_term(Terms2,Poly,Terms3).
+poly_add(poly(Var,Terms1),C,poly(Var,Terms3)):-!,
+	add_to_order_zero_term(Terms1,C,Terms3).
+poly_add(C1,C2,C):-
+	C== C1 + C2.
+--
+term_add([],X,X):-!.
+term_add(X,[],X):-!.
+term_add([term(E,C1)|Rest1],[term(E,C2)|Rest2],[term(E,C3)|Rest3]):-!,
+	poly_add(C1,C2,C3),
+	term_add(Rest1,Rest2,Rest3).
+term_add([term(E1,C1)|Rest1],[term(E2,C2)|Rest2],[term(E1,C1)|Rest3]):-
+	E1 < E2,!,
+	term_add(Rest1,[term(E2,C2)|Rest2],Rest3).
+term_add(Terms1,[term(E2,C2)|Rest2],[term(E2,C2)|Rest3]):-
+	term_add(Terms1,Rest2,Rest3).
+--
+add_to_order_zero_term([term(0,C1)|Rest],C2,[term(0,C3)|Rest]):-!,
+	poly_add(C1,C2,C3).
+add_to_order_zero_term(Terms,C,[term(0,C)|Terms]).
+--
+poly_exp(0,_,1):-!.
+poly_exp(N,Poly,Result):-
+	even(N),!,
+	M== ?div(N,2),
+	poly_exp(M,Poly,Part),
+	poly_mul(Part,Part,Result).
+poly_exp(N,Poly,Result):-
+	M== N - 1,
+	poly_exp(M,Poly,Part),
+	poly_mul(Poly,Part,Result).
+--
+poly_mul(poly(Var,Terms1),poly(Var,Terms2),poly(Var,Terms3)):-!,
+	term_mul(Terms1,Terms2,Terms3).
+poly_mul(poly(Var1,Terms1),poly(Var2,Terms2),poly(Var1,Terms3)):-
+	Var1 < Var2,!,
+	mul_through(Terms1,poly(Var2,Terms2),Terms3).
+poly_mul(P,poly(Var,Terms2),poly(Var,Terms3)):-!,
+	mul_through(Terms2,P,Terms3).
+poly_mul(poly(Var,Terms1),C,poly(Var,Terms3)):-!,
+	mul_through(Terms1,C,Terms3).
+poly_mul(C1,C2,C):-
+	C== C1 * C2.
+--
+term_mul([],_,[]):-!.
+term_mul(_,[],[]):-!.
+term_mul([Term|Terms1],Terms2,Terms3):-
+	single_term_mul(Terms2,Term,PartA),
+	term_mul(Terms1,Terms2,PartB),
+	term_add(PartA,PartB,Terms3).
+--
+single_term_mul([],_,[]).
+single_term_mul([term(E1,C1)|Rest1],term(E2,C2),[term(E3,C3)|Rest2]):-
+	E3== E1 + E2,
+	poly_mul(C1,C2,C3),
+	single_term_mul(Rest1,term(E2,C2),Rest2).
+--
+mul_through([],_,[]).
+mul_through([term(E,Term1)|Rest1],Poly,[term(E,Term2)|Rest2]):-
+	poly_mul(Term1,Poly,Term2),
+	mul_through(Rest1,Poly,Rest2).
+]
+-----------------------------------------------------------------------

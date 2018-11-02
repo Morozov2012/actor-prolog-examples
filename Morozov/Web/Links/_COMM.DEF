@@ -1,0 +1,27 @@
+package "Morozov/Web/Links/_Comm" ('_Empty_Protocol'):
+---------------------------------------------------------------
+--        The "WEB/LINKS/_COMM" Actor Prolog package.        --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains a set of connectors for             --
+-- linking various program components.                       --
+---------------------------------------------------------------
+import 'AnalyserControl' from "Morozov/Web/Scanning/Control";
+import 'EngineControl' from "Morozov/Web/Engines/Control";
+import 'EngineInput' from "Morozov/Web/Engines/Control";
+---------------------------------------------------------------
+interface '_AnalyserControl'
+(specialized 'AnalyserControl', '_Empty_Protocol'):
+[
+]
+---------------------------------------------------------------
+interface '_EngineControl'
+(specialized 'EngineControl', '_Empty_Protocol'):
+[
+]
+---------------------------------------------------------------
+interface '_EngineInput'
+(specialized 'EngineInput', '_Empty_Protocol'):
+[
+]
+---------------------------------------------------------------

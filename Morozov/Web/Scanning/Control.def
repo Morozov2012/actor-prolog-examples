@@ -1,0 +1,114 @@
+package "Morozov/Web/Scanning/Control":
+---------------------------------------------------------------
+--        The "SCANNING/CONTROL" Actor Prolog package.       --
+--         (c) 2002-2005, IRE RAS, Alexei A. Morozov.        --
+---------------------------------------------------------------
+import 'Plain_Report'	from "Morozov/Web/Scanning/Messages";
+import 'HTML_Report'	from "Morozov/Web/Scanning/Messages";
+import 'ReportFile'	from "Morozov/Web/Scanning/Messages";
+import 'GenericReport'	from "Morozov/Web/Scanning/Messages";
+import 'ExternalBrowser'
+			from "Morozov/Web/Browsing/Browser";
+---------------------------------------------------------------
+-- This package supports user interface that provides        --
+-- control of the analysis of the Web Sites.                 --
+---------------------------------------------------------------
+interface 'ControlDialog' (specialized 'Dialog'):
+--
+variable:
+--
+	location			: WebAddressList;
+	output_mode			: OutputDeviceNumber;
+	output_file_name		: STRING;
+--
+constant:
+--
+	default_output_file		: STRING;
+--
+variable:
+--
+	maximal_waiting_time		: MaximalWaitingTime;
+	domain				: WebAddressSegment;
+	use_max_depth			: UseMaxDepth;
+	max_depth			: Level;
+	alternative_names		: WebAddressList;
+--
+internal:
+--
+	engine				: 'AnalyserControl';
+--
+variable:
+--
+	output_device			: OutputDeviceInstance;
+	virtual_resources		: WebAddressList;
+--
+internal:
+--
+	reporter_1			: 'GenericReport';
+	reporter_2			: 'GenericReport';
+--
+	report_file			: 'ReportFile';
+--
+	switch				: 'Switch';
+	browser				: 'ExternalBrowser';
+--
+variable:
+--
+	name_of_report_file		: WebAddressList;
+--
+[
+]
+------------------------------------------------------------------
+interface 'Switch' (specialized 'File'):
+--
+internal:
+--
+	dialog				: 'Dialog';
+--
+variable:
+--
+	location			: WebAddressList;
+	output_mode			: OutputDeviceNumber;
+--
+internal:
+--
+	reporter_1			: OutputDeviceInstance;
+	reporter_2			: OutputDeviceInstance;
+--
+variable:
+--
+	output_device			: OutputDeviceInstance;
+	alternative_names		: WebAddressList;
+--
+variable:
+--
+	virtual_resources		: WebAddressList;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+select_domain(WebAddressList)				- (i);
+--
+select_output_device
+	(OutputDeviceNumber,OutputDeviceInstance)	- (i,i);
+--
+determine_virtual_resources(WebAddressList)		- (i);
+--
+]
+------------------------------------------------------------------
+interface 'AnalyserControl':
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+open(_*);
+start(_*);
+show(_*);
+--
+]
+------------------------------------------------------------------

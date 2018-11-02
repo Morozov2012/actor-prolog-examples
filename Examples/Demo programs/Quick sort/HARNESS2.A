@@ -1,0 +1,58 @@
+--------------------------------------------------------------------
+--                                                                --
+--      A generic benchmark harness                               --
+--      (c) 2011, IRE RAS, Alexei A. Morozov                      --
+--                                                                --
+--------------------------------------------------------------------
+class 'TestFacilities' (specialized 'Alpha'):
+--
+internal:
+--
+con		= ('Console');
+window		= ('Report',x=15,width=50,y=15,height=7);
+timer		= ('Timer');
+--
+[
+goal:-!,
+	-- bench(100).
+	bench(1000).
+	-- bench(100000).
+	-- bench(1000000).
+	-- bench(1).
+--
+bench(Count):-
+	T1== timer ? time(),
+	dodummy(Count),
+	T2== timer ? time(),
+	dobench(Count),
+	T3== timer ? time(),
+	Delta1== T2 - T1,
+	Delta2== T3 - T2,
+	Period== (Delta2 - Delta1),
+	con ? writef("%d iterations take %d msec\n",Count,Period),
+	con ? writef("%f milliseconds per iteration\n",Period/Count).
+--
+dodummy(Count):-
+	data(Data),
+	repeat(Count),
+	dummy_benchmark(Data,_),
+	fail.
+dodummy(_).
+--
+dobench(Count):-
+	data(Data),
+	repeat(Count),
+	benchmark(Data,_),
+	-- benchmark(Data,Result),
+	-- con ? writeln(Result),
+	fail.
+dobench(_).
+--
+repeat(_).
+repeat(N):-
+	N > 1,
+	repeat(N-1).
+--
+dummy_benchmark(_,[]).
+]
+--------------------------------------------------------------------

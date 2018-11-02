@@ -1,0 +1,119 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2015 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Webcam":
+
+import 'BufferedImage' from "Morozov/Java2D";
+import 'WritableImageProducer' from "Morozov/Java2D";
+
+DOMAINS:
+
+WebcamNameList		= WebcamName*.
+WebcamName		= STRING; 'default'.
+--
+WebcamResolution	=
+			'CIF';		-- 352 x 288
+			'HD720';	-- 1280 x 720
+			'HD720P';	-- 1280 x 720
+			'HVGA';		-- 480 x 400
+			'PAL';		-- 768 x 576
+			'QQVGA';	-- 176 x 144
+			'QVGA';		-- 320 x 240
+			'QXGA';		-- 2048 x 1536
+			'SVGA';		-- 800 x 600
+			'SXGA';		-- 1280 x 1024
+			'UXGA';		-- 1600 x 1200
+			'VGA';		-- 640 x 480
+			'WXGA';		-- 1280 x 768
+			'XGA'.		-- 1024 x 768
+--
+ViewSizeList		= ViewSize*.
+ViewSize		= size(ViewWidth,ViewHeight).
+ViewWidth, ViewHeight	= INTEGER.
+
+--------------------------------------------------------------------
+-- The 'Webcam' class is specialized class 'DataAbstraction'.     --
+--------------------------------------------------------------------
+
+interface 'Webcam'
+
+(specialized
+	'DataAbstraction',
+	'WritableImageProducer'):
+--
+default_name				: WebcamName;
+--
+maximal_waiting_time			: WaitingInterval;
+--
+width					: Width;
+height					: Height;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+open() = YesNo;
+open(WebcamName) = YesNo			- (i);
+open(WebcamName,TimeInterval) = YesNo		- (i,i);
+--
+close;
+--
+determ:
+--
+is_open;
+contains_new_image;
+--
+imperative:
+--
+get_actual_name() = STRING;
+get_image('BufferedImage')			- (i);
+get_FPS() = REAL;
+--
+-- Get list of webcams to use. This method will wait given time
+-- interval for webcam devices to be discovered. Time argument
+-- is given in seconds.
+--
+get_webcam_list = WebcamNameList;
+get_webcam_list(TimeInterval) = WebcamNameList;
+--
+watch_webcam_list(YesNo)			- (i)(o);
+watch_webcam_state(YesNo)			- (i)(o);
+--
+get_view_sizes() = ViewSizeList;
+--
+set_width(Width)				- (i);
+set_width(ViewWidth)				- (i);
+get_width() = Width;
+--
+set_height(Height)				- (i);
+set_height(ViewHeight)				- (i);
+get_height() = Height;
+--
+set_default_resolution(WebcamResolution)	- (i);
+set_default_resolution(Width,Height)		- (i,i);
+set_default_resolution(ViewWidth,ViewHeight)	- (i,i);
+get_default_resolution(Width,Height)		- (o,o);
+--
+set_actual_resolution(WebcamResolution)		- (i);
+set_actual_resolution(Width,Height)		- (i,i);
+set_actual_resolution(ViewWidth,ViewHeight)	- (i,i);
+get_actual_resolution(INTEGER,INTEGER)		- (o,o);
+--
+set_default_name(WebcamName)			- (i);
+get_default_name() = WebcamName;
+set_maximal_waiting_time(WaitingInterval)	- (i);
+get_maximal_waiting_time() = WaitingInterval;
+--
+-- These methods are to be implemented by the programmer:
+--
+webcam_added(WebcamName)			- (i);
+webcam_removed(WebcamName)			- (i);
+--
+webcam_open(WebcamName)				- (i);
+webcam_image_obtained(WebcamName)		- (i);
+webcam_closed(WebcamName)			- (i);
+webcam_disposed(WebcamName)			- (i);
+]

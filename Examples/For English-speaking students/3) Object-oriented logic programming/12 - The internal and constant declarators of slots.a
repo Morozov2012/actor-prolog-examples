@@ -1,0 +1,64 @@
+-----------------------------------------------------
+--                                                 --
+--              Actor Prolog lessons               --
+--           (c) 2015 Alexei A. Morozov            --
+--                                                 --
+-- The topic: Object-oriented logic programming.   --
+-- The internal declarator of slots.               --
+--                                                 --
+-- Questions: What are classes and class instances --
+-- (the worlds)? What are slots of the class       --
+-- instances? What is the destination of the       --
+-- internal declarator of the slots?               --
+--                                                 --
+-----------------------------------------------------
+
+DOMAINS:
+
+N	= INTEGER.
+
+-----------------------------------------------------
+
+class 'MyClass' (specialized 'Console'):
+[
+PREDICATES:
+
+imperative:
+
+q(N,N,N)	- (i,i,o);
+
+CLAUSES:
+
+q(A,B,3):-
+	writeln(A,B).
+]
+
+-----------------------------------------------------
+
+class 'Main' (specialized 'Console'):
+
+-- constant:
+internal:
+
+-- slot		= (('MyClass'));
+slot		= ('MyClass');
+
+[
+PREDICATES:
+
+imperative:
+
+p(N,N,N)	- (i,i,o);
+
+CLAUSES:
+
+goal:-!,
+	p(1,2,C),
+	writeln(C).
+
+p(A,B,C):-!,
+	slot ? q(A,B,C).
+
+]
+
+-----------------------------------------------------

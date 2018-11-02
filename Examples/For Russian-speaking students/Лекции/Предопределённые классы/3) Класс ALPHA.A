@@ -1,0 +1,30 @@
+
+DOMAINS:
+
+reference:
+
+D1	= f(D1).
+D2	= INTEGER.
+
+PREDICATES:
+
+create_term(D1)		- (o);
+
+class 'Main' (specialized 'Alpha'):
+
+con	= ('Console');
+
+[
+
+goal:-
+	create_term(X),
+	con ? writeln("X = ",X),
+	con ? writeln("Is the X variable bound?"),
+	bound(X),!,
+	con ? writeln("Yes, X is bound.").
+goal:-!,
+	con ? writeln("No, X is free.").
+
+create_term(f(_)).
+
+]

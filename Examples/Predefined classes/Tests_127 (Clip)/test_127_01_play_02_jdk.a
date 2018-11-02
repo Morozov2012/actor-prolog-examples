@@ -1,0 +1,24 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'Clip' from "morozov/Sound";
+
+class 'Main' (specialized 'Clip'):
+--
+constant:
+--
+name		= "jar:data/sitar3";
+extension	= ".mid";
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("Start the test..."),
+	play,
+	con ? writeln("Done!").
+]

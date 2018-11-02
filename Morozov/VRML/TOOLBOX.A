@@ -1,0 +1,527 @@
+package "Morozov/VRML/Toolbox":
+-----------------------------------------------------------------------
+--                                                                   --
+--             The "VRML/TOOLBOX" Actor Prolog package.              --
+--            (c) 2002-2007, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package provides procedures for creation of VRML reports.    --
+-----------------------------------------------------------------------
+import 'Report_Mode'	from "Morozov/VRML/Mode";
+import 'Color_Table'	from "Morozov/VRML/Colors";
+-----------------------------------------------------------------------
+class 'VRML_Toolbox' (specialized 'Alpha'):
+--
+output;
+mode;
+--
+background_picture	= "../space4.gif";
+--
+text_operations		= ('Text');
+colors			= ('Color_Table');
+con			= ('Console');
+env			= ('Timer');
+--
+[
+goal:-!.
+-----------------------------------------------------------------------
+write(T*):-
+	output ? write(T*).
+--
+writeln(T*):-
+	output ? writeln(T*).
+--
+nl:-
+	output ? nl.
+--
+shift(S1,S2,Arguments*):-
+	write_shift(S1+S2),
+	output ? writeln(Arguments*).
+--
+write_shift(S):-
+	S > 0,!,
+	output ? write("  "),
+	write_shift(S-1).
+write_shift(_).
+-----------------------------------------------------------------------
+write_Heading:-
+	shift(0,0,"#VRML V2.0 utf8").
+-----------------------------------------------------------------------
+write_WorldInfo:-
+	F1== text_operations ? format(
+		"title \"%s\"",
+		"Actor Prolog. An Example of Web Agent Report."),
+	shift(0,0,"WorldInfo{"),
+	shift(0,1,F1),
+	env ? date(Year,_,_),
+	shift(0,1,"info [\"(c) ",Year," IRE RAS Alexei A. Morozov\"]"),
+	shift(0,0,"}").
+-----------------------------------------------------------------------
+write_NavigationInfo:-
+	shift(0,0,"NavigationInfo{"),
+	write_type_of_navigation,
+	shift(0,1,"headlight TRUE"),
+	shift(0,0,"}").
+--
+write_type_of_navigation:-
+	mode ? enable_navigation,!,
+	shift(0,1,"type \"FLY\"").
+write_type_of_navigation:-
+	shift(0,1,"type \"NONE\"").
+-----------------------------------------------------------------------
+write_Background:-
+	mode ? use_LightPanel,!,
+	shift(0,0,"Background{"),
+	shift(0,1,"skyColor [0.41 0.5 0.69, 0.41 0.5 0.69]"),
+	shift(0,1,"skyAngle [0.78]"),
+	shift(0,0,"}").
+write_Background:-
+	mode ? use_Background,!,
+	shift(0,0,"Background{"),
+	write_background_file_name("backUrl"),
+	write_background_file_name("bottomUrl"),
+	write_background_file_name("frontUrl"),
+	write_background_file_name("leftUrl"),
+	write_background_file_name("rightUrl"),
+	write_background_file_name("topUrl"),
+	shift(0,0,"}").
+write_Background.
+--
+write_background_file_name(Name):-
+	F== text_operations ? format(
+		"%s [\"%s\"]",Name,background_picture),
+	shift(0,1,F).
+-----------------------------------------------------------------------
+write_Fog:-
+	mode ? use_Fog,
+	mode ? use_flying_camera,!,
+	shift(0,0,"DEF SpecialFog Fog{"),
+	shift(0,1,"color 0 0 0.7"),
+	shift(0,1,"fogType \"EXPONENTIAL\""),
+	shift(0,1,"visibilityRange 10"),
+	shift(0,0,"}"),
+	shift(0,0,"DEF NoFog Fog{"),
+	shift(0,1,"visibilityRange 0"),
+	shift(0,0,"}").
+write_Fog:-
+	mode ? use_Fog,!,
+	shift(0,0,"Fog{"),
+	shift(0,1,"color 0 0 0.7"),
+	shift(0,1,"fogType \"EXPONENTIAL\""),
+	shift(0,1,"visibilityRange 10"),
+	shift(0,0,"}").
+write_Fog.
+-----------------------------------------------------------------------
+write_Dashboard:-
+	mode ? use_flying_camera,!,
+	shift(0,0,"DEF PS1 ProximitySensor{"),
+	shift(0,1,"size 100 100 100"),
+	shift(0,0,"}"),
+	shift(0,0,"DEF Dashboard Transform{"),
+	shift(0,1,"children["),
+	shift(0,2,"Transform{"),
+	shift(0,3,"translation -0.10 -0.075 -0.20"),
+	shift(0,3,"children["),
+	shift(0,4,"Transform{"),
+	shift(0,5,"translation 0.01 0.01 0.04"),
+	shift(0,5,"children["),
+	shift(0,6,"DEF SELECT Switch{"),
+	shift(0,7,"whichChoice 0"),
+	shift(0,7,"choice["),
+	write_dashboard(8,"1 0 0",'no'),
+	write_dashboard(8,"0 1 0",'yes'),
+	shift(0,7,"]"),
+	shift(0,6,"}"),
+	shift(0,5,"]"),
+	shift(0,4,"}"),
+	shift(0,4,"Shape{"),
+	shift(0,5,"geometry Text{"),
+	shift(0,6,"string [\"Fly !\"]"),
+	shift(0,6,"fontStyle FontStyle{"),
+	shift(0,7,"family \"SERIF\""),
+	shift(0,7,"style \"BOLD\""),
+	shift(0,7,"size 0.015"),
+	shift(0,6,"}"),
+	shift(0,5,"}"),
+	shift(0,4,"}"),
+	shift(0,4,"DEF TS1 TouchSensor{"),
+	shift(0,4,"}"),
+	shift(0,3,"]"),
+	shift(0,2,"}"),
+	shift(0,1,"]"),
+	shift(0,0,"}"),
+	shift(0,0,"DEF TOGGLE Script{"),
+	shift(0,1,"eventIn SFBool isOver"),
+	shift(0,1,"eventOut SFInt32 whichChoice"),
+	shift(0,1,"url \"javascript:"),
+	shift(0,2,"function isOver(value,time){"),
+	shift(0,3,"if(value==true) whichChoice= 1;"),
+	shift(0,3,"else whichChoice= 0;"),
+	shift(0,2,"}\""),
+	shift(0,1,"}"),
+	shift(0,0,"ROUTE TS1.isOver TO TOGGLE.isOver"),
+	shift(0,0,"ROUTE TOGGLE.whichChoice TO SELECT.whichChoice"),
+	F1== text_operations ? format(
+		"ROUTE %s TO %s",
+		"PS1.orientation_changed",
+		"Dashboard.set_rotation"),
+	shift(0,0,F1),
+	F2== text_operations ? format(
+		"ROUTE %s TO %s",
+		"PS1.position_changed",
+		"Dashboard.set_translation"),
+	shift(0,0,F2).
+write_Dashboard.
+--
+write_dashboard(S0,Color,'yes'):-!,
+	shift(S0,0,"Group{"),
+	shift(S0,1,"children["),
+	S2== S0 + 2,
+	write_dashboard_pyramid(S2),
+	shift(S0,2,"Transform{"),
+	shift(S0,3,"translation 0.02 0.0085 0"),
+	shift(S0,3,"children["),
+	S4== S0 + 4,
+	write_dashboard_box(S4,Color),
+	shift(S0,3,"]"),
+	shift(S0,2,"}"),
+	shift(S0,1,"]"),
+	shift(S0,0,"}").
+write_dashboard(S0,Color,_):-
+	shift(S0,0,"Transform{"),
+	shift(S0,1,"translation 0.02 0.0085 0"),
+	shift(S0,1,"children["),
+	S2== S0 + 2,
+	write_dashboard_box(S2,Color),
+	shift(S0,1,"]"),
+	shift(S0,0,"}").
+-----------------------------------------------------------------------
+write_dashboard_pyramid(S1):-
+	shift(S1,0,"Shape{"),
+	shift(S1,1,"appearance Appearance{"),
+	shift(S1,2,"material Material{"),
+	shift(S1,3,"transparency 1"),
+	shift(S1,2,"}"),
+	shift(S1,1,"}"),
+	S2== S1 + 1,
+	write_dashboard_pyramid_geometry(S2),
+	shift(S1,0,"}").
+--
+write_dashboard_pyramid_geometry(S):-
+	shift(S,0,"geometry IndexedFaceSet{"),
+	shift(S,1,"coord Coordinate{"),
+	shift(S,2,"point["),
+	shift(S,3,"0 0 0,"),
+	--
+	shift(S,3,"0.04 0 0,"),
+	shift(S,3,"0.04 0.017 0,"),
+	shift(S,3,"0 0.018 0,"),
+	shift(S,3,"0.09 0.065 0.161"),
+	--
+	shift(S,2,"]"),
+	shift(S,1,"}"),
+	shift(S,1,"coordIndex["),
+	shift(S,2,"0 1 2 3 -1"),
+	shift(S,2,"1 4 0 -1"),
+	shift(S,2,"2 4 1 -1"),
+	shift(S,2,"3 4 2 -1"),
+	shift(S,2,"4 3 0 -1"),
+	shift(S,1,"]"),
+	shift(S,0,"}").
+-----------------------------------------------------------------------
+write_dashboard_box(S1,Color):-
+	shift(S1,0,"Shape{"),
+	shift(S1,1,"appearance Appearance{"),
+	shift(S1,2,"material Material{"),
+	F1== text_operations ? format("emissiveColor %s",Color),
+	shift(S1,3,F1),
+	F2== text_operations ? format("diffuseColor %s",Color),
+	shift(S1,3,F2),
+	F3== text_operations ? format("specularColor %s",Color),
+	shift(S1,3,F3),
+	shift(S1,3,"transparency 0.5"),
+	shift(S1,2,"}"),
+	shift(S1,1,"}"),
+	S2== S1 + 1,
+	write_dashboard_box_geometry(S2),
+	shift(S1,0,"}").
+--
+write_dashboard_box_geometry(S):-
+	shift(S,0,"geometry Box{"),
+	shift(S,1,"size 0.032 0.0159 0.0001"),
+	shift(S,0,"}").
+-----------------------------------------------------------------------
+write_Dashboard_Route:-
+	mode ? use_flying_camera,
+	mode ? use_Fog,!,
+	shift(0,0,"ROUTE TS1.isOver TO MVP.set_bind"),
+	shift(0,0,"ROUTE TS1.isOver TO SpecialFog.set_bind").
+write_Dashboard_Route:-
+	mode ? use_flying_camera,!,
+	shift(0,0,"ROUTE TS1.isOver TO MVP.set_bind").
+write_Dashboard_Route.
+-----------------------------------------------------------------------
+write_shape_of_VBox(S,_/*Name*/,Width,Height1,K,Hue):-
+	--
+	W2== ?round(Width / 2 * 100.0) / 100,
+	MW2== -(W2),
+	W1== ?round(Width / 4 * 100.0) / 100,
+	MW1== -(W1),
+	Top== ?round((Height1 + W2) * 100.0) / 100,
+	Height2== ?round(Height1 * 100.0) / 100,
+	--
+	?random(),
+	?random(),
+	?random(),
+	?random(),
+	--
+	colors ? make_special_color(Hue,K/*0.3*/,R2,G2,B2),
+	--
+	shift(S,0,"Shape{"),
+	shift(S,1,"appearance Appearance{"),
+	shift(S,2,"material Material{"),
+	--
+	shift(S,3,"diffuseColor ",R2," ",G2," ",B2),
+	shift(S,3,"emissiveColor 0 0 0"),
+	shift(S,3,"ambientIntensity 1"),
+	shift(S,3,"shininess 0.7"),
+	shift(S,3,"specularColor 1 1 1"),
+	shift(S,3,"transparency 0.3"),
+	--
+	shift(S,2,"}"),
+	shift(S,1,"}"),
+	shift(S,1,"geometry IndexedFaceSet{"),
+	shift(S,2,"coord Coordinate{"),
+	shift(S,3,"point ["),
+	shift(S,4,W2," 0 ",MW1,","),
+	shift(S,4,W1," 0 ",MW2,","),
+	shift(S,4,MW1," 0 ",MW2,","),
+	shift(S,4,MW2," 0 ",MW1,","),
+	shift(S,4,MW2," 0 ",W1,","),
+	shift(S,4,MW1," 0 ",W2,","),
+	shift(S,4,W1," 0 ",W2,","),
+	shift(S,4,W2," 0 ",W1,","),
+	shift(S,4,"",W2," ",Height2," ",MW1,","),
+	shift(S,4,"",W1," ",Height2," ",MW2,","),
+	shift(S,4,"",MW1," ",Height2," ",MW2,","),
+	shift(S,4,"",MW2," ",Height2," ",MW1,","),
+	shift(S,4,"",MW2," ",Height2," ",W1,","),
+	shift(S,4,"",MW1," ",Height2," ",W2,","),
+	shift(S,4,"",W1," ",Height2," ",W2,","),
+	shift(S,4,"",W2," ",Height2," ",W1,","),
+	shift(S,4,0," ",Top," 0"),
+	shift(S,4,"]"),
+	shift(S,3,"}"),
+	shift(S,3,"coordIndex ["),
+	shift(S,4,"0 1 9 8 -1"),
+	shift(S,4,"1 2 10 9 -1"),
+	shift(S,4,"2 3 11 10 -1"),
+	shift(S,4,"3 4 12 11 -1"),
+	shift(S,4,"4 5 13 12 -1"),
+	shift(S,4,"5 6 14 13 -1"),
+	shift(S,4,"6 7 15 14 -1"),
+	shift(S,4,"7 0 8 15 -1"),
+	shift(S,4,"0 7 6 5 4 3 2 1 0 -1"),
+	shift(S,4,"8 9 16 -1"),
+	shift(S,4,"9 10 16 -1"),
+	shift(S,4,"10 11 16 -1"),
+	shift(S,4,"11 12 16 -1"),
+	shift(S,4,"12 13 16 -1"),
+	shift(S,4,"13 14 16 -1"),
+	shift(S,4,"14 15 16 -1"),
+	shift(S,4,"15 8 16 -1"),
+	shift(S,3,"]"),
+	shift(S,2,"solid FALSE"),
+	shift(S,1,"}"),
+	shift(S,0,"}").
+--
+write_title_of_VBox(S1,Name,Width,Height,UseWhiteLabels):-
+	--
+	Y2== ?round((Height + Width) * 100.0) / 100.0,
+	--
+	shift(S1,0,"Transform{"),
+	shift(S1,1,"translation 0 ",Y2," 0"),
+	shift(S1,1,"children["),
+	--
+	S2== S1 + 2,
+	write_dummy_sphere(S2,UseWhiteLabels),
+	write_title_of_VBox(S2,Name),
+	--
+	shift(S1,1,"]"),
+	shift(S1,0,"}").
+--
+write_title_of_VBox(S2,Name):-
+	mode ? use_flying_camera,!,
+	write_name_lod(S2,Name).
+write_title_of_VBox(S2,Name):-
+	write_name_billboard(S2,Name,0.2,"SANS").
+-----------------------------------------------------------------------
+write_dummy_sphere(S1,'yes'):-!,
+	shift(S1,0,"Shape{"),
+	shift(S1,1,"appearance Appearance{"),
+	shift(S1,2,"material Material{"),
+	shift(S1,3,"diffuseColor 1 1 1"),
+	shift(S1,3,"transparency 0"),
+	shift(S1,2,"}"),
+	shift(S1,1,"}"),
+	shift(S1,1,"geometry Sphere{"),
+	shift(S1,2,"radius 0"),
+	shift(S1,1,"}"),
+	shift(S1,0,"}").
+write_dummy_sphere(_,_).
+-----------------------------------------------------------------------
+write_name_lod(S1,Name):-
+	shift(S1,0,"LOD{"),
+	shift(S1,1,"range [1.5]"),
+	shift(S1,1,"level["),
+	--
+	S2== S1 + 2,
+	write_name_billboard(S2,Name,0.1,"SERIF"),
+	--
+	shift(S1,2,"Group{"),
+	shift(S1,3,"children[]"),
+	shift(S1,2,"}"),
+	--
+	shift(S1,1,"]"),
+	shift(S1,0,"}").
+--
+write_name_billboard(S1,Name,Size,Font):-
+	--
+	shift(S1,0,"Billboard{"),
+	shift(S1,1,"axisOfRotation 0 0 0"),
+	shift(S1,1,"children["),
+	--
+	S2== S1 + 2,
+	write_name_text(S2,Name,Size,Font),
+	--
+	shift(S1,1,"]"),
+	shift(S1,0,"}").
+--
+write_name_text(S1,Name,Size,Font):-
+	shift(S1,0,"Shape{"),
+	shift(S1,1,"geometry Text{"),
+	F1== text_operations ? format("string [\"%s\"]",Name),
+	shift(S1,2,F1),
+	shift(S1,2,"fontStyle FontStyle{"),
+	F2== text_operations ? format("family \"%s\"",Font),
+	shift(S1,3,F2),
+	shift(S1,3,"size ",Size,""),
+	shift(S1,3,"justify \"MIDDLE\""),
+	shift(S1,2,"}"),
+	shift(S1,1,"}"),
+	shift(S1,0,"}").
+-----------------------------------------------------------------------
+write_Viewpoint(S1):-
+	shift(S1,0,"DEF SVP Viewpoint{"),
+	shift(S1,1,"position 5 2 7"),
+	shift(S1,1,"orientation 20 -40 3 -0.7"),
+	shift(S1,1,"fieldOfView 0.78"),
+	shift(S1,0,"}").
+-----------------------------------------------------------------------
+write_PointLight(S):-
+	shift(S,0,"PointLight{"),
+	shift(S,1,"location 0 0 0"),
+	shift(S,0,"}").
+--
+write_PointLight(S,Number,Color,Interval):-
+	PointColor== "color " + Color,
+	FD1== text_operations ? format(
+		"DEF TRAN_PL_%d Transform{",Number),
+	shift(S,0,FD1),
+	shift(S,1,"children ["),
+	shift(S,2,"PointLight{"),
+	shift(S,3,"location 0 0 0"),
+	shift(S,3,PointColor),
+	shift(S,3,"attenuation 1 0 0"),
+	shift(S,2,"}"),
+	shift(S,1,"]"),
+	shift(S,0,"}"),
+	FD2== text_operations ? format(
+		"DEF T%d TimeSensor{",Number),
+	shift(S,0,FD2),
+	shift(S,1,"cycleInterval ",Interval,""),
+	shift(S,1,"loop TRUE"),
+	shift(S,0,"}"),
+	FD3== text_operations ? format(
+		"DEF CI%d PositionInterpolator{",Number),
+	shift(S,0,FD3),
+	shift(S,1,"key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]"),
+	shift(S,1,"keyValue ["),
+	write_PointLightPath(S,Number),
+	shift(S,1,"]"),
+	shift(S,0,"}"),
+	FR1== text_operations ? format(
+		"ROUTE T%d.fraction_changed TO CI%d.set_fraction",
+		Number,Number),
+	shift(S,0,FR1),
+	FR2== text_operations ? format(
+		"ROUTE CI%d.value_changed TO TRAN_PL_%d.translation",
+		Number,Number),
+	shift(S,0,FR2).
+--
+write_PointLightPath(S,1):-!,
+	write_point_1(S,","),
+	write_point_2(S,","),
+	write_point_3(S,","),
+	write_point_4(S,","),
+	write_point_5(S,","),
+	write_point_6(S,","),
+	write_point_7(S,","),
+	write_point_8(S,","),
+	write_point_1(S,"").
+write_PointLightPath(S,2):-!,
+	write_point_3(S,","),
+	write_point_4(S,","),
+	write_point_5(S,","),
+	write_point_6(S,","),
+	write_point_7(S,","),
+	write_point_8(S,","),
+	write_point_1(S,","),
+	write_point_2(S,","),
+	write_point_3(S,"").
+write_PointLightPath(S,3):-!,
+	write_point_5(S,","),
+	write_point_6(S,","),
+	write_point_7(S,","),
+	write_point_8(S,","),
+	write_point_1(S,","),
+	write_point_2(S,","),
+	write_point_3(S,","),
+	write_point_4(S,","),
+	write_point_5(S,"").
+write_PointLightPath(S,4):-!,
+	write_point_7(S,","),
+	write_point_8(S,","),
+	write_point_1(S,","),
+	write_point_2(S,","),
+	write_point_3(S,","),
+	write_point_4(S,","),
+	write_point_5(S,","),
+	write_point_6(S,","),
+	write_point_7(S,"").
+write_PointLightPath(_,_):-
+	break('Error in write_PointLightPath.').
+write_PointLightPath(_,_).
+--
+write_point_1(S,Rest):-
+	write_point_X(S,"25 -25 -25",Rest).
+write_point_2(S,Rest):-
+	write_point_X(S,"-25 25 25",Rest).
+write_point_3(S,Rest):-
+	write_point_X(S,"-25 25 -25",Rest).
+write_point_4(S,Rest):-
+	write_point_X(S,"25 -25 25",Rest).
+write_point_5(S,Rest):-
+	write_point_X(S,"-25 -25 25",Rest).
+write_point_6(S,Rest):-
+	write_point_X(S,"25 25 -25",Rest).
+write_point_7(S,Rest):-
+	write_point_X(S,"25 25 25",Rest).
+write_point_8(S,Rest):-
+	write_point_X(S,"-25 -25 -25",Rest).
+--
+write_point_X(S,Coordinates,Rest):-
+	Text== Coordinates + Rest,
+	shift(S,2,Text).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,188 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+VideoFrameNumber	= INTEGER; STRING.
+--
+Hue			= INTEGER; STRING.
+Saturation		= INTEGER; STRING.
+Brightness		= INTEGER; STRING.
+Contrast		= INTEGER; STRING.
+--
+IsMatureTrack		= YesNo.
+IsLastSegment		= 'no'; 'yes'.
+--
+-----------------------------------------------------------------------
+interface 'ControlDialog' (specialized 'Dialog'):
+--
+constant:
+--
+	data_directory		: STRING;
+	file_name_format	: STRING;
+	frame_rate		: REAL;
+	subsampling		: INTEGER;
+--
+	inverse_transformation_matrix	: TransformationMatrix;
+--
+internal:
+--
+	vpm			: 'VideoProcessingMachine';
+	timer			: 'SpecialTimer';
+	graphic_window		: 'Canvas2D';
+	text			: 'Text';
+	image1			: 'BufferedImage';
+	image2			: 'BufferedImage';
+	state			: 'ProgramState';
+	accumulator		: 'Accumulator';
+	con			: 'Console';
+--
+variable:
+--
+	first_frame		: VideoFrameNumber;
+	last_frame		: VideoFrameNumber;
+--
+constant:
+--
+	circle_radius		: REAL;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+detect_minimal_file_number(INTEGER,INTEGER)	- (i,o);
+detect_maximal_file_number
+	(INTEGER,INTEGER,INTEGER)		- (i,o,i);
+show_frame_range_if_necessary(INTEGER,INTEGER)	- (i,i);
+--
+divide_list(INTEGER,PointList,PointList)	- (i,i,o);
+--
+tick;
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+--
+draw_scene;
+--
+draw_blob_list(BlobList,PointX,PointY)		- (i,i,i);
+draw_blob(Blob,PointX,PointY)			- (i,i,i);
+select_blob_color(BlobType,Color)		- (i,o);
+--
+draw_legend;
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,REAL) = REAL				- (i,i);
+'-'(PointY,REAL) = REAL				- (i,i);
+'-'(REAL,PointX) = REAL				- (i,i);
+'-'(REAL,PointY) = REAL				- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+--
+determ:
+--
+'>'(PointX,REAL)				- (i,i);
+'>'(PointY,REAL)				- (i,i);
+'>'(REAL,PointX)				- (i,i);
+'>'(REAL,PointY)				- (i,i);
+'<'(PointX,REAL)				- (i,i);
+'<'(PointY,REAL)				- (i,i);
+'<'(REAL,PointX)				- (i,i);
+'<'(REAL,PointY)				- (i,i);
+'>='(PointX,REAL)				- (i,i);
+'>='(PointY,REAL)				- (i,i);
+'>='(REAL,PointX)				- (i,i);
+'>='(REAL,PointY)				- (i,i);
+'<='(PointX,REAL)				- (i,i);
+'<='(PointY,REAL)				- (i,i);
+'<='(REAL,PointX)				- (i,i);
+'<='(REAL,PointY)				- (i,i);
+--
+imperative:
+--
+round(PointX) = INTEGER				- (i);
+round(PointY) = INTEGER				- (i);
+trunc(PointX) = INTEGER				- (i);
+trunc(PointY) = INTEGER				- (i);
+]
+-----------------------------------------------------------------------
+interface 'SpecialTimer' (specialized 'Timer'):
+--
+internal:
+--
+target_world	: 'ControlDialog';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		: 'Timer';
+--
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER);
+		  frame_counter(INTEGER);
+		  stop_watch_time(INTEGER);
+		  global_counter(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)			- (o);
+get_current_frame(INTEGER)			- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)			- (i);
+set_current_frame(INTEGER)			- (i);
+--
+reset_stopwatch;
+get_stopwatch_time(INTEGER)			- (o);
+--
+reset_frame_counter;
+increase_frame_counter;
+get_frame_counter(INTEGER)			- (o);
+--
+increase_global_counter;
+get_global_counter(INTEGER)			- (o);
+]
+-----------------------------------------------------------------------
+interface 'Accumulator' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= accumulated_sum(BlobType,SYMBOL,INTEGER,REAL).
+--
+PREDICATES:
+--
+imperative:
+--
+add_value(BlobType,SYMBOL,REAL)			- (i,i,i);
+--
+determ:
+--
+get_average_value(BlobType,SYMBOL,REAL)		- (i,i,o);
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,118 @@
+--
+-- Вычисление определителя матрицы
+-- (с) 2007 Шевченко Никита, МГППУ, ИТ 4.2
+--
+
+DOMAINS:
+
+N	= INTEGER.
+LIST	= N*.
+Matrix	= LIST*.
+
+PREDICATES:
+
+imperative:
+
+del_i(Matrix,N,N,Matrix)	- (i,i,i,o);		/* Удаление  строки из матрицы */
+del_ilist(LIST,N,N,LIST)	- (i,i,i,o);
+del_j(Matrix,N,Matrix)		- (i,i,o);		/* Удаление столбца из матрицы */
+del_ij(Matrix,N,N,Matrix)	- (i,i,i,o);		/* Удаление из матрицы строки и столбца */
+det(Matrix,N,N)			- (i,i,o);		/* Вычисление детерминанта */
+sum(Matrix,Matrix,N,N,N,N,N)	- (i,i,i,i,i,i,o);	/* Сумма детерминантов миноров */
+
+determ:
+
+get_el_or_Fail(LIST,N,N,N)	- (i,i,i,o);		/* Получение элемента строки */
+
+imperative:
+
+get_el(LIST,N,N,N)		- (i,i,i,o);		/* Получение элемента строки */
+
+imperative:
+
+len(LIST,N,N)			- (i,i,o);		/* Длина строки списка */
+
+determ:
+
+lenMatr(Matrix,N)		- (i,o);		/* Длина первой строки матрицы */
+
+CLAUSES:
+
+/* Удаление i-ой строки */
+
+del_i([_|Rest],Index,Index,Rest):-!.
+del_i([H|T],Index,Curr,[H|Rest]):-
+	Index <> Curr,!,
+	del_i(T,Index,Curr+1,Rest).
+del_i(_,_,_,[]).
+
+/* Удаление i-го элемента */
+
+del_ilist([_|Rest],Index,Index,Rest):-!.
+del_ilist([H|T],Index,Curr,[H|Rest]):-
+	Index <> Curr,!,
+	del_ilist(T,Index,Curr+1,Rest).
+del_ilist(_,_,_,[]).
+
+/* Удаление j-го столбца как j-го элемента в каждой строке */
+
+del_j([H|T],ColInd,[Str|Rest]):-
+	del_ilist(H,ColInd,1,Str),
+	del_j(T,ColInd,Rest).
+del_j([],_,[]).
+
+/* Удаление j-го столбца и i-ой строки */
+
+del_ij(L,I,J,L2):-
+	del_i(L,I,1,L1),
+	del_j(L1,J,L2).
+
+/* Получение элемента строки по номеру */
+
+get_el_or_Fail([_|T],Index,Curr,Number):-
+	get_el_or_Fail(T,Index,Curr+1,Number),!.
+get_el_or_Fail([H|_],Index,Index,H).
+
+get_el(List,Index,Counter,Number):-
+	get_el_or_Fail(List,Index,Counter,Number),!.
+get_el(_,_,_,_):-
+	writeln("Sorry, an internal error!"),
+	break.
+
+/* Длина строки */
+
+len([_|T],Count,Res):-
+	len(T,Count+1,Res).
+len([],R,R).
+
+/* Длина строки матрицы */
+
+lenMatr([H|_],Res):-
+	len(H,0,Res).
+
+/* Детерминант */
+
+sum(L,[H|_],Count,Mult,Rank, Res,R2):-
+	get_el_or_Fail(H,Count,1,El),!,
+	del_ij(L,1,Count,Minor),
+	det(Minor,Rank-1,R),
+	sum(L,L,Count+1,Mult*(-1),Rank,El*R*Mult + Res,R2).
+sum(_,_,_,_,_,R,R).
+
+det([H|_],1,Res):-!,
+	get_el(H,1,1,Res).
+det(L,Rank,Dt):-
+	sum(L,L,1,1,Rank,0,Dt).
+
+goal:-
+	L== [[1,2,1,3,1],
+	     [3,1,3,5,2],
+	     [3,4,2,7,6],
+	     [2,5,7,8,5],
+	     [5,2,3,4,1]],
+	--
+	lenMatr(L,K),
+	writeln("Ранг матрицы равен ",K),
+	--
+	det(L,K,Res),
+	writeln("Детерминант равен ",Res).

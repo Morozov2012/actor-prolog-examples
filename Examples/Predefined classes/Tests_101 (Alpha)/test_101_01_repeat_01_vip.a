@@ -1,0 +1,45 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+determ:
+
+test1;
+
+imperative:
+
+test2;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-
+	test1,
+	fail.
+goal:-!,
+	con ? nl,
+	test2.
+--
+test1:-
+	con ? writeln("Test 1:"),
+	repeat,
+		con ? write("*"),!,
+		fail.
+test1:-
+	con ? writeln("Failure").
+--
+test2:-
+	con ? writeln("Test 2:"),
+	repeat,
+		con ? write("*"),
+		fail.
+test2:-
+	con ? writeln("Failure").
+]

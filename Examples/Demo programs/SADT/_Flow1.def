@@ -1,0 +1,32 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, Alexei A. Morozov, IRE RAS. --
+-- Transmitting of flow messages between --
+-- blocks of SADT model.                 --
+-------------------------------------------
+DOMAINS:
+--
+reference:
+--
+MyMessage	= STRING.
+--
+-------------------------------------------
+interface '_Sender'
+(specialized '_Block', 'Dialog'):
+--
+value_o1	: MyMessage;
+--
+[
+]
+-------------------------------------------
+interface '_Receiver'
+(specialized '_Block', 'Alpha'):
+--
+value_c1	: MyMessage;
+--
+[
+check(MyMessage)		- (i);
+--
+concat(STRING,STRING,MyMessage)	- (i,o,i);
+]
+-------------------------------------------

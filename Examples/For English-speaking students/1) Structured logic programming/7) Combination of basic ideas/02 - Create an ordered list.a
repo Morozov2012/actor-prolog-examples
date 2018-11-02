@@ -1,0 +1,41 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas.                          --
+--                                       --
+-- The task: create an ordered list.     --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) Recursion with the input argument  --
+--    (counter increase).                --
+-- 2) An input argument.                 --
+-- 3) Recursion with the output argument --
+--    (output assembling of a list).     --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+imperative:
+
+p(INTEGER,INTEGER,List)	- (i,i,o);
+
+CLAUSES:
+
+goal:-
+	p(1,10,Y),
+	writeln(Y).
+
+p(N,Max,[N|Rest]):-
+	N <= Max,!,
+	p(N+1,Max,Rest).
+p(_,_,[]).
+

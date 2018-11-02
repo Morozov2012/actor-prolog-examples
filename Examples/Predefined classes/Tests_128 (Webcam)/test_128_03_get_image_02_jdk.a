@@ -1,0 +1,33 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	panel	= ('Canvas2D');
+	buffer	= ('BufferedImage');
+--
+[
+goal:-!,
+	panel ? show,
+	watch_webcam_state('yes'),
+	open.
+--
+webcam_image_obtained(_):-!,
+	get_image(buffer),
+	panel ? get_size_in_pixels(WP,HP),
+	buffer ? get_size_in_pixels(WI,HI),
+	X0== (WP - WI) / 2 / WP,
+	Y0== (HP - HI) / 2 / HP,
+	Width== WI / WP,
+	Height== HI / HP,
+	panel ? clear('no'),
+	panel ? draw_image(buffer,X0,Y0,Width,Height),
+	panel ? draw_now.
+]

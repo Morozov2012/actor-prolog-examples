@@ -1,0 +1,206 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Astrohn";
+import .. from "morozov/ColorMap";
+-----------------------------------------------------------------------
+project: (('VideoPlayer'))
+-----------------------------------------------------------------------
+class 'VideoPlayer' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer		= ('TerahertzVideoManager',
+				player=self,
+				main_window,
+				legend_window);
+	main_window	= ('Canvas2D',
+				background_color='SystemControl');
+	legend_window	= ('Canvas2D',
+				background_color='SystemControl');
+	con		= ('Console');
+	text_operations	= ('Text');
+	color_maps	= ('ColorMap');
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+	exit_on_close		= 'yes';
+--
+[
+goal:-!,
+	update_color_map,
+	show.
+--
+action("Select"):-
+	FileName== con?input_file_name(
+		"Please select data file",
+		"*.ap2j",
+		[
+		"*.ap2j","Data Files",
+		"*.*","All Files"
+		]),!,
+	buffer ? set_name(FileName),
+	put('title',"Terahertz Video Player ["+FileName+"]"),
+	play_video.
+action("Play"):-!,
+	play_video.
+action("Pause"):-!,
+	buffer ? pause.
+action("Stop"):-!,
+	buffer ? stop.
+--
+play_video:-
+	check_file_name,!,
+	update_color_map,
+	park_scroll_control,
+	buffer ? start.
+play_video.
+--
+check_file_name:-
+	buffer ? does_exist(),!.
+check_file_name:-
+	FileName== buffer?get_name(),
+	con ? error(
+		"Illegal File name",
+		text_operations?format(
+			"The '%s' file does not exist.",FileName)),
+	fail.
+--
+modified_control(1010):-!,
+	buffer ? frame_obtained.
+modified_control(1020):-!,
+	update_color_map,
+	buffer ? frame_obtained.
+modified_control(1030):-!,
+	update_color_map,
+	buffer ? frame_obtained.
+modified_control(1040):-!,
+	update_color_map,
+	buffer ? frame_obtained.
+modified_control(1050):-!,
+	update_color_map,
+	buffer ? frame_obtained.
+modified_control(1060):-!,
+	update_color_map,
+	buffer ? frame_obtained.
+modified_control(3012):-
+	Position== ?cast("INTEGER",?get(3012)),
+	buffer ? retrieve_buffered_frame(Position),!.
+--
+update_color_map:-
+	DoNotControlZoom== ?val("YesNo",?get(1020)),
+	ZoomImage== ?val("YesNo",?get(1030)),
+	ZoomingCoefficient== ?val("Numerical",?get(1040)),
+	DoNotControlCM== ?val("YesNo",?get(1050)),
+	TextCM== ?val("STRING",?get(1060)),!,
+	buffer ? set_use_recorded_zooming_commands(DoNotControlZoom),
+	buffer ? set_zoom_image(ZoomImage),
+	buffer ? set_zooming_coefficient(ZoomingCoefficient),
+	buffer ? set_use_recorded_color_map_commands(DoNotControlCM),
+	ColorMap== color_maps?string_to_color_map_name(TextCM),
+	buffer ? set_main_color_map(ColorMap).
+update_color_map.
+--
+set_read_buffer_size(Size):-
+	put(3011,[1,Size]).
+--
+park_scroll_control:-
+	Range== ?val("I_List",?get(3011)),
+	Range == [_,Right],!,
+	put(3012,Right).
+park_scroll_control.
+]
+-----------------------------------------------------------------------
+class 'TerahertzVideoManager' (specialized 'Astrohn'):
+--
+constant:
+--
+	name;
+--
+	operating_mode			= 'PLAYING';
+	read_buffer_size		= 100;
+--
+internal:
+--
+	player;
+	main_window;
+	legend_window;
+--
+	image				= ('BufferedImage');
+	con				= ('Console');
+	text				= ('Text');
+	timer				= ('Timer');
+--
+[
+goal:-!,
+	player ? set_read_buffer_size(read_buffer_size).
+--
+frame_obtained:-
+	commit,
+	DisplayingMode== ?cast("STRING",player?get(1010)),
+	get_image(DisplayingMode,IW,IH,FN,FT,FrameRate,FontSize),!,
+	resize_main_window(IW,IH),
+	main_window ? suspend_redrawing,
+	main_window ? clear,
+	main_window ? draw_image(image,0,0,1,1),
+	report_time(FN,FT,FrameRate,FontSize),
+	main_window ? draw_now.
+--
+get_image("Terahertz Image",IW,IH,Number,Time,FrameRate,14):-!,
+	get_recent_terahertz_image(image),
+	get_terahertz_image_size_in_pixels(IW,IH),
+	get_recent_terahertz_frame_number(Number),
+	get_recent_terahertz_frame_time(Time),
+	get_recent_terahertz_frame_rate(FrameRate).
+get_image("Color Image",IW,IH,Number,Time,FrameRate,18):-!,
+	get_recent_color_image(image),
+	get_color_image_size_in_pixels(IW,IH),
+	get_recent_color_frame_number(Number),
+	get_recent_color_frame_time(Time),
+	get_recent_color_frame_rate(FrameRate).
+get_image(_,IW,IH,Number,Time,FrameRate,18):-
+	get_recent_combined_image(image),
+	get_color_image_size_in_pixels(IW,IH),
+	get_recent_terahertz_frame_number(Number),
+	get_recent_terahertz_frame_time(Time),
+	get_recent_terahertz_frame_rate(FrameRate).
+--
+resize_main_window(IW,IH):-
+	IW > 0,
+	IH > 0,!,
+	main_window ? refine_width(IW/IH).
+resize_main_window(_,_).
+--
+data_transfer_error(ErrorName):-!,
+	con ? error("Data Transfer Error",ErrorName).
+--
+report_time(_,_,_,FontSize):-
+	main_window ? set_brush('Green'),
+	main_window ? set_font({size:FontSize}),
+	fail.
+report_time(FrameNumber,FrameTime,_,_):-
+	FrameNumber >= 0,
+	Time== timer?convert_to_time(FrameTime),
+	Time == time(Hours,Minutes,Seconds,Milliseconds),
+	main_window ? set_text_alignment('LEFT','TOP'),
+	main_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"T: %02d:%02d:%02d.%03d; F: %d",
+			Hours,Minutes,Seconds,Milliseconds,
+			FrameNumber)),
+	fail.
+report_time(_,_,FrameRate,_):-
+	FrameRate >= 0,
+	main_window ? set_text_alignment('RIGHT','TOP'),
+	main_window ? draw_text(
+		0.95, 0.02,
+		text?format(
+			"FR: %2.1f",FrameRate)),
+	fail.
+report_time(_,_,_,_).
+]
+-----------------------------------------------------------------------

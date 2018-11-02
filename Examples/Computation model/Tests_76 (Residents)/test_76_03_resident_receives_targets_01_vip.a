@@ -1,0 +1,106 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+p1	= [A,B,C,D];
+p2	= (('Observer',
+		data= r3
+		));
+r3	= p1 ?? f(1,2,3,0);
+p4	= (('Sender',
+		output= [A,B,C,D]));
+--
+[
+]
+-----------------------------------------------------------------------
+class 'T1' (specialized 'Target'):
+--
+x	= 40;
+width	= 20;
+--
+[
+hello:-
+	set_color('RoyalBlue'),
+	writeln("Hello from T1!"),
+	set_color('default').
+--
+f(_,_,C,D)= C + D :-
+	numerical(C,D).
+]
+-----------------------------------------------------------------------
+class 'T2' (specialized 'Target'):
+--
+x	= 60;
+width	= 20;
+--
+[
+hello:-
+	set_color('RoyalBlue'),
+	writeln("Hello from T2!"),
+	set_color('default').
+--
+f(A,B,C,D)= A + B + C + D :-
+	numerical(A,B,C,D).
+]
+-----------------------------------------------------------------------
+class 'Target' (specialized 'Report'):
+[
+f(_,_,_,_)= _ :-
+	hello,
+	fail.
+f(A,B,_,_)= A + B :-
+	numerical(A,B).
+]
+-----------------------------------------------------------------------
+class 'Observer' (specialized 'Report'):
+--
+variable:
+--
+	data;
+--
+constant:
+--
+	x	= 0;
+	width	= 40;
+--
+[
+goal:-!,
+	set_color('RoyalBlue'),
+	writeln("Received data:"),
+	set_color('Violet'),
+	writeln(data),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Timer'):
+--
+constant:
+--
+	p1	= (('T1'));
+	p2	= (('T2'));
+--
+protecting:
+--
+	output;
+--
+[
+goal:-!,
+	activate.
+--
+tick:-
+	time(Hour,Minute,Second,_),
+	H== ?val("T_List",Hour),
+	M== ?val("T_List",Minute),
+	S== ?val("T_List",Second),
+	get_target(Second,T),
+	output == [H,M,S,T],!.
+--
+get_target(S,T):-
+	?mod(S,10) < 5,!,
+	T== ?val("T_List",p1).
+get_target(_,T):-
+	T== ?val("T_List",p2).
+]
+-----------------------------------------------------------------------

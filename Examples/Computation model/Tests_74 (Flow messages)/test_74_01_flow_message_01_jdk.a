@@ -1,0 +1,79 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+D1	= STRING.
+--
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Report'):
+--
+protecting:
+--
+output		: D1;
+--
+constant:
+--
+y		= 0;
+height		= 10;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-
+	output == "Hello world!",
+	set_color('Fuchsia'),
+	writeln("Sender: ",output),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Report'):
+--
+variable:
+--
+input		: D1;
+--
+constant:
+--
+y		= 10;
+height		= 15;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-
+	set_color('DkGreen'),
+	writeln("Receiver: ",input),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= (('Sender',
+		output=X));
+w2	= (('Receiver',
+		input=X));
+--
+[
+goal.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------

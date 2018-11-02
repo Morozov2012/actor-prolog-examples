@@ -1,0 +1,48 @@
+mesh(80,25)
+window_font("Arial",17,[bold])
+dialog_font("Arial",18,[])
+dialog 'Main' (
+	"The Actor Prolog language",
+	default,default,default,
+	centered,centered,default)
+vbox(center)
+	"Please, enter window coordinates and text:"
+	grid
+		row
+			column
+				"I= "
+			end_of_column
+			column
+				editinteger(i,10,9)
+			end_of_column
+			column
+				statictext("     ")
+			end_of_column
+		end_of_row
+		row
+			column
+				"J= "
+			end_of_column
+			column
+				editinteger(j,10,4)
+			end_of_column
+			column
+				statictext("     ")
+			end_of_column
+		end_of_row
+		row
+			column
+				"Value= "
+			end_of_column
+			column
+				editname(value,10,"")
+			end_of_column
+			column
+				statictext("     ")
+			end_of_column
+		end_of_row
+	end_of_grid
+	statictext("")
+	statictext("")
+end_of_vbox
+end_of_dialog

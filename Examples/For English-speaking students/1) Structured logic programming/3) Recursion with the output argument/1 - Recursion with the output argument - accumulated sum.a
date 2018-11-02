@@ -1,0 +1,36 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Recursion.         --
+--                                       --
+-- Questions: What is a recursion with   --
+-- the output argument? Why does not the --
+-- compiler implement the tail recursion --
+-- optimization in this particular case? --
+-- (The latter question is to be         --
+-- discussed after the study of          --
+-- arithmetical functions and their      --
+-- implementation in Actor Prolog.)      --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+nondeterm:
+
+p(INTEGER)		- (o);
+
+CLAUSES:
+
+goal:-
+	p(X),
+	writeln(X).
+
+p(Y+N):-
+	N== ?input_integer(
+		"Input a number please",0),
+	p(Y).
+p(0).

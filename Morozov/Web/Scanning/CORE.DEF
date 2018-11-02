@@ -1,0 +1,99 @@
+package "Morozov/Web/Scanning/Core":
+---------------------------------------------------------------
+--         The "SCANNING/CORE"Actor Prolog package.          --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This is a set of auxiliary classes that support           --
+-- implementation of Web scanners analyzing Web Sites.       --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import 'ErrorMessages' from "Morozov/Web/Scanning/Messages";
+import 'ReportWindow'	from "Morozov/Web/Scanning/Messages";
+---------------------------------------------------------------
+interface 'Scanner' (specialized 'WebReceptor'):
+--
+variable:
+--
+	location	: WebAddress;
+--
+internal:
+--
+	diary		: 'Report';
+--
+	messages	: 'ErrorMessages';
+--
+	report_window	: 'ReportWindow';
+	file_operations	: 'WebFile';
+--
+[
+PREDICATES:
+--
+determ:
+--
+resource_has_unknown_type(WebAddressList)	- (i);
+is_HTML_file(WebAddressList)			- (i);
+--
+imperative:
+--
+delete_web_prefix(
+	WebAddressList,WebAddressList)		- (i,o);
+--
+determ:
+--
+is_actul_file_name(WebAddressList)		- (i);
+check_HTML_file_name(WebAddressList)		- (i);
+--
+is_picture(WebAddressList)			- (i);
+--
+is_non_empty_list(ReferenceList)		- (i);
+contains(WebAddressList,WebAddressList)		- (i,i);
+--
+imperative:
+--
+produce_message(
+	Level,Node,WebAddressList,ErrorDescription);
+--
+determ:
+--
+concat(	WebAddressList,
+	WebAddressList,
+	WebAddressList)				- (i,o,i);
+--
+nondeterm:
+--
+search(WebAddressList,STRING) = INTEGER		- (i,i);
+--
+imperative:
+--
+get_URL(WebAddressList) = STRING		- (i);
+]
+---------------------------------------------------------------
+-- The 'RunTimeMessages' class implements the output of      --
+-- auxiliary messages to the text window. This class is an   --
+-- descendant of the 'Report' predefined class that          --
+-- implements the text windows.                              --
+---------------------------------------------------------------
+interface 'RunTimeMessages' (specialized 'Report'):
+--
+[
+PREDICATES:
+--
+imperative:
+--
+writeln_green(_*)				- (i);
+writeln_red(_*)					- (i);
+--
+]
+---------------------------------------------------------------
+interface 'WebFile' (specialized 'File'):
+[
+PREDICATES:
+--
+imperative:
+--
+extract_path(
+	WebAddressList,
+	STRING/*Path*/,
+	STRING/*FileName*/)	- (i,o,o);
+]
+---------------------------------------------------------------

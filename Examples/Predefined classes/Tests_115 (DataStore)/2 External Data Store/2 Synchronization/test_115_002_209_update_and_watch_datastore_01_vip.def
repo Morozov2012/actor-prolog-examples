@@ -1,0 +1,58 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'DataStore'):
+--
+internal:
+--
+	updater	: 'DataStoreUpdater';
+	con1	: 'Report';
+	con2	: 'Report';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+report_whether_data_store_is_updated;
+test_datastore;
+inspect_datastore;
+]
+-----------------------------------------------------------------------
+interface 'DataStoreUpdater' (specialized 'Timer'):
+--
+internal:
+--
+	store	: 'DataStore';
+	writer	: 'MyDatabase';
+--
+	con	: 'Report';
+--
+[]
+-----------------------------------------------------------------------
+interface 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	store	: 'DataStore';
+	con	: 'Report';
+--
+[
+DOMAINS:
+--
+Target		= my_data(REAL).
+--
+PREDICATES:
+--
+imperative:
+--
+update_database;
+--
+modify_database;
+modify_database(REAL)		- (i);
+--
+check_database(Color)		- (i);
+report_checksum(REAL,Color)	- (i,i);
+]
+-----------------------------------------------------------------------

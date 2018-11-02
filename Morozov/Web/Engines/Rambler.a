@@ -1,0 +1,94 @@
+package "Morozov/Web/Engines/Rambler":
+---------------------------------------------------------------
+--            The "RAMBLER" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package is an interface of the RAMBLER search        --
+-- engine. You can freely use it to collect information of   --
+-- any kind in the World Wide Web.                           --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import "Morozov/Web/Engines/Control";
+import 'EngineControl'
+		from "Morozov/Web/Engines/Control";
+import 'EngineInput'
+		from "Morozov/Web/Engines/Control";
+import 'SearchEngine' from "Morozov/Web/Engines/Core";
+---------------------------------------------------------------
+class 'Rambler' (specialized 'SearchEngine'):
+--
+variable:
+--
+	location		= "http://nova.rambler.ru";
+	maximal_waiting_time	= 20.0;
+	tags			= ["LI","B"];
+--
+internal:
+--
+	text;
+--
+[
+prepare_request_or_Fail(Words1,Request):-!,
+	replace_spaces("+","%2B",Words1,Words2),
+	replace_spaces("  "," ",Words2,Words3),
+	replace_spaces(" ","+",Words3,Words4),
+	--
+	check_keywords(Words4),
+	--
+	/*
+	Request== "/search?btnG=Найти%21&query=" + Words4.
+	*/
+	Request==
+		"/search?btnG="
+		"%D0%9D%D0%B0%D0%B9%D1%82%D0%B8%21"
+		"&query=" + Words4.
+	-- con ? writeln(">>>",Request,"<<<").
+---------------------------------------------------------------
+extract_reference_from_tree([block("LI",List)|_],R):-
+	extract_reference_from_block_LI(List,R).
+extract_reference_from_tree([_|Rest],R):-!,
+	extract_reference_from_tree(Rest,R).
+--
+extract_reference_from_block_LI(
+		[block("B",_),ref(URL,_)|_],URL):-!.
+extract_reference_from_block_LI([N,ref(URL,_)|_],URL):-
+	text ? convert_to_integer(N),!.
+extract_reference_from_block_LI([N,_,ref(URL,_)|_],URL):-
+	text ? convert_to_integer(N).
+---------------------------------------------------------------
+extract_address_of_next_page(
+		[
+		block("LI",[block("B",[N2|_])]),
+		block("LI",[ref(R,[N3])])|_],
+		PageNumber,R):-
+	text ? convert_to_integer(N2) == 1,
+	PageNumber== text ? convert_to_integer(N3),!.
+extract_address_of_next_page(
+		[
+		block("LI",[ref(_,[N1])]),
+		block("LI",[block("B",[N2|_])]),
+		block("LI",[ref(R,[N3])])|_],
+		PageNumber,R):-
+	text ? convert_to_integer(N1),
+	text ? convert_to_integer(N2),
+	PageNumber== text ? convert_to_integer(N3),!.
+extract_address_of_next_page(
+		[
+		block("LI",[N2]),
+		block("LI",[ref(R,[N3])])|_],
+		PageNumber,R):-
+	text ? convert_to_integer(N2) == 1,
+	PageNumber== text ? convert_to_integer(N3),!.
+extract_address_of_next_page(
+		[
+		block("LI",[ref(_,[N1])]),
+		block("LI",[N2]),
+		block("LI",[ref(R,[N3])])|_],
+		PageNumber,R):-
+	text ? convert_to_integer(N1),
+	text ? convert_to_integer(N2),
+	PageNumber== text ? convert_to_integer(N3),!.
+extract_address_of_next_page([_|Rest],N,R):-
+	extract_address_of_next_page(Rest,N,R).
+]
+---------------------------------------------------------------

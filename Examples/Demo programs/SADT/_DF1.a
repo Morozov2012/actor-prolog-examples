@@ -1,0 +1,145 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007 IRE RAS Alexei A. Morozov.   --
+-- Transmitting of direct and flow       --
+-- messages between SADT blocks.         --
+-------------------------------------------
+class '_Control' (specialized 'Dialog'):
+--
+constant:
+--
+	entry_o1;
+--
+variable:
+--
+	value_o1;
+--
+[
+goal:-!.
+]
+-------------------------------------------
+class '_Sender' (specialized 'Dialog'):
+--
+constant:
+--
+	entry_o1;
+--
+variable:
+--
+	value_o1;
+--
+internal:
+--
+	generator	= ('SpecialTimer',
+				world=self);
+--
+variable:
+--
+	text;
+--
+protecting:
+--
+	period;
+--
+variable:
+--
+	mode_of_timer;
+--
+[
+goal:-!,
+	control_period(period),
+	control_mode(mode_of_timer).
+--
+control_period(Delta):-
+	numerical(Delta),
+	generator ? set_period(
+		?val("Numerical",Delta)),!.
+control_period(_).
+--
+control_mode('no'):-!,
+	generator ? suspend.
+control_mode('yes'):-!,
+	generator ? activate.
+control_mode(_):-
+	generator ? suspend.
+--
+action("send"):-
+	entry_o1 ? user_message(text),!.
+action(_):-!.
+--
+send_message:-
+	entry_o1 ? timer_message(text),!.
+send_message.
+--
+user_message(_).
+timer_message(_).
+]
+-------------------------------------------
+class 'SpecialTimer' (specialized 'Timer'):
+--
+internal:
+--
+	world;
+--
+[
+tick:-!,
+	world ? send_message.
+]
+-------------------------------------------
+class '_Receiver' (specialized 'Alpha'):
+--
+constant:
+--
+	entry_i1;
+	entry_c1;
+--
+variable:
+--
+	value_i1;
+	value_c1;
+--
+internal:
+--
+	con;
+--
+[
+goal:-!,
+	con ? show,
+	con ? writeln(
+		"I have received "
+		"flow message:"),
+	con ? set_color('Blue'),
+	con ? writeln(value_c1),
+	con ? set_color('Black'),
+	check(value_c1).
+--
+check(#):-!.
+check(Value):-
+	concat(	"Output value ",
+		TN,
+		Value),
+	IN== ?convert_to_integer(TN),
+	even(IN).
+--
+show(_,_):-!,
+	con ? show.
+--
+user_message(Text):-
+	con ? show,
+	con ? writeln(
+		"I have received "
+		"direct message:"),
+	con ? set_color('Red'),
+	con ? writeln(Text),
+	con ? set_color('Black').
+--
+timer_message(Text):-
+	con ? show,
+	con ? writeln(
+		"I have received "
+		"direct message:"),
+	con ? set_color('DkGreen'),
+	con ? writeln(Text),
+	con ? set_color('Black').
+]
+-------------------------------------------

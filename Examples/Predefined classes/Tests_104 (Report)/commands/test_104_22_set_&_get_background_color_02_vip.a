@@ -1,0 +1,58 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= ('MyWindow',
+		background_color= 'default',
+		new_background_color= 'RoyalBlue',
+		x= 0,
+		y= 0);
+w2	= ('MyWindow',
+		background_color= 'Red',
+		new_background_color= 'RoyalBlue',
+		x= 0,
+		y= 1);
+w3	= ('MyWindow',
+		background_color= 'RoyalBlue',
+		new_background_color= 'default',
+		x= 0,
+		y= 2);
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	new_background_color	: Color;
+--
+	width			= 1;
+	height			= 1;
+--
+	text_color		= 'Lime';
+	font_name		= 'fixed';
+	font_size		= 28;
+	font_style		= 'bold';
+	background_color;
+	maximal_line_number	= 'window_height';
+--
+[
+goal:-!,
+	set_title(?format(
+		"Background color: %s",new_background_color)),
+	write("++++++++"),
+	write(" Initial background color: ",background_color),nl,
+	write("+ Test +"),
+	set_background_color(new_background_color),
+	BC== ?get_background_color(),
+	write(" New background color: ",BC),nl,
+	write("++++++++"),nl.
+]
+-----------------------------------------------------------------------

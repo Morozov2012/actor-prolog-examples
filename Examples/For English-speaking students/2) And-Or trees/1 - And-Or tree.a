@@ -1,0 +1,101 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: And-Or trees.              --
+-- Deterministic logic programs.         --
+--                                       --
+-- Questions: What is the And-Or tree?   --
+-- What is a search tree (the Or tree)   --
+-- of a logic program? What is a proof   --
+-- tree (the And tree) of the logic      --
+-- program? How the search tree of a     --
+-- deterministic logic program looks     --
+-- like? How the proof tree of the       --
+-- deterministic logic program looks     --
+-- like?                                 --
+--                                       --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	a.
+
+a:-
+	b,
+	c,
+	d.
+
+b:-
+	writeln("B").
+
+c:-
+	e,
+	f.
+
+e:-
+	writeln("E").
+
+f:-
+	writeln("F").
+
+d:-
+	writeln("D").
+
+/*
+Here is the proof tree (the And tree) of
+given logic program. The tree grows from
+top to down:
+                the goal
+                statement
+                |
+                a
+              / | \
+             b  c  d
+               / \
+              e   f
+
+(The b, d, e, and f sub-goals are not
+detailed for the sake of simplicity.)
+
+This is the search tree (the Or tree) of
+the logic program. This tree grows from
+top to down too:
+
+                Sub-goals: a.
+                (the goal statement of
+		the program)
+                |
+                | a :- b, c, d.
+                |
+                Sub-goals: b, c, d.
+                |
+                | b.
+                |
+                Sub-goals: c, d.
+                |
+                | c :- e, f.
+                |
+                Sub-goals: e, f, d.
+                |
+                | e.
+                |
+                Sub-goals: f, d.
+                |
+                | f.
+                |
+                Sub-goals: d.
+                |
+                | d.
+                |
+                Sub-goals: the empty list
+		(The execution of the
+		program is terminated
+		with success.)
+
+Note that the Or tree has one branch only
+is this example.
+
+*/

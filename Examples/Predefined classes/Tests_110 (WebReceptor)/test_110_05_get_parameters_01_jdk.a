@@ -1,0 +1,115 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test2(URL);
+test3;
+test4;
+test4(URL);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+r1	= ('ExternalResource',
+		location=
+			"file:///"
+			"D:/Morozov/z/z-dj/DEMO/EXE/"
+			"EXAMPLES/Predefined%20classes/"
+			"Tests_110%20(WebReceptor)/"
+			"data/report1.html");
+r2	= ('ExternalResource',
+		location=
+			"D:\\Morozov\\z\\z-dj\\DEMO\\EXE\\"
+			"EXAMPLES\\Predefined classes\\"
+			"Tests_110 (WebReceptor)\\"
+			"data\\report1.html");
+r3	= ('ExternalResource',
+		location=
+			"data/report1.html");
+r4	= ('ExternalResource',
+		location="");
+r5	= ('ExternalResource',
+		location=
+			"D:\\Morozov\\z\\z-dj\\DEMO\\EXE\\"
+			"EXAMPLES\\Predefined classes\\"
+			"Tests_110 (WebReceptor)");
+r6	= ('ExternalResource',
+		location=
+			"http://www.cplire.ru/Lab144/"
+			"index.html");
+r7	= ('ExternalResource',
+		location=
+			"http://www.yandex.ru/");
+--
+[
+goal:-
+	r1 ? test_resource,
+	r2 ? test_resource,
+	r3 ? test_local_resource,
+	r4 ? test_local_resource("data/report1.html"),
+	r5 ? test_resource,
+	r6 ? test_resource,
+	r7 ? test_resource.
+]
+-----------------------------------------------------------------------
+class 'ExternalResource' (specialized 'WebReceptor'):
+--
+internal:
+--
+	con			= ('Console');
+--
+constant:
+--
+	location;
+--
+[
+IMPERATIVES:
+--
+test_resource;
+test_local_resource;
+test_local_resource(URL);
+--
+CLAUSES:
+--
+test_resource:-!,
+	test1,
+	test2,
+	test3,
+	test4.
+--
+test_local_resource:-!,
+	test1,
+	test3.
+test_local_resource(URL):-!,
+	test2(URL),
+	test4(URL).
+--
+test1:-
+	?get_parameters().
+--
+test2:-
+	?get_parameters(location).
+test2(URL):-
+	?get_parameters(URL).
+--
+test3:-
+	Parameters== ?get_parameters(),
+	con ? writeln(Parameters).
+--
+test4:-
+	Parameters== ?get_parameters(location),
+	con ? writeln(Parameters).
+test4(URL):-
+	Parameters== ?get_parameters(URL),
+	con ? writeln(Parameters).
+]
+-----------------------------------------------------------------------

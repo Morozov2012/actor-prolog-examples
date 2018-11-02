@@ -1,0 +1,24 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+dialog1	: 'DemoPanel';
+[
+]
+-----------------------------------------------------------------------
+interface 'DemoPanel' (specialized 'Dialog'):
+--
+internal:
+--
+con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+check_all_controls;
+check_control(DialogFieldName)		- (i);
+]
+-----------------------------------------------------------------------

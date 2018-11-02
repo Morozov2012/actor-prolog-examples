@@ -1,0 +1,1643 @@
+KIT ;
+  IDL VERSION 1.2.8 ;
+  TITLE '  SELECTION OF METHOD OF OIL PRODUCTION  This program is designed on 
+the basis of book: Eremin N.A. Hydrocarbon field simulation by fuzzy logic met
+hods. - Moscow: Nayka, 1994. - 462 p.' ;
+  AUTHOR 'Alexei A. Morozov' ;
+  CREATION DATE 3/12/1998 ;
+  PROJECT NAME 'Actor Prolog' ;
+
+  MODEL 'OIL PRODUCTION'
+    {LWI
+    F 0 -13 0 0 0 400
+      0 0 0 204 3 2 1 18
+      100 'Times New Roman'
+    F 1 -11 0 0 0 400
+      0 0 0 0 3 2 1 49
+      80 'Courier New'
+    F 2 -27 0 0 0 400
+      0 0 0 0 3 2 1 34
+      200 'Arial'
+    F 3 -21 0 0 0 400
+      0 0 0 204 3 2 1 18
+      160 'Times New Roman'
+    F 4 -16 0 0 0 400
+      0 0 0 204 3 2 1 18
+      120 'Times New Roman'
+    F 5 -19 0 0 0 400
+      0 0 0 0 3 2 1 34
+      140 'Arial'
+    F 6 -24 0 0 0 400
+      0 0 0 204 3 2 1 18
+      180 'Times New Roman'
+    F 7 -27 0 0 0 400
+      0 0 0 204 3 2 1 18
+      200 'Times New Roman'
+    F 8 -13 0 900 900 400
+      0 0 0 204 3 2 1 18
+      100 'Times New Roman'
+    D 2 3 3 4 5 0 0 0 1
+    G 0 6
+    T 'PUBLICATION'
+    R 60
+    M 0  }
+ ;
+    AUTHOR 'Alexei A. Morozov' ;
+    PROJECT NAME 'Actor Prolog' ;
+
+    DIAGRAM GRAPHIC A-0 ;
+      CREATION DATE 3/12/1998 ;
+      REVISION DATE 29/1/2003 ;
+      TITLE '  SELECTION OF METHOD OF OIL PRODUCTION  This program is designed
+ on the basis of book: Eremin N.A. Hydrocarbon field simulation by fuzzy logic
+ methods. - Moscow: Nayka, 1994. - 462 p.' ;
+      STATUS PUBLICATION ;
+
+      BOX 0 ;
+        NAME '{LWI I 7 255 255 255}<CR><CR>SELECTION OF METHOD<CR>OF OIL PRODU
+CTION<CR><CR>This program is designed on<CR>the basis of book:<CR>Eremin N.A. 
+Hydrocarbon field simulation<CR>by fuzzy logic methods. -<CR>Moscow: Nayka, 19
+94. - 462 p.<CR>#atom block#' ;
+        BOX COORDINATES (0,19712;0,81505) (0,81731;0,14107) ;
+        DETAIL REFERENCE N A0 ;
+      ENDBOX ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A0 ;
+      CREATION DATE 3/12/1998 ;
+      REVISION DATE 29/1/2003 ;
+      TITLE '  SELECTION OF METHOD OF OIL PRODUCTION  This program is designed
+ on the basis of book: Eremin N.A. Hydrocarbon field simulation by fuzzy logic
+ methods. - Moscow: Nayka, 1994. - 462 p.' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Describe<CR>parameters of<CR>hydrocarbon fi
+eld' ;
+        BOX COORDINATES (0,17308;0,32915) (0,34615;0,16458) ;
+        DETAIL REFERENCE N A1 ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Check adaptability<CR>of existed methods<CR
+>of oil production<CR>#or block#' ;
+        BOX COORDINATES (0,40865;0,58777) (0,58173;0,37618) ;
+        DETAIL REFERENCE N A2 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Display<CR>solution' ;
+        BOX COORDINATES (0,64423;0,79937) (0,81731;0,63480)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,34615;0,22727) (0,37500;0,22727) (0,37500;0,47806) (0,40865;0,
+47806) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,42596;0,20846) ;
+        SQUIGGLE COORDINATES (0,42596;0,21473) (0,37500;0,29781) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,58173;0,47806) (0,61058;0,47806) (0,61058;0,72100) (0,64423;0,
+72100) ;
+        LABEL '{LWI I 4 255 255 }acceptable methods' ;
+        LABEL COORDINATES (0,65769;0,52351) ;
+        SQUIGGLE COORDINATES (0,65769;0,52038) (0,61058;0,58777) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A2 ;
+      CREATION DATE 3/12/1998 ;
+      REVISION DATE 29/1/2003 ;
+      TITLE 'Check adaptability of existed methods of oil production #or block
+#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Artificial<CR>waterflooding' ;
+        BOX COORDINATES (0,17308;0,18809) (0,36538;0,03918)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Thermal<CR>methods<CR>#or block#' ;
+        BOX COORDINATES (0,27885;0,35266) (0,39423;0,20376) ;
+        DETAIL REFERENCE N A22 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Physical-<CR>chemical<CR>methods<CR>#or blo
+ck#' ;
+        BOX COORDINATES (0,34135;0,54859) (0,48558;0,36834) ;
+        DETAIL REFERENCE N A23 ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 3 255 255 255}Gas methods<CR>#or block#' ;
+        BOX COORDINATES (0,40865;0,71317) (0,55288;0,56426) ;
+        DETAIL REFERENCE N A24 ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 3 255 255 255}Microbiological<CR>methods<CR>#or block#' ;
+
+        BOX COORDINATES (0,50000;0,90909) (0,65385;0,72884) ;
+        DETAIL REFERENCE N A25 ;
+      ENDBOX ;
+
+      BOX 6 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [1]' ;
+        BOX COORDINATES (0,72596;0,55643) (0,83173;0,35266)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,46238) ;
+        PATH (0,01923;0,45455) (0,14904;0,45455) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,01442;0,39185) ;
+        SINK BRANCH 3 4 7 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,36538;0,11755) (0,69712;0,11755) (0,69712;0,37618) (0,72596;0,
+37618) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,54135;0,08777) ;
+        SINK BOX 6I1 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,39423;0,26646) (0,66346;0,26646) (0,66346;0,41536) (0,72596;0,
+41536) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,54327;0,23981) ;
+        SINK BOX 6I2 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,48558;0,45455) (0,72596;0,45455) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,54615;0,43417) ;
+        SINK BOX 6I3 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 6O1 ;
+        PATH (0,83173;0,45455) (0,97596;0,45455) ;
+        LABEL '{LWI I 4 255 255 }acceptable<CR>methods' ;
+        LABEL COORDINATES (0,85769;0,40439) ;
+        SINK BORDER O1 (0,97885;0,46238) ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,55288;0,64263) (0,66346;0,64263) (0,66346;0,49373) (0,72596;0,
+49373) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,56731;0,55016) ;
+        SINK BOX 6I4 ;
+      ENDSEG ;
+
+      ARROWSEG 14 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,65385;0,79154) (0,69231;0,79154) (0,69231;0,53292) (0,72596;0,
+53292) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,71346;0,73511) ;
+        SINK BOX 6I5 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,14904;0,27429) (0,27885;0,27429) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,14904;0,45455) (0,34135;0,45455) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BRANCH 7 ;
+        PATH (0,14904;0,63480) (0,40865;0,63480) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,14904;0,27429) (0,14904;0,10972) (0,17308;0,10972) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,14904;0,45455) (0,14904;0,27429) ;
+        LABEL 'parameters of field' ;
+        SINK BRANCH 5 6 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,14904;0,45455) (0,14904;0,63480) ;
+        LABEL 'parameters of field' ;
+        SINK BRANCH 8 9 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BRANCH 7 ;
+        PATH (0,14904;0,63480) (0,14904;0,81505) (0,50000;0,81505) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 5I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A22 ;
+      CREATION DATE 3/12/1998 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Thermal methods #or block#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Steam flooding' ;
+        BOX COORDINATES (0,22115;0,33699) (0,39423;0,17241)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Thermal<CR>flooding' ;
+        BOX COORDINATES (0,30769;0,57210) (0,48077;0,40752)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Fire flooding' ;
+        BOX COORDINATES (0,41346;0,80721) (0,58654;0,64263)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [2]' ;
+        BOX COORDINATES (0,70673;0,56426) (0,82212;0,42320)  ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER I1 (0,00481;0,49373) ;
+        PATH (0,01923;0,48589) (0,18269;0,48589) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,02115;0,41536) ;
+        SINK BRANCH 3 4 5 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,39423;0,25862) (0,63462;0,25862) (0,63462;0,44671) (0,70673;0,
+44671) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,53173;0,23354) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,48077;0,49373) (0,70673;0,49373) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,53558;0,46865) ;
+        SINK BOX 4I2 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,82212;0,49373) (0,97596;0,49373) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,86635;0,47022) ;
+        SINK BORDER O1 (0,97885;0,50157) ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,58654;0,73668) (0,63942;0,73668) (0,63942;0,54075) (0,70673;0,
+54075) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,65769;0,68966) ;
+        SINK BOX 4I3 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,18269;0,48589) (0,30769;0,48589) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,18269;0,48589) (0,18269;0,25078) (0,22115;0,25078) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,18269;0,48589) (0,18269;0,73668) (0,41346;0,73668) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A23 ;
+      CREATION DATE 3/12/1998 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Physical- chemical methods #or block#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}1 group of<CR>physical-chemical<CR>methods<
+CR>#or block#' ;
+        BOX COORDINATES (0,25962;0,42320) (0,49038;0,21160) ;
+        DETAIL REFERENCE N A231 ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}2 group of<CR>physical-chemical<CR>methods<
+CR>#or block#' ;
+        BOX COORDINATES (0,34135;0,74451) (0,57212;0,53292) ;
+        DETAIL REFERENCE N A232 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [23]' ;
+        BOX COORDINATES (0,70673;0,67398) (0,85096;0,53292)  ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER I1 (0,00481;0,64263) ;
+        PATH (0,01923;0,63480) (0,15385;0,63480) ;
+        LABEL '{LWI I 4 255 255 }parameters of field' ;
+        LABEL COORDINATES (0,01731;0,72414) ;
+        SINK BRANCH 3 4 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,49038;0,31348) (0,65865;0,31348) (0,65865;0,57210) (0,70673;0,
+57210) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,55481;0,28527) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,85096;0,60345) (0,97596;0,60345) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,88077;0,57994) ;
+        SINK BORDER O1 (0,97885;0,61129) ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,57212;0,63480) (0,70673;0,63480) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,59519;0,71473) ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,15385;0,63480) (0,34135;0,63480) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,15385;0,63480) (0,15385;0,31348) (0,25962;0,31348) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A231 ;
+      CREATION DATE 3/12/1998 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE '1 group of physical-chemical methods #or block#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Alkaline<CR>waterflooding' ;
+        BOX COORDINATES (0,22596;0,28213) (0,39423;0,14107)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Sulphuric<CR>acid flooding' ;
+        BOX COORDINATES (0,30769;0,47022) (0,48558;0,32915)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Spirituous<CR>waterflooding' ;
+        BOX COORDINATES (0,36058;0,65831) (0,53846;0,51724)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 3 255 255 255}Carbonated<CR>waterflooding' ;
+        BOX COORDINATES (0,45192;0,84639) (0,63942;0,70533)  ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [231]' ;
+        BOX COORDINATES (0,73558;0,66614) (0,85096;0,49373)  ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER I1 (0,00481;0,59561) ;
+        PATH (0,01923;0,58777) (0,18269;0,58777) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,01827;0,52038) ;
+        SINK BRANCH 3 4 5 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,39423;0,21160) (0,65385;0,21160) (0,65385;0,51724) (0,73558;0,
+51724) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,68365;0,20690) ;
+        SINK BOX 5I1 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,48558;0,39969) (0,60096;0,39969) (0,60096;0,55643) (0,73558;0,
+55643) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,52115;0,37304) ;
+        SINK BOX 5I2 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,85096;0,57994) (0,97596;0,57994) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,86538;0,55172) ;
+        SINK BORDER O1 (0,97885;0,58777) ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,53846;0,59561) (0,73558;0,59561) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,58558;0,65831) ;
+        SINK BOX 5I3 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,63942;0,78370) (0,68750;0,78370) (0,68750;0,63480) (0,73558;0,
+63480) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,70288;0,73824) ;
+        SINK BOX 5I4 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,18269;0,39969) (0,30769;0,39969) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,18269;0,58777) (0,36058;0,58777) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,18269;0,39969) (0,18269;0,21160) (0,22596;0,21160) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,18269;0,58777) (0,18269;0,39969) ;
+        LABEL 'parameters of field' ;
+        SINK BRANCH 6 7 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,18269;0,58777) (0,18269;0,78370) (0,45192;0,78370) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A232 ;
+      CREATION DATE 3/12/1998 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE '2 group of physical-chemical methods #or block#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Surfactant<CR>waterflooding' ;
+        BOX COORDINATES (0,22115;0,25862) (0,38942;0,10188)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Polymer<CR>flooding' ;
+        BOX COORDINATES (0,27885;0,47022) (0,44712;0,31348)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Micellar<CR>flooding' ;
+        BOX COORDINATES (0,37981;0,65831) (0,50962;0,51724)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 3 255 255 255}Micellar-<CR>polymer<CR>flooding' ;
+        BOX COORDINATES (0,49038;0,86207) (0,62019;0,70533)  ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [232]' ;
+        BOX COORDINATES (0,71635;0,62696) (0,84135;0,48589)  ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER I1 (0,00481;0,59561) ;
+        PATH (0,01923;0,58777) (0,18269;0,58777) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,01923;0,52194) ;
+        SINK BRANCH 3 4 5 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,38942;0,18025) (0,66827;0,18025) (0,66827;0,50940) (0,71635;0,
+50940) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,50096;0,14890) ;
+        SINK BOX 5I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,44712;0,39969) (0,62019;0,39969) (0,62019;0,54075) (0,71635;0,
+54075) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,50288;0,36520) ;
+        SINK BOX 5I2 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,84135;0,55643) (0,97596;0,55643) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,87404;0,52978) ;
+        SINK BORDER O1 (0,97885;0,56426) ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,50962;0,57210) (0,71635;0,57210) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,54904;0,64420) ;
+        SINK BOX 5I3 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,62019;0,78370) (0,67788;0,78370) (0,67788;0,60345) (0,71635;0,
+60345) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,69712;0,73041) ;
+        SINK BOX 5I4 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,18269;0,39969) (0,27885;0,39969) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,18269;0,58777) (0,37981;0,58777) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,18269;0,39969) (0,18269;0,18025) (0,22115;0,18025) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,18269;0,58777) (0,18269;0,39969) ;
+        LABEL 'parameters of field' ;
+        SINK BRANCH 11 12 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,18269;0,58777) (0,18269;0,78370) (0,49038;0,78370) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A24 ;
+      CREATION DATE 3/12/1998 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Gas methods #or block#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Nitrogen<CR>injection<CR>#or block#' ;
+        BOX COORDINATES (0,22115;0,21160) (0,36538;0,04702) ;
+        DETAIL REFERENCE N A241 ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Carbon dioxide<CR>injection<CR>#or block#' 
+;
+        BOX COORDINATES (0,29327;0,40752) (0,43750;0,22727) ;
+        DETAIL REFERENCE N A242 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}High pressure<CR>gas injection' ;
+        BOX COORDINATES (0,35577;0,57210) (0,49038;0,42320)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 3 255 255 255}Hydrocarbon<CR>solvent<CR>injection' ;
+        BOX COORDINATES (0,39904;0,75235) (0,56250;0,58777)  ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 3 255 255 255}Enriched-gas<CR>injection' ;
+        BOX COORDINATES (0,50481;0,91693) (0,64904;0,76803)  ;
+      ENDBOX ;
+
+      BOX 6 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [24]' ;
+        BOX COORDINATES (0,73077;0,60345) (0,84615;0,39969)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,50940) ;
+        PATH (0,01923;0,50157) (0,18750;0,50157) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,02019;0,44514) ;
+        SINK BRANCH 3 4 5 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,36538;0,12539) (0,67788;0,12539) (0,67788;0,42320) (0,73077;0,
+42320) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,50481;0,10188) ;
+        SINK BOX 6I1 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,43750;0,31348) (0,62019;0,31348) (0,62019;0,46238) (0,73077;0,
+46238) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,50769;0,28840) ;
+        SINK BOX 6I2 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,49038;0,50157) (0,73077;0,50157) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,51058;0,47179) ;
+        SINK BOX 6I3 ;
+      ENDSEG ;
+
+      ARROWSEG 17 ;
+        SOURCE BOX 6O1 ;
+        PATH (0,84615;0,50157) (0,97596;0,50157) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,88077;0,47022) ;
+        SINK BORDER O1 (0,97885;0,50940) ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,56250;0,68182) (0,62981;0,68182) (0,62981;0,54075) (0,73077;0,
+54075) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,58365;0,72884) ;
+        SINK BOX 6I4 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,64904;0,83856) (0,69231;0,83856) (0,69231;0,57994) (0,73077;0,
+57994) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,70288;0,77586) ;
+        SINK BOX 6I5 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,18750;0,31348) (0,29327;0,31348) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,18750;0,50157) (0,35577;0,50157) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 14 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,18750;0,68182) (0,39904;0,68182) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,18750;0,31348) (0,18750;0,12539) (0,22115;0,12539) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,18750;0,50157) (0,18750;0,31348) ;
+        LABEL 'parameters of field' ;
+        SINK BRANCH 9 10 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,18750;0,50157) (0,18750;0,68182) ;
+        LABEL 'parameters of field' ;
+        SINK BRANCH 13 14 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,18750;0,68182) (0,18750;0,83856) (0,50481;0,83856) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 5I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A25 ;
+      CREATION DATE 3/12/1998 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Microbiological methods #or block#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Bio-surfactant<CR>waterflooding' ;
+        BOX COORDINATES (0,23077;0,21160) (0,36058;0,07053)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Biopolymer<CR>waterflooding<CR>#or block#' 
+;
+        BOX COORDINATES (0,27404;0,39185) (0,42308;0,23511) ;
+        DETAIL REFERENCE N A252 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Bacterium<CR>injection' ;
+        BOX COORDINATES (0,33173;0,55643) (0,50962;0,41536)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 3 255 255 255}Microbe<CR>(molasses)<CR>waterflooding' ;
+        BOX COORDINATES (0,44231;0,73668) (0,57212;0,57994)  ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 3 255 255 255}Activation of<CR>natural<CR>microflora' ;
+        BOX COORDINATES (0,52885;0,89342) (0,66346;0,75235)  ;
+      ENDBOX ;
+
+      BOX 6 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [25]' ;
+        BOX COORDINATES (0,77404;0,56426) (0,87981;0,39185)  ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER I1 (0,00481;0,49373) ;
+        PATH (0,01923;0,48589) (0,17308;0,48589) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,02115;0,42476) ;
+        SINK BRANCH 3 4 5 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,36058;0,14107) (0,73558;0,14107) (0,73558;0,41536) (0,77404;0,
+41536) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,56827;0,11755) ;
+        SINK BOX 6I1 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,42308;0,31348) (0,69712;0,31348) (0,69712;0,44671) (0,77404;0,
+44671) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,56827;0,28213) ;
+        SINK BOX 6I2 ;
+      ENDSEG ;
+
+      ARROWSEG 17 ;
+        SOURCE BOX 6O1 ;
+        PATH (0,87981;0,47806) (0,97596;0,47806) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,89038;0,45298) ;
+        SINK BORDER O1 (0,97885;0,48589) ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,50962;0,47806) (0,77404;0,47806) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,57212;0,46238) ;
+        SINK BOX 6I3 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,57212;0,65831) (0,70192;0,65831) (0,70192;0,50940) (0,77404;0,
+50940) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,60481;0,61755) ;
+        SINK BOX 6I4 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,66346;0,82288) (0,73558;0,82288) (0,73558;0,54075) (0,77404;0,
+54075) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,75288;0,75705) ;
+        SINK BOX 6I5 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,17308;0,31348) (0,27404;0,31348) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,17308;0,48589) (0,33173;0,48589) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 14 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,17308;0,65831) (0,44231;0,65831) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,17308;0,31348) (0,17308;0,14107) (0,23077;0,14107) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,17308;0,48589) (0,17308;0,31348) ;
+        LABEL 'parameters of field' ;
+        SINK BRANCH 11 10 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,17308;0,48589) (0,17308;0,65831) ;
+        LABEL 'parameters of field' ;
+        SINK BRANCH 13 14 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,17308;0,65831) (0,17308;0,81505) (0,52885;0,81505) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 5I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A1 ;
+      CREATION DATE 8/12/1998 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Describe parameters of hydrocarbon field' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Rock' ;
+        BOX COORDINATES (0,06731;0,19592) (0,14423;0,08621)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Bed' ;
+        BOX COORDINATES (0,11538;0,28997) (0,18269;0,21160)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Base oil' ;
+        BOX COORDINATES (0,14904;0,41536) (0,25481;0,30564)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 3 255 255 255}Stratal<CR>water' ;
+        BOX COORDINATES (0,22115;0,54075) (0,32692;0,43103)  ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 3 255 255 255}Native gas' ;
+        BOX COORDINATES (0,29327;0,66614) (0,40865;0,55643)  ;
+      ENDBOX ;
+
+      BOX 6 ;
+        NAME '{LWI I 3 255 255 255}Bedded<CR>substances' ;
+        BOX COORDINATES (0,37500;0,79154) (0,49038;0,68182)  ;
+      ENDBOX ;
+
+      BOX 7 ;
+        NAME '{LWI I 3 255 255 255}Mineral<CR>constituents' ;
+        BOX COORDINATES (0,45673;0,91693) (0,59135;0,80721)  ;
+      ENDBOX ;
+
+      BOX 8 ;
+        NAME '{LWI I 3 255 255 255}Make up<CR>list of<CR>parameters' ;
+        BOX COORDINATES (0,68269;0,51724) (0,78846;0,28213)  ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,14423;0,13323) (0,63942;0,13323) (0,63942;0,30564) (0,68269;0,
+30564) ;
+        LABEL '{LWI I 4 255 255 }parameters' ;
+        LABEL COORDINATES (0,33942;0,11285) ;
+        SINK BOX 8I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,18269;0,25862) (0,59135;0,25862) (0,59135;0,33699) (0,68269;0,
+33699) ;
+        LABEL '{LWI I 4 255 255 }parameters' ;
+        LABEL COORDINATES (0,34135;0,23824) ;
+        SINK BOX 8I2 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,25481;0,36834) (0,68269;0,36834) ;
+        LABEL '{LWI I 4 255 255 }parameters' ;
+        LABEL COORDINATES (0,36827;0,33699) ;
+        SINK BOX 8I3 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 8O1 ;
+        PATH (0,78846;0,39969) (0,97596;0,39969) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,83077;0,33856) ;
+        SINK BORDER O1 (0,97885;0,40752) ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,32692;0,49373) (0,50962;0,49373) (0,50962;0,39969) (0,68269;0,
+39969) ;
+        LABEL '{LWI I 4 255 255 }parameters' ;
+        LABEL COORDINATES (0,36731;0,46552) ;
+        SINK BOX 8I4 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,40865;0,60345) (0,55769;0,60345) (0,55769;0,43103) (0,68269;0,
+43103) ;
+        LABEL '{LWI I 4 255 255 }parameters' ;
+        LABEL COORDINATES (0,45000;0,56740) ;
+        SINK BOX 8I5 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 6O1 ;
+        PATH (0,49038;0,72884) (0,60096;0,72884) (0,60096;0,46238) (0,68269;0,
+46238) ;
+        LABEL '{LWI I 4 255 255 }parameters' ;
+        LABEL COORDINATES (0,51827;0,77743) ;
+        SINK BOX 8I6 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 7O1 ;
+        PATH (0,59135;0,86207) (0,64423;0,86207) (0,64423;0,49373) (0,68269;0,
+49373) ;
+        LABEL '{LWI I 4 255 255 }parameters' ;
+        LABEL COORDINATES (0,66442;0,68182) ;
+        SINK BOX 8I7 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A252 ;
+      CREATION DATE 10/6/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Biopolymer waterflooding #or block#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Xanthane' ;
+        BOX COORDINATES (0,26923;0,26646) (0,39904;0,12539)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Glucan' ;
+        BOX COORDINATES (0,37981;0,50940) (0,50962;0,36834)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Polysacharide' ;
+        BOX COORDINATES (0,48558;0,75235) (0,61538;0,61129)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [252]' ;
+        BOX COORDINATES (0,71635;0,50940) (0,84615;0,36834)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,44671) ;
+        PATH (0,01923;0,43887) (0,20673;0,43887) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,01731;0,38558) ;
+        SINK BRANCH 3 4 5 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,39904;0,19592) (0,64423;0,19592) (0,64423;0,39185) (0,71635;0,
+39185) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,52596;0,17241) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,50962;0,43887) (0,71635;0,43887) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,52788;0,40909) ;
+        SINK BOX 4I2 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,84615;0,43887) (0,97596;0,43887) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,87212;0,41379) ;
+        SINK BORDER O1 (0,97885;0,44671) ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,61538;0,68182) (0,68269;0,68182) (0,68269;0,48589) (0,71635;0,
+48589) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,70385;0,64890) ;
+        SINK BOX 4I3 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,20673;0,43887) (0,37981;0,43887) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,20673;0,43887) (0,20673;0,19592) (0,26923;0,19592) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,20673;0,43887) (0,20673;0,68182) (0,48558;0,68182) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A241 ;
+      CREATION DATE 10/6/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Nitrogen injection #or block#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Miscible<CR>nitrogen' ;
+        BOX COORDINATES (0,22596;0,43103) (0,39904;0,26646)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Immiscible nitrogen' ;
+        BOX COORDINATES (0,29327;0,82288) (0,49519;0,65831)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [241]' ;
+        BOX COORDINATES (0,62500;0,57994) (0,79808;0,41536)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,35266) ;
+        PATH (0,01923;0,34483) (0,17308;0,34483) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,01827;0,46238) ;
+        SINK BRANCH 3 4 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,39904;0,34483) (0,53365;0,34483) (0,53365;0,47022) (0,62500;0,
+47022) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,49231;0,30251) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,79808;0,49373) (0,97596;0,49373) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,85481;0,45611) ;
+        SINK BORDER O1 (0,97885;0,50157) ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,49519;0,73668) (0,59135;0,73668) (0,59135;0,54075) (0,62500;0,
+54075) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,61827;0,74765) ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,17308;0,34483) (0,22596;0,34483) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,17308;0,34483) (0,17308;0,73668) (0,29327;0,73668) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A242 ;
+      CREATION DATE 10/6/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Carbon dioxide injection #or block#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Miscible CO2' ;
+        BOX COORDINATES (0,21154;0,39185) (0,42308;0,22727)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Immiscible CO2' ;
+        BOX COORDINATES (0,27404;0,74451) (0,49519;0,57994)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Assemble<CR>list [242]' ;
+        BOX COORDINATES (0,65865;0,57994) (0,83173;0,41536)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,31348) ;
+        PATH (0,01923;0,30564) (0,14904;0,30564) ;
+        LABEL '{LWI I 4 255 255 }parameters of<CR>field' ;
+        LABEL COORDINATES (0,02019;0,25078) ;
+        SINK BRANCH 3 4 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,42308;0,30564) (0,54808;0,30564) (0,54808;0,45455) (0,65865;0,
+45455) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,52692;0,26332) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,83173;0,49373) (0,97596;0,49373) ;
+        LABEL '{LWI I 4 255 255 }solutions' ;
+        LABEL COORDINATES (0,87212;0,46082) ;
+        SINK BORDER O1 (0,97885;0,50157) ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,49519;0,65831) (0,61538;0,65831) (0,61538;0,53292) (0,65865;0,
+53292) ;
+        LABEL '{LWI I 4 255 255 }solution' ;
+        LABEL COORDINATES (0,57692;0,72257) ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,14904;0,30564) (0,21154;0,30564) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,14904;0,30564) (0,14904;0,65831) (0,27404;0,65831) ;
+        LABEL 'parameters of field' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GLOSSARY A0G {LWI A 
+      TERM '  SELECTION OF METHOD OF OIL PRODUCTION  This program is designed 
+on the basis of book: Eremin N.A. Hydrocarbon field simulation by fuzzy logic 
+methods. - Moscow: Nayka, 1994. - 462 p.'
+      ''
+      S 'PUBLICATION'
+      C 2 5 255
+      F 1.000000
+      TERM 'Describe parameters of hydrocarbon field'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Check adaptability of existed methods of oil production #or block#
+'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Display solution'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Artificial waterflooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Thermal methods #or block#'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Physical- chemical methods #or block#'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Gas methods #or block#'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Microbiological methods #or block#'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Steam flooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Thermal flooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Fire flooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM '1 group of physical-chemical methods #or block#'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM '2 group of physical-chemical methods #or block#'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Alkaline waterflooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Sulphuric acid flooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Spirituous waterflooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Carbonated waterflooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Surfactant waterflooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Polymer flooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Micellar flooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Micellar- polymer flooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Nitrogen injection #or block#'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Carbon dioxide injection #or block#'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'High pressure gas injection'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Hydrocarbon solvent injection'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Enriched-gas injection'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Bio-surfactant waterflooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Biopolymer waterflooding #or block#'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Bacterium injection'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Microbe (molasses) waterflooding'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Activation of natural microflora'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Assemble list [1]'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Assemble list [2]'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Assemble list [23]'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Assemble list [231]'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Assemble list [232]'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Assemble list [24]'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Assemble list [25]'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Rock'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Bed'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Base oil'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Stratal water'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Native gas'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Bedded substances'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Mineral constituents'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Make up list of parameters'
+      ''
+      S 'PUBLICATION'
+      C 7 5 255
+      F 1.000000
+      TERM 'Xanthane'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Glucan'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Polysacharide'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Assemble list [252]'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Miscible nitrogen'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Immiscible nitrogen'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Assemble list [241]'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Miscible CO2'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Immiscible CO2'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Assemble list [242]'
+      ''
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+     ENDGLOSS } ;
+     GLOSSARY ;
+      TERM 'parameters of field'
+      ''
+      {LWI S 'PUBLICATION'
+      C 0 0
+ } ;
+      TERM 'acceptable methods'
+      ''
+      {LWI S 'PUBLICATION'
+      C 0 0
+ } ;
+      TERM 'solutions'
+      ''
+      {LWI S 'PUBLICATION'
+      C 0 0
+ } ;
+      TERM 'solution'
+      ''
+      {LWI S 'PUBLICATION'
+      C 0 0
+ } ;
+      TERM 'parameters'
+      ''
+      {LWI S 'PUBLICATION'
+      C 2 2
+ } ;
+     ENDGLOSS ;
+    ENDDIAGRAM ;
+  ENDMODEL ;
+
+ENDKIT ;

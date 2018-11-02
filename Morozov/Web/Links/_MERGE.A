@@ -1,0 +1,54 @@
+package "Morozov/Web/Links/_Merge"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--        The "WEB/LINKS/MERGE" Actor Prolog package.        --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains a set of connectors for             --
+-- linking various program components.                       --
+---------------------------------------------------------------
+class '_Merge_Two_Lists' (specialized '_Block'):
+--
+variable:
+--
+	value_i1;
+	value_i2;
+	value_o1;
+--
+internal:
+--
+	entry_o1;
+--
+	con;
+--
+[
+goal:-!,
+	con ? clear,
+	merge_lists(value_i1,value_i2,value_o1).
+--
+show(_*):-!,
+	con ? show.
+--
+open(_*):-!.
+start(_*):-!.
+--
+search(_*):-!.
+--
+merge_lists(#,List,List):-!.
+merge_lists([Item|Rest],List2,List3):-
+	member(Item,List2),!,
+	con ? writeln("Common element: ",Item),
+	merge_lists(Rest,List2,List3).
+merge_lists([Item|Rest],List2,[Item|List3]):-!,
+	merge_lists(Rest,List2,List3).
+merge_lists(_,List,List):-!.
+merge_lists(List1,List2,_):-
+	con ? writeln("Sorry, the input is illegal:"),
+	con ? writeln(List1),
+	con ? writeln(List2).
+--
+member(Item,[Item|_]):-!.
+member(Item,[_|Rest]):-!,
+	member(Item,Rest).
+]
+---------------------------------------------------------------

@@ -1,0 +1,42 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'ColoredReport' (specialized 'Report'):
+[
+write_value(Message,Value):-
+	write(Message),
+	write_colored_term(Value),
+	nl.
+--
+write_colored_term(Value):-
+	real(Value),!,
+	set_color('Magenta'),
+	write(Value),
+	set_color('Black').
+write_colored_term(Value):-
+	integer(Value),!,
+	set_color('Blue'),
+	write(Value),
+	set_color('Black').
+write_colored_term(Value):-
+	string(Value),!,
+	set_color('DkGreen'),
+	write(Value),
+	set_color('Black').
+write_colored_term(Value):-
+	symbol(Value),!,
+	set_color('Orange'),
+	write(Value),
+	set_color('Black').
+write_colored_term(Value):-
+	set_color('SkyBlue'),
+	write(Value),
+	set_color('Black').
+--
+write_error_message(Text):-
+	set_color('Red'),
+	writeln(Text),
+	set_color('Black').
+]
+-----------------------------------------------------------------------

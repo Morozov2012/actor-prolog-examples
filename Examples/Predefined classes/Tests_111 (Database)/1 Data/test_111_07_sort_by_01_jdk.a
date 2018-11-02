@@ -1,0 +1,95 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+DOMAINS:
+Target	= SYMBOL{x:INTEGER,y:REAL,z:STRING}; STRING.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyDatabase');
+--
+[
+IMPERATIVES:
+--
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+--
+CLAUSES:
+--
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test2,
+	test4,
+	test2,
+	test5,
+	test2,
+	test6,
+	test2,
+	test7,
+	test2.
+--
+test1:-
+	writeln("Test 1:"),
+	writeln("\tI will store data items."),
+	store ? append('dog'{x:1000,y:0.7,z:"Theta"}),
+	store ? append("Not a set record (1)."),
+	store ? append('cobra'{x:0000,y:0.5,z:"Beta"}),
+	store ? append({x:2000,y:0.4,z:"Alpha"}),
+	store ? append("Not a set record (2)."),
+	store ? append({x:3000,y:0.3,z:"Gamma"}),
+	store ? append('cat'{x:5000,y:0.1,z:"Kappa"}),
+	writeln("\tDone.").
+--
+test2:-
+	writeln("Test 2:"),
+	writeln("\tI will retrieve data items:"),
+	store?find(Item),
+	writeln("\t\t",Item),
+	fail.
+test2:-
+	writeln("\tDone.").
+--
+test3:-
+	writeln("Test 3:"),
+	writeln("\tI will sort data items by the 'x' field."),
+	store?sort_by('x'),
+	writeln("\tDone.").
+--
+test4:-
+	writeln("Test 4:"),
+	writeln("\tI will sort data items by the 'y' field."),
+	store?sort_by('y'),
+	writeln("\tDone.").
+--
+test5:-
+	writeln("Test 5:"),
+	writeln("\tI will sort data items by the 'z' field."),
+	store?sort_by('z'),
+	writeln("\tDone.").
+--
+test6:-
+	writeln("Test 6:"),
+	writeln("\tI will sort data items by the 0 field."),
+	store?sort_by(0),
+	writeln("\tDone.").
+--
+test7:-
+	writeln("Test 7:"),
+	writeln("\tI will sort data items by the \"z\" field."),
+	store?sort_by("z"),
+	writeln("\tDone.").
+]
+-----------------------------------------------------------------------

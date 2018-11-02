@@ -1,0 +1,84 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'Clip' from "morozov/Sound";
+
+PREDICATES:
+--
+imperative:
+--
+check_resource_state;
+
+class 'Main' (specialized 'Clip'):
+--
+constant:
+--
+extension	= ".mid";
+--
+internal:
+--
+timer	= ('Timer');
+con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("Start the test..."),
+	check_resource_state,
+	--
+	con ? writeln("Open the resource..."),
+	open("jar:data/clementi"),
+	check_resource_state,
+	--
+	con ? writeln("Get the length in frames..."),
+	FrameLength== ?get_frame_length(),
+	con ? writeln(
+		"\tThe length is ",
+		FrameLength,
+		" frames."),
+	--
+	con ? writeln("Get the length in microseconds..."),
+	Microseconds== ?get_microsecond_length(),
+	con ? writeln(
+		"\tThe length is ",
+		Microseconds,
+		" microseconds."),
+	--
+	con ? writeln("Set the current position..."),
+	set_microsecond_position(18000000),
+	con ? writeln("Set loop points..."),
+	set_loop_points(1000000,1100000),
+	check_resource_state,
+	--
+	con ? writeln("Start the loop(2) procedure..."),
+	loop(2),
+	check_resource_state,
+	--
+	con ? writeln("Sleep..."),
+	timer ? sleep(21),
+	check_resource_state,
+	--
+	con ? writeln("Stop the play..."),
+	stop,
+	check_resource_state,
+	--
+	con ? writeln("Close the resource..."),
+	close,
+	check_resource_state,
+	--
+	con ? writeln("Done!").
+--
+check_resource_state:-
+	Frames== ?get_frame_position(),
+	con ? writeln(
+		"\tThe current position is ",
+		Frames,
+		" frames."),
+	--
+	Microseconds== ?get_microsecond_position(),
+	con ? writeln(
+		"\tThe current position is ",
+		Microseconds,
+		" microseconds.").
+]

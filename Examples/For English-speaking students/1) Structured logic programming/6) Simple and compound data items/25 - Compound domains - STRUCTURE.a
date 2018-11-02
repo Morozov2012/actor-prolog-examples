@@ -1,0 +1,53 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Structures.                           --
+--                                       --
+-- Questions: What are structures? Can a --
+-- structure contain a term that is the  --
+-- structure itself? Is it O.K. to use   --
+-- recursive structures in a logic       --
+-- program? Does this version of the     --
+-- Actor Prolog language implement the   --
+-- 'occur check'? What problems can      --
+-- happen during the processing of       --
+-- recursive terms because the 'occur    --
+-- check' is not implemented in the      --
+-- logic language? Is it possible to     --
+-- create a recursive term without the   --
+-- usage of reference domains? Can one   --
+-- create a recursive term of a ground   --
+-- domain?                               --
+--                                       --
+-- Recommendation: open the Task Manager --
+-- of your computer to observe the       --
+-- execution of this program.            --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+reference:
+
+MyStructure	= s1(MyStructure).
+
+PREDICATES:
+
+create_variable(MyStructure)	- (o);
+p(MyStructure)			- (i);
+
+CLAUSES:
+
+goal:-
+	create_variable(Infinity),
+	Infinity == s1(Infinity),
+	p(Infinity).
+
+create_variable(_).
+
+p(X):-
+	writeln(X).

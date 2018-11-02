@@ -1,0 +1,11 @@
+
+CLAUSES:
+
+goal:-
+	DN1== ?input_directory_name("C:\\"),
+	
+	writeln(DN1),
+	
+	DN2== ?input_directory_name("Выберите каталог",""),
+	
+	writeln(DN2).

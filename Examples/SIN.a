@@ -1,0 +1,42 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2011, IRE RAS, Alexei A. Morozov. --
+-- Simple trigonometric functions.       --
+-------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+[
+goal:-
+	X== 100,
+	writeln("x=",X),
+	A== ?sin(X) * ?sin(X),
+	B== ?cos(X) * ?cos(X),
+	writeln("sin(x)^2+cos(x)^2=",A+B),
+	H== ?hypot(?sin(X),?cos(X)),
+	writeln("sin(x)^2+cos(x)^2=",H),
+	C== ?exp(2*?ln(?sqrt(X))),
+	writeln("e^(2*ln(sqrt(x)))=",C),
+	D== ?exp(?log10(X)*?ln(10)),
+	writeln("e^(log10(x)*ln(10))=",D),
+	E==?tan(?arctan(X)),
+	writeln("tan(arctan(x))=",E),
+	Y== -1.8,
+	writeln("y=",Y),
+	F== ?round(Y),
+	writeln("round(y)=",F),
+	G== ?trunc(Y),
+	writeln("trunc(y)=",G),
+	H== ?abs(Y),
+	writeln("abs(y)=",H),
+	I== ?random(),
+	writeln("random()=",I),
+	J== ?random(X),
+	writeln("random(x)=",J),
+	K== ?inc(X),
+	writeln("inc(x)=",K),
+	L== ?dec(X),
+	writeln("dec(x)=",L),
+	M== ?'-'(X),
+	writeln("-(x)=",M),
+	writeln("pi=",?pi).
+]
+-------------------------------------------

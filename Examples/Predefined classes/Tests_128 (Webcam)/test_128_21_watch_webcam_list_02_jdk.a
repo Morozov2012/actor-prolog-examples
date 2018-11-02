@@ -1,0 +1,62 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Webcam";
+-----------------------------------------------------------------------
+project: (('ControlPanel'))
+-----------------------------------------------------------------------
+class 'ControlPanel' (specialized 'Dialog'):
+--
+internal:
+--
+	watcher			= ('WebcamWatcher',
+					report);
+	report			= ('Report');
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+goal:-!,
+	show.
+--
+modified_control(Address):-
+	Mode== ?val("YesNo",?get(Address)),!,
+	watcher ? switch_watcher(Mode).
+--
+action("clear"):-!,
+	report ? clear.
+action("exit"):-!,
+	hide,
+	break.
+]
+-----------------------------------------------------------------------
+class 'WebcamWatcher' (specialized 'Webcam'):
+--
+internal:
+--
+	report		: 'Report';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+switch_watcher(YesNo)		- (i);
+--
+CLAUSES:
+--
+switch_watcher(Mode):-
+	watch_webcam_list(Mode).
+--
+webcam_added(Name):-!,
+	report ? set_color('DkGreen'),
+	report ? writeln("This webcam is connected: ",Name).
+--
+webcam_removed(Name):-!,
+	report ? set_color('Red'),
+	report ? writeln("This webcam is disconnected: ",Name).
+]
+-----------------------------------------------------------------------

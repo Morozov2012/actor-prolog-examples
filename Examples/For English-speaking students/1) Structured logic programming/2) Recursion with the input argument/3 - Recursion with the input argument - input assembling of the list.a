@@ -1,0 +1,40 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Recursion.         --
+--                                       --
+-- Questions: What is a recursion with   --
+-- the input argument? How can one       --
+-- implement assembling of a list        --
+-- with the help of the recursion with   --
+-- the input argument? Please explain    --
+-- why does the recursion with the input --
+-- argument assemble the elements of the --
+-- list in the inverse order?            --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+nondeterm:
+
+p(List)		- (i);
+
+CLAUSES:
+
+goal:-
+	p([]).
+
+p(Tail):-
+	Head== ?input_integer(
+		"Input a number please",0),
+	p([Head|Tail]).
+p(Result):-
+	writeln(Result).

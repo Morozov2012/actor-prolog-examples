@@ -1,0 +1,55 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- INTEGER.                              --
+--                                       --
+-- Questions: What is an integer range?  --
+-- How can one create a new domain that  --
+-- is a kind of an integer range? Does   --
+-- the compiler check whether a number   --
+-- of this domain belongs to the range   --
+-- during the translation of a program?  --
+-- Does the compiler check whether a     --
+-- number of this domain belongs to the  --
+-- range during the execution of the     --
+-- program? How can one declare that a   --
+-- built-in arithmetical operation is    --
+-- applicable for this domain? (The      --
+-- latter question is to be discussed    --
+-- after the study of arithmetical       --
+-- functions and the object-oriented     --
+-- syntax of Actor Prolog.               --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+Hour		= [1 .. 24].
+
+PREDICATES:
+
+p1(Hour)		- (i);
+p2(Hour)		- (i);
+
+class 'Main' (specialized 'DemoConsole'):
+[
+PREDICATES:
+
+'+'(Hour,Hour) = Hour	- (i,i);
+
+CLAUSES:
+
+goal:-
+	-- p1(25).
+	p1(24).
+
+p1(X):-
+	p2(X+1).
+
+p2(X):-
+	writeln(X).
+]

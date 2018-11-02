@@ -1,0 +1,156 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2012 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Sound":
+
+--------------------------------------------------------------------
+-- The 'Clip' class is specialized class 'DataAbstraction'.       --
+--------------------------------------------------------------------
+
+interface 'Clip'
+
+(specialized
+	'DataAbstraction',
+	'OperatingSystemResource',
+	'DataResourceConsumer'):
+
+[
+PREDICATES:
+
+imperative:
+
+-- The play predicate opens the clip, then starts the clip, waits
+-- for the completion of the playback, stops the clip, and closes
+-- the clip. Parameters: FileName - the name of audio resource from
+-- which audio data will be read into the clip.
+play;
+play(FileName)					- (i);
+play(STRING/*FileName*/)			- (i);
+
+-- The open predicate opens the clip with the format and audio data
+-- present in the provided file. Opening a clip means that it should
+-- acquire any required system resources and become operational.
+-- Invoking this method on a line which is already open is illegal
+-- and may result in an IllegalStateException.
+-- Parameters: FileName - the name of audio resource from which
+-- audio data will be read into the clip.
+open;
+open(FileName)						- (i);
+open(STRING/*FileName*/)				- (i);
+
+-- The close predicate closes the line, indicating that any system
+-- resources in use by the line can be released.
+close;
+
+-- The start predicate allows a line to engage in data I/O. If
+-- invoked on a line that is already running, this method does
+-- nothing. Unless the data in the buffer has been flushed, the line
+-- resumes I/O starting with the first frame that was unprocessed at
+-- the time the line was stopped.
+start;
+-- The stop predicate stops the line. A stopped line should cease
+-- I/O activity. If the line is open and running, however, it should
+-- retain the resources required to resume activity. A stopped line
+-- should retain any audio data in its buffer instead of discarding
+-- it, so that upon resumption the I/O can continue where it left
+-- off, if possible.
+stop;
+-- The loop predicate starts looping playback from the current
+-- position. Playback will continue to the loop's end point, then
+-- loop back to the loop start point count times, and finally
+-- continue playback to the end of the clip. If the current position
+-- when this method is invoked is greater than the loop end point,
+-- playback simply continues to the end of the clip without looping.
+-- A count value of 0 indicates that any current looping should
+-- cease and playback should continue to the end of the clip. The
+-- behavior is undefined when this method is invoked with any other
+-- value during a loop operation. If playback is stopped during
+-- looping, the current loop status is cleared; the behavior of
+-- subsequent loop and start requests is not affected by an
+-- interrupted loop operation. Parameters: Count - the number of
+-- times playback should loop back from the loop's end position to
+-- the loop's start position, or -1 to indicate that looping should
+-- continue until interrupted.
+loop(INTEGER/*Count*/)					- (i);
+
+-- The get_frame_length function obtains the media length in
+-- sample frames.
+-- Returns: the media length, expressed in sample frames, or -1
+-- if the line is not open.
+get_frame_length() = INTEGER;
+-- The get_microsecond_length function obtains the media duration
+-- in microseconds.
+-- Returns: the media duration, expressed in microseconds, or -1
+-- if the line is not open.
+get_microsecond_length() = INTEGER; /*Microseconds*/
+
+-- The get_frame_position function obtains the current position in
+-- the audio data, in sample frames. The frame position measures
+-- the number of sample frames captured by, or rendered from, the
+-- line since it was opened. Note: this return value will NOT wrap
+-- around after 2^31 frames, because the function is implemented
+-- using the getLongFramePosition Java method. Returns: the number
+-- of frames already processed since the line was opened.
+get_frame_position() = INTEGER;
+-- The get_microsecond_position function obtains the current
+-- position in the audio data, in microseconds. The microsecond
+-- position measures the time corresponding to the number of sample
+-- frames captured by, or rendered from, the line since it was
+-- opened. The level of precision is not guaranteed. For example, an
+-- implementation might calculate the microsecond position from the
+-- current frame position and the audio sample frame rate. The
+-- precision in microseconds would then be limited to the number
+-- of microseconds per sample frame. Returns: the number of
+-- microseconds of data processed since the line was opened.
+get_microsecond_position() = INTEGER; /*Microseconds*/
+
+-- The set_frame_position predicate sets the media position in
+-- sample frames. The position is zero-based; the first frame is
+-- frame number zero. When the clip begins playing the next time, it
+-- will start by playing the frame at this position.
+-- Parameters: Frames - the desired new media position, expressed in
+-- sample frames.
+set_frame_position(INTEGER/*Frames*/)			- (i);
+-- The set_microsecond_position predicate sets the media position in
+-- microseconds. When the clip begins playing the next time, it will
+-- start at this position. The level of precision is not guaranteed.
+-- For example, an implementation might calculate the microsecond
+-- position from the current frame position and the audio sample
+-- frame rate. The precision in microseconds would then be limited
+-- to the number of microseconds per sample frame.
+-- Parameters: Microseconds - the desired new media position,
+-- expressed in microseconds.
+set_microsecond_position(INTEGER/*Microseconds*/)	- (i);
+
+-- The set_loop_points predicate sets the first and last sample
+-- frames that will be played in the loop. The ending point must be
+-- greater than or equal to the starting point, and both must fall
+-- within the size of the loaded media. A value of 0 for the
+-- starting point means the beginning of the loaded media.
+-- Similarly, a value of -1 for the ending point indicates the last
+-- frame of the media. Parameters: Start - the loop's starting
+-- position, in sample frames (zero-based), End - the loop's ending
+-- position, in sample frames (zero-based), or -1 to indicate the
+-- final frame.
+set_loop_points(INTEGER/*Start*/,INTEGER/*End*/)	- (i,i);
+
+determ:
+
+-- The is_open predicate indicates whether the line is open,
+-- meaning that it has reserved system resources and is operational,
+-- although it might not currently be playing or capturing sound.
+is_open;
+
+-- The is_active predicate indicates whether the line is engaging
+-- in active I/O (such as playback or capture).
+is_active;
+
+-- The is_running predicate indicates whether the line is running.
+-- The default is false. An open line begins running when the first
+-- data is presented in response to an invocation of the start
+-- method, and continues until presentation ceases in response to a
+-- call to stop or because playback completes.
+is_running;
+]

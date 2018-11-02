@@ -1,0 +1,19 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support this operation.
+--
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+	env	= ('DesktopWindow');
+--
+[
+goal:-!,
+	Value== env?get_system_property("java.runtime.version"),
+	writeln(Value).
+]
+-----------------------------------------------------------------------

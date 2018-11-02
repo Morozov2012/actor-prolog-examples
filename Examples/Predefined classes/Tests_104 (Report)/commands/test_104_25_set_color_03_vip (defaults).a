@@ -1,0 +1,101 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+IMPERATIVES:
+--
+initiate_window_attributes;
+modify_window_attributes;
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= ('Window1',
+		text_color= 'Red',
+		space_color= 'default',
+		x= 0);
+w2	= ('Window1',
+		text_color= 'Red',
+		space_color= 'Violet',
+		x= 1);
+w3	= ('Window2',
+		text_color= 'Red',
+		space_color= 'default',
+		x= 2);
+w4	= ('Window2',
+		text_color= 'Red',
+		space_color= 'Violet',
+		x= 3);
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Window1' (specialized 'MyWindow'):
+[
+goal:-!,
+	initiate_window_attributes,
+	set_color('Red'),
+	writeln("Red"),
+	set_color('DkGreen'),
+	writeln("DkGreen"),
+	set_color('Blue'),
+	writeln("Blue"),
+	set_color('default'),
+	writeln("default"),
+	modify_window_attributes.
+]
+-----------------------------------------------------------------------
+class 'Window2' (specialized 'MyWindow'):
+[
+goal:-!,
+	initiate_window_attributes,
+	set_color('Red','Yellow'),
+	writeln("Red, Yellow"),
+	set_color('DkGreen','Yellow'),
+	writeln("DkGreen, Yellow"),
+	set_color('Blue','Yellow'),
+	writeln("Blue, Yellow"),
+	set_color('default','Yellow'),
+	writeln("default, Yellow"),
+	set_color('Red','default'),
+	writeln("Red, default"),
+	set_color('DkGreen','default'),
+	writeln("DkGreen, default"),
+	set_color('Blue','default'),
+	writeln("Blue, default"),
+	set_color('default','default'),
+	writeln("default, default"),
+	modify_window_attributes.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	y= 0;
+	width= 1;
+	height= 1;
+--
+	text_color;
+	space_color;
+--
+	font_name= 'helvetica';
+	font_style= 'bold';
+	font_size= 32;
+--
+[
+initiate_window_attributes:-
+	writeln("Text: ",text_color),
+	writeln("Space: ",space_color),
+	writeln("Initial color").
+--
+modify_window_attributes:-
+	set_background_color('LtGray'),
+	set_font('helvetica',21,['bold','underlined']).
+]
+-----------------------------------------------------------------------

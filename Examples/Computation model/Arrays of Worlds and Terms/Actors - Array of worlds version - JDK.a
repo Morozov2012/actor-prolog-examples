@@ -1,0 +1,168 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'WorldArray' as 'WindowArray'
+	from "Arrays"('TargetClass':='TextPage');
+
+class 'Main' (specialized 'Dialog'):
+
+variable:
+
+	i;
+	j;
+	value;
+
+protecting:
+
+	link;
+
+constant:
+
+	x		= 'centered';
+	y		= 'centered';
+
+internal:
+
+	output		= ('TextOutput',
+				link);
+	tools		= ('MatrixOperations');
+
+[
+goal:-
+	show,
+	send_value(i,j,value).
+--
+send_value(#,#,_):-!.
+send_value(I,J,Value):-
+	Value== tools?matrix_element(link,I,J),!.
+send_value(_,_,_).
+]
+
+-----------------------------------------------------------------------
+
+class 'TextOutput' (specialized 'Alpha'):
+
+variable:
+
+	link;
+
+constant:
+
+	w	= 'WindowArray'[1 .. 7] of (('TextPage',link));
+
+	x_list	= [9,27,45,47,41,13,7];
+	y_list	= [4,1,4,9,12,12,9];
+
+	text_colors = [
+			'White',
+			'White',
+			'Black',
+			'Black',
+			'Black',
+			'White',
+			'White'
+			];
+	background_colors = [
+			'Red',
+			'Orange',
+			'Yellow',
+			'Green',
+			'Cyan',
+			'Blue',
+			'Violet'
+			];
+
+internal:
+
+	tools		= ('MatrixOperations');
+
+[
+goal:-!,
+	create_text_windows(
+		1,7,
+		x_list,y_list,
+		text_colors,background_colors).
+--
+create_text_windows(N,Max,[X|R1],[Y|R2],[TC|R3],[BC|R4]):-
+	N <= Max,
+	w[N] <- show_window(X,Y,TC,BC),!,
+	create_text_windows(N+1,Max,R1,R2,R3,R4).
+create_text_windows(_,_,_,_,_,_).
+]
+
+-----------------------------------------------------------------------
+
+class 'TextPage' (specialized 'Report'):
+
+variable:
+
+	link;
+
+variable:
+
+	x			= _;
+	y			= _;
+	text_color		= _;
+	background_color	= _;
+	title			= _;
+
+constant:
+
+	width	= 27;
+	height	= 10;
+
+internal:
+
+	tools	= ('MatrixOperations');
+	memory	= ('TextPageStore');
+
+[
+show_window(x,y,text_color,background_color):-
+	memory ? retract_all(coordinates(_,_)),
+	memory ? insert(coordinates(x,y)),
+	title== ?format("i=%d j=%d",x,y),!,
+	show.
+show_window(_,_,_,_).
+--
+goal:-!,
+	retrieve_and_write_value(link).
+--
+retrieve_and_write_value(Link):-
+	C== memory?match(coordinates(_,_)),
+	C == coordinates(X,Y),
+	write_value(tools?matrix_element(Link,X,Y)),!.
+retrieve_and_write_value(Link):-
+	[Link],!.
+retrieve_and_write_value(_).
+--
+write_value(#).
+write_value(V):-
+	writeln(V).
+]
+
+-----------------------------------------------------------------------
+
+class 'TextPageStore' (specialized 'Database'):
+[
+]
+
+-----------------------------------------------------------------------
+
+class 'MatrixOperations' (specialized 'Alpha'):
+[
+matrix_element([Row|_],1,J) = ?row_element(Row,J) :-!.
+matrix_element([_|Rest],I,J) = ?matrix_element(Rest,I-1,J) :-
+	numerical(I),
+	I > 0,!.
+matrix_element(#,_,_) = #.
+--
+row_element([Value|_],1) = Value :-!.
+row_element([_|Rest],J) = ?row_element(Rest,J-1) :-
+	numerical(J),
+	J > 0,!.
+row_element(#,_) = #.
+]
+
+-----------------------------------------------------------------------

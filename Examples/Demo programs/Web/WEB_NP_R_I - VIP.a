@@ -1,0 +1,157 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2011, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving and output of information from    --
+--       arbitrary number of Web resources by         --
+--       concurrent processes.                        --
+--------------------------------------------------------
+project: (('Main'))
+--------------------------------------------------------
+class 'Main' (specialized 'WebReceptor'):
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	target_list;
+--
+-- PRIVATE SLOTS:
+--
+variable:
+--
+	all_receptors;
+--
+constant:
+--
+	location =
+		"http://www.cplire.ru/Lab144/"
+		"selected.html";
+--
+	chain	 = (('ReceptorChain',
+			target_list,
+			previous_receptors=[],
+			all_receptors));
+	out	 = (('Output',
+			suspending: all_receptors));
+--
+[
+goal:-!,
+	check_list(?get_references()).
+--
+check_list([]):-!.
+check_list(target_list).
+]
+--------------------------------------------------------
+class 'ReceptorChain':
+--
+-- PROCESS INPUTS:
+--
+suspending:
+--
+	target_list;
+--
+constant:
+--
+	previous_receptors;
+--
+variable:
+--
+	receptor_list;
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	all_receptors;
+	rest_of_list;
+--
+-- PRIVATE SLOTS:
+--
+variable:
+--
+	location;
+--
+constant:
+--
+	chain	 = (('ReceptorChain',
+			target_list=
+				rest_of_list,
+			previous_receptors=
+				[receiver|previous_receptors],
+			all_receptors=
+				receptor_list));
+	receiver = (('CheckPage',
+			location));
+--
+[
+goal:-
+	check_list(target_list,all_receptors).
+--
+check_list([location],[receiver|previous_receptors]):-!.
+check_list([location|rest_of_list],_):-
+	all_receptors == receptor_list.
+--
+alarm(_):-
+	fail.
+]
+--------------------------------------------------------
+class 'CheckPage' (specialized 'WebReceptor'):
+--
+-- PROCESS INPUTS:
+--
+suspending:
+--
+	location;
+--
+-- PRIVATE SLOTS:
+--
+variable:
+--
+	parameters;
+--
+[
+goal:-!,
+	[parameters],
+	parameters == ?get_parameters().
+--
+get_data= Line
+	:-
+	[parameters],
+	parameters == entry(URL,Date,_,_),
+	Line== ?format(
+		"%s\t%s",
+		URL,
+		?date_to_string(Date)).
+--
+date_to_string(date(Year,Month,Day))=
+	?format("%d-%02d-%04d",Day,Month,Year)
+	:-!.
+date_to_string(_)= "".
+]
+--------------------------------------------------------
+class 'Output' (specialized 'Dialog'):
+--
+-- PROCESS INPUTS:
+--
+variable:
+--
+	all_receptors;
+--
+-- PROCESS OUTPUTS:
+--
+protecting:
+--
+	results	 = all_receptors ?? get_data();
+--
+-- PRIVATE SLOTS:
+--
+constant:
+--
+	background_color	= 'Yellow';
+--
+[
+goal:-!,
+	[all_receptors],
+	show.
+]
+--------------------------------------------------------

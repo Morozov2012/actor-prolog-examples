@@ -1,0 +1,60 @@
+-------------------------------------------
+--                                       --
+--  ак сделать предикат невидимым из     --
+-- других классов?                       --
+--                                       --
+-------------------------------------------
+
+class 'Main' (specialized 'EngineOutput'):
+--
+w	= ('SearchEngine',
+		engine_output=self);
+--
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+another_predicate(INTEGER)	- (i);
+--
+CLAUSES:
+--
+find_reference(_).
+--
+another_predicate(_).
+--
+goal:-!,
+	w ? inspect.
+]
+
+class 'EngineOutput' (specialized 'Console'):
+[
+PREDICATES:
+--
+imperative:
+--
+find_reference(INTEGER)		- (i);
+]
+
+class 'SearchEngine' (specialized 'Console'):
+--
+internal:
+--
+engine_output	 : 'EngineOutput';
+--
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+inspect;
+--
+CLAUSES:
+--
+inspect:-
+	engine_output ? find_reference(1000).
+]

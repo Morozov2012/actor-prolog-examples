@@ -1,0 +1,80 @@
+package "Morozov/VRML/Vectors":
+-----------------------------------------------------------------------
+--                                                                   --
+--             The "VRML/VECTORS" Actor Prolog package.              --
+--            (c) 2002-2007, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package provides vector operations for computing trajectory  --
+-- of flying viewpoint in VRML scenes.                               --
+-----------------------------------------------------------------------
+class 'Vector' (specialized 'Alpha'):
+[
+goal:-!.
+-----------------------------------------------------------------------
+compute_orientation(I,J,X4,Y4,Z4,Gamma):-
+	B== ?sub(I,J),
+	A== p(0.0,0.0,-1.0),
+	V4== ?mult(A,B),
+	K2== ?normalized_vector(V4),
+	K2== p(X3,Y3,Z3),
+	X4== ?round(X3 * 100.0) / 100.0,
+	Y4== ?round(Y3 * 100.0) / 100.0,
+	Z4== ?round(Z3 * 100.0) / 100.0,
+	Gamma== ?gamma(A,B).
+-----------------------------------------------------------------------
+scalar_square(p(X,Y,Z))=
+	X*X + Y*Y + Z*Z.
+--
+vector_k(p(Xi,Yi,Zi),C)= p(Xk,Yk,Zk) :-
+	Xk== Xi * C,
+	Yk== Yi * C,
+	Zk== Zi * C.
+--
+scalar_mult(p(Xi,Yi,Zi),p(Xj,Yj,Zj))=
+	Xi*Xj + Yi*Yj + Zi*Zj.
+-----------------------------------------------------------------------
+sub(p(Xi,Yi,Zi),p(Xj,Yj,Zj))= p(Xk,Yk,Zk) :-
+	Xk== Xi - Xj,
+	Yk== Yi - Yj,
+	Zk== Zi - Zj.
+--
+mult(p(Xi,Yi,Zi),p(Xj,Yj,Zj))= p(Xk,Yk,Zk) :-
+	Xk== Yi*Zj - Zi*Yj,
+	Yk== Zi*Xj - Xi*Zj,
+	Zk== Xi*Yj - Yi*Xj.
+-----------------------------------------------------------------------
+gamma(A,B)= Gamma :-
+	A2== ?scalar_square(A),
+	D1== ?scalar_mult(A,B),
+	B2== ?scalar_square(B),
+	A2B2== A2 * B2,
+	A2B2 > 0.0,!,
+	CosGamma== D1 / ?sqrt(A2B2),
+	Gamma== ?gamma(CosGamma).
+gamma(_,_)= 0.0.
+--
+gamma(CosGamma)= Gamma2 :-
+	CosGamma <> 0.0,!,
+	SinGamma== ?sqrt(1 - CosGamma*CosGamma),
+	TanGamma== SinGamma / CosGamma,
+	Gamma1== ?arctan(TanGamma),
+	Gamma2== ?normalized_gamma(Gamma1).
+gamma(_)= Gamma :-
+	Gamma== ?pi / 2.
+--
+normalized_gamma(Gamma1)= Gamma2 :-
+	Gamma1 >= 0.0,!,
+	Gamma2== ?round(Gamma1 * 100.0) / 100.0.
+normalized_gamma(Gamma1)= Gamma3 :-
+	Gamma2== ?pi + Gamma1,
+	Gamma3== ?normalized_gamma(Gamma2).
+-----------------------------------------------------------------------
+normalized_vector(K1)= K2 :-
+	C1== ?scalar_square(K1),
+	C1 > 0.0,!,
+	C2== 1 / ?sqrt(C1),
+	K2== ?vector_k(K1,C2).
+normalized_vector(_)= p(0.0,0.0,-1.0).
+]
+-----------------------------------------------------------------------

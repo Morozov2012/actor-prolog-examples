@@ -1,0 +1,56 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+
+import 'WorldArray' as 'WindowArray'
+	from "Arrays"('TargetClass':='MyClass');
+
+class 'Main' (specialized 'Alpha'):
+--
+w	= 'WindowArray'[1 .. 3] of ('MyClass');
+--
+[
+goal:-
+	w[Index] ? p("Pass 1: ","Index= ",Index),
+	fail.
+goal:-
+	w[Index] ? p("Pass 2: ","Index= ",Index),
+	fail.
+goal:-
+	w[Index] ? p("Pass 3: ","Index= ",Index),
+	fail.
+goal:-
+	w[Index] ? p("Pass 4: ","Index= ",Index),
+	fail.
+goal:-
+	w[Index] ? p("Pass 5: ","Index= ",Index),
+	fail.
+goal:-!.
+]
+
+class 'MyClass' (specialized 'Report'):
+--
+internal:
+--
+con	= ('Report',
+		x='centered',
+		y='centered',
+		width=45,
+		height=15);
+--
+[
+PREDICATES:
+--
+imperative:
+--
+p(_*)	- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	writeln("The goal statement is never called.").
+--
+p(Text*):-
+	con ? writeln(Text*).
+]

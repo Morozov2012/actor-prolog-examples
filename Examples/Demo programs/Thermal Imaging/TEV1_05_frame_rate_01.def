@@ -1,0 +1,81 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/TEV1";
+import .. from "morozov/ColorMap";
+--
+-----------------------------------------------------------------------
+interface 'Viewer' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer			: 'CameraControl';
+	main_window		: 'Canvas2D';
+	con			: 'Console';
+	color_maps		: 'ColorMap';
+--
+constant:
+--
+	dlg_ctrl_apply_anomalous_voltage_detector
+						: DialogFieldName;
+	dlg_ctrl_anomalous_voltage_threshold	: DialogFieldName;
+	dlg_ctrl_apply_anomalous_temperature_detector
+						: DialogFieldName;
+	dlg_ctrl_anomalous_temperature_threshold
+						: DialogFieldName;
+	--
+	dlg_ctrl_number_of_dead_pixels		: DialogFieldName;
+	dlg_ctrl_anomalous_voltage_pixels	: DialogFieldName;
+	dlg_ctrl_anomalous_temperature_pixels	: DialogFieldName;
+	dlg_ctrl_eliminate_anomalous_pixels	: DialogFieldName;
+	--
+	dlg_ctrl_color_map			: DialogFieldName;
+	dlg_ctrl_zoom_image			: DialogFieldName;
+	dlg_ctrl_zooming_coefficient		: DialogFieldName;
+	dlg_ctrl_do_not_suspend_USB		: DialogFieldName;
+	dlg_ctrl_output_debug_information	: DialogFieldName;
+	--
+	dlg_ctrl_scrollbar_USB_read_time_out	: DialogFieldName;
+	dlg_ctrl_editor_USB_read_time_out	: DialogFieldName;
+	dlg_ctrl_scrollbar_USB_write_time_out	: DialogFieldName;
+	dlg_ctrl_editor_USB_write_time_out	: DialogFieldName;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+select_and_open_device;
+initialize_data_acquisition(DeviceIdentifierList)	- (i);
+initialize_selected_device(DeviceIdentifier)		- (i);
+--
+update_displaying_mode;
+--
+report_anomalous_pixels(INTEGER,INTEGER,INTEGER)	- (i,i,i);
+--
+initialize_controls;
+]
+-----------------------------------------------------------------------
+interface 'CameraControl' (specialized 'TEV1'):
+--
+internal:
+--
+	viewer			: 'Viewer';
+	main_window		: 'Canvas2D';
+	image			: 'BufferedImage';
+	con			: 'Console';
+	text			: 'Text';
+	timer			: 'Timer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+resize_main_window(INTEGER,INTEGER)			- (i,i);
+report_time(INTEGER,INTEGER,REAL,REAL,REAL)		- (i,i,i,i,i);
+]
+-----------------------------------------------------------------------

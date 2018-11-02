@@ -1,0 +1,312 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+Value	= SYMBOL; STRING; BINARY.
+
+PREDICATES:
+
+imperative:
+
+create_value(Value)		- (o);
+testF1(Value)			- (i);
+testF2(Value)			- (i);
+testF3(Value)			- (i);
+--
+test0;
+test11;
+test12;
+test13;
+test21;
+test22;
+test23;
+test31;
+test32;
+test33;
+test41;
+test42;
+test43;
+test44;
+test51;
+test52;
+test53;
+test54;
+--
+write_green(_*)			- (i);
+write_red(_*)			- (i);
+write_blue(_*)			- (i);
+write_black(_*)			- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+PREDICATES:
+
+determ:
+
+symbol(Value*)		- (i);
+string(Value*)		- (i);
+
+CLAUSES:
+
+goal:-!,
+	create_value(V),
+	testF1(V),
+	testF2(V),
+	testF3(V),
+	test0,
+	test11,
+	test12,
+	test13,
+	test21,
+	test22,
+	test23,
+	test31,
+	test32,
+	test33,
+	test41,
+	test42,
+	test43,
+	test44,
+	test51,
+	test52,
+	test53,
+	test54.
+--
+create_value(_).
+--
+testF1(V):-
+	write_blue("Test F1:"),
+	write_black("v=",V),
+	?symbol(V),!,
+	write_red("Failure: x is a symbol.").
+testF1(_):-
+	write_green("O.K.: x is not a symbol.").
+--
+testF2(V):-
+	write_blue("Test F2:"),
+	write_black("v=",V),
+	?string(V),!,
+	write_red("Failure: x is a string.").
+testF2(_):-
+	write_green("O.K.: x is not a string.").
+--
+testF3(V):-
+	write_blue("Test F3:"),
+	write_black("v=",V),
+	?binary(V),!,
+	write_red("Failure: x is a binary.").
+testF3(_):-
+	write_green("O.K.: x is not a binary.").
+--
+test0:-
+	write_blue("Test 0:"),
+	?symbol(),
+	?string(),
+	?binary(),!,
+	write_green("O.K.").
+test0:-
+	write_red("Failure").
+--
+test11:-
+	write_blue("Test 11:"),
+	X== 'name',
+	write_black("x=",X),
+	?symbol(X),!,
+	write_green("O.K.: x is a symbol.").
+test11:-
+	write_red("Failure").
+--
+test12:-
+	write_blue("Test 12:"),
+	X== 'name',
+	write_black("x=",X),
+	?string(X),!,
+	write_red("Failure").
+test12:-
+	write_green("O.K.: x is not a string.").
+--
+test13:-
+	write_blue("Test 13:"),
+	X== 'name',
+	write_black("x=",X),
+	?binary(X),!,
+	write_red("Failure").
+test13:-
+	write_green("O.K.: x is not a binary.").
+--
+test21:-
+	write_blue("Test 21:"),
+	X== "text",
+	write_black("x=",X),
+	?symbol(X),!,
+	write_red("Failure").
+test21:-
+	write_green("O.K.: x is not a symbol.").
+--
+test22:-
+	write_blue("Test 22:"),
+	X== "text",
+	write_black("x=",X),
+	?string(X),!,
+	write_green("O.K.: x is a string.").
+test22:-
+	write_red("Failure").
+--
+test23:-
+	write_blue("Test 23:"),
+	X== "text",
+	write_black("x=",X),
+	?binary(X),!,
+	write_red("Failure").
+test23:-
+	write_green("O.K.: x is not a binary.").
+--
+test31:-
+	write_blue("Test 31:"),
+	X== "01-23,4567;89 aB_cD|eF:Ab.Cd",
+	write_black("x=",X),
+	?symbol(X),!,
+	write_red("Failure").
+test31:-
+	write_green("O.K.: x is not a symbol.").
+--
+test32:-
+	write_blue("Test 32:"),
+	X== "01-23,4567;89 aB_cD|eF:Ab.Cd",
+	write_black("x=",X),
+	?string(X),!,
+	write_green("O.K.: x is a string.").
+test32:-
+	write_red("Failure").
+--
+test33:-
+	write_blue("Test 33:"),
+	X== "01-23,4567;89 aB_cD|eF:Ab.Cd",
+	write_black("x=",X),
+	?binary(X),!,
+	write_green("O.K.: x is a binary.").
+test33:-
+	write_red("Failure").
+--
+test41:-
+	write_blue("Test 41:"),
+	X== 'name1',
+	Y== 'name2',
+	write_black("x=",X," y=",Y),
+	?symbol(X,Y),!,
+	write_green("O.K.: x and y are symbols.").
+test41:-
+	write_red("Failure").
+--
+test42:-
+	write_blue("Test 42:"),
+	X== 'name',
+	Y== "text",
+	write_black("x=",X," y=",Y),
+	?string(X,Y),!,
+	write_red("Failure").
+test42:-
+	write_green("O.K.: x or y is not a string.").
+--
+test43:-
+	write_blue("Test 43:"),
+	X== 'name',
+	Y== "text",
+	write_black("x=",X," y=",Y),
+	?symbol(X,Y),!,
+	write_red("Failure").
+test43:-
+	write_green("O.K.: x or y is not a symbol.").
+--
+test44:-
+	write_blue("Test 44:"),
+	X== "text1",
+	Y== "text2",
+	write_black("x=",X," y=",Y),
+	?string(X,Y),!,
+	write_green("O.K.: x and y are strings.").
+test44:-
+	write_red("Failure").
+--
+test51:-
+	write_blue("Test 51:"),
+	X== "text",
+	Y== "EEFF_0A2B_E5C7",
+	write_black("x=",X," y=",Y),
+	?string(X,Y),!,
+	write_green("O.K.: x and y are strings.").
+test51:-
+	write_red("Failure").
+--
+test52:-
+	write_blue("Test 52:"),
+	X== "text",
+	Y== "EEFF_0A2B_E5C7",
+	write_black("x=",X," y=",Y),
+	?binary(X,Y),!,
+	write_red("Failure").
+test52:-
+	write_green("O.K.: x or y is not binary.").
+--
+test53:-
+	write_blue("Test 53:"),
+	X== "ffee_1200",
+	Y== "EEFF_0A2B_E5C7",
+	write_black("x=",X," y=",Y),
+	?string(X,Y),!,
+	write_green("O.K.: x and y are strings.").
+test53:-
+	write_red("Failure").
+--
+test54:-
+	write_blue("Test 54:"),
+	X== "ffee_1200",
+	Y== "EEFF_0A2B_E5C7",
+	write_black("x=",X," y=",Y),
+	?binary(X,Y),!,
+	write_green("O.K.: x and y are binary.").
+test54:-
+	write_red("Failure").
+--
+write_green(Arguments*):-
+	con ? set_color('DkGreen'),
+	con ? writeln("   ",Arguments*),
+	con ? set_color('default').
+--
+write_red(Arguments*):-
+	con ? set_color('Red'),
+	con ? writeln("   ",Arguments*),
+	con ? set_color('default').
+--
+write_blue(Arguments*):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln(Arguments*),
+	con ? set_color('default').
+--
+write_black(Comment,Value):-!,
+	con ? write("   ",Comment),
+	con ? set_color('Violet'),
+	con ? writeln(Value),
+	con ? set_color('default').
+write_black(Comment1,Value1,Comment2,Value2):-!,
+	con ? write("   ",Comment1),
+	con ? set_color('Violet'),
+	con ? write(Value1),
+	con ? set_color('default'),
+	con ? write(Comment2),
+	con ? set_color('Violet'),
+	con ? writeln(Value2),
+	con ? set_color('default').
+write_black(Arguments*):-
+	con ? writeln("   ",Arguments*).
+]

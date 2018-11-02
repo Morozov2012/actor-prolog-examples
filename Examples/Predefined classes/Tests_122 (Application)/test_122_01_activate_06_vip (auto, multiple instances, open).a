@@ -1,0 +1,56 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011-2015 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+RefSTRING	= STRING.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+argument_file	= ('File',
+			name= "data/report2.rtf");
+--
+browser		= ('ExternalBrowser',
+			arguments);
+--
+variable:
+--
+	arguments	: RefSTRING;
+--
+[
+goal:-!,
+	-- arguments== argument_file?get_URL(),
+	arguments==
+		"\"" + argument_file?get_full_name() + "\"",
+	browser ? activate().
+]
+-----------------------------------------------------------------------
+class 'ExternalBrowser' (specialized 'Application'):
+--
+constant:
+--
+	command		= auto(".doc");
+--
+variable:
+--
+	arguments	: RefSTRING;
+--
+constant:
+--
+	window_mode			= 'restored';
+	enable_multiple_instances	= 'yes';
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+end(Code):-!,
+	con ? writeln("ExitCode: ",Code).
+]
+-----------------------------------------------------------------------

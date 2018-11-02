@@ -1,0 +1,49 @@
+
+interface 'Main' (specialized 'Console'):
+
+w1	: 'A1';
+
+w2	: 'A1';
+
+[
+]
+
+class 'Main' (specialized 'Console'):
+
+w1	= ('A1');
+
+w2	= ('A1',
+		n= 500);
+
+[
+
+goal:-!,
+	writeln("Hello from the Main class."),
+	w1 ? p("Message to the W1 world."),
+	w2 ? p("Message to the W2 world.").
+
+]
+
+interface 'A1' (specialized 'Console'):
+
+n	: INTEGER;
+
+[
+
+p(STRING)	- (i);
+
+]
+
+class 'A1' (specialized 'Console'):
+
+n	= 100;
+
+[
+
+goal:-!,
+	writeln(n).
+
+p(Text):-
+	writeln(Text).
+
+]

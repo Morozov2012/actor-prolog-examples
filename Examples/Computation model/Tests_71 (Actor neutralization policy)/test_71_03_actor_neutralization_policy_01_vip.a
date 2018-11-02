@@ -1,0 +1,136 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+Values	= Value*.
+Value	= f(N).
+N	= INTEGER; STRING.
+--
+PREDICATES:
+--
+determ:
+--
+implement_action(DialogActionName)	- (i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Dialog'):
+--
+variable:
+--
+list	: Values	= (('TestBed')) ?? r(f(output_slot_1));
+--
+variable:
+--
+output_slot_1		: N;
+--
+constant:
+--
+con		= ('Report',
+			title= "Main",
+			y= 20,
+			height= 5);
+--
+[
+goal:-!,
+	show,
+	con ? set_color('Red'),
+	con ? writeln("collected values: ",list).
+--
+action(_):-!.
+]
+-----------------------------------------------------------------------
+class 'TestBed' (specialized 'Alpha'):
+--
+variable:
+--
+	v	: Value;
+--
+internal:
+--
+w1	= ('ActorHolder2',
+		v);
+w2	= ('ActorHolder1',
+		v);
+--
+con	= ('Report',
+		title= "TestBed",
+		x= 0,
+		y= 0,
+		width= 20,
+		height= 20);
+--
+[
+PREDICATES:
+--
+r(Value) = Value			- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	con ? set_color('DkGreen'),
+	con ? writeln("goal: v= ",v).
+--
+r(v) = v :-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("r: v= ",v).
+]
+-----------------------------------------------------------------------
+class 'ActorHolder1' (specialized 'Timer'):
+--
+variable:
+--
+	v	: Value;
+--
+internal:
+--
+	con	= ('Report',
+			title= "Actor Holder 1  [ v == f(100) ]",
+			x= 20,
+			y= 0,
+			width= 30,
+			height= 20);
+--
+[
+goal:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("try: v == f(100)"),
+	v == f(100),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("done: v == f(100)").
+goal:-!,
+	con ? set_color('Red'),
+	con ? writeln("failure, v= ",v).
+]
+-----------------------------------------------------------------------
+class 'ActorHolder2' (specialized 'Timer'):
+--
+variable:
+--
+	v	: Value;
+--
+internal:
+--
+	con	= ('Report',
+			title= "Actor Holder 2  [ v == f(_) ]",
+			x= 50,
+			y= 0,
+			width= 30,
+			height= 20);
+--
+[
+goal:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("try: v == f(_)"),
+	v == f(_),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("done: v == f(_)").
+goal:-!,
+	con ? set_color('Red'),
+	con ? writeln("failure, v= ",v).
+]
+-----------------------------------------------------------------------

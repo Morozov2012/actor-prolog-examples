@@ -1,0 +1,106 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test0;
+test1;
+test2(MenuDefinition)	- (i);
+--
+class 'Main' (specialized 'Report'):
+--
+constant:
+--
+	x		= 'centered';
+	y		= 'centered';
+	width		= 21;
+	height		= 7;
+	time_delay	= 1.0;
+--
+internal:
+--
+	con		= ('Console');
+	timer		= ('Timer');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	show,
+	timer ? sleep(time_delay),
+	test2([
+		submenu("&Flowers",[
+			item("&Bachelor's-button\tAlt-B","alt pressed B"),
+			item("&Ox-eye daisy\tCtrl-Alt-O","alt control pressed O"),
+			item("&Wild vetch\tAlt-Shift-W","alt shift pressed W"),
+			'separator',
+			item("&Sweet-william\tCtrl-Shift-S","shift control pressed S"),
+			item("Fo&rget-me-not\tCtrl-Alt-Shift-R","alt control shift pressed R")
+			]),
+		submenu("&Meal",[
+			item("Ju&icy apple\tShift-I","shift pressed I"),
+			item("Pl&um\tCtrl-U","control pressed U"),
+			'separator',
+			item("P&ear\tCtrl-Shift-E","control shift released E"),
+			item("&Grapes\tCtrl-Alt-G","control alt released G"),
+			item("B&lack-currant\tCtrl-Alt-Shift-L","control alt shift released L")
+			]),
+		'spacer',
+		submenu("&Help",[
+			item("E&xplanation\tF1","pressed F1"),
+			item("&Community\tC","released C"),
+			'separator',
+			item("Co&ntacts\tN","pressed N")
+			])
+		]),
+	test1,
+	show,
+	timer ? sleep(time_delay),
+	test2([]),
+	test1,
+	show.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_menu(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	M== ?get_menu(),!,
+	con ? write("menu: "),
+	con ? set_color('Violet'),
+	con ? writeln(M),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test2(M):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	con ? writeln("I will set: menu= ",M),
+	set_menu(M),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

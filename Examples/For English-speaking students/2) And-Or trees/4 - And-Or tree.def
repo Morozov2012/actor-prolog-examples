@@ -1,0 +1,12 @@
+
+DOMAINS:
+
+Name	= STRING.
+
+PREDICATES:
+
+nondeterm:
+
+father(Name,Name)		- (_,_);
+mother(Name,Name)		- (_,_);
+grandpapa(Name,Name)		- (_,_);

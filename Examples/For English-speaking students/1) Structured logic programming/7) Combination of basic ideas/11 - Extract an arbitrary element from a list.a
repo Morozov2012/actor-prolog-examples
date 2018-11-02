@@ -1,0 +1,42 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Combination of     --
+-- basic ideas. The element predicate.   --
+--                                       --
+-- The task: extract an arbitrary        --
+-- element from a list.                  --
+--                                       --
+-- Basic ideas to be used:               --
+-- 1) An output argument.                --
+-- 2) Disassembling of a list.           --
+-- 3) Backtracking.                      --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+nondeterm:
+
+element(INTEGER,List)		- (o,i);
+
+CLAUSES:
+
+goal:-
+	element(X,[1,2,3,4,5]),
+		writeln("An element: ",X),
+		fail.
+goal:-
+	writeln("There are no other ",
+		"elements.").
+
+element(H,[H|_]).
+element(H,[_|Rest]):-
+	element(H,Rest).

@@ -1,0 +1,17 @@
+mesh(80,25)
+dialog_font('helvetica',18)
+padding(0.5,0.5)
+
+dialog 'MyDialog' ("Demo Panel",default,default,default,centered,centered,default)
+	hbox(justify)
+		groupbox
+			scaling(1,5)
+				button("action","&Left")
+			end_of_scaling
+			vbox
+				button("action","&First")
+				button("action","&Second")
+			end_of_vbox
+		end_of_groupbox
+	end_of_hbox
+end_of_dialog

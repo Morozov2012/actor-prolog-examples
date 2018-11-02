@@ -1,0 +1,149 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+A1	= f(INTEGER,A2,REAL); g(A2).
+A2	= {name:SYMBOL,text:STRING,list:A3}.
+A3	= A4*.
+A4	= {a:INTEGER,b:REAL,c:SYMBOL,d:STRING}.
+--
+B1	= f(INTEGER,B2,REAL); g(B2).
+B2	= {name:SYMBOL,list:B3,text:STRING}.
+B3	= B4*.
+B4	= {a:INTEGER,c:SYMBOL,b:REAL,d:STRING}.
+--
+IMPERATIVES:
+--
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+--
+-----------------------------------------------------------------------
+class 'HashSetA' (specialized 'HashSet'):
+name	= "Test.db";
+[
+DOMAINS:
+Target	= A1.
+]
+-----------------------------------------------------------------------
+class 'HashSetB' (specialized 'HashSet'):
+name	= "Test.db";
+[
+DOMAINS:
+Target	= B1.
+]
+-----------------------------------------------------------------------
+class 'DatabaseC' (specialized 'Database'):
+name	= "Test.db";
+[
+DOMAINS:
+Target	= A1.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+store1	= ('HashSetA');
+store2	= ('HashSetB');
+store3	= ('DatabaseC');
+--
+[
+goal:-
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test1,
+	test2,
+	test6,
+	test7,
+	test8,
+	test5,
+	test4,
+	test5.
+--
+test1:-
+	writeln("Test 1:"),
+	writeln("\tI will store data items to HashSet A."),
+	store1 ? append(
+		f(1,{name:'n1',list:[{a:1,b:11.0,c:'symb1'}]},3.0)),
+	store1 ? append(
+		f(10,{list:[{a:3,b:3.14,c:'symb2'}],name:'n2'},9.0)),
+	store1 ? append(
+		f(1,{name:'n1',list:[{a:1,b:11.0,c:'symb1'}]},3.0)),
+	store1 ? append(
+		f(17,{name:'n3',list:[{a:5,b:1.0,c:'symb3'}]},11.0)),
+	store1 ? append(
+		f(1,{list:[{a:1,b:11.0,c:'symb1'}],name:'n1'},3.0)),
+	writeln("\tDone.").
+--
+test2:-
+	writeln("Test 2:"),
+	writeln("\tI will search data items in HashSet A:"),
+	store1 ? find(Item),
+	writeln("\t\t",Item),
+	fail.
+test2:-
+	writeln("\tDone.").
+--
+test3:-
+	writeln("Test 3:"),
+	writeln("\tI will save HashSet A to the Test.db file."),
+	store1 ? save,
+	writeln("\tDone.").
+--
+test4:-
+	writeln("Test 4:"),
+	writeln("\tI will load HashSet B from the Test.db file."),
+	store2 ? load,
+	writeln("\tDone.").
+--
+test5:-
+	writeln("Test 5:"),
+	writeln("\tI will search data items in HashSet B:"),
+	store2 ? find(Item),
+	writeln("\t\t",Item),
+	fail.
+test5:-
+	writeln("\tDone.").
+--
+test6:-
+	writeln("Test 6:"),
+	writeln("\tI will store data items to Database C."),
+	store3 ? append(
+		f(1,{name:'n1',list:[{a:1,b:11.0,c:'symb1'}]},3.0)),
+	store3 ? append(
+		f(10,{list:[{a:3,b:3.14,c:'symb2'}],name:'n2'},9.0)),
+	store3 ? append(
+		f(1,{name:'n1',list:[{a:1,b:11.0,c:'symb1'}]},3.0)),
+	store3 ? append(
+		f(17,{name:'n3',list:[{a:5,b:1.0,c:'symb3'}]},11.0)),
+	store3 ? append(
+		f(1,{list:[{a:1,b:11.0,c:'symb1'}],name:'n1'},3.0)),
+	writeln("\tDone.").
+--
+test7:-
+	writeln("Test 7:"),
+	writeln("\tI will save Database C to the Test.db file."),
+	store3 ? save,
+	writeln("\tDone.").
+--
+test8:-
+	writeln("Test 8:"),
+	writeln("\tI will clear HashSet B."),
+	store2 ? retract_all,
+	writeln("\tDone.").
+]
+-----------------------------------------------------------------------

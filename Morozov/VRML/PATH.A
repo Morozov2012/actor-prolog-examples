@@ -1,0 +1,244 @@
+package "Morozov/VRML/Path":
+-----------------------------------------------------------------------
+--                                                                   --
+--               The "VRML/PATH" Actor Prolog package.               --
+--            (c) 2002-2007, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package is intended for generating trajectory of flying      --
+-- viewpoint in VRML scenes.                                         --
+-----------------------------------------------------------------------
+import 'Vector' from "Morozov/VRML/Vectors";
+import "Morozov/Web/Scanning/Counter";
+import 'VRML_Toolbox' from "Morozov/VRML/Toolbox";
+-----------------------------------------------------------------------
+class 'Trajectory' (specialized 'Alpha'):
+--
+internal:
+--
+	output;
+--
+	store			= ('ViewpointDatabase');
+--
+	bag			= ('ViewpointBag',
+					world=self);
+--
+constant:
+--
+	deboosting_factor	= 10;
+--
+internal:
+--
+	vector_operations	= ('Vector');
+	text_operations		= ('Text');
+	con			= ('Console');
+--
+[
+goal:-!.
+--
+reset:-
+	store ? retract_all().
+-----------------------------------------------------------------------
+add_viewpoint_position(Name,X2,Y2,Z2):-
+	increase_viewpoint_counter(N),
+	store ? append(
+		vp(N,Name,
+			?cast("RefX",X2),
+			?cast("RefY",Y2),
+			?cast("RefZ",Z2))).
+/**/
+increase_viewpoint_counter(N2):-
+	store ? retract(last_number_of_viewpoint_position(N1)),!,
+	N2== N1 + 1,
+	store ? insert(last_number_of_viewpoint_position(N2)).
+increase_viewpoint_counter(0):-
+	store ? insert(last_number_of_viewpoint_position(0)).
+-----------------------------------------------------------------------
+write_ViewpointPath(_):-
+	List1== bag ? get_any_position_of_viewpoint(),
+	sort_point_list(List1,List2),
+	store ? retract_all(vp(_,_,_,_,_)),
+	save_viewpoint_positions(0,List2),
+	fail.
+write_ViewpointPath(S1):-
+	--
+	store ? find(last_number_of_viewpoint_position(N)),
+	--
+	output ? shift(S1,0,"DEF P1 PositionInterpolator{"),
+	S2== S1 + 1,
+	output ? write_shift(S2),
+	output ? write("key ["),
+	write_key_items(N),
+	output ? write(" ]\n"),
+	output ? shift(S1,1,"keyValue["),
+	write_viewpoint_positions(S1,0,N),
+	output ? shift(S1,1,"]"),
+	output ? shift(S1,0,"}"),
+	--
+	output ? shift(S1,0,"DEF OI1 OrientationInterpolator{"),
+	output ? write_shift(S2),
+	output ? write("key ["),
+	write_key_items(0,N),
+	output ? write(" ]\n"),
+	output ? shift(S1,1,"keyValue["),
+	write_viewpoint_orientations(S1,0,N),
+	output ? shift(S1,1,"]"),
+	output ? shift(S1,0,"}"),
+	--
+	fail.
+write_ViewpointPath(S1):-
+	--
+	output ? shift(S1,0,"DEF TR Transform{"),
+	output ? shift(S1,1,"children["),
+	output ? shift(S1,2,"DEF MVP Viewpoint{"),
+	output ? shift(S1,3,"position 0 0 0"),
+	output ? shift(S1,3,"fieldOfView 0.78"),
+	output ? shift(S1,3,"description \"Moving\""),
+	output ? shift(S1,2,"}"),
+	output ? shift(S1,1,"]"),
+	output ? shift(S1,0,"}"),
+	--
+	fail.
+write_ViewpointPath(_):-
+	store ? save("Path.log").
+-----------------------------------------------------------------------
+write_MovingViewpoint(S1):-
+	--
+	store ? find(last_number_of_viewpoint_position(N)),
+	Interval== N * deboosting_factor,
+	F1== text_operations ? format("cycleInterval %d",Interval),
+	--
+	output ? shift(S1,0,"DEF TV TimeSensor{"),
+	output ? shift(S1,1,F1),
+	output ? shift(S1,1,"loop TRUE"),
+	output ? shift(S1,0,"}"),
+	output ? shift(S1,0,
+		"ROUTE TV.fraction_changed TO OI1.set_fraction"),
+	output ? shift(S1,0,
+		"ROUTE TV.fraction_changed TO P1.set_fraction"),
+	output ? shift(S1,0,
+		"ROUTE OI1.value_changed TO TR.set_rotation"),
+	output ? shift(S1,0,
+		"ROUTE P1.value_changed TO TR.set_translation"),
+	--
+	fail.
+write_MovingViewpoint(_).
+-----------------------------------------------------------------------
+get_any_position_of_viewpoint= vp(N,Name,X,Y,Z) :-
+	store ? find(Record),
+	Record == vp(N,Name,X,Y,Z).
+--
+save_viewpoint_positions(N,[vp(_,Name,X,Y,Z)|Rest]):-!,
+	store ? append(vp(N,Name,X,Y,Z)),
+	save_viewpoint_positions(N+1,Rest).
+save_viewpoint_positions(_,_).
+-----------------------------------------------------------------------
+sort_point_list(List1,List2):-
+	create_tree(Tree),
+	list_to_tree(List1,Tree),
+	tree_to_list(Tree,[],List2).
+--
+create_tree(_).
+--
+list_to_tree([I|Rest],Tree):-!,
+	insert_item(I,Tree),
+	list_to_tree(Rest,Tree).
+list_to_tree(_,_).
+--
+insert_item(I,b(I,_,_)):-!.
+insert_item(I1,b(I2,L,_)):-
+	is_greater(I1,I2),!,
+	insert_item(I1,L).
+insert_item(I,b(_,_,R)):-!,
+	insert_item(I,R).
+insert_item(_,_):-
+	break('Error in insert_item.').
+insert_item(_,_).
+--
+tree_to_list('empty',List,List):-!.
+tree_to_list(b(I,L,R),L1,L3):-!,
+	tree_to_list(L,L1,L2),
+	tree_to_list(R,[I|L2],L3).
+tree_to_list(_,_,_):-
+	break('Error in tree_to_list.').
+tree_to_list(_,_,[]).
+--
+is_greater(vp(_,_,_,Height1,_),vp(_,_,_,Height2,_)):-
+	Height1 > Height2.
+-----------------------------------------------------------------------
+write_key_items(N):-
+	write_key_items(0,N+1).
+--
+write_key_items(N,N):-!,
+	output ? write("1").
+write_key_items(N,Max):-
+	K== ?round((N / Max) * 100.0) / 100.0,
+	output ? write(K,", "),
+	write_key_items(N+1,Max).
+-----------------------------------------------------------------------
+write_viewpoint_positions(S1,N,Max):-
+	N <= Max,
+	store ? find(vp(N,_,X,Y,Z)),!,
+	write_viewpoint_position(
+		S1,?cast("PX",X),?cast("PY",Y),?cast("PZ",Z),","),
+	write_viewpoint_positions(S1,N+1,Max).
+write_viewpoint_positions(S1,_,_):-
+	store ? find(vp(0,_,X,Y,Z)),!,
+	write_viewpoint_position(
+		S1,?cast("PX",X),?cast("PY",Y),?cast("PZ",Z),"").
+write_viewpoint_positions(_,_,_).
+--
+write_viewpoint_position(S1,X,Y,Z,Rest):-
+	output ? shift(S1,1,"",X," ",Y," ",Z,Rest).
+-----------------------------------------------------------------------
+write_viewpoint_orientations(S1,N,Max):-
+	N <= Max,
+	store ? find(vp(N,_,X,Y,Z)),!,
+	write_viewpoint_orientations(
+		S1,N,?cast("PX",X),?cast("PY",Y),?cast("PZ",Z)),
+	write_viewpoint_orientations(S1,N+1,Max).
+write_viewpoint_orientations(S1,_,_):-
+	store ? find(vp(0,_,X,Y,Z)),!,
+	write_viewpoint_orientations(
+		S1,0,?cast("PX",X),?cast("PY",Y),?cast("PZ",Z)).
+write_viewpoint_orientations(_,_,_).
+--
+write_viewpoint_orientations(S1,N,X1,Y1,Z1):-
+	store ? find(vp(N+1,_,X2,Y2,Z2)),!,
+	write_viewpoint_orientation(
+		S1,
+		X1,Y1,Z1,
+		?cast("PX",X2),?cast("PY",Y2),?cast("PZ",Z2),
+		",").
+write_viewpoint_orientations(S1,_,X1,Y1,Z1):-
+	store ? find(vp(0,_,X2,Y2,Z2)),!,
+	write_viewpoint_orientation(
+		S1,
+		X1,Y1,Z1,
+		?cast("PX",X2),?cast("PY",Y2),?cast("PZ",Z2),
+		"").
+write_viewpoint_orientations(_,_,_,_,_):-
+	break('Error in write_viewpoint_orientations.').
+write_viewpoint_orientations(_,_,_,_,_).
+--
+write_viewpoint_orientation(S1,X1,Y1,Z1,X2,Y2,Z2,Rest):-
+	I== p(X1,Y1,Z1),
+	J== p(X2,Y2,Z2),
+	vector_operations ? compute_orientation(I,J,X3,Y3,Z3,Gamma),
+	output ? shift(S1,2,"",X3," ",Y3," ",Z3," ",Gamma,Rest).
+]
+-----------------------------------------------------------------------
+class 'ViewpointDatabase' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------
+class 'ViewpointBag' (specialized 'FindAll'):
+--
+mode	= 'bag';
+--
+[
+goal:-!.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------

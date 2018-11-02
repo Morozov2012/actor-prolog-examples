@@ -1,0 +1,11 @@
+
+CLAUSES:
+
+goal:-
+	input_font(FontName1,FontSize1),
+	
+	writeln(FontName1," ",FontSize1),
+	
+	input_font(FontName2,FontSize2,FontStyle2),
+	
+	writeln(FontName2," ",FontSize2," ",FontStyle2).

@@ -1,0 +1,91 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N	= INTEGER.
+--
+reference:
+--
+T_List	= INTEGER; ('Target'); #; T_List*.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+variable:
+--
+	p1	: T_List;
+--
+constant:
+--
+	p2	: 'Observer';
+--
+variable:
+--
+	r3	: T_List;
+--
+constant:
+--
+	p4	: 'Sender';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'T1' (specialized  'Target'):
+[
+]
+-----------------------------------------------------------------------
+interface 'T2' (specialized  'Target'):
+[
+]
+-----------------------------------------------------------------------
+interface 'Target' (specialized 'Report'):
+[
+PREDICATES:
+--
+nondeterm:
+--
+f(N,N,N,N) = T_List	- (i,i,i,i);
+--
+imperative:
+--
+hello;
+--
+'+'(N,N) = N		- (i,i);
+'+'(N,N) = INTEGER	- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'Observer' (specialized 'Report'):
+--
+variable:
+--
+	data	: T_List;
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Sender' (specialized 'Timer'):
+--
+constant:
+--
+	p1	: 'Target';
+	p2	: 'Target';
+--
+variable:
+--
+	output	: T_List;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+tick;
+--
+get_target(Seconds,T_List)	- (i,o);
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,166 @@
+------------------------------------------------------------------------
+--              An example of Actor Prolog program.                   --
+--              (c) 2012, Alexei A. Morozov, IRE RAS.                 --
+------------------------------------------------------------------------
+DOMAINS:
+--
+lazy:
+--
+Transactions	= ItemList; level(N,Transactions); 'empty_list'.
+--
+reference:
+--
+ItemList	= Item*.
+Item		= item(N,Text).
+N		= INTEGER.
+Text		= STRING.
+--
+------------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+feedback	: 'FeedBackChannel';
+p		: 'Bubble';
+--
+[
+]
+------------------------------------------------------------------------
+interface 'Bubble' (specialized 'Transaction'):
+--
+constant:
+--
+	watch	: 'Constraint';
+--
+variable:
+--
+	data_1	: Transactions;
+--
+constant:
+--
+	env	: 'Timer';
+	con	: 'Console';
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+i_goal(Transactions,Transactions)			- (i,o);
+--
+determ:
+--
+is_empty(Transactions,Transactions)			- (i,o);
+--
+nondeterm:
+--
+i_initialize(Transactions,Transactions)			- (i,o);
+--
+nondeterm:
+--
+i_append_item(Transactions,Transactions,N,Text)		- (i,o,i,i);
+i_retract_item(Transactions,Transactions,N,Text)	- (i,o,o,o);
+i_end_update(Transactions,Transactions)			- (i,o);
+--
+determ:
+--
+'<'(N,N)						- (i,i);
+'>'(Text,Text)						- (i,i);
+]
+------------------------------------------------------------------------
+interface 'Constraint' (specialized 'Transaction'):
+--
+output		: 'Report';
+--
+data_1		: Transactions;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+loop(INTEGER)		- (i);
+]
+------------------------------------------------------------------------
+-- Auxiliary Classes                                                  --
+------------------------------------------------------------------------
+interface 'Transaction' (specialized 'Console'):
+--
+variable:
+--
+	data_1		: Transactions;
+	data_2		: Transactions;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+begin_update(Transactions,Transactions)			- (i,_);
+begin_transaction(Transactions,Transactions)		- (i,_);
+--
+determ:
+--
+bind_if_need(Transactions)				- (i);
+--
+nondeterm:
+--
+end_update(Transactions,Transactions)			- (i,_);
+--
+nondeterm:
+--
+end_transaction(Transactions,Transactions)		- (i,_);
+--
+link;
+--
+dummy_link(Transactions)				- (i);
+--
+find(Item)						- (i);
+--
+find(Transactions,Item)					- (i,_);
+--
+find_update(Transactions,Item)				- (i,_);
+--
+find_in_list(Transactions,Item)				- (i,_);
+--
+insert(Transactions,Transactions,Item)			- (i,_,i);
+append(Transactions,Transactions,Item)			- (i,_,i);
+--
+append_list(Transactions,Transactions,Item)		- (i,_,i);
+--
+clear(Transactions,Transactions)			- (i,_);
+--
+retract(Transactions,Transactions,Item)			- (i,_,_);
+--
+retract_list(Transactions,Transactions,Item)		- (i,_,_);
+--
+retractall(Transactions,Transactions,Item)		- (i,i,_);
+--
+retract_all_from_list(Transactions,Transactions,Item)	- (i,i,_);
+--
+is_element(Transactions,Item)				- (i,i);
+--
+imperative:
+--
+'+'(N,N) = N						- (i,i);
+'-'(N,N) = N						- (i,i);
+]
+------------------------------------------------------------------------
+interface 'FeedBackChannel':
+--
+variable:
+--
+	input	: Transactions;
+--
+protecting:
+--
+	output	: Transactions;
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+goal;
+]
+------------------------------------------------------------------------

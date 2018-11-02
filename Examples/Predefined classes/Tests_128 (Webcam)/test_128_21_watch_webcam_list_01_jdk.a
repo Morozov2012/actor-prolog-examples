@@ -1,0 +1,42 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+
+PREDICATES:
+
+imperative:
+
+check_watcher;
+
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	check_watcher,
+	watch_webcam_list('yes'),
+	check_watcher,
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Please connect additional webcams"),
+	con ? writeln("or disconnect already connected ones."),
+	con ? writeln("Listening for events...").
+--
+check_watcher:-
+	watch_webcam_list(Mode),
+	con ? set_color('default'),
+	con ? writeln("Webcam list watcher is active: ",Mode).
+--
+webcam_added(WebcamName):-!,
+	con ? set_color('DkGreen'),
+	con ? writeln("This webcam is connected: ",WebcamName).
+--
+webcam_removed(WebcamName):-!,
+	con ? set_color('Red'),
+	con ? writeln("This webcam is disconnected: ",WebcamName).
+]

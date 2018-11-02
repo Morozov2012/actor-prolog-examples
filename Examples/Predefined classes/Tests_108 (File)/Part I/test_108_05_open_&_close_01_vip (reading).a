@@ -1,0 +1,154 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+test9;
+
+class 'Main':
+--
+constant:
+--
+	testbed1	= (('Test',
+				name= "test.asc",
+				time_delay= 1));
+	testbed2	= (('Test',
+				name= 'stdin',
+				time_delay= 2));
+	testbed3	= (('Test',
+				name= 'stdout',
+				time_delay= 3));
+	testbed4	= (('Test',
+				name= 'stderr',
+				time_delay= 4));
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'Timer'):
+--
+constant:
+--
+	name		: FileName;
+	time_delay	: INTEGER;
+--
+internal:
+--
+	file	= ('File',
+			name);
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	delay(time_delay).
+--
+tick:-!,
+	con ? writeln("=== File: ",name," ==="),
+	test6,
+	test7,
+	test1,
+	test4,
+	test8,
+	test3,
+	test8,
+	test9,
+	test5,
+	test2,
+	test4,
+	test8,
+	test3,
+	test8,
+	test5.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tI will try to open the file for reading."),
+	file ? open('reading'),
+	con ? writeln("\tDone!").
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tI will try to open the file for reading."),
+	file ? open(name,'reading'),
+	con ? writeln("\tDone!").
+--
+test3:-
+	con ? writeln("Test 3"),
+	con ? writeln("\tI will try to read a line."),
+	Text== file?read_line(),!,
+	con ? writeln("\tResult: >>>",Text,"<<<").
+test3:-
+	con ? writeln("\tI cannot read it.").
+--
+test4:-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to read a byte."),
+	Byte== file?read_byte(),!,
+	con ? writeln("\tResult: >>>",Byte,"<<<").
+test4:-
+	con ? writeln("\tI cannot read it.").
+--
+test5:-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to close the file."),
+	file ? close(),
+	con ? writeln("\tThe file was closed successfully.").
+--
+test6:-
+	con ? writeln("Test 6"),
+	string(name),!,
+	con ? writeln("\tI will try to create the file."),
+	file ? set_string("Hello world!"),
+	con ? writeln("\tDone.").
+test6:-
+	con ? writeln(
+		"\tThe ",name," standard file is already created.").
+--
+test7:-
+	con ? writeln("Test 7"),
+	con ? writeln("\tDoes the file exist?"),
+	file ? does_exist(),!,
+	con ? writeln("\tYes, it does!").
+test7:-
+	con ? writeln("\tNo, it doesn't.").
+--
+test8:-
+	con ? writeln("Test 8"),
+	con ? writeln("\tIs this the end of the file?"),
+	file ? eof(),!,
+	con ? writeln("\tYes, it is!").
+test8:-
+	con ? writeln("\tNo, it is not.").
+--
+test9:-
+	con ? writeln("Test 9"),
+	con ? writeln("\tI will try to flush the file."),
+	file ? flush(),
+	con ? writeln("\tThe file was flushed successfully.").
+--
+alarm(Exception):-!,
+	con ? set_color('Red'),
+	con ? writeln("Error: ",Exception),
+	con ? set_color('default').
+]

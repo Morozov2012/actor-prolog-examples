@@ -1,0 +1,13 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+interface 'ColoredReport' (specialized 'Report'):
+[
+IMPERATIVES:
+--
+write_value(STRING,_)			- (i,i);
+write_colored_term(_)			- (i);
+write_error_message(STRING)		- (i);
+]
+-----------------------------------------------------------------------

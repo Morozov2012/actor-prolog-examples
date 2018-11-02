@@ -1,0 +1,102 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+N	= SYMBOL.
+R	= REAL.
+S	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'MyHashMap' (specialized 'LinkedHashMap'):
+[
+DOMAINS:
+--
+TargetValue	= f(N,R,S).
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyHashMap');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("I will retrieve the first key:"),
+	set_color('default'),
+	K1== store?get_first_key(),!,
+	writeln("The first key: ",K1),
+	set_color('Red'),
+	writeln("Done."),
+	set_color('default').
+test1:-
+	set_color('DkGreen'),
+	writeln("Failure!"),
+	set_color('default').
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("I will retrieve the first key:"),
+	set_color('default'),
+	store?get_first_key(),!,
+	set_color('Red'),
+	writeln("Done."),
+	set_color('default').
+test2:-
+	set_color('DkGreen'),
+	writeln("Failure!"),
+	set_color('default').
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("I will store data items."),
+	set_color('default'),
+	store ? append(map(10000,f('s10',3.14,"Text10"))),
+	store ? append(map(20000,f('s20',3.14,"Text20"))),
+	store ? append(map(30000,f('s30',3.14,"Text30"))),
+	K1== store?get_first_key(),
+	store ? insert_after(f('s12',3.14,"Text12"),K1,K2),
+	writeln("Key one: ",K2),
+	K3== store?get_first_key(),!,
+	store ? insert_after(f('s11',3.14,"Text11"),K3,K4),
+	writeln("Key two: ",K4),
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+test3:-
+	set_color('Red'),
+	writeln("Failure!"),
+	set_color('default').
+--
+test4:-
+	set_color('RoyalBlue'),
+	writeln("I will retrieve data items:"),
+	set_color('Blue'),
+	store ? find(Item),
+		writeln(Item),
+		fail.
+test4:-
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+]
+-----------------------------------------------------------------------

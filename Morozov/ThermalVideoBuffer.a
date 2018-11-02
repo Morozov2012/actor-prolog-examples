@@ -1,0 +1,112 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/ThermalVideoBuffer":
+
+import 'VideoBuffer' from "Morozov/VideoBuffer";
+import 'BufferedImage' from "Morozov/Java2D";
+import "Morozov/Vision";
+
+--------------------------------------------------------------------
+-- The 'ThermalVideoBuffer' class is specialized                  --
+-- class 'VideoBuffer'.                                           --
+--------------------------------------------------------------------
+
+class 'ThermalVideoBuffer' (specialized 'VideoBuffer'):
+
+autoranging_mode				= 'on';
+averaging_mode					= 'off';
+--
+double_color_map_mode				= 'off';
+main_color_map					= 'PURPLE';
+auxiliary_color_map				= 'GRAY';
+--
+lower_temperature_bound				= -10.0;
+upper_temperature_bound				= 100.0;
+lower_main_temperature_quantile			= 0.0;
+upper_main_temperature_quantile			= 100.0;
+lower_auxiliary_temperature_quantile		= 0.0;
+upper_auxiliary_temperature_quantile		= 100.0;
+--
+use_recorded_temperature_range_commands		= 'no';
+use_recorded_color_map_commands			= 'no';
+--
+[
+SOURCE:
+	"morozov.built_in.ThermalVideoBuffer";
+
+CLAUSES:
+--
+reset_frame_rate:
+	[external "resetFrameRate"].
+--
+get_delivered_color_maps(MainColorMap,AuxiliaryColorMap):
+	[external "getDeliveredColorMaps"].
+--
+set_autoranging_mode(OnOff):
+	[external "setAutorangingMode"].
+get_autoranging_mode() = OnOff:
+	[external "getAutorangingMode"].
+--
+set_averaging_mode(OnOff):
+	[external "setAveragingMode"].
+get_averaging_mode() = OnOff:
+	[external "getAveragingMode"].
+--
+set_double_color_map_mode(OnOff):
+	[external "setDoubleColorMapMode"].
+get_double_color_map_mode() = OnOff:
+	[external "getDoubleColorMapMode"].
+--
+set_main_color_map(DetailedColorMap):
+	[external "setMainColorMap"].
+get_main_color_map() = DetailedColorMap:
+	[external "getMainColorMap"].
+--
+set_auxiliary_color_map(DetailedColorMap):
+	[external "setAuxiliaryColorMap"].
+get_auxiliary_color_map() = DetailedColorMap:
+	[external "getAuxiliaryColorMap"].
+--
+set_lower_temperature_bound(Temperature):
+	[external "setLowerTemperatureBound"].
+get_lower_temperature_bound() = Temperature:
+	[external "getLowerTemperatureBound"].
+--
+set_upper_temperature_bound(Temperature):
+	[external "setUpperTemperatureBound"].
+get_upper_temperature_bound() = Temperature:
+	[external "getUpperTemperatureBound"].
+--
+set_lower_main_temperature_quantile(Temperature):
+	[external "setLowerMainTemperatureQuantile"].
+get_lower_main_temperature_quantile() = Temperature:
+	[external "getLowerMainTemperatureQuantile"].
+--
+set_upper_main_temperature_quantile(Temperature):
+	[external "setUpperMainTemperatureQuantile"].
+get_upper_main_temperature_quantile() = Temperature:
+	[external "getUpperMainTemperatureQuantile"].
+--
+set_lower_auxiliary_temperature_quantile(Temperature):
+	[external "setLowerAuxiliaryTemperatureQuantile"].
+get_lower_auxiliary_temperature_quantile() = Temperature:
+	[external "getLowerAuxiliaryTemperatureQuantile"].
+--
+set_upper_auxiliary_temperature_quantile(Temperature):
+	[external "setUpperAuxiliaryTemperatureQuantile"].
+get_upper_auxiliary_temperature_quantile() = Temperature:
+	[external "getUpperAuxiliaryTemperatureQuantile"].
+--
+set_use_recorded_temperature_range_commands(YesNo):
+	[external "setUseRecordedTemperatureRangeCommands"].
+get_use_recorded_temperature_range_commands() = YesNo:
+	[external "getUseRecordedTemperatureRangeCommands"].
+--
+set_use_recorded_color_map_commands(YesNo):
+	[external "setUseRecordedColorMapCommands"].
+get_use_recorded_color_map_commands() = YesNo:
+	[external "getUseRecordedColorMapCommands"].
+]

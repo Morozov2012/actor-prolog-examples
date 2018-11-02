@@ -1,0 +1,291 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	data_directory		= "data";
+	target_directory	= "Fight_RunAway1";
+	sampling_rate		= 25;
+--
+	sender		= (('Sender',
+				target= receiver,
+				data_directory,
+				target_directory,
+				sampling_rate));
+--
+	receiver	= (('Receiver',
+				data_directory,
+				target_directory,
+				sampling_rate));
+--
+[
+]
+-----------------------------------------------------------------------
+class 'Sender' (specialized 'Timer'):
+--
+constant:
+--
+	target;
+--
+constant:
+--
+	data_directory;
+	target_directory;
+	sampling_rate;
+--
+	target_CVML_description	= "fra1gt.xml";
+--
+internal:
+--
+	description	= ('CVML_Resource',
+				location= data_directory);
+	store		= ('CVML_Store');
+	state		= ('ProgramState');
+--
+	con		= ('Console',
+				x= 10,
+				y= 22,
+				height= 3);
+--
+[
+goal:-!,
+	Content== description?get_trees(
+		"jar:" + data_directory + "/" +
+		target_directory + "_jpg" + "/" +
+		target_CVML_description),
+	save_frames(Content),
+	Time0== ?milliseconds(),
+	state ? set_beginning_time(Time0),
+	set_period((1/sampling_rate/2),0),
+	activate.
+--
+save_frames([Frame|Rest]):-!,
+	save_frame(Frame),
+	save_frames(Rest).
+save_frames([]):-!.
+save_frames(ErrorMessage):-
+	con ? writeln(
+		"I cannot read the \"",
+		target_CVML_description,
+		"\" file: ",
+		ErrorMessage).
+--
+save_frame(block("FRAME",FrameContent)):-!,
+	save_frame_content(FrameContent,FrameContent).
+save_frame(_).
+--
+save_frame_content([attribute("NUMBER",T)|_],FrameContent):-!,
+	save_frame_number_and_content(T,FrameContent).
+save_frame_content([_|Rest],FrameContent):-!,
+	save_frame_content(Rest,FrameContent).
+save_frame_content(_,_).
+--
+save_frame_number_and_content(T,FrameContent):-
+	N== ?convert_to_integer(T),!,
+	store ? put(N,FrameContent).
+save_frame_number_and_content(_,_).
+--
+tick:-
+	T2== ?milliseconds(),
+	state ? get_beginning_time(T1),
+	Delta== (T2 - T1) / 1000.0 * sampling_rate,
+	N== ?convert_to_integer(?round(Delta)),!,
+	load_figure(N,T2).
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	FrameContent== store?get(N),!,
+	extract_object_list(FrameContent,Objects),
+	target [<<] process_frame(N,Objects).
+load_figure(_,T2):-
+	state ? set_beginning_time(T2).
+--
+extract_object_list([block("OBJECTLIST",Objects)|_],Objects):-!.
+extract_object_list([_|Rest],Objects):-!,
+	extract_object_list(Rest,Objects).
+extract_object_list(_,[]).
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Alpha'):
+--
+constant:
+--
+	data_directory;
+	target_directory;
+	sampling_rate;
+--
+internal:
+--
+	image		= ('BufferedImage');
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	prompt_window	= ('Report',
+				y= 22,
+				height= 3);
+	con		= ('Console',
+				x= 40,
+				y= 22,
+				height= 3);
+--
+[
+goal:-!,
+	graphic_window ? show,
+	prompt_window ? write(
+		"The data are coming from the EC Funded CAVIAR ",
+		"project / IST 2001 37540,\n",
+		"found at URL: ",
+		"http://homepages.inf.ed.ac.uk/rbf/CAVIAR/.").
+--
+process_frame(N,Objects):-
+	ImageToBeDrawn==
+		"jar:" + data_directory + "/" +
+		target_directory + "_jpg" + "/JPEGS/" +
+		target_directory +
+		con?format("%03d",N) + ".jpg",
+	image ? load(ImageToBeDrawn),
+	image ? get_size_in_pixels(IW,IH),
+	graphic_window ? clear('no'),
+	graphic_window ? draw_image(image,0,0,1,1),
+	show_object_list(Objects,IW,IH),
+	graphic_window ? draw_now.
+--
+show_object_list([Object|Rest],IW,IH):-!,
+	show_object(Object,IW,IH),
+	show_object_list(Rest,IW,IH).
+show_object_list(_,_,_).
+--
+show_object(block("OBJECT",ObjectAttributes),IW,IH):-!,
+	show_object_attributes(ObjectAttributes,"",IW,IH).
+show_object(_,_,_).
+--
+show_object_attributes([attribute("ID",Id)|Rest],_,IW,IH):-!,
+	show_object_attributes(Rest,Id,IW,IH).
+show_object_attributes([Attribute|Rest],Id,IW,IH):-!,
+	show_object_attribute(Attribute,Id,IW,IH),
+	show_object_attributes(Rest,Id,IW,IH).
+show_object_attributes(_,_,_,_).
+--
+show_object_attribute(block("BOX",BoxAttributes),Id,IW,IH):-!,
+	show_box_attributes(
+		BoxAttributes,Id,"","","","",IW,IH,'Yellow',3).
+show_object_attribute(_,_,_,_).
+--
+show_box_attributes(
+		[attribute("H",TH)|Rest],
+		Id,TX,TY,TW,_,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		[attribute("W",TW)|Rest],
+		Id,TX,TY,_,TH,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		[attribute("XC",TX)|Rest],
+		Id,_,TY,TW,TH,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		[attribute("YC",TY)|Rest],
+		Id,TX,_,TW,TH,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		[_|Rest],Id,TX,TY,TW,TH,IW,IH,Color,LineWidth):-!,
+	show_box_attributes(
+		Rest,Id,TX,TY,TW,TH,IW,IH,Color,LineWidth).
+show_box_attributes(
+		_,_/*Id*/,TX,TY,TW,TH,IW,IH,Color,LineWidth):-
+	X1== ?convert_to_numerical(TX),
+	Y1== ?convert_to_numerical(TY),
+	W1== ?convert_to_numerical(TW),
+	H1== ?convert_to_numerical(TH),!,
+	X2== (X1 - W1 / 2) / IW,
+	Y2== (Y1 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? set_pen({color:Color,lineWidth:LineWidth}),
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2).
+show_box_attributes(_,_,_,_,_,_,_,_,_,_).
+]
+-----------------------------------------------------------------------
+class 'CVML_Resource' (specialized 'WebReceptor'):
+--
+constant:
+--
+tags	= [	/*
+		"?xml",
+		"dataset",
+		*/
+		"frame",
+		"objectlist",
+		"object",
+		"grouplist",
+		"group",
+		/*
+		"orientation",
+		*/
+		"box",
+		/*
+		"context",
+		*/
+		"situation"
+		/*
+		"appearance",
+		"hypothesislist",
+		"hypothesis",
+		"movement",
+		"role",
+		"context",
+		"situation"
+		*/];
+--
+extract_attributes	= 'yes';
+--
+[
+unpaired_tags_table(_):-!,
+	fail.
+flat_tags_table(_):-!,
+	fail.
+reference_containers_table(_,_):-!,
+	fail.
+special_entities_table(_,_):-!,
+	fail.
+]
+-----------------------------------------------------------------------
+class 'CVML_Store' (specialized 'HashMap'):
+[
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+[
+CLAUSES:
+--
+get_beginning_time(T):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(T),!.
+--
+set_beginning_time(T):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(T)).
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)).
+]
+-----------------------------------------------------------------------

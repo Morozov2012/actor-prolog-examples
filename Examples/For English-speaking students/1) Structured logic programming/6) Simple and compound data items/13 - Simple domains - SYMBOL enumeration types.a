@@ -1,0 +1,41 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- SYMBOL.                               --
+--                                       --
+-- Questions: What is a symbol           --
+-- enumeration type? How can one create  --
+-- a new domain that is a kind of a      --
+-- symbol enumeration type? Does the     --
+-- compiler check whether a term of this --
+-- domain belongs to the enumeration?    --
+-- Can an enumeration type include       --
+-- numbers, symbols, and strings         --
+-- simultaneously?                       --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+MonthName =
+	'January'; 'February'; 'March';
+	'April'; 'May'; 'June'; 'July';
+	'August'; 'September'; 'October';
+	'November'; 'December'.
+
+PREDICATES:
+
+p(MonthName)		- (i);
+
+CLAUSES:
+
+goal:-
+	-- p('WrongName').
+	p('April').
+
+p(X):-
+	writeln(X).

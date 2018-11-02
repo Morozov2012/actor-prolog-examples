@@ -1,0 +1,82 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	number_of_agents	: INTEGER;
+--
+	agents	: 'AgentArray' of 'MyAgent';
+--
+internal:
+--
+	store	: 'DataStore';
+--
+	con	: 'Console';
+--
+[]
+-----------------------------------------------------------------------
+interface 'AgentArray' (specialized 'DynamicWorlds'):
+[
+PREDICATES:
+--
+nondeterm:
+--
+element(INTEGER*) = 'MyAgent'		- (_);
+]
+-----------------------------------------------------------------------
+interface 'MyAgent' (specialized 'Timer'):
+--
+constant:
+--
+	data_store	: 'DataStore';
+--
+internal:
+--
+	database	: 'MyDatabase';
+	con		: 'Report';
+--
+constant:
+--
+	target_width	: Width;
+	target_height	: Height;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+initiate(INTEGER,INTEGER)		- (i,i);
+--
+imperative:
+--
+'-'(Width,Width) = INTEGER		- (i,i);
+'-'(Height,Height) = INTEGER		- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	con	: 'Report';
+--
+[
+DOMAINS:
+--
+Target		= my_data(REAL).
+--
+PREDICATES:
+--
+imperative:
+--
+test_database;
+report_whether_database_is_updated;
+--
+update_database;
+update_database(REAL)			- (i);
+--
+report_checksum(REAL)			- (i);
+]
+-----------------------------------------------------------------------

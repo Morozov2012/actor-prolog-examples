@@ -1,0 +1,15 @@
+
+PREDICATES:
+
+nondeterm:
+
+a;
+c;
+
+determ:
+
+b;
+e;
+f;
+g;
+d;

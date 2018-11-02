@@ -1,0 +1,102 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	p1	= (('Receiver'));
+--
+internal:
+--
+	timer1	= ('MainTimer',
+			receiver=p1,
+			con);
+	timer2	= ('AuxiliaryTimer',
+			receiver=p1,
+			con);
+--
+	con	= ('Report',
+			y= 0,
+			height= 12);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'MainTimer' (specialized 'Timer'):
+--
+constant:
+--
+	receiver;
+--
+internal:
+--
+	con;
+--
+[
+goal:-!,
+	set_period(2,0),
+	activate.
+--
+tick:-!,
+	Time== ?time(),
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Main Timer :: Current time: ",Time),
+	con ? set_color('default'),
+	receiver << message("From the Main timer").
+]
+-----------------------------------------------------------------------
+class 'AuxiliaryTimer' (specialized 'Timer'):
+--
+constant:
+--
+	receiver;
+--
+internal:
+--
+	con;
+--
+[
+goal:-!,
+	delay(5).
+--
+tick:-!,
+	Time== ?time(),
+	con ? set_color('Fuchsia'),
+	con ? writeln("Auxiliary Timer :: Current time: ",Time),
+	con ? set_color('default'),
+	receiver << message("From the Auxiliary timer").
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Alpha'):
+--
+internal:
+--
+	env	= ('Timer');
+--
+	con	= ('Report',
+			y= 12,
+			height= 13);
+--
+[
+PREDICATES:
+--
+imperative:
+--
+message(STRING)		- (i);
+--
+CLAUSES:
+--
+goal:-!.
+--
+message(Text):-
+	Time== env?time(),
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"Receiver: ",
+		"I have received message: \"",
+		Text,"\" at ",Time),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

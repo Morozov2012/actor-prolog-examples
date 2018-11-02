@@ -1,0 +1,56 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+--                                                                   --
+-- This is a demonstration of using the mouse for interaction        --
+-- in a Java 3D scene.                                               --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+class 'Main' (specialized 'Canvas3D'):
+--
+constant:
+--
+	y	= 0;
+	height	= 19;
+--
+internal:
+--
+con	= ('Console',
+		y= 19,
+		height= 6);
+--
+[
+goal:-!,
+	show([
+		'TransformGroup'({
+			allowTransformWrite: 'yes',
+			allowTransformRead: 'yes',
+			branches: [
+				'ColorCube'({
+					scale: 0.4
+					}),
+				'MouseRotate'({
+					schedulingBounds: 'BoundingSphere'({})
+					}),
+				'MouseTranslate'({
+					schedulingBounds: 'BoundingSphere'({})
+					}),
+				'MouseZoom'({
+					schedulingBounds: 'BoundingSphere'({})
+					}),
+				'MouseWheelZoom'({
+					schedulingBounds: 'BoundingSphere'({})
+					})
+				]
+			})
+		]),
+	con ? writeln(
+		"Hold the mouse button while moving "
+		"the mouse to make the cube move:\n"
+		"     left mouse button      - rotate cube;\n"
+		"     right mouse button     - translate cube;\n"
+		"     mouse wheel            - zoom cube;\n"
+		"     Alt+left mouse button  - zoom cube.").
+]

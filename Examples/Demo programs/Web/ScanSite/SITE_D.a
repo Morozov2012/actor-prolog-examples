@@ -1,0 +1,14 @@
+---------------------------------------------------------------
+--            An example of Actor Prolog program.            --
+--        (c) 2002-2012, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This program is an example of visual component-oriented   --
+-- programming in Actor Prolog. The program consists only of --
+-- the SADT diagram in the IDL format. The source text       --
+-- components written in Actor Prolog are connected to the   --
+-- program automatically in accordance to the names of       --
+-- blocks of the SADT diagram and the #package options       --
+-- included into the notes of the blocks of the diagram.     --
+-- Actor Prolog translates the diagram into the logic        --
+-- program and executes it.                                  --
+---------------------------------------------------------------

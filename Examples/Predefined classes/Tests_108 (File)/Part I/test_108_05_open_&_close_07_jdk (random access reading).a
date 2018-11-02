@@ -1,0 +1,246 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3(Color,Color)	- (i,i);
+test4(Color,Color)	- (i,i);
+test5;
+test6;
+test7(Color,Color)	- (i,i);
+test8(Color,Color)	- (i,i);
+test9;
+test10;
+test11;
+test12;
+test13;
+test14;
+test15;
+
+class 'Main':
+--
+internal:
+--
+	file1	= ('Test',
+			name= "test.asc");
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'File'):
+--
+constant:
+--
+	name	: FileName;
+--
+	random_access	= 'on';
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("=== File: ",name," ==="),
+	test6,
+	test7('DkGreen','Red'),
+	test1,
+	test4('DkGreen','Red'),
+	test8('Red','DkGreen'),
+	test3('DkGreen','Red'),
+	test8('DkGreen','Red'),
+	test9,
+	test5,
+	test2,
+	test4('DkGreen','Red'),
+	test8('Red','DkGreen'),
+	test3('DkGreen','Red'),
+	test10,
+	test3('Red','DkGreen'),
+	test11,
+	test10,
+	test3('DkGreen','Red'),
+	test14,
+	test12,
+	test10,
+	test3('DkGreen','Red'),
+	test13,
+	test10,
+	test3('DkGreen','Red'),
+	test14,
+	test10,
+	test3('DkGreen','Red'),
+	test8('DkGreen','Red'),
+	test5,
+	test15.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tI will try to open the file for reading."),
+	?open('reading'),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tDone."),
+	con ? set_color('default').
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tI will try to open the file for reading."),
+	?open(name,'reading'),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tDone."),
+	con ? set_color('default').
+--
+test3(Color,_):-
+	con ? writeln("Test 3"),
+	con ? writeln("\tI will try to read a line."),
+	Text== ?read_line(),!,
+	con ? set_color(Color),
+	con ? write("\tResult: >>>"),
+	con ? set_color('Blue'),
+	con ? write(Text),
+	con ? set_color(Color),
+	con ? writeln("<<<"),
+	con ? set_color('default').
+test3(_,Color):-
+	con ? set_color(Color),
+	con ? writeln("\tI cannot read it."),
+	con ? set_color('default').
+--
+test4(Color,_):-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to read a byte."),
+	Byte== ?read_byte(),!,
+	con ? set_color(Color),
+	con ? write("\tResult: >>>"),
+	con ? set_color('Blue'),
+	con ? write(Byte),
+	con ? set_color(Color),
+	con ? writeln("<<<"),
+	con ? set_color('default').
+test4(_,Color):-
+	con ? set_color(Color),
+	con ? writeln("\tI cannot read it."),
+	con ? set_color('default').
+--
+test5:-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to close the file."),
+	?close(),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tThe file was closed successfully."),
+	con ? set_color('default').
+--
+test6:-
+	con ? writeln("Test 6"),
+	con ? writeln("\tI will try to create the file."),
+	?set_string("0123456789"),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tDone."),
+	con ? set_color('default').
+--
+test7(Color,_):-
+	con ? writeln("Test 7"),
+	con ? writeln("\tDoes the file exist?"),
+	?does_exist(),!,
+	con ? set_color(Color),
+	con ? writeln("\tYes, it does."),
+	con ? set_color('default').
+test7(_,Color):-
+	con ? set_color(Color),
+	con ? writeln("\tNo, it doesn't."),
+	con ? set_color('default').
+--
+test8(Color,_):-
+	con ? writeln("Test 8"),
+	con ? writeln("\tIs this the end of the file?"),
+	?eof(),!,
+	con ? set_color(Color),
+	con ? writeln("\tYes, it is."),
+	con ? set_color('default').
+test8(_,Color):-
+	con ? set_color(Color),
+	con ? writeln("\tNo, it is not."),
+	con ? set_color('default').
+--
+test9:-
+	con ? writeln("Test 9"),
+	con ? writeln("\tI will try to flush the file."),
+	?flush(),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tThe file was flushed successfully."),
+	con ? set_color('default').
+--
+test10:-
+	con ? writeln("Test 10"),
+	con ? writeln("\tI will try to get the file position."),
+	?get_position(),
+	P== ?get_position(),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tPosition = ",P),
+	con ? set_color('default').
+--
+test11:-
+	con ? writeln("Test 11"),
+	con ? writeln("\tI will try to set the file position"),
+	con ? writeln("\trelative to the start of the file."),
+	P== 3,
+	?set_position(P,'start'),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tPosition = ",P),
+	con ? set_color('default').
+--
+test12:-
+	con ? writeln("Test 12"),
+	con ? writeln("\tI will try to set the file position"),
+	con ? writeln("\trelative to the current position"),
+	con ? writeln("\tof the file."),
+	P== 2,
+	?set_position(P,'relative'),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tPosition = ",P),
+	con ? set_color('default').
+--
+test13:-
+	con ? writeln("Test 13"),
+	con ? writeln("\tI will try to set the file position"),
+	con ? writeln("\trelative to the end of the file."),
+	P== -3,
+	?set_position(P,'end'),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tPosition = ",P),
+	con ? set_color('default').
+--
+test14:-
+	con ? writeln("Test 14"),
+	con ? writeln("\tI will try to set the file position"),
+	con ? writeln("\tin the default mode."),
+	P== 3,
+	?set_position(P),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tPosition = ",P),
+	con ? set_color('default').
+--
+test15:-
+	con ? writeln("Test 15"),
+	con ? writeln("\tI will try to read the file."),
+	Text== ?get_string(),
+	con ? set_color('DkGreen'),
+	con ? write("\tResult: >>>"),
+	con ? set_color('Blue'),
+	con ? write(Text),
+	con ? set_color('DkGreen'),
+	con ? writeln("<<<"),
+	con ? set_color('default').
+]

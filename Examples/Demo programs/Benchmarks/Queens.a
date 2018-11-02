@@ -1,0 +1,88 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  QUEENS                                                           --
+--                                                                   --
+--  9-queens program                                                 --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  2015.06.28 02:32                                                 --
+--  Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB         --
+--  Windows7 - PM.64 (RUS)                                           --
+--  ========================================================         --
+--  AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                           --
+--                                                                   --
+--  g:\temp1\jv>java -version                                        --
+--  java version "1.7.0_80"                                          --
+--  Java(TM) SE Runtime Environment (build 1.7.0_80-b15)             --
+--  Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)  --
+--                                                                   --
+--  java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation            --
+--  -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch       --
+--                                                                   --
+--  10000 iterations take 192196 msec                                --
+--  19.219600 milliseconds per iteration                             --
+--                                                                   --
+--  EXE file:                                                        --
+--                                                                   --
+--  10000 iterations take 19920 msec                                 --
+--  1.992 milliseconds per iteration                                 --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities' from "HARNESS";
+-----------------------------------------------------------------------
+PREDICATES:
+--
+nondeterm:
+--
+queen(TestData,TestData)			- (i,o);
+queen_2(TestData,TestData,TestData)		- (i,i,o);
+qperm(TestData,TestData)			- (i,o);
+qdelete(INTEGER,INTEGER,TestData,TestData)	- (o,i,i,o);
+--
+determ:
+--
+safe(TestData)					- (i);
+nodiag(TestData,INTEGER,INTEGER)		- (i,i,i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+[
+benchmark(Data,Out):-
+	queen(Data,Out).
+--
+data([1,2,3,4,5,6,7,8,9]).
+--
+queen(Data,Out):-
+	queen_2(Data,[],Out).
+--
+queen_2([],_,[]).
+queen_2([H|T],History,[Q|M]):-
+	qdelete(Q,H,T,L1),
+	nodiag(History,Q,1),
+	queen_2(L1,[Q|History],M).
+--
+qperm([],[]).
+qperm([X|Y],[U|V]):-
+	qdelete(U,X,Y,Z),
+	qperm(Z,V).
+--
+qdelete(A,A,L,L).
+qdelete(X,A,[H|T],[A|R]):-
+	qdelete(X,H,T,R).
+--
+safe([]).
+safe([N|L]):-
+	nodiag(L,N,1),
+	safe(L).
+--
+nodiag([],_,_).
+nodiag([N|L],B,D1):-
+	D1 <> N - B,
+	D1 <> B - N,
+	D2== D1 + 1,
+	nodiag(L,B,D2).
+]
+-----------------------------------------------------------------------

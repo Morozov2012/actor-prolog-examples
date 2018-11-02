@@ -1,0 +1,180 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Underdetermined sets.                 --
+--                                       --
+-- Questions: What are underdetermined   --
+-- sets? What is the idea of the         --
+-- unification of the underdetermined    --
+-- sets? Can the name of a pair of an    --
+-- underdetermined set be a variable?    --
+-- Can the value of the pair be a        --
+-- variable? Can this variable be        --
+-- unbound? Can one unify                --
+-- underdetermined sets that contain     --
+-- pairs with unbound values? How can a  --
+-- non-ground value of a pair be refined --
+-- during the unification of an          --
+-- underdetermined set? Can an           --
+-- underdetermined set accept new        --
+-- elements (pairs) during the           --
+-- unification? How can an unbound tail  --
+-- of an underdetermined set be refined  --
+-- during the unification of the set?    --
+-- Let R be a tail of an underdetermined --
+-- set that contains a pair with the f   --
+-- name. Can the R variable be unified   --
+-- with an underdetermined set that      --
+-- contains a pair with the same name f? --
+-- Why is the unification impossible?    --
+-- Can an underdetermined set contain    --
+-- two pairs with the same name? Does    --
+-- the compiler check this condition     --
+-- during the translation of the         --
+-- program? Does the compiler implement  --
+-- this rule during the execution of the --
+-- program?                              --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+reference:
+
+Fruit	= {	name:R_STRING,
+		taste:Taste,
+		size:Size,
+		color:R_SYMBOL}.
+
+Taste		= 'good'; 'bad'.
+Size		= 'big'; 'medium'; 'small'.
+R_STRING	= STRING.
+R_SYMBOL	= SYMBOL.
+
+PREDICATES:
+
+create_variable(Taste)		- (o);
+create_variable(Size)		- (o);
+create_variable(R_STRING)	- (o);
+create_variable(R_SYMBOL)	- (o);
+create_variable(Fruit)		- (o);
+--
+match(Fruit,Fruit)		- (i,i);
+
+CLAUSES:
+
+goal:-
+	create_variable(C2),
+	--
+	match(	{
+		name:"pear",
+		size:'big',
+		color:'yellow',
+		taste:'good'},
+		{
+		name:"pear",
+		taste:'good',
+		color:C2,
+		size:'big'}),
+	--
+	create_variable(R4),
+	--
+	match(	{
+		name:"pear",
+		color:'yellow',
+		taste:'good',
+		size:'big'},
+		{
+		color:'yellow',
+		name:"pear"
+		|R4}),
+	--
+	create_variable(R5),
+	--
+	match({name:"pear"|R5},R4),
+	--
+	create_variable(R7),
+	--
+	match({name:"pear"|R7},R5),
+	--
+	create_variable(N9),
+	create_variable(T10),
+	--
+	match(	{
+		color:'yellow',
+		name:N9,
+		size:'big',
+		taste:'good'},
+		{
+		name:"pear",
+		color:'green',
+		taste:T10,
+		size:'big'}),
+	--
+	create_variable(N11),
+	create_variable(T12),
+	--
+	match(	{
+		color:'yellow',
+		name:N11,
+		size:'big',
+		taste:'good'},
+		{
+		name:"pear",
+		color:'yellow',
+		taste:T12,
+		size:'big'}),
+	--
+	create_variable(C13),
+	create_variable(N13),
+	create_variable(R13),
+	create_variable(R14),
+	--
+	match(	{color:C13,name:N13|R13},
+		{name:"pear"|R14}),
+	--
+	create_variable(S15),
+	create_variable(C16),
+	--
+	match(S15,{name:"pear",color:C16}),
+	--
+	set_color('RoyalBlue'),
+	writeln("Several variables were ",
+		"refined (substituted):"),
+	set_color('default'),
+	writeln("C2 = ",C2),
+	writeln("R4 = ",R4),
+	writeln("R5 = ",R5),
+	writeln("R7 = ",R7),
+	writeln("N9 = ",N9),
+	writeln("T10 = ",T10),
+	writeln("N11 = ",N11),
+	writeln("T12 = ",T12),
+	writeln("N13 = ",N13),
+	writeln("C13 = ",C13),
+	writeln("R13 = ",R13),
+	writeln("R14 = ",R14),
+	writeln("S15 = ",S15),
+	writeln("C16 = ",C16).
+
+create_variable(_).
+
+match(X,Y):-
+	X == Y,!,
+	set_color('DkGreen'),
+	writeln("These terms were ",
+		"unified successfully:"),
+	set_color('default'),
+	writeln(X),
+	writeln(Y).
+match(X,Y):-
+	set_color('Red'),
+	writeln("I cannot unify ",
+		"these terms:"),
+	set_color('default'),
+	writeln(X),
+	writeln(Y).

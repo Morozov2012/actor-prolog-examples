@@ -1,0 +1,62 @@
+-------------------------------------------------------------------
+--              An example of Actor Prolog program.              --
+--          (c) 2002-2011, IRE RAS, Alexei A. Morozov.           --
+-------------------------------------------------------------------
+-- This is an auxiliary utility that processes data collected    --
+-- by the ScanWeb program. Execute it after the Step2 program.   --
+-------------------------------------------------------------------
+import 'Jewel_Report' from "Morozov/VRML/Report";
+-------------------------------------------------------------------
+project: (('Main'))
+-------------------------------------------------------------------
+class 'Main':
+--
+input		= ('WebReceptor',
+			location= "Tables");
+--
+file_operations	= ('File');
+text_operations	= ('Text');
+--
+output		= ('Jewel_Report');
+--
+bat_file	= ('File',
+			name="rename_5.bat");
+--
+con		= ('Console');
+--
+[
+goal:-
+	con ? writeln("Start program..."),
+	FileName== input ? get_reference("","*.tab"),
+	file_operations ? is_normal(FileName),
+	con ? writeln("Input file: ",FileName),
+	output ? create_report(FileName,'static',"space\\static"),
+	output ? create_report(FileName,'dynamic',"space\\fly"),
+	fail.
+goal:-
+	bat_file ? open('writing'),
+	--
+	output ? get_any_target_file(FileName),
+	file_operations ?
+		extract_extension(FileName,Base_Path_And_Name,_),
+	bat_file ? writeln("gzip -9 -f ",FileName),
+	LeftName==
+		file_operations ?
+		replace_extension(Base_Path_And_Name,".wrl.gz"),
+	file_operations ? extract_path(FileName,_,TargetFile),
+	RightName== text_operations ? lower(TargetFile),
+	bat_file ? writeln("ren ",LeftName," ",RightName),
+	--
+	fail.
+goal:-!,
+	bat_file ? close,
+	BatFile== bat_file ? get_full_name(),
+	con ? set_color('Blue'),
+	con ? writeln("Use bat file \"",BatFile,"\" to"),
+	con ? writeln("compress target VRML files."),
+	con ? set_color('Black'),
+	con ? writeln("Good luck!").
+--
+alarm(0).
+]
+-------------------------------------------------------------------

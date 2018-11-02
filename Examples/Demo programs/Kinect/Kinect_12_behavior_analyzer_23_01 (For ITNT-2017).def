@@ -1,0 +1,432 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Kinect";
+import .. from "morozov/ColorMap";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+Side		= 'Right'; 'Left'.
+--
+-----------------------------------------------------------------------
+interface 'VideoPlayer' (specialized 'Dialog'):
+--
+internal:
+--
+buffer			: 'ControllableBuffer';
+main_window		: 'Canvas2D';
+legend_window		: 'Canvas2D';
+con			: 'Console';
+text_operations		: 'Text';
+file_operations		: 'File';
+color_maps		: 'ColorMap';
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_file_name;
+--
+imperative:
+--
+update_displaying_mode;
+update_color_map;
+update_people_coloring;
+--
+determ:
+--
+string_to_frame_type(STRING) = KinectFrameType			- (i);
+string_to_people_index(STRING) = KinectPeopleIndexMode		- (i);
+string_to_circumscription(STRING) = KinectCircumscriptionMode	- (i);
+string_to_skeletons(STRING) = KinectSkeletonsMode		- (i);
+string_to_people_colors(STRING)	= ColorMap			- (i);
+]
+-----------------------------------------------------------------------
+interface 'ControllableBuffer' (specialized 'KinectBuffer'):
+--
+internal:
+--
+	main_window		: 'Canvas2D';
+	legend_window		: 'Canvas2D';
+	analyzer		: 'BehaviorAnalyzer';
+	image			: 'BufferedImage';
+	directory_name		: 'DirectoryName';
+	con			: 'Console';
+	text			: 'Text';
+	timer_operations	: 'Timer';
+--
+constant:
+--
+constant:
+--
+	ellipse_radius		: INTEGER;
+--
+	velocity_bound_1	: REAL;
+	velocity_bound_2	: REAL;
+	velocity_bound_3	: REAL;
+	velocity_bound_4	: REAL;
+	velocity_bound_5	: REAL;
+	velocity_bound_6	: REAL;
+	velocity_bound_7	: REAL;
+	velocity_bound_8	: REAL;
+--
+	velocity_color_1	: Color;
+	velocity_color_2	: Color;
+	velocity_color_3	: Color;
+	velocity_color_4	: Color;
+	velocity_color_5	: Color;
+	velocity_color_6	: Color;
+	velocity_color_7	: Color;
+	velocity_color_8	: Color;
+	velocity_color_9	: Color;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+get_image_size_in_pixels(
+	PointX,
+	PointY,
+	KinectFrameType)		- (o,o,i);
+--
+draw_tracks_or_skeletons(
+	KinectSkeletonsMode,
+	KinectFrameType,
+	PointX,
+	PointY)				- (i,i,i,i);
+--
+draw_skeletons(
+	PointX,
+	PointY,
+	Skeletons,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_tracks(
+	PointX,
+	PointY,
+	TracksOfSkeletons,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_recent_skeleton(
+	PointX,
+	PointY,
+	Skeletons,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_skeleton(
+	PointX,
+	PointY,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_spine(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonSpine,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_arm(
+	PointX,
+	PointY,
+	SkeletonSpine,
+	SkeletonArm,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_hand(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonJoint,
+	SkeletonArm,
+	KinectFrameType)		- (i,i,i,i,i,i);
+draw_leg(
+	PointX,
+	PointY,
+	SkeletonSpine,
+	SkeletonLeg,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_link(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i,i);
+--
+select_line_width(
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	INTEGER)			- (i,i,o);
+select_line_width(
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	INTEGER)			- (i,i,i,o);
+--
+draw_joint(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_identifier(
+	PointX,
+	PointY,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_hand_trajectories(
+	PointX,
+	PointY,
+	Skeleton,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_trajectory_segment(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i,i);
+--
+velocity(
+	Numerical,
+	Numerical,
+	Numerical) = REAL		- (i,i,i);
+--
+select_trajectory_color(REAL,Color)	- (i,o);
+--
+draw_parallelepipeds(
+	PointX,
+	PointY,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i);
+draw_parallelepiped(
+	PointX,
+	PointY,
+	Parallelepiped,
+	KinectFrameType,
+	Color,
+	Numerical)			- (i,i,i,i,i,i);
+--
+draw_rectangles(
+	PointX,
+	PointY,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i);
+draw_rectangle(
+	PointX,
+	PointY,
+	Rectangle,
+	KinectFrameType,
+	Color,
+	Numerical)			- (i,i,i,i,i,i);
+--
+draw_line(
+	PointX,
+	PointY,
+	VertexPosition2D,
+	VertexPosition2D,
+	KinectFrameType,
+	Color,
+	Numerical,
+	PenAttributes)			- (i,i,i,i,i,i,i,i);
+draw_line(
+	PointX,
+	PointY,
+	VertexPosition3D,
+	VertexPosition3D,
+	KinectFrameType,
+	Color,
+	Numerical,
+	PenAttributes)			- (i,i,i,i,i,i,i,i);
+--
+report_time(FrameNumber,INTEGER,REAL)	- (i,i,i);
+--
+draw_legend;
+hide_legend;
+--
+set_output_directory(STRING)		- (i);
+--
+save_frame_if_necessary(
+	KinectBufferOperatingMode,
+	FrameNumber)			- (i,i);
+--
+continue_exporting_if_necessary;
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX		- (i,i);
+'+'(PointY,PointY) = PointY		- (i,i);
+'-'(PointX,PointX) = PointX		- (i,i);
+'-'(PointY,PointY) = PointY		- (i,i);
+'/'(PointX,PointX) = PointX		- (i,i);
+'/'(PointY,PointY) = PointY		- (i,i);
+--
+power(PointX,INTEGER) = REAL		- (i,i);
+power(PointY,INTEGER) = REAL		- (i,i);
+power(PointX,INTEGER) = REAL		- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'BehaviorAnalyzer' (specialized 'Alpha'):
+--
+internal:
+--
+graphic_window		: 'Canvas2D';
+buffer			: 'KinectBuffer';
+con			: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+analyse_chronicle(SkeletonChronicle)		- (i);
+--
+determ:
+--
+analyse_skeletons
+	(Skeletons,SkeletonChronicle)		- (i,i);
+--
+analyse_moving_arm(
+	Skeletons,
+	SkeletonChronicle,
+	INTEGER,
+	Side,
+	Point3D,
+	REAL,
+	INTEGER)				- (i,i,i,i,i,i,i);
+--
+nondeterm:
+--
+a_moving_arm_of_a_person(
+	Skeletons,
+	INTEGER,
+	Side,
+	Point3D,
+	REAL,
+	INTEGER)				- (i,o,o,o,o,o);
+a_moving_hand_of_a_person(
+	Skeleton,
+	INTEGER,
+	Side,
+	Point3D,
+	REAL,
+	INTEGER)				- (i,o,o,o,o,o);
+a_moving_joint(
+	SkeletonJoint,
+	Point3D,
+	REAL)					- (i,o,o);
+
+--
+determ:
+--
+is_near_a_head_of_a_person(
+	Skeletons,
+	SkeletonChronicle,
+	INTEGER,
+	Side,
+	Point3D,
+	REAL,
+	INTEGER)				- (i,i,i,i,i,i,i);
+--
+nondeterm:
+--
+select_the_head_of_a_person(
+	Skeletons,
+	INTEGER,
+	Point3D,
+	REAL,
+	INTEGER)				- (i,i,i,i,o);
+--
+determ:
+--
+check_the_head_of_the_person(
+	SkeletonChronicle,
+	INTEGER,
+	Side,
+	INTEGER,
+	INTEGER,
+	INTEGER)				- (i,i,i,i,i,o);
+--
+is_fast_and_near(Point3D,REAL,Point3D)		- (i,i,i);
+--
+determ:
+--
+is_near_a_hand_of_a_person(
+	Skeletons,
+	SkeletonChronicle,
+	INTEGER,
+	Side,
+	Point3D,
+	INTEGER)				- (i,i,i,i,i,i);
+--
+nondeterm:
+--
+select_a_hand_of_a_person(
+	Skeletons,
+	INTEGER,
+	Point3D,
+	INTEGER,
+	Side)					- (i,i,i,o,o);
+--
+determ:
+--
+check_the_hand_of_the_person(
+	SkeletonChronicle,
+	INTEGER,
+	Side,
+	INTEGER,
+	Side,
+	INTEGER,
+	INTEGER)				- (i,i,i,i,i,i,o);
+--
+is_near(Point3D,Point3D)			- (i,i);
+--
+get_hand(
+	INTEGER,
+	Side,
+	Skeletons,
+	Point3D,
+	REAL)					- (i,i,i,o,o);
+get_hand(
+	Skeleton,
+	Side,
+	Point3D,
+	REAL)					- (i,i,o,o);
+--
+get_head(
+	INTEGER,
+	Skeletons,
+	Point3D)				- (i,i,o);
+--
+imperative:
+--
+distance(Numerical,Numerical,Numerical) = REAL	- (i,i,i);
+--
+velocity(Numerical,Numerical,Numerical) = REAL	- (i,i,i);
+--
+duration(INTEGER,INTEGER) = REAL		- (i,i);
+--
+fuzzy_metrics(REAL,REAL,REAL) = REAL		- (i,i,i);
+fuzzy_metrics(INTEGER,INTEGER,INTEGER) = REAL	- (i,i,i);
+--
+imperative:
+--
+'-'(Numerical,Numerical) = Numerical		- (i,i);
+--
+power(Numerical,INTEGER) = REAL			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'DirectoryName' (specialized 'Database'):
+[
+DOMAINS:
+Target	= STRING.
+]
+-----------------------------------------------------------------------

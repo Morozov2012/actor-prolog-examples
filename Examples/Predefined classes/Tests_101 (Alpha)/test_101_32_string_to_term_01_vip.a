@@ -1,0 +1,47 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+D1	= f(INTEGER,D2).
+D2	= D3*.
+D3	= {a:REAL,b:SYMBOL,c:STRING}.
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1.
+--
+test0:-
+	con ? writeln("Test 0:"),
+	T1== "f(5,[{a:100.0,b:'name',c:\"Text\"}])",
+	con ? writeln("\tInput:  ",T1," (string)"),
+	?string_to_term(T1),!,
+	con ? writeln("\tO.K.").
+test0:-
+	con ? writeln("\tFailure").
+--
+test1:-
+	con ? writeln("Test 1:"),
+	T1== "f(5,[{a:100.0,b:'name',c:\"Text\"}])",
+	con ? writeln("\tInput:  ",T1," (string)"),
+	N1== ?cast("D1",?string_to_term(T1)),!,
+	con ? writeln("\tResult: ",N1).
+test1:-
+	con ? writeln("\tFailure").
+]

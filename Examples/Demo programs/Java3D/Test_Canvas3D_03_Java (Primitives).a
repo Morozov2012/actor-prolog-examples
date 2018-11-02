@@ -1,0 +1,117 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+class 'Main' (specialized 'Canvas3D'):
+--
+enable_scene_antialiasing	= 'yes';
+--
+[
+goal:-!,
+	Bounds== 'BoundingSphere'({}),
+	show([
+		'TransformGroup'({
+			allowTransformWrite: 'yes',
+			branches: [
+				'TransformGroup'({
+					transform3D: 'Transform3D'({
+						scale: 0.2
+						}),
+					branches: [
+						'Box'({
+							xdim: 1.2,
+							ydim: 0.3,
+							zdim: 0.8,
+							generateNormals: 'yes',
+							generateNormalsInward: 'yes',
+							appearance: 'Appearance'({
+								material: 'Material'({})
+								})
+							}),
+						'TransformGroup'({
+							transform3D: 'Transform3D'({
+								translation: [0,1.5,0]
+								}),
+							branches: [
+								'Sphere'({
+									radius: 1.0,
+									generateNormals: 'yes',
+									divisions: 100
+									})
+								]
+							}),
+						'TransformGroup'({
+							transform3D: 'Transform3D'({
+								translation: [-1,-1.5,0]
+								}),
+							branches: [
+								'Cylinder'({
+									radius: 1.0,
+									height: 2.0,
+									generateNormals: 'yes',
+									xdivisions: 100,
+									ydivisions: 1,
+									appearance: 'Appearance'({
+										material: 'Material'({}),
+										transparencyAttributes: 'TransparencyAttributes'({
+											transparency: 0.5,
+											transparencyMode: 'NICEST'
+											})
+										})
+									})
+								]
+							}),
+						'TransformGroup'({
+							transform3D: 'Transform3D'({
+								translation: [1,-1.5,0]
+								}),
+							branches: [
+								'Cone'({
+									radius: 1.0,
+									height: 2.0,
+									generateNormals: 'yes',
+									xdivisions: 100,
+									ydivisions: 1
+									})
+								]
+							})
+						]
+					}),
+				'RotationInterpolator'({
+					alpha: 'Alpha3D'({
+						increasingEnable: 'yes',
+						decreasingEnable: 'yes',
+						increasingAlphaDuration: 4500,
+						decreasingAlphaDuration: 4500,
+						alphaAtZeroDuration: 300,
+						alphaAtOneDuration: 300,
+						increasingAlphaRampDuration: 500,
+						decreasingAlphaRampDuration: 500,
+						loopCount: -1
+						}),
+					schedulingBounds: Bounds
+					})
+				]
+			}),
+		'AmbientLight'({
+			lightOn: 'yes',
+			color: 'Red',
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(3,3,3),
+			attenuation: a(1,0,0),
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(-2,2,2),
+			attenuation: a(1,0,0),
+			influencingBounds: Bounds
+			})
+		]).
+]

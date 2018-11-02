@@ -1,0 +1,33 @@
+package "Morozov/Web/Engines/_Control"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--            The "CONTROL" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package is intended for control of search engines.   --
+---------------------------------------------------------------
+import "Morozov/Web/Scanning/Counter";
+import 'ControlDialog' from "Morozov/Web/Engines/Control";
+---------------------------------------------------------------
+class '_Control_Engine' (specialized '_Block'):
+--
+internal:
+--
+	entry_o1;
+--
+variable:
+--
+	value_o1;
+--
+internal:
+--
+	world	= ('ControlDialog',
+			engine=entry_o1);
+--
+[
+goal:-!.
+--
+show(_*):-!,
+	world ? show.
+]
+---------------------------------------------------------------

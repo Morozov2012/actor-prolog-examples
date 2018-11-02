@@ -1,0 +1,96 @@
+package "Morozov/VRML/Names":
+-----------------------------------------------------------------------
+--                                                                   --
+--              The "VRML/NAMES" Actor Prolog package.               --
+--            (c) 2002-2005, IRE RAS, Alexei A. Morozov.             --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package is intended for generating contracted names.         --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+delete_vowels(INTEGER,INTEGER,STRING,STRING)	- (i,i,i,o);
+--
+determ:
+--
+is_vowel(INTEGER);
+is_space(STRING);
+--
+imperative:
+--
+truncate_name(INTEGER,STRING,STRING)		- (i,i,o);
+--
+-----------------------------------------------------------------------
+--
+class 'ShortName' (specialized 'Text'):
+[
+make_short_name(LowerName,FileName):-
+	make_short_name(8,LowerName,FileName).
+--
+make_short_name(Delta,LowerName1,UpperName):-
+	replace_spaces(1,LowerName1,LowerName2),
+	Delta >= ?length(LowerName2),!,
+	UpperName== ?upper(LowerName2).
+make_short_name(Delta,LowerName,FileName):-
+	UpperName1== ?upper(LowerName),
+	extract_front_code(" ",C0,_),!,
+	delete_vowels(1,C0,UpperName1,UpperName2),
+	truncate_name(Delta,UpperName2,FileName).
+make_short_name(_,Name,Name).
+--
+delete_vowels(N,PreviousLetter,S1,S3):-
+	N > 1,
+	extract_front_code(S1,C,S2),
+	is_vowel(C),!,
+	delete_vowels(N+1,PreviousLetter,S2,S3).
+delete_vowels(N,PreviousLetter,S1,"_"+S4):-
+	N <= 1,
+	split(1,S1,S2,S3),
+	is_space(S2),!,
+	delete_vowels(N,PreviousLetter,S3,S4).
+delete_vowels(N,PreviousLetter,S1,S4):-
+	split(1,S1,S2,S3),
+	is_space(S2),!,
+	delete_vowels(N,PreviousLetter,S3,S4).
+delete_vowels(N,C,S1,S3):-
+	extract_front_code(S1,C,S2),!,
+	delete_vowels(N,C,S2,S3).
+delete_vowels(N,_,S1,C+S3):-
+	extract_front_code(S1,C,S2),!,
+	delete_vowels(N+1,C,S2,S3).
+delete_vowels(_,_,_,"").
+--
+replace_spaces(N,S1,"_"+S4):-
+	split(1,S1,S2,S3),
+	is_space(S2),!,
+	replace_spaces(N,S3,S4).
+replace_spaces(N,S1,C+S3):-
+	extract_front_code(S1,C,S2),!,
+	replace_spaces(N+1,S2,S3).
+replace_spaces(_,_,"").
+--
+is_vowel(`A):-!.
+is_vowel(`E):-!.
+is_vowel(`I):-!.
+is_vowel(`O):-!.
+is_vowel(`U):-!.
+is_vowel(`Y).
+--
+is_space(" "):-!.
+is_space("-"):-!.
+is_space("+"):-!.
+is_space("/"):-!.
+is_space("\\"):-!.
+is_space("."):-!.
+is_space("'").
+--
+truncate_name(Limit,Name,Name):-
+	Limit >= ?length(Name),!.
+truncate_name(Limit,Name1,Name2):-
+	split(Limit,Name1,Name2,_),!.
+truncate_name(_,Name,Name).
+]
+-----------------------------------------------------------------------

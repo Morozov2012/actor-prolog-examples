@@ -1,0 +1,104 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+FileNameList	= FileName*.
+
+PREDICATES:
+
+imperative:
+
+test1(FileNameList)		- (i);
+test_file_name(FileName)	- (i);
+test2;
+
+class 'Main' (specialized 'File'):
+--
+constant:
+--
+	name	= "xxx\\yyy/name.ext.v1";
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-
+	FileNameList== [
+		"g:\\x.xx\\yyy\\Name.ext.v1",
+		"g:/xx.x/yy.y/Name.ext.v1",
+		"http:\\x.xx\\yyy\\Name.ext.v1",
+		"http:/xx.x/yy.y/Name.ext.v1",
+		"\\xxx\\y.yy\\Name.ext.v1",
+		"/xx.x/yyy/Name.ext.v1",
+		"xx.x\\yyy\\Name.ext.v1",
+		"xxx/yy.y/Name.ext.v1",
+		-- 'stdin',
+		"Name.ext"
+		],
+	test1(FileNameList),
+	fail.
+goal:-
+	FileNameList== [
+		"g:\\x.xx\\yyy\\Name",
+		"g:/xx.x/yy.y/Name",
+		"http:\\x.xx\\yyy\\Name",
+		"http:/xx.x/yy.y/Name",
+		"\\xxx\\y.yy\\Name",
+		"/xx.x/yyy/Name",
+		"xx.x\\yyy\\Name",
+		"xxx/yy.y/Name",
+		-- 'stdin',
+		"Name"
+		],
+	test1(FileNameList),
+	fail.
+goal:-
+	FileNameList== [
+		"g:\\x.xx\\yyy\\Name.",
+		"g:/xx.x/yy.y/Name.",
+		"http:\\x.xx\\yyy\\Name.",
+		"http:/xx.x/yy.y/Name.",
+		"\\xxx\\y.yy\\Name.",
+		"/xx.x/yyy/Name.",
+		"xx.x\\yyy\\Name.",
+		"xxx/yy.y/Name.",
+		-- 'stdin',
+		"Name."
+		],
+	test1(FileNameList),
+	fail.
+goal:-
+	FileNameList== [
+		"xxx/yy.y/Name.ext.v/1",
+		"xxx/yy.y/Name.ext.v\\1",
+		"xxx/yy.y/Name.ext.v:1"
+		],
+	test1(FileNameList),
+	fail.
+goal:-
+	test2,
+	fail.
+--
+test1([FileName|Rest]):-!,
+	test_file_name(FileName),
+	test1(Rest).
+test1(_).
+--
+test_file_name(FileName):-
+	con ? writeln("---"),
+	?extract_extension(FileName,Name1,Ext1),
+	con ? writeln("Target Name: ",FileName),
+	con ? writeln("Name:        ",Name1),
+	con ? writeln("Extension:   ",Ext1).
+--
+test2:-
+	con ? writeln("---"),
+	?extract_extension(Name1,Ext1),
+	con ? writeln("Target Name: ",name," (slot)"),
+	con ? writeln("Name:        ",Name1),
+	con ? writeln("Extension:   ",Ext1).
+]

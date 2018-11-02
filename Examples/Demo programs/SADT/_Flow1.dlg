@@ -1,0 +1,26 @@
+mesh(80,30)
+--
+window_font("Arial",14)
+diagram_font("Arial",17)
+dialog_font("Arial",14)
+--
+success_color('Green',default)
+failure_color('Red','White')
+--
+dialog '_Sender' (
+     "Sender control panel",
+     'White','Blue',default,
+     centered,centered,default)
+vbox(center)
+     vbox(left)
+          radiobuttons(value_o1)
+               radiobutton("Output value 1")
+               radiobutton("Output value 2")
+               radiobutton("Output value 3")
+               radiobutton("Output value 4")
+               radiobutton("Output value 5")
+          end_of_radiobuttons
+     end_of_vbox
+     button(close,"&Close dialog")
+end_of_vbox
+end_of_dialog

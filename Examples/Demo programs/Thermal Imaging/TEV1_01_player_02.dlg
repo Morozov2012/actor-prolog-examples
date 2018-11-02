@@ -1,0 +1,77 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+draft('off')
+
+dialog 'VideoPlayer'(
+	"Video Player",
+	default,default,default,centered,centered,default)
+vbox(justify)
+	hbox(justify)
+		custom(000,15,65,"Control2D")
+		custom['KeepProportions'](main_window,70,55,"Control2D")
+		custom(legend_window,15,65,"Control2D")
+	end_of_hbox
+	hbox(justify)
+		togglebutton(1010,"Use Recorded Zooming Commands",'no')
+		togglebutton(1020,"Zoom Image",'no')
+		editreal(1030,10,2.1)
+		togglebutton(1040,"Use Recorded Color Map Commands",'no')
+		listbutton(0,1050,10,7,
+			[
+			"Aqua",
+			"Autumn",
+			"Blackhot",
+			"Blaze",
+			"BlueRed",
+			"Bone",
+			"Bright Rainbow",
+			"Cool",
+			"Copper",
+			"Gray",
+			"Green",
+			"Hot",
+			"HSV",
+			"Iron",
+			"Jet",
+			"LightJet",
+			"Medical",
+			"Ocean",
+			"Parula",
+			"Pink",
+			"Prism",
+			"Purple",
+			"Red",
+			"Reptiloid",
+			"Soft Rainbow",
+			"Spring",
+			"Summer",
+			"Winter",
+			"Optical",
+			"None"
+			],
+			"Purple"
+			)
+	end_of_hbox
+	hscroll(3011,3012,50,[0,255],0)
+	hbox(justify)
+	scaling(3.5,1.0)
+		button("Select","&Select")
+		ok("Play","&Play")
+		button("Pause","Pa&use")
+		button("Stop","S&top")
+		button(close,"&Quit")
+	end_of_scaling
+	end_of_hbox
+	padding(0,0)
+		statictext(
+			"The project is supported by the Russian "
+			"Foundation for Basic Research, "
+			"grant 16-29-09626-ofi_m.")
+	end_of_padding
+end_of_vbox
+end_of_dialog

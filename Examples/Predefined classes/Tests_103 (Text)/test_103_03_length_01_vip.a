@@ -1,0 +1,41 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2;
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2.
+--
+test0:-
+	con ? writeln("Test 0"),
+	?length(),
+	?length("Hello world!").
+--
+test1:-
+	con ? writeln("Test 1"),
+	set_string("1234567890"),
+	L1== ?length(),
+	con ? writeln("\tLength 1: ",L1).
+--
+test2:-
+	con ? writeln("Test 2"),
+	L2== ?length("Hello World!"),
+	con ? writeln("\tLength 2: ",L2).
+]

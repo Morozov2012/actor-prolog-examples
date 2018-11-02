@@ -1,0 +1,128 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+R	= REAL.
+S	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+all_tests;
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'MyHashMap' (specialized 'LinkedHashMap'):
+--
+reuse_key_numbers	= 'no';
+--
+[
+DOMAINS:
+--
+TargetValue	= f(R,S).
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyHashMap');
+--
+[
+goal:-!,
+	Mode1== store?get_reuse_key_numbers(),
+	writeln("Reuse key numbers: ",Mode1),
+	store ? set_reuse_key_numbers('no'),
+	Mode2== store?get_reuse_key_numbers(),
+	set_color('Maroon'),
+	writeln("Reuse key numbers: ",Mode2),
+	set_color('default'),
+	all_tests,
+	store ? set_reuse_key_numbers('yes'),
+	Mode3== store?get_reuse_key_numbers(),
+	set_color('Aqua'),
+	writeln("Reuse key numbers: ",Mode3),
+	set_color('default'),
+	all_tests.
+--
+all_tests:-
+	test1,
+	test3,
+	test4,
+	test3,
+	test2,
+	test3.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("I will store data items."),
+	set_color('Orange'),
+	store ? insert(map(10000,f(3.14,"Test1:One"))),
+	store ? insert(map(2,f(7.00,"Test1:Two"))),
+	store ? insert(f(12.00,"Test1:Three:Key"),Key1),
+	writeln("\tKey one: ",Key1),
+	store ? insert(f(3.14,"Test1:Four:Key"),Key2),
+	writeln("\tKey two: ",Key2),
+	store ? insert(f(3.14,"Test1:Five:Key"),Key3),
+	writeln("\tKey three: ",Key3),
+	store ? insert(map(10000,f(3.14,"Test1:Six"))),
+	store ? insert(map(30000,f(3.14,"Test1:Seven"))),
+	store ? insert(map(40000,f(9.00,"Test1:Eight"))),
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("I will store data items."),
+	set_color('Orange'),
+	store ? insert(map(50000,f(3.14,"Test2:One"))),
+	store ? insert(map(30000,f(7.00,"Test2:Two"))),
+	store ? insert(f(12.00,"Test2:Three:Key"),Key1),
+	writeln("\tKey one: ",Key1),
+	store ? insert(f(3.14,"Test2:Four:Key"),Key2),
+	writeln("\tKey two: ",Key2),
+	store ? insert(f(3.14,"Test2:Five:Key"),Key3),
+	writeln("\tKey three: ",Key3),
+	store ? insert(f(3.14,"Test2:Six:Key"),Key4),
+	writeln("\tKey four: ",Key4),
+	store ? insert(map(50000,f(3.14,"Test2:Seven"))),
+	store ? insert(map(70000,f(3.14,"Test2:Eight"))),
+	store ? insert(map(80000,f(9.00,"Test2:Nine"))),
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("I will retrieve data items:"),
+	set_color('Blue'),
+	store ? find(Item),
+		writeln("\t",Item),
+		fail.
+test3:-
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+--
+test4:-
+	set_color('RoyalBlue'),
+	writeln("I will delete data items:"),
+	set_color('Magenta'),
+	Item== store?match(map(_,f(3.14,_))),
+		store ? retract(Item),
+		writeln("\t",Item),
+		fail.
+test4:-
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+]
+-----------------------------------------------------------------------

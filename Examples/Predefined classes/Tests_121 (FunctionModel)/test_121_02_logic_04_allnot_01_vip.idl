@@ -1,0 +1,140 @@
+KIT ;
+  IDL VERSION 1.2.8 ;
+  TITLE 'The idea of man-machine interaction #allnot block# ' ;
+  CREATION DATE 19/11/98 ;
+  PROJECT NAME 'Model 1' ;
+
+  MODEL 'Model 1'
+    {LWI
+    F 0 -13 0 0 0 400
+      0 0 0 0 3 2 1 34
+      100 'Arial'
+    F 1 -11 0 0 0 400
+      0 0 0 0 3 2 1 49
+      80 'Courier New'
+    F 2 -27 0 0 0 400
+      0 0 0 0 3 2 1 34
+      200 'Arial'
+    F 3 -21 0 0 0 400
+      0 0 0 0 3 2 1 34
+      160 'Arial'
+    F 4 -16 0 0 0 400
+      0 0 0 0 3 2 1 34
+      120 'Arial'
+    F 5 -19 0 0 0 400
+      0 0 0 0 3 2 1 34
+      140 'Arial'
+    F 6 -24 0 0 0 400
+      0 0 0 0 3 2 1 34
+      180 'Arial'
+    D 2 3 3 4 5 0 0 0 1
+    G 0 6
+    T 'WORKING'
+    R 34
+    B 1 10 5
+      0 1 -1 1 0 0 0 0 1 0.000000 1.000000
+      7 1 7
+       'The idea of<CR>man-machine interaction<CR>#allnot block#<CR>'
+       'WORKING'
+      1 1 -1 1 0 0 0 0 1 0.000000 1.000000
+      7 1 7
+       'Subgoal 1'
+       'WORKING'
+      2 1 -1 1 0 0 0 0 1 0.000000 1.000000
+      1 1 1
+       'Subgoal2'
+       'WORKING'
+      3 0 0 0 0 0 0 0 0.0 0.0
+      255 255 255
+      4 1 -1 1 0 0 0 0 1 0.000000 1.000000
+      7 1 7
+       'Subgoal 2'
+       'WORKING'
+      5 1 -1 1 0 0 0 0 1 0.000000 1.000000
+      7 1 7
+       'Subgoal 3'
+       'WORKING'
+      6 0 0 0 0 0 0 0 0.0 0.0
+      255 255 255
+      7 0 0 0 0 0 0 0 0.0 0.0
+      255 255 255
+      8 0 0 0 0 0 0 0 0.0 0.0
+      255 255 255
+      9 0 0 0 0 0 0 0 0.0 0.0
+      255 255 255
+    B 2 10 1
+      0 1 -1 1 0 0 1
+      255 255
+       'Direct messages'
+       'WORKING'
+      1 0 0 0 0 0 0
+      255 255
+      2 0 0 0 0 0 0
+      255 255
+      3 0 0 0 0 0 0
+      255 255
+      4 0 0 0 0 0 0
+      255 255
+      5 0 0 0 0 0 0
+      255 255
+      6 0 0 0 0 0 0
+      255 255
+      7 0 0 0 0 0 0
+      255 255
+      8 0 0 0 0 0 0
+      255 255
+      9 0 0 0 0 0 0
+      255 255
+    M 0  }
+ ;
+    PROJECT NAME 'Model 1' ;
+
+    DIAGRAM GRAPHIC A-0 ;
+      CREATION DATE 19/11/98 ;
+      REVISION DATE 26/11/98 ;
+      TITLE 'The idea of man-machine interaction#allnot block# ' ;
+      STATUS WORKING ;
+
+      BOX 0 ;
+        NAME '{LWI I 2 255 255 255}The idea of<CR>man-machine interaction<CR>#allnot block#<CR>' ;
+        BOX COORDINATES (0.33173,0.65831) (0.66346,0.32915) ;
+        DETAIL REFERENCE N A0 ;
+      ENDBOX ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A0 ;
+      CREATION DATE 20/11/98 ;
+      REVISION DATE 26/11/98 ;
+      TITLE 'The idea of man-machine interaction #allnot block# ' ;
+      STATUS WORKING ;
+
+      BOX 1 ;
+        NAME '{LWI I 3 255 255 255}Subgoal 1' ;
+        BOX COORDINATES (0.17308,0.32915) (0.34615,0.16458) ;
+        DETAIL REFERENCE N A1 ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 3 255 255 255}Subgoal 2' ;
+        BOX COORDINATES (0.40865,0.56426) (0.58173,0.39969) ;
+        DETAIL REFERENCE N A2 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 3 255 255 255}Subgoal 3' ;
+        BOX COORDINATES (0.64423,0.79937) (0.81731,0.63480) ;
+        DETAIL REFERENCE N A3 ;
+      ENDBOX ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GLOSSARY A0G ;
+     GLOSSARY ;
+      TERM 'Direct messages'
+      '' ;
+     ENDGLOSS ;
+    ENDDIAGRAM ;
+  ENDMODEL ;
+
+ENDKIT ;

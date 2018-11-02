@@ -1,0 +1,70 @@
+--------------------------------------------------------
+--       An example of Actor Prolog program.          --
+--       (c) 2007, IRE RAS, Alexei A. Morozov.        --
+--       Retrieving and output of information from    --
+--       arbitrary number of Web resources.           --
+--------------------------------------------------------
+DOMAINS:
+--
+Target		= ('CheckPages'); #; Target*; STRING.
+--
+--------------------------------------------------------
+interface 'Main' (specialized 'WebReceptor'):
+--
+constant:
+--
+	receiver	: 'CheckPages';
+	out		: 'Output';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+send_references(ReferenceList);
+]
+--------------------------------------------------------
+interface 'CheckPages' (specialized 'WebReceptor'):
+--
+internal:
+--
+	registry	: 'WebPageDatabase';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+check(STRING);
+store_parameters(STRING,ContentParameters);
+--
+nondeterm:
+--
+get_data= Target;
+--
+imperative:
+--
+date_to_string(ResourceDate) = STRING;
+]
+--------------------------------------------------------
+interface 'Output' (specialized 'Dialog'):
+--
+constant:
+--
+	data_source	: Target;
+--
+variable:
+--
+	results		: Target;
+--
+[
+]
+--------------------------------------------------------
+interface 'WebPageDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= page(STRING,ContentParameters).
+--
+]
+--------------------------------------------------------

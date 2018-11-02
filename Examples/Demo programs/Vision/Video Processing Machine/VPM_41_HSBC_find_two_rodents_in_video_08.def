@@ -1,0 +1,415 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+VideoFrameNumber	= INTEGER; STRING.
+--
+Hue			= INTEGER; STRING.
+Saturation		= INTEGER; STRING.
+Brightness		= INTEGER; STRING.
+Contrast		= INTEGER; STRING.
+--
+IsMatureTrack		= YesNo.
+IsLastSegment		= 'no'; 'yes'.
+--
+ObjectIdentifier	= INTEGER.
+--
+-----------------------------------------------------------------------
+interface 'DialogHSBC' (specialized 'Dialog'):
+--
+constant:
+--
+	data_directory		: STRING;
+	file_name		: STRING;
+	frame_rate		: REAL;
+--
+	inverse_transformation_matrix	: TransformationMatrix;
+--
+internal:
+--
+	video			: 'VideoReader';
+	vpm			: 'VideoProcessingMachine';
+	timer			: 'Timer';
+	graphic_window		: 'Canvas2D';
+	text			: 'Text';
+	image1			: 'BufferedImage';
+	image2			: 'BufferedImage';
+	state			: 'ProgramState';
+	model			: 'VisualSceneModel';
+	con			: 'Console';
+--
+variable:
+--
+	first_frame		: VideoFrameNumber;
+	last_frame		: VideoFrameNumber;
+--
+	minimal_hue_1		: Hue;
+	maximal_hue_1		: Hue;
+	minimal_hue_2		: Hue;
+	maximal_hue_2		: Hue;
+--
+	minimal_saturation	: Saturation;
+	maximal_saturation	: Saturation;
+--
+	minimal_brightness	: Brightness;
+	maximal_brightness	: Brightness;
+--
+	minimal_contrast	: Contrast;
+	maximal_contrast	: Contrast;
+--
+constant:
+--
+	big_circle_radius	: REAL;
+	small_circle_radius	: REAL;
+	maximal_distance	: REAL;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+detect_minimal_file_number(INTEGER)		- (o);
+detect_maximal_file_number(INTEGER)		- (o);
+show_frame_range_if_necessary(INTEGER,INTEGER)	- (i,i);
+--
+divide_list(INTEGER,PointList,PointList)	- (i,i,o);
+--
+frame_obtained;
+data_transfer_completion;
+data_transfer_error(ExceptionName)		- (i);
+--
+draw_scene;
+--
+draw_existing_tracks(
+	TrackList,
+	TrackList,
+	FrameNumber,
+	PointX,
+	PointY)			- (i,o,i,i,i);
+--
+determ:
+--
+draw_existing_track(
+	Track,
+	FrameNumber,
+	PointX,
+	PointY)			- (i,i,i,i);
+--
+imperative:
+--
+draw_new_tracks(
+	TrackList,
+	FrameNumber,
+	PointX,
+	PointY)			- (i,i,i,i);
+draw_new_track(
+	Track,
+	FrameNumber,
+	PointX,
+	PointY)			- (i,i,i,i);
+--
+determ:
+--
+get_current_coordinates(
+	TrackSegmentList,INTEGER,INTEGER)	- (i,o,o);
+get_current_blob_coordinates(
+	TrackOfBlob,INTEGER,INTEGER)		- (i,o,o);
+--
+imperative:
+--
+draw_invisible_objects(
+	FrameNumber,INTEGER,INTEGER)		- (i,i,i);
+--
+draw_invisible_object(
+	ObjectIdentifier,
+	REAL,
+	PointX,
+	PointY,
+	PenAttributes,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i);
+--
+draw_track(
+	ObjectIdentifier,
+	TrackSegmentList,
+	YesNo,
+	REAL,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+--
+draw_first_blob_rectangle(
+	TrackSegmentList,
+	ObjectIdentifier,
+	IsMatureTrack,
+	REAL,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i);
+draw_track_segments(
+	TrackSegmentList,
+	TrackSegment,
+	IsMatureTrack,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+draw_track_segment(
+	TrackSegment,
+	TrackSegment,
+	IsLastSegment,
+	IsMatureTrack,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i);
+--
+draw_track_of_blob(
+	TrackOfBlob,
+	BlobCoordinates,
+	IsLastSegment,
+	IsMatureTrack,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i);
+draw_blob_rectangle(
+	BlobCoordinates,
+	IsMatureTrack,
+	ObjectIdentifier,
+	REAL,
+	Color,
+	INTEGER,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i,i);
+select_dash_array(
+	IsMatureTrack,
+	PenAttributes)		- (i,o);
+draw_blob_label(
+	ObjectIdentifier,
+	REAL,
+	PointX,
+	PointY,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+draw_blob_link(
+	BlobCoordinates,
+	BlobCoordinates,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i);
+--
+draw_segment_link(
+	TrackSegment,
+	TrackSegment,
+	PointX,
+	PointY)			- (i,i,i,i);
+--
+draw_circle(PointX,PointY)	- (i,i);
+--
+select_color(INTEGER,Color)			- (i,o);
+--
+draw_legend;
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+hypot(PointX,PointY) = REAL			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'VideoReader' (specialized 'FFmpeg'):
+--
+internal:
+--
+target_world;
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		: 'Timer';
+--
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER);
+		  frame_counter(INTEGER);
+		  stop_watch_time(INTEGER);
+		  global_counter(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)			- (o);
+get_current_frame(INTEGER)			- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)			- (i);
+set_current_frame(INTEGER)			- (i);
+--
+reset_stopwatch;
+get_stopwatch_time(INTEGER)			- (o);
+--
+reset_frame_counter;
+increase_frame_counter;
+get_frame_counter(INTEGER)			- (o);
+--
+increase_global_counter;
+get_global_counter(INTEGER)			- (o);
+]
+-----------------------------------------------------------------------
+interface 'VisualSceneModel' (specialized 'Database'):
+--
+internal:
+--
+con		: 'Console';
+--
+[
+DOMAINS:
+--
+Target		= blob(	INTEGER,
+			PointX,
+		  	PointY,
+		  	FrameNumber,
+		  	REAL);	-- Traversed path
+		  object(
+		  	INTEGER,
+		  	ObjectIdentifier,
+		  	PointX,
+		  	PointY,
+		  	FrameNumber,
+		  	REAL);	-- Traversed path
+		  object_counter(ObjectIdentifier);
+		  nearest_point(
+		  	INTEGER,
+		  	REAL,
+		  	PointX,
+		  	PointY,
+		  	REAL).	-- Traversed path
+--
+PREDICATES:
+--
+imperative:
+--
+set_blob_position(
+	INTEGER,
+	PointX,
+	PointY,
+	FrameNumber,
+	REAL)			- (i,i,i,i,i);
+set_object_position(
+	INTEGER,
+	ObjectIdentifier,
+	PointX,
+	PointY,
+	FrameNumber,
+	REAL)			- (i,i,i,i,i,i);
+--
+determ:
+--
+get_object_position(
+	INTEGER,
+	ObjectIdentifier,
+	PointX,
+	PointY,
+	REAL)			- (i,o,o,o,o);
+--
+/*
+imperative:
+--
+get_object_path(ObjectIdentifier,REAL)		- (i,o);
+*/
+--
+nondeterm:
+--
+find_object(
+	ObjectIdentifier,
+	PointX,
+	PointY,
+	FrameNumber,
+	REAL)			- (o,o,o,o,o);
+--
+imperative:
+--
+register_new_object(
+	INTEGER,
+	PointX,
+	PointY,
+	FrameNumber,
+	REAL,
+	ObjectIdentifier)	- (i,i,i,i,i,o);
+--
+crerate_new_identifier(ObjectIdentifier)	- (o);
+--
+determ:
+--
+find_nearest_object(
+	INTEGER,
+	INTEGER,
+	FrameNumber,
+	REAL,
+	ObjectIdentifier,
+	REAL)			- (i,i,i,i,o,o);
+--
+find_nearest_blob(
+	PointX,
+	PointY,
+	FrameNumber,
+	REAL,
+	INTEGER,
+	PointX,
+	PointY,
+	REAL)			- (i,i,i,i,o,o,o,o);
+--
+imperative:
+--
+reset_nearest_point;
+--
+update_nearest_point(
+	INTEGER,
+	REAL,
+	PointX,
+	PointY,
+	REAL)			- (i,i,i,i,i);
+--
+determ:
+--
+get_nearest_point(
+	INTEGER,
+	REAL,
+	PointX,
+	PointY,
+	REAL)			- (o,o,o,o,o);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+hypot(PointX,PointY) = REAL			- (i,i);
+]
+-----------------------------------------------------------------------

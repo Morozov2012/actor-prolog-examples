@@ -1,0 +1,107 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Lists.                                --
+--                                       --
+-- Questions: What are lists? What is    --
+-- the idea of list unification? Can one --
+-- unify lists that have unbound         --
+-- elements? How can a non-ground        --
+-- element of a list be refined during   --
+-- the unification of the list? Can a    --
+-- list accept new elements during the   --
+-- unification? How can an unbound tail  --
+-- of a list be refined during the       --
+-- unification of the list? Can two      --
+-- unbound variables be unified? What is --
+-- a chaining of the variables? What is  --
+-- the difference between the pattern    --
+-- matching and the unification?         --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+reference:
+
+MyList		= MyElement*.
+MyElement	= INTEGER.
+
+PREDICATES:
+
+create_variable(MyElement)	- (o);
+create_variable(MyList)		- (o);
+--
+compare(MyList,MyList)		- (i,i);
+
+CLAUSES:
+
+goal:-
+	create_variable(B2),
+	--
+	compare([1,2,3],[1,B2,3]),
+	--
+	create_variable(R4),
+	--
+	compare([1,2,3,4,5],[1,2,3|R4]),
+	--
+	create_variable(A5),
+	create_variable(B6),
+	--
+	compare([A5,2,3],[1,B6,5]),
+	--
+	create_variable(A7),
+	create_variable(B8),
+	--
+	compare([A7,2,3],[1,B8,3]),
+	--
+	create_variable(A9),
+	create_variable(B9),
+	create_variable(R9),
+	create_variable(R10),
+	--
+	compare([A9,B9|R9],[1|R10]),
+	--
+	create_variable(L11),
+	create_variable(B12),
+	--
+	compare(L11,[1,B12,3]),
+	--
+	set_color('RoyalBlue'),
+	writeln("Several variables were ",
+		"refined (substituted):"),
+	set_color('default'),
+	writeln("B2 = ",B2),
+	writeln("R4 = ",R4),
+	writeln("A5 = ",A5),
+	writeln("B6 = ",B6),
+	writeln("A7 = ",A7),
+	writeln("B8 = ",B8),
+	writeln("A9 = ",A9),
+	writeln("B9 = ",B9),
+	writeln("R9 = ",R9),
+	writeln("R10 = ",R10),
+	writeln("L11 = ",L11),
+	writeln("B12 = ",B12).
+
+create_variable(_).
+
+compare(X,Y):-
+	X == Y,!,
+	set_color('DkGreen'),
+	writeln("These terms were ",
+		"unified successfully:"),
+	set_color('default'),
+	writeln(X),
+	writeln(Y).
+compare(X,Y):-
+	set_color('Red'),
+	writeln("I cannot unify ",
+		"these terms:"),
+	set_color('default'),
+	writeln(X),
+	writeln(Y).

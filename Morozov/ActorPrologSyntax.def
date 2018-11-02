@@ -1,0 +1,84 @@
+--------------------------------------------------------------------
+-- (c) 2017 Alexei A. Morozov                                     --
+-- Actor Prolog self-compiling compiler                           --
+--------------------------------------------------------------------
+
+DOMAINS:
+
+ActorPrologTokens	= ActorPrologToken*.
+--
+ActorPrologToken =
+	--
+	t(ActorPrologToken,TextPosition);
+	--
+	'end_of_text';				-- The end of text
+	'rest_of_text';				-- The rest of text
+	'end_of_line';				-- End of line
+	--
+	'comma'; 'dot'; 'exclam';		-- , . !
+	'colon'; 'semicolon';			-- : ;
+	'question_mark';			-- ?
+	'number_sign';				-- #
+	--
+	'l_round_bracket';			-- (
+	'r_round_bracket';			-- )
+	--
+	'bar';					-- |
+	'l_brace'; 'r_brace';			-- { }
+	--
+	'l_square_bracket';			-- [
+	'r_square_bracket';			-- ]
+	--
+	'multiply'; 'plus'; 'minus';		-- * + -
+	'divide';				-- /
+	'lt'; 'eq'; 'gt';			-- < = >
+	--
+	'informational_message';		-- <<
+	'control_message';			-- <-
+	'collecting_all';			-- ??
+	--
+	'implication';				-- :-
+	'equality';				-- ==
+	'assignment';				-- :=
+	'ne'; 'le'; 'ge';			-- <> <= >=
+	'range';				-- ..
+	--
+	symbol(SYMBOL,NameIsInQuotes);		-- <functor>
+	vn(STRING);				-- <variable>
+	keyword(SYMBOL);
+	character(INTEGER);			-- <integer>
+	integer_10(INTEGER);			-- <integer>
+	integer_R(
+		INTEGER,
+		INTEGER,STRING,INTEGER);	-- <integer>
+	real(REAL);				-- <real>
+	string(STRING);				-- <string>
+	binary(BINARY).				-- <binary>
+--
+TextPosition		= INTEGER.
+NameIsInQuotes		= 'no'; 'yes'.
+
+--------------------------------------------------------------------
+-- The 'ActorPrologScanner' class is specialized class 'Text'.    --
+--------------------------------------------------------------------
+
+interface 'ActorPrologScanner' (specialized 'Text'):
+--
+constant:
+--
+keywords		: S_List;
+keep_text_positions	: YesNo;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+convert_to_tokens(STRING) = ActorPrologTokens		- (i);
+--
+set_keywords(S_List)					- (i);
+get_keywords() = S_List;
+--
+set_keep_text_positions(YesNo)				- (i);
+get_keep_text_positions() = YesNo;
+]

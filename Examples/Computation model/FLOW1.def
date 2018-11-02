@@ -1,0 +1,42 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, Alexei A. Morozov, IRE RAS. --
+-- Transmission of flow message.         --
+-------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+Text	= STRING.
+--
+-------------------------------------------
+interface 'Flow1':
+--
+p1	: 'Receiver';
+p2	: 'Sender';
+[
+]
+-------------------------------------------
+interface 'Receiver':
+--
+variable:
+--
+	input	: Text;
+--
+constant:
+--
+	con	: 'Report';
+--
+[
+]
+-------------------------------------------
+interface 'Sender':
+--
+variable:
+--
+	output	: Text;
+--
+[
+]
+-------------------------------------------

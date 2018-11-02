@@ -1,0 +1,369 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2016 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Kinect":
+
+import "Morozov/ColorMap";
+import 'BufferedScene' from "Morozov/Java3D";
+import 'BufferedImage' from "Morozov/Java2D";
+import 'WritableImageProducer' from "Morozov/Java2D";
+import "Morozov/Vision";
+import "Morozov/VideoBuffer";
+
+DOMAINS:
+
+SkeletonChronicle	= SkeletonFrame*.
+--
+SkeletonFrame		= {	frame: FrameNumber,
+				time: INTEGER,
+				skeletons: Skeletons
+				}.
+--
+TracksOfSkeletons	= TrackOfSkeletons*.
+--
+TrackOfSkeletons	= {	identifier: INTEGER,
+				is_complete: YesNo,
+				frame1: FrameNumber,
+				time1: INTEGER,
+				frame2: FrameNumber,
+				time2: INTEGER,
+				skeletons: Skeletons
+				}.
+--
+Skeletons	= Skeleton*.
+--
+Skeleton	= {	identifier: INTEGER,
+			frame: FrameNumber,
+			time: INTEGER,
+			head: SkeletonJoint,
+			spine: SkeletonSpine,
+			left_arm: SkeletonArm,
+			right_arm: SkeletonArm,
+			left_leg: SkeletonLeg,
+			right_leg: SkeletonLeg,
+			total_parallelepiped: Parallelepiped,
+			skeleton_parallelepiped: Parallelepiped,
+			total_rectangle: Rectangle,
+			skeleton_rectangle: Rectangle
+			}.
+--
+SkeletonSpine	= {	neck: SkeletonJoint,
+			shoulder: SkeletonJoint,
+			mid: SkeletonJoint,
+			base: SkeletonJoint
+			}.
+SkeletonArm	= {	shoulder: SkeletonJoint,
+			elbow: SkeletonJoint,
+			wrist: SkeletonJoint,
+			hand: SkeletonJoint,
+			tip: SkeletonJoint,
+			thumb: SkeletonJoint
+			}.
+SkeletonLeg	= {	hip: SkeletonJoint,
+			knee: SkeletonJoint,
+			ankle: SkeletonJoint,
+			foot: SkeletonJoint
+			}.
+--
+SkeletonJoint	= {	status: SkeletonJointStatus,
+			position: VertexPosition3D,
+			orientation: JointOrientation3D
+			}.
+--
+SkeletonJointStatus	= 'TRACKED'; 'INFERRED'; 'UNKNOWN'.
+--
+Parallelepiped	= {	vertex11: VertexPosition3D,
+			vertex12: VertexPosition3D,
+			vertex13: VertexPosition3D,
+			vertex14: VertexPosition3D,
+			vertex21: VertexPosition3D,
+			vertex22: VertexPosition3D,
+			vertex23: VertexPosition3D,
+			vertex24: VertexPosition3D
+			}.
+--
+Rectangle	= {	vertex1: VertexPosition2D,
+			vertex2: VertexPosition2D,
+			vertex3: VertexPosition2D,
+			vertex4: VertexPosition2D
+			}.
+--
+VertexPosition3D = {	point: Point3D,
+			velocity: Point3D,
+			acceleration: Point3D,
+			mapping1: Point2D,
+			mapping2: Point2D
+			}.
+VertexPosition2D = {	mapping1: Point2D,
+			mapping2: Point2D
+			}.
+--
+JointOrientation3D	= q(	Numerical,
+				Numerical,
+				Numerical,
+				Numerical).
+
+--------------------------------------------------------------------
+-- The 'Kinect' class is specialized class 'DataAbstraction'.     --
+--------------------------------------------------------------------
+
+ExtendedCorrection	= 'default'; INTEGER.
+
+interface 'Kinect' (specialized 'DataAbstraction'):
+
+skeleton_release_time	: INTEGER;
+
+horizontal_correction	: ExtendedCorrection;
+vertical_correction	: ExtendedCorrection;
+
+[
+PREDICATES:
+--
+imperative:
+--
+activate;
+stop;
+--
+set_skeleton_release_time(INTEGER)			- (i);
+get_skeleton_release_time() = INTEGER;
+--
+set_horizontal_correction(ExtendedCorrection)		- (i);
+get_horizontal_correction() = ExtendedCorrection;
+--
+set_vertical_correction(ExtendedCorrection)		- (i);
+get_vertical_correction() = ExtendedCorrection;
+--
+set_correction(ExtendedCorrection,ExtendedCorrection)	- (i,i);
+get_correction(ExtendedCorrection,ExtendedCorrection)	- (o,o);
+--
+get_correction_in_pixels(INTEGER,INTEGER)		- (o,o);
+]
+
+--------------------------------------------------------------------
+-- The 'KinectBuffer' class is                                    --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+DOMAINS:
+
+KinectBufferOperatingMode =
+		'RECORDING'; 'PLAYING'; 'READING'; 'LISTENING'.
+--
+KinectDisplayingMode	= {
+			frame_type: KinectFrameType,
+			people_index: KinectPeopleIndexMode,
+			circumscription: KinectCircumscriptionModes,
+			skeletons: KinectSkeletonsMode
+			};
+			'default'.
+--
+KinectFrameType		=	'DEPTH_MAPS';
+				'COLORED_DEPTH_MAPS';
+				'INFRARED';
+				'LONG_EXPOSURE_INFRARED';
+				'MAPPED_COLOR';
+				'POINT_CLOUDS';
+				'COLOR';
+				'DEVICE_TUNING';
+				'NONE'.
+--
+KinectPeopleIndexMode	=	'TINCTURE_PEOPLE';
+				'PAINT_PEOPLE';
+				'EXTRACT_PEOPLE';
+				'ADAPTIVELY_EXTRACT_PEOPLE';
+				'PROJECT_PEOPLE';
+				'NONE'.
+--
+KinectCircumscriptionModes =	KinectCircumscriptionMode;
+				KinectCircumscriptionMode*.
+--
+KinectCircumscriptionMode =	'TOTAL_RECTANGLES';
+				'SKELETON_RECTANGLES';
+				'TOTAL_PARALLELEPIPEDS';
+				'SKELETON_PARALLELEPIPEDS';
+				'NONE'.
+--
+KinectSkeletonsMode	=	'DETECT_SKELETONS';
+				'DETECT_AND_TRACK_SKELETONS';
+				'NONE'.
+--
+KinectDevice	=	'none';
+			device('Kinect',KinectDataAcquisitionMode);
+			auto('Kinect').
+--
+KinectDataAcquisitionMode	= 'auto'; KinectFrameType*.
+--
+KinectPerformanceOptimization	= 'DATA_FLOW'; 'OPERATION_SPEED'; 'default'.
+--
+KinectSurfaceType		= 'CONVEX'; 'CONCAVE'; 'default'.
+
+interface 'KinectBuffer'
+
+(specialized
+	'DataAbstraction',
+	'OperatingSystemResource',
+	'DataResourceConsumer',
+	'WritableImageProducer'):
+
+operating_mode			: KinectBufferOperatingMode;
+displaying_mode			: KinectDisplayingMode;
+input_device			: KinectDevice;
+data_acquisition_optimization	: KinectPerformanceOptimization;
+description			: TextAttribute;
+copyright			: TextAttribute;
+registration_date		: TextAttribute;
+registration_time		: TextAttribute;
+color_map			: ColorMap;
+people_colors			: ColorMap;
+write_buffer_size		: INTEGER;
+read_buffer_size		: INTEGER;
+maximal_chronicle_length	: Numerical;
+slow_motion_coefficient		: Numerical;
+maximal_frame_delay		: IntegerAttribute;
+scene_depth_threshold		: Numerical;
+scene_surface_type		: KinectSurfaceType;
+
+[
+PREDICATES:
+--
+imperative:
+--
+start;
+start(YesNo)						- (i);
+pause;
+stop;
+--
+connect;
+connect(YesNo)						- (i);
+--
+determ:
+--
+is_active;
+is_suspended;
+--
+determ:
+--
+retrieve_buffered_frame(INTEGER)			- (i);
+--
+determ:
+--
+eof;
+--
+commit;
+--
+imperative:
+--
+get_recent_frame_number(FrameNumber)			- (o);
+get_recent_frame_time(INTEGER)				- (o);
+get_recent_frame_relative_time(INTEGER)			- (o);
+get_recent_frame_rate(REAL)				- (o);
+--
+get_recent_image('BufferedImage')			- (i);
+--
+get_recent_scene('BufferedScene')			- (i);
+get_recent_scene('BufferedScene','BufferedImage')	- (i,i);
+--
+get_recent_mapping('BufferedImage')			- (i);
+get_recent_mapping('BufferedImage','BufferedImage')	- (i,i);
+--
+set_lookup_table(FileName)				- (i);
+set_lookup_table(STRING/*FileName*/)			- (i);
+set_lookup_table(FileName,INTEGER,INTEGER)		- (i,i,i);
+set_lookup_table(STRING/*FileName*/,INTEGER,INTEGER)	- (i,i,i);
+--
+reset_lookup_table;
+--
+set_scene_appearance(Appearance)			- (i);
+reset_scene_appearance;
+--
+get_skeletons(Skeletons)				- (o);
+get_chronicle(SkeletonChronicle)			- (o);
+get_tracks(TracksOfSkeletons)				- (o);
+--
+get_depth_image_size_in_pixels(INTEGER,INTEGER)		- (o,o);
+get_color_image_size_in_pixels(INTEGER,INTEGER)		- (o,o);
+--
+get_computed_correction(INTEGER,INTEGER)		- (o,o);
+--
+get_delivered_data_acquisition_mode(
+	KinectDataAcquisitionMode)			- (o);
+get_delivered_people_index_mode(KinectPeopleIndexMode)	- (o);
+get_delivered_circumscription_modes(
+	KinectCircumscriptionModes)			- (o);
+get_delivered_skeletons_mode(KinectSkeletonsMode)	- (o);
+get_delivered_description(STRING)			- (o);
+get_delivered_copyright(STRING)				- (o);
+get_delivered_registration_date(STRING)			- (o);
+get_delivered_registration_time(STRING)			- (o);
+--
+determ:
+--
+recent_reading_error(INTEGER,ExceptionName)		- (o,o);
+--
+imperative:
+--
+set_operating_mode(KinectBufferOperatingMode)		- (i);
+get_operating_mode() = KinectBufferOperatingMode;
+--
+set_displaying_mode(KinectDisplayingMode)		- (i);
+get_displaying_mode() = KinectDisplayingMode;
+--
+set_input_device(KinectDevice)				- (i);
+get_input_device() = KinectDevice;
+--
+set_data_acquisition_optimization
+	(KinectPerformanceOptimization)			- (i);
+get_data_acquisition_optimization()
+	= KinectPerformanceOptimization;
+--
+set_description(TextAttribute)				- (i);
+get_description() = TextAttribute;
+--
+set_copyright(TextAttribute)				- (i);
+get_copyright() = TextAttribute;
+--
+set_registration_date(TextAttribute)			- (i);
+get_registration_date() = TextAttribute;
+--
+set_registration_time(TextAttribute)			- (i);
+get_registration_time() = TextAttribute;
+--
+set_color_map(ColorMap)					- (i);
+get_color_map() = ColorMap;
+--
+set_people_colors(ColorMap)				- (i);
+get_people_colors() = ColorMap;
+--
+set_write_buffer_size(INTEGER)				- (i);
+get_write_buffer_size() = INTEGER;
+--
+set_read_buffer_size(INTEGER)				- (i);
+get_read_buffer_size() = INTEGER;
+--
+set_maximal_chronicle_length(Numerical)			- (i);
+get_maximal_chronicle_length() = Numerical;
+--
+set_slow_motion_coefficient(Numerical)			- (i);
+get_slow_motion_coefficient() = Numerical;
+--
+set_maximal_frame_delay(IntegerAttribute)		- (i);
+get_maximal_frame_delay() = IntegerAttribute;
+--
+set_scene_depth_threshold(Numerical)			- (i);
+get_scene_depth_threshold() = Numerical;
+--
+set_scene_surface_type(KinectSurfaceType)		- (i);
+get_scene_surface_type() = KinectSurfaceType;
+--
+-- These methods are to be implemented by the programmer:
+--
+frame_obtained;
+data_transfer_completion;
+--
+buffer_overflow;
+buffer_deallocation;
+--
+data_transfer_error(ExceptionName)			- (i);
+]

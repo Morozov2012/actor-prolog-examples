@@ -1,0 +1,67 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N	= INTEGER.
+T_Item	= INTEGER.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	p1	: 'Sender';
+	p2	: 'Receiver';
+--
+internal:
+--
+	con	: 'Report';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Sender' (specialized 'Timer'):
+--
+variable:
+--
+	output	: T_Item;
+--
+internal:
+--
+	con	: 'Report';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+tick;
+--
+determ:
+--
+form_output(Minutes,Seconds,Milliseconds);
+]
+-----------------------------------------------------------------------
+interface 'Receiver' (specialized 'Alpha'):
+--
+variable:
+--
+	input	: T_Item;
+--
+internal:
+--
+	con	: 'Report';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+p(STRING)	- (i);
+]
+-----------------------------------------------------------------------

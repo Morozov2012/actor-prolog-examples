@@ -1,0 +1,291 @@
+package "Morozov/Web/Scanning/Counter":
+---------------------------------------------------------------------
+--          The "SCANNING/COUNTER" Actor Prolog package.           --
+--           (c) 2002-2005, IRE RAS, Alexei A. Morozov.            --
+---------------------------------------------------------------------
+class 'Statistics' (specialized 'Database'):
+--
+internal:
+--
+	local_counter	= ('Counter');
+	text_operations	= ('WebText');
+--
+	old_nodes	= ('WebAddressRegistry');
+--
+constant:
+--
+	report		= #;
+	found_pages	= #;
+--
+[
+goal:-!.
+--
+reset(WebAddress,Item):-
+	--
+	retract_all(number_of_pages(WebAddress,_)),
+	retract_all(current_size(WebAddress,_)),
+	retract_all(number_of_HTML_leafs(WebAddress,_)),
+	retract_all(number_of_binary_leafs(WebAddress,_)),
+	retract_all(number_of_picture_leafs(WebAddress,_)),
+	retract_all(number_of_errors(WebAddress,_)),
+	retract_all(current_NList(WebAddress,_)),
+	retract_all(current_resource(WebAddress,_)),
+	--
+	old_nodes ? retract_all(old(WebAddress,_)),
+	--
+	insert(number_of_pages(WebAddress,0)),
+	insert(current_size(WebAddress,0)),
+	insert(number_of_HTML_leafs(WebAddress,0)),
+	insert(number_of_binary_leafs(WebAddress,0)),
+	insert(number_of_picture_leafs(WebAddress,0)),
+	insert(number_of_errors(WebAddress,0)),
+	insert(current_NList(WebAddress,[])),
+	insert(current_resource(WebAddress,Item)).
+--
+add_old_node(WebAddress,Name1):-
+	P== text_operations ? search(Name1,"#"),
+	text_operations ? split(P-1,Name1,Name2,_),!,
+	old_nodes ? insert(old(WebAddress,Name2)).
+add_old_node(WebAddress,Name):-
+	old_nodes ? insert(old(WebAddress,Name)).
+--
+is_old_node(WebAddress,Name1):-
+	P== text_operations ? search(Name1,"#"),!,
+	text_operations ? split(P-1,Name1,Name2,_),
+	old_nodes ? find(old(WebAddress,Name2)),!.
+is_old_node(WebAddress,Name):-
+	old_nodes ? find(old(WebAddress,Name)),!.
+--
+register_parameters(
+		WebAddress,URL,Text,Keywords,
+		entry(_,Date,_,Size)):-
+	string(Text),!,
+	count_keywords(URL,Text,Keywords,NList),
+	register_keywords(WebAddress,NList),
+	register_date(WebAddress,?cast("WebResourceDate",Date)),
+	increase_page_counter(WebAddress),
+	register_size(WebAddress,?cast("Size",Size)).
+register_parameters(_,_,_,_,_).
+--
+count_keywords(_,_,[],[]):-!.
+count_keywords(URL,Text,[Keyword|Rest],[Number|NList]):-!,
+	count_keyword(
+		URL,
+		Text,
+		text_operations?lower(Keyword),
+		Number),
+	count_keywords(URL,Text,Rest,NList).
+count_keywords(_,_,_,[]).
+--
+count_keyword(URL,Text,Keyword1,N1+N2):-
+	Keyword2== text_operations?replace_all(Keyword1,"-"," "),
+	Keyword2 <> Keyword1,!,
+	search_keyword(URL,Text,Keyword1,N1),
+	search_keyword(URL,Text,Keyword2,N2).
+count_keyword(URL,Text,Keyword,Number):-
+	search_keyword(URL,Text,Keyword,Number).
+--
+search_keyword(_,Text,Keyword,_):-
+	local_counter ? reset,
+	text_operations ? search(Text,Keyword),
+	local_counter ? increase,
+	fail.
+search_keyword(URL,_,Keyword,N):-
+	local_counter ? value(Number),
+	Number > 0,
+	N== ?cast("N",Number),
+	found_pages ? append(
+		page_contains_keyword(URL,Keyword,N)),
+	report ? writeln(
+		"\"",Keyword,"\": ",URL," (",Number," times)"),!.
+search_keyword(_,_,_,0).
+--
+register_keywords(WebAddress,NList):-
+	retract(current_NList(WebAddress,[])),!,
+	insert(current_NList(WebAddress,NList)).
+register_keywords(WebAddress,NList2):-
+	retract(current_NList(WebAddress,NList1)),!,
+	NList3== NList1 + NList2,
+	insert(current_NList(WebAddress,NList3)).
+register_keywords(WebAddress,NList):-
+	insert(current_NList(WebAddress,NList)).
+--
+-- '+'([N1|Rest1],[N2|Rest2])= [N1+N2|Rest1+Rest2] :-!.
+-- '+'([],NList)= NList :-!.
+--
+register_date(WebAddress,PageDate):-
+	find(recent_date(WebAddress,RecentDate)),!,
+	update_recent_date(WebAddress,RecentDate,PageDate).
+register_date(WebAddress,PageDate):-
+	insert(recent_date(WebAddress,PageDate)).
+--
+update_recent_date(WebAddress,RecentDate,PageDate):-
+	is_less(RecentDate,PageDate),!,
+	retract_all(recent_date(WebAddress,_)),
+	insert(recent_date(WebAddress,PageDate)).
+update_recent_date(_,_,_).
+--
+is_less(#,date(_,_,_)):-!.
+is_less(Date1,Date2):-
+	Date1 == date(_,_,_),
+	Date2 == date(_,_,_),
+	Date1 < Date2.
+--
+increase_page_counter(WebAddress):-
+	retract(number_of_pages(WebAddress,N)),!,
+	insert(number_of_pages(WebAddress,N+1)).
+increase_page_counter(WebAddress):-
+	insert(number_of_pages(WebAddress,1)).
+--
+register_size(WebAddress,Size2):-
+	integer(Size2),
+	Size2 > 0,
+	find(current_size(WebAddress,Size1)),!,
+	update_recent_size(WebAddress,Size1,Size2).
+register_size(WebAddress,Size2):-
+	integer(Size2),
+	Size2 > 0,!,
+	insert(current_size(WebAddress,Size2)).
+register_size(_,_).
+--
+update_recent_size(WebAddress,Size1,Size2):-
+	integer(Size1),
+	retract_all(current_size(WebAddress,_)),!,
+	insert(current_size(WebAddress,Size1+Size2)).
+update_recent_size(_,_,_).
+--
+register_error(WebAddress):-
+	retract(number_of_errors(WebAddress,N)),!,
+	insert(number_of_errors(WebAddress,N+1)).
+register_error(WebAddress):-!,
+	insert(number_of_errors(WebAddress,1)).
+register_error(_).
+--
+get_parameters(R,Date,I,Size,H,P,O,E,NList):-
+	find(current_resource(WebAddress,R)),
+	get_target_parameters(WebAddress,Date,I,Size,H,P,O,E,NList).
+--
+get_target_parameters(WebAddress,Date,I,Size,H,P,O,E,NList):-
+	find(number_of_pages(WebAddress,I)),!,
+	find(current_size(WebAddress,Size)),!,
+	find(recent_date(WebAddress,Date)),!,
+	find(number_of_HTML_leafs(WebAddress,H)),!,
+	find(number_of_picture_leafs(WebAddress,P)),!,
+	find(number_of_binary_leafs(WebAddress,O)),!,
+	find(number_of_errors(WebAddress,E)),!,
+	find(current_NList(WebAddress,NList)),!.
+--
+count_HTML_leaf(WebAddress):-
+	retract(number_of_HTML_leafs(WebAddress,N)),!,
+	insert(number_of_HTML_leafs(WebAddress,N+1)).
+count_HTML_leaf(WebAddress):-
+	insert(number_of_HTML_leafs(WebAddress,1)).
+--
+count_binary_leaf(WebAddress):-
+	retract(number_of_binary_leafs(WebAddress,N)),!,
+	insert(number_of_binary_leafs(WebAddress,N+1)).
+count_binary_leaf(WebAddress):-
+	insert(number_of_binary_leafs(WebAddress,1)).
+--
+count_picture_leaf(WebAddress):-
+	retract(number_of_picture_leafs(WebAddress,N)),!,
+	insert(number_of_picture_leafs(WebAddress,N+1)).
+count_picture_leaf(WebAddress):-
+	insert(number_of_picture_leafs(WebAddress,1)).
+]
+---------------------------------------------------------------------
+class 'Counter' (specialized 'Database'):
+[
+reset:-
+	retract_all().
+--
+increase:-
+	retract(N),!,
+	insert(N+1).
+increase:-
+	insert(1).
+--
+value(N):-
+	find(N),!.
+value(0).
+]
+---------------------------------------------------------------------
+class 'WebResourceRegistry' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------------
+-- This class implements the output of the collected information.  --
+---------------------------------------------------------------------
+class 'StatisticsReporter' (specialized 'Alpha'):
+--
+internal:
+--
+	site_statistics;
+	found_pages;
+	output;
+--
+[
+goal:-!.
+--
+write_report=_ :-
+	[output],
+	create_report.
+--
+create_report:-
+	output ? write_header,
+	output ? begin_title("The Results of Analysis"),
+	output ? end_title,
+	--
+	output ? begin_title("There are keywords on the pages"),
+	output ? end_title,
+	--
+	found_pages ? find(
+		page_contains_keyword(Page,Keyword,Number)),
+	--
+	output ? write("\"",Keyword,"\": "),
+	output ? write_valid_URL(Page),
+	output ? write(" (",Number," times)"),
+	output ? break_line,
+	--
+	fail.
+create_report:-
+	output ? break_line,
+	--
+	site_statistics ? get_parameters(
+		Item,Date,Pages,Size,NoH,NoP,NoB,NoE,NList),
+	--
+	Item == {address:URL|_},
+	output ? begin_title("Parameters"),
+	output ? end_title,
+	output ? writeln("Address: ",URL),
+	output ? writeln("Date = ",Date),
+	output ? writeln("Pages = ",Pages),
+	output ? writeln("Size = ",Size),
+	output ? writeln(
+		"Number of pointers to external HTML = ",NoH),
+	output ? writeln("Number of pictures = ",NoP),
+	output ? writeln("Number of pointers to other data = ",NoB),
+	output ? writeln("Number of error links = ",NoE),
+	output ? writeln("Numbers of Keywords = ",NList),
+	--
+	fail.
+create_report:-
+	--
+	output ? write_footer,
+	--
+	fail.
+create_report.
+]
+---------------------------------------------------------------------
+class 'WebAddressRegistry' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------------
+class 'PageRegistry' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------------
+class 'WebText' (specialized 'Text'):
+[
+]
+---------------------------------------------------------------------

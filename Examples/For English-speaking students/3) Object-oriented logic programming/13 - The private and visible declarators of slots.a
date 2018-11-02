@@ -1,0 +1,43 @@
+-----------------------------------------------------
+--                                                 --
+--              Actor Prolog lessons               --
+--           (c) 2015 Alexei A. Morozov            --
+--                                                 --
+-- The topic: Object-oriented logic programming.   --
+-- The private and visible declarators of slots.   --
+--                                                 --
+-- Questions: What are classes and class instances --
+-- (the worlds)? What are slots of the class       --
+-- instances? What is the destination of the       --
+-- private and visible declarators of the slots?   --
+-- What is overriding of the slot declarators?     --
+--                                                 --
+-----------------------------------------------------
+
+project: (('Main',
+		my_slot=100))
+
+-----------------------------------------------------
+
+interface 'Main' (specialized 'DemoConsole'):
+--
+visible:
+-- private:
+--
+my_slot		: INTEGER;
+--
+[
+]
+
+-----------------------------------------------------
+
+class 'Main' (specialized 'DemoConsole'):
+--
+my_slot		= 1;
+--
+[
+goal:-
+	writeln(my_slot).
+]
+
+-----------------------------------------------------

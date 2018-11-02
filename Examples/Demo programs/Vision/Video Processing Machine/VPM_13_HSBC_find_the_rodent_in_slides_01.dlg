@@ -1,0 +1,147 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+
+dialog_font("Arial",8,[])
+padding(1,0)
+draft('off')
+
+modeless dialog 'DialogHSBC' (
+	"HSBC Dialog",
+	default,default,default,
+	centered,centered,default)
+vbox(center)
+	hbox(center)
+		-- custom(graphic_window,48,36,"Control2D")
+		custom['KeepProportions'](graphic_window,64,48,"Control2D")
+	end_of_hbox
+	grid
+	row
+		column(right)
+			"Minimal Hue1"
+		end_of_column
+		column(right)
+			hscroll(1001,minimal_hue_1,25,[0,255],0)
+		end_of_column
+		column(right)
+			editinteger(minimal_hue_1,3,0)
+		end_of_column
+		column(right)
+			"First Frame:"
+		end_of_column
+		column(right)
+			hscroll(1002,first_frame,25,[1,1000],0)
+		end_of_column
+		column(right)
+			editinteger(first_frame,5,0)
+		end_of_column
+	end_of_row
+	row
+		column(right)
+			"Maximal Hue1"
+		end_of_column
+		column(right)
+			hscroll(1003,maximal_hue_1,25,[0,255],255)
+		end_of_column
+		column(right)
+			editinteger(maximal_hue_1,3,255)
+		end_of_column
+		column(right)
+			"Last Frame:"
+		end_of_column
+		column(right)
+			hscroll(1004,last_frame,25,[1,1000],0)
+		end_of_column
+		column(right)
+			editinteger(last_frame,5,1000)
+		end_of_column
+	end_of_row
+	row
+		column(right)
+			"Minimal Hue2"
+		end_of_column
+		column(right)
+			hscroll(1005,minimal_hue_2,25,[0,255],0)
+		end_of_column
+		column(right)
+			editinteger(minimal_hue_2,3,0)
+		end_of_column
+		column(right)
+			"Minimal Brightness"
+		end_of_column
+		column(right)
+			hscroll(1006,minimal_brightness,25,[0,255],0)
+		end_of_column
+		column(right)
+			editinteger(minimal_brightness,3,0)
+		end_of_column
+	end_of_row
+	row
+		column(right)
+			"Maximal Hue2"
+		end_of_column
+		column(right)
+			hscroll(1007,maximal_hue_2,25,[0,255],255)
+		end_of_column
+		column(right)
+			editinteger(maximal_hue_2,3,255)
+		end_of_column
+		column(right)
+			"Maximal Brightness"
+		end_of_column
+		column(right)
+			hscroll(1008,maximal_brightness,25,[0,255],255)
+		end_of_column
+		column(right)
+			editinteger(maximal_brightness,3,255)
+		end_of_column
+	end_of_row
+	row
+		column(right)
+			"Minimal Saturation"
+		end_of_column
+		column(right)
+			hscroll(1009,minimal_saturation,25,[0,255],0)
+		end_of_column
+		column(right)
+			editinteger(minimal_saturation,3,0)
+		end_of_column
+		column(right)
+			"Minimal Contrast"
+		end_of_column
+		column(right)
+			hscroll(1010,minimal_contrast,25,[0,255],0)
+		end_of_column
+		column(right)
+			editinteger(minimal_contrast,3,0)
+		end_of_column
+	end_of_row
+	row
+		column(right)
+			"Maximal Saturation"
+		end_of_column
+		column(right)
+			hscroll(1011,maximal_saturation,25,[0,255],255)
+		end_of_column
+		column(right)
+			editinteger(maximal_saturation,3,255)
+		end_of_column
+		column(right)
+			"Maximal Contrast"
+		end_of_column
+		column(right)
+			hscroll(1012,maximal_contrast,25,[0,255],255)
+		end_of_column
+		column(right)
+			editinteger(maximal_contrast,3,255)
+		end_of_column
+	end_of_row
+	end_of_grid
+	"The data are coming from "
+	"the Institute of Higher Nervous Activity "
+	"and Neurophysiology of RAS"
+end_of_vbox
+end_of_dialog

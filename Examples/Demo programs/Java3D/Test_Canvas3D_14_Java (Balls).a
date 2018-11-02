@@ -1,0 +1,225 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+DOMAINS:
+
+Balls		= Ball*.
+Ball		= ball(NodeLabel,Position,Velocity).
+Position	= Translation.
+Velocity	= Numerical*.
+
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	scene_halfwidth			= 0.5;
+	ball_radius	: Radius	= 0.03;
+--
+internal:
+--
+	object_store	= ('ObjectStore',
+				scene_halfwidth);
+	canvas		= ('TargetCanvas',
+				scene= object_store,
+				ball_radius);
+--
+[
+goal:-!,
+	set_period(0.030,0.0),
+	activate.
+--
+tick:-!,
+	object_store ? modify(?time()),
+	canvas ? update.
+]
+
+class 'ObjectStore' (specialized 'Database'):
+--
+constant:
+--
+	scene_halfwidth	= 1;
+--
+[
+DOMAINS:
+--
+Target		= Ball; Time.
+--
+PREDICATES:
+--
+imperative:
+--
+modify(Time)				- (i);
+--
+calculate_new_position(
+	Position,
+	Velocity,
+	Time,
+	Time) = Position	- (i,i,i,i);
+--
+correct_velosity(
+	Position,
+	Position,
+	Position,
+	Velocity,
+	Velocity)		- (i,i,o,i,o);
+--
+correct_V_and_P(
+	Numerical,
+	Numerical,
+	Numerical,
+	Numerical,
+	Numerical)		- (i,i,o,i,o);
+--
+'+'(Position,Position)	= Position	- (i,i);
+'*'(Velocity,REAL)	= Position	- (i,i);
+'-'(Numerical)		= Numerical	- (i);
+--
+CLAUSES:
+--
+modify(T2):-
+	Item1== ?match(time(_,_,_,_)),
+	T1== ?val("Time",Item1),
+	B1== ?match(ball(_,_,_)),
+		B1 == ball(Label,P1,V1),
+		P2== ?calculate_new_position(P1,V1,T1,T2),
+		correct_velosity(P1,P2,P3,V1,V2),
+		retract_all(B1),
+		insert(ball(Label,P3,V2)),
+		fail.
+modify(T2):-
+	retract_all(time(_,_,_,_)),
+	insert(T2).
+--
+calculate_new_position(P1,V1,T1,T2) = P2 :-
+	Interval== (T2 - T1) / 1000.0,
+	P2== P1 + V1 * Interval.
+--
+correct_velosity([P1|R1],[P2|R2],[P3|R3],[V1|R4],[V2|R5]):-!,
+	correct_V_and_P(P1,P2,P3,V1,V2),
+	correct_velosity(R1,R2,R3,R4,R5).
+correct_velosity(_,_,[],_,[]).
+--
+correct_V_and_P(P1,P2,P1,V1,V2):-
+	P2 >= scene_halfwidth,!,
+	V2== -(V1).
+correct_V_and_P(P1,P2,P1,V1,V2):-
+	P2 <= -(scene_halfwidth),!,
+	V2== -(V1).
+correct_V_and_P(_,P2,P2,V1,V1).
+]
+
+class 'TargetCanvas' (specialized 'Canvas3D'):
+--
+internal:
+--
+	scene		: 'ObjectStore';
+--
+constant:
+--
+	ball_radius	: Radius	= 0.03;
+--
+	enable_scene_antialiasing	= 'yes';
+	background_color		= 'Black';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+create_balls(INTEGER,Balls)		- (i,o);
+insert_balls(Balls)			- (i);
+--
+create_spheres(Balls,Radius,NodeList)	- (i,i,o);
+create_sphere(Ball,Radius,Node)		- (i,i,o);
+--
+update;
+--
+CLAUSES:
+--
+goal:-!,
+	create_balls(100,Balls),
+	insert_balls(Balls),
+	create_spheres(Balls,ball_radius,Spheres),
+	Bounds== 'BoundingSphere'({
+		center: p(0.0,0.0,0.0),
+		radius: 100.0
+		}),
+	show([	'Background'({
+			color: background_color,
+			scaleMode: 'SCALE_REPEAT',
+			applicationBounds: Bounds
+			}),
+		'OrbitBehavior'({
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			})
+		| Spheres
+		]).
+--
+create_balls(N,[ball(N,[0,0,0],[Vx,Vy,Vz])|Rest]):-
+	N > 0,!,
+	Vx== ?random() - 0.5,
+	Vy== ?random() - 0.5,
+	Vz== ?random() - 0.5,
+	create_balls(N-1,Rest).
+create_balls(_,[]).
+--
+insert_balls([Ball|Rest]):-!,
+	scene ? insert(Ball),
+	insert_balls(Rest).
+insert_balls(_).
+--
+create_spheres([Ball|Rest1],Radius,[Sphere|Rest2]):-!,
+	create_sphere(Ball,Radius,Sphere),
+	create_spheres(Rest1,Radius,Rest2).
+create_spheres(_,_,[]).
+--
+create_sphere(ball(Label,_,_),Radius,Sphere):-
+	Red== ?random() / 1.5,
+	Green== ?random() / 1.5,
+	Blue== ?random() / 1.5,
+	Sphere ==
+		'TransformGroup'({
+			label: Label,
+			allowTransformWrite: 'yes',
+			allowTransformRead: 'yes',
+			branches: [
+				'Sphere'({
+					radius: Radius,
+					generateNormals: 'yes',
+					divisions: 100,
+					appearance: 'Appearance'({
+						material: 'Material'({
+							ambientColor: color3(Red,Green,Blue),
+							diffuseColor: 'Black',
+							specularColor: color3(0.8,0.8,0.8),
+							emissiveColor: color3(Red,Green,Blue),
+							shininess: 70
+							})
+						})
+					}),
+				'PointLight'({
+					color: color3(Red,Green,Blue),
+					position: p(0.0,0.0,0.0),
+					attenuation: a(1,0,0),
+					influencingBounds: 'BoundingSphere'({
+						center: p(0.0,0.0,0.0),
+						radius: 100.0
+						})
+					})
+				]
+			}).
+--
+update:-
+	B== scene?match(ball(_,_,_)),
+		B == ball(Label,Position,_),
+		set_translation(Label,Position),
+		fail.
+update.
+]

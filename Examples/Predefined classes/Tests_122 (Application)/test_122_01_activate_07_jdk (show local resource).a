@@ -1,0 +1,37 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012-2015 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+argument_file	= ('File',
+			name= "data/report1.html");
+--
+browser		= ('ExternalBrowser');
+--
+[
+goal:-!,
+	browser ? set_arguments(argument_file?get_URL()),
+	browser ? activate().
+]
+-----------------------------------------------------------------------
+class 'ExternalBrowser' (specialized 'Application'):
+--
+constant:
+--
+	command		= 'auto';
+--
+constant:
+--
+	window_mode			= 'restored';
+	enable_multiple_instances	= 'no';
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+end(Code):-!,
+	con ? writeln("ExitCode: ",Code).
+]
+-----------------------------------------------------------------------

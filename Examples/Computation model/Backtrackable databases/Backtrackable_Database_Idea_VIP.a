@@ -1,0 +1,221 @@
+------------------------------------------------------------------------
+--              An example of Actor Prolog program.                   --
+--              (c) 2012, Alexei A. Morozov, IRE RAS.                 --
+------------------------------------------------------------------------
+--              This program explains the idea of                     --
+--              backtrackable databases.                              --
+--              Here are several predicates                           --
+--              to retrieve and update data in                        --
+--              backtrackable database with                           --
+--              constraints and transactions.                         --
+------------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+feedback= (('FeedBackChannel',
+		variable:
+			input=V1,
+		protecting:
+			output=V2));
+--
+p	= (('Bubble',
+		protecting:
+			data_1=V1,
+		variable:
+			data_2=V2));
+--
+[
+]
+------------------------------------------------------------------------
+class 'Bubble' (specialized 'Transaction'):
+--
+constant:
+--
+	watch	= ('Constraint',
+			data_1);
+--
+variable:
+--
+	data_1;
+--
+constant:
+--
+	env	= ('Timer');
+	con	= ('Console');
+--
+[
+goal:-
+	i_goal('empty_list',_).
+--
+i_goal(D1,D5):-
+	D1 ? begin_update(D2),
+	is_empty(D2,D3),
+	i_initialize(D3,D4),
+	i_end_update(D4,D5).
+i_goal(D1,D7):-
+	D1 ? begin_update(D2),
+	i_retract_item(D2,D3,N1,Text1),
+	i_retract_item(D3,D4,N2,Text2),
+	N1 < N2,
+	Text1 > Text2,
+	con ? writeln(
+		"I permute ",
+		N1,"-",Text1," and ",
+		N2,"-",Text2),
+	i_append_item(D4,D5,N1,Text2),
+	i_append_item(D5,D6,N2,Text1),
+	i_end_update(D6,D7),
+	env ? sleep(0.100).
+--
+is_empty(D,D):-
+	D ? find_update(_),!,
+	fail.
+is_empty(D,D).
+--
+i_initialize(D1,D10):-
+	D1 ? begin_update(D2),
+	i_append_item(D2,D3,1,"Monday"),
+	i_append_item(D3,D4,2,"Tuesday"),
+	i_append_item(D4,D5,3,"Wednesday"),
+	i_append_item(D5,D6,4,"Thursday"),
+	i_append_item(D6,D7,5,"Friday"),
+	i_append_item(D7,D8,6,"Saturday"),
+	i_append_item(D8,D9,7,"Sunday"),
+	i_end_update(D9,D10).
+--
+i_append_item(D1,D2,N,Text):-
+	D1 ? append(D2,item(N,Text)).
+--
+i_retract_item(D1,D2,N,Text):-
+	D1 ? retract(D2,item(N,Text)).
+--
+i_end_update(D4,D5):-
+	D4 ? end_update(D5).
+]
+------------------------------------------------------------------------
+class 'Constraint' (specialized 'Transaction'):
+--
+output	= ('Report',
+		x= 15,
+		y= 5,
+		width= 50,
+		height= 15);
+--
+data_1;
+--
+[
+goal:-
+	data_1 ? find(Item),
+	free(Item),!.
+goal:-
+	output ? clear,
+	output ? writeln("Bubble sorting by number:"),
+	loop(1).
+--
+loop(N):-
+	data_1 ? find(item(N,Text)),
+	output ? writeln(N," ",Text),
+	loop(N+1).
+loop(_).
+]
+------------------------------------------------------------------------
+-- Auxiliary Classes                                                  --
+------------------------------------------------------------------------
+class 'Transaction' (specialized 'Console'):
+--
+variable:
+--
+	data_1;
+	data_2;
+--
+[
+--
+begin_update(D1,D2):-
+	D1 ? begin_transaction(D2).
+--
+begin_transaction('empty_list',level(1,data_2)):-
+	bind_if_need(data_2).
+begin_transaction(level(N,List),level(N+1,List)).
+--
+bind_if_need([]):-!.
+bind_if_need(_).
+--
+end_update(D2,D3):-
+	D2 ? end_transaction(D3).
+--
+end_transaction(level(1,List),'empty_list'):-!,
+	data_1:= List.
+end_transaction(level(N,List),level(N-1,List)).
+--
+link:-
+	dummy_link(data_1).
+--
+dummy_link(_).
+--
+find(T):-
+	data_1 ? find(T).
+--
+find([T|_],T).
+find([_|R],T):-
+	find(R,T).
+--
+find_update(D2,T):-
+	D2 ? find_in_list(T).
+--
+find_in_list(level(_,List),T):-
+	find(List,T).
+--
+insert(level(N,D),level(N,[T|D]),T).
+--
+append(level(N,L1),level(N,L2),T):-
+	append_list(L1,L2,T).
+--
+append_list([],[T],T).
+append_list([F|R1],[F|R2],T):-
+	append_list(R1,R2,T).
+--
+clear(level(N,_),level(N,[])).
+--
+retract(level(N,L1),level(N,L2),T):-
+	retract_list(L1,L2,T).
+--
+retract_list([T|R],R,T).
+retract_list([F|R1],[F|R2],T):-
+	retract_list(R1,R2,T).
+--
+retractall(level(N,L1),level(N,L2),T):-
+	retract_all_from_list(L1,L2,T).
+--
+-- Note that the 'retractall' predicate has no
+-- logical semantics in this implementation.
+--
+retract_all_from_list([],[],_):-!.
+retract_all_from_list([T|R1],R2,T):-!,
+	retract_all_from_list(R1,R2,T).
+retract_all_from_list([F|R1],[F|R2],T):-
+	retract_all_from_list(R1,R2,T).
+--
+is_element([T|_],T).
+is_element([_|L],T):-
+	is_element(L,T).
+]
+------------------------------------------------------------------------
+class 'FeedBackChannel':
+--
+variable:
+--
+	input;
+--
+protecting:
+--
+	output;
+--
+[
+goal:-
+	input== #,
+	output== [].
+goal:-
+	output== input.
+--
+alarm(_).
+]
+------------------------------------------------------------------------

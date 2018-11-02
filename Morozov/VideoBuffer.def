@@ -1,0 +1,143 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/VideoBuffer":
+
+import 'BufferedImage' from "Morozov/Java2D";
+import 'WritableImageProducer' from "Morozov/Java2D";
+import "Morozov/Vision";
+
+--------------------------------------------------------------------
+-- The 'VideoBuffer' class is                                     --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+DOMAINS:
+
+VideoBufferOperatingMode =
+		'RECORDING';
+		'PLAYING';
+		'READING';
+		'SPECULATIVE_READING';
+		'LISTENING'.
+--
+TextAttribute		= STRING; 'default'.
+IntegerAttribute	= INTEGER; 'default'.
+
+interface 'VideoBuffer'
+
+(specialized
+	'DataAbstraction',
+	'OperatingSystemResource',
+	'DataResourceConsumer',
+	'WritableImageProducer'):
+
+operating_mode				: VideoBufferOperatingMode;
+description				: TextAttribute;
+copyright				: TextAttribute;
+registration_date			: TextAttribute;
+registration_time			: TextAttribute;
+zoom_image				: YesNo;
+zooming_coefficient			: Numerical;
+use_recorded_zooming_commands		: YesNo;
+opening_attempt_period			: ActionPeriod;
+write_buffer_size			: INTEGER;
+read_buffer_size			: INTEGER;
+slow_motion_coefficient			: Numerical;
+maximal_frame_delay			: IntegerAttribute;
+
+[
+PREDICATES:
+--
+imperative:
+--
+start;
+pause;
+stop;
+--
+determ:
+--
+is_active;
+is_suspended;
+is_committed;
+contains_new_frame;
+--
+imperative:
+--
+retrieve_buffered_frame(INTEGER)			- (i);
+--
+determ:
+--
+retrieve_timed_frame(TimeInterval)			- (i);
+--
+determ:
+--
+eof;
+--
+commit;
+--
+imperative:
+--
+get_delivered_description(STRING)			- (o);
+get_delivered_copyright(STRING)				- (o);
+get_delivered_registration_date(STRING)			- (o);
+get_delivered_registration_time(STRING)			- (o);
+--
+determ:
+--
+recent_reading_error(INTEGER,ExceptionName)		- (o,o);
+recent_data_acquisition_error(ExceptionName)		- (o);
+--
+imperative:
+--
+set_operating_mode(VideoBufferOperatingMode)		- (i);
+get_operating_mode() = VideoBufferOperatingMode;
+--
+set_description(TextAttribute)				- (i);
+get_description() = TextAttribute;
+--
+set_copyright(TextAttribute)				- (i);
+get_copyright() = TextAttribute;
+--
+set_registration_date(TextAttribute)			- (i);
+get_registration_date() = TextAttribute;
+--
+set_registration_time(TextAttribute)			- (i);
+get_registration_time() = TextAttribute;
+--
+set_zoom_image(YesNo)					- (i);
+get_zoom_image() = YesNo;
+--
+set_zooming_coefficient(Numerical)			- (i);
+get_zooming_coefficient() = Numerical;
+--
+set_use_recorded_zooming_commands(YesNo)		- (i);
+get_use_recorded_zooming_commands() = YesNo;
+--
+set_opening_attempt_period(ActionPeriod)		- (i);
+get_opening_attempt_period() = ActionPeriod;
+--
+set_write_buffer_size(INTEGER)				- (i);
+get_write_buffer_size() = INTEGER;
+--
+set_read_buffer_size(INTEGER)				- (i);
+get_read_buffer_size() = INTEGER;
+--
+set_slow_motion_coefficient(Numerical)			- (i);
+get_slow_motion_coefficient() = Numerical;
+--
+set_maximal_frame_delay(IntegerAttribute)		- (i);
+get_maximal_frame_delay() = IntegerAttribute;
+--
+-- These methods are to be implemented by the programmer:
+--
+frame_obtained;
+data_transfer_completion;
+--
+buffer_overflow;
+buffer_deallocation;
+--
+data_transfer_error(ExceptionName)			- (i);
+]

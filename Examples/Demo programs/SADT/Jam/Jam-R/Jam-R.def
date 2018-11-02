@@ -1,0 +1,166 @@
+------------------------------------------------------------------------
+--                 An example of visual expert system.                --
+--               The program is written in Actor Prolog.              --
+--               (c) Alexei A. Morozov, December 5, 2004.             --
+------------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+KitchenWare	= KitchenWare*; ('_Block'); STRING.
+--
+Ingredient	= STRING; Ingredient*.
+--
+Duration	= INTEGER; STRING.
+--
+------------------------------------------------------------------------
+interface '_÷икл_варки_твЄрдых_€год_и_фруктов'
+(specialized '_Block'):
+--
+value_i1	: Ingredient;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_÷икл_варки_м€гких_€год_и_фруктов'
+(specialized '_Block'):
+--
+value_i1	: Ingredient;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_Ќагреть_смесь' (specialized 'Ќагреть—месь'):
+--
+variable:
+--
+	value_i2	: Ingredient;
+	time		: Duration;
+--
+variable:
+--
+	fruits		: Ingredient;
+--
+[
+set_time(Ingredient,Duration)		- (i,i);
+]
+------------------------------------------------------------------------
+interface 'Ќагреть—месь' (specialized '_Block'):
+--
+protecting:
+--
+	time		: Duration;
+--
+variable:
+--
+	fruits		: Ingredient;
+--
+[
+]
+------------------------------------------------------------------------
+interface '_ќсновной_этап_варки' (specialized 'Ќагреть—месь'):
+--
+variable:
+--
+	value_i1	: Ingredient;
+	time		: Duration;
+--
+variable:
+--
+	fruits		: Ingredient;
+[
+set_time(Ingredient,Duration)		- (i,i);
+]
+------------------------------------------------------------------------
+interface '_јнализ_модели:_ акие_необходимы_посуда_и_инструменты?'
+(specialized '_Block'):
+--
+constant:
+--
+	container	: '_Block';
+--
+variable:
+--
+	result		: KitchenWare;
+	instruments	: KitchenWare;
+--
+constant:
+--
+	agent		: 'FindInstruments';
+--
+[
+refine_list(
+	KitchenWare,
+	KitchenWare,
+	KitchenWare)			- (i,i,i)(i,i,o);
+--
+is_list(KitchenWare)			- (i);
+is_not_element(KitchenWare,KitchenWare)	- (i,i);
+]
+------------------------------------------------------------------------
+interface 'FindInstruments':
+--
+constant:
+--
+	container	: '_Block';
+--
+variable:
+--
+	result		: KitchenWare;
+--
+constant:
+--
+	agent		: 'Instruments';
+[
+]
+------------------------------------------------------------------------
+interface 'Instruments' (specialized 'Alpha'):
+--
+variable:
+--
+	source_list	: KitchenWare;
+	target_list	: KitchenWare;
+	result		: KitchenWare;
+--
+protecting:
+--
+	tail_list	: KitchenWare;
+--
+variable:
+--
+	tail_result	: KitchenWare;
+--
+constant:
+--
+	tail		: 'Instruments';
+--
+[
+PREDICATES:
+--
+contains_no_worlds(KitchenWare)		- (i);
+--
+]
+------------------------------------------------------------------------
+interface '_Block' (specialized '_Empty_Protocol', 'Dialog'):
+--
+total_model	: 'FunctionModel';
+--
+[
+PREDICATES:
+--
+determ:
+--
+goal;
+--
+nondeterm:
+--
+component('_Block')			- (o);
+--
+instrument()= KitchenWare;
+--
+determ:
+--
+check_fruits(Ingredient)		- (i);
+]
+------------------------------------------------------------------------

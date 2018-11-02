@@ -1,0 +1,239 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+TextLabel		= STRING.
+ThermalDataSupplier	= ('ThermalDataSupplier').
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Timer', 'CommunicationOperations'):
+--
+constant:
+--
+internal:
+--
+	main_label	: NodeLabel;
+	datastore	: 'DataStore';
+	database	: '3DDataSources';
+	graphic_window	: 'Canvas3D';
+	dialog		: 'Dialog';
+	buffer2D	: 'BufferedImage';
+	data_supplier	: 'CurrentDataSupplier';
+	thermal_data	: 'ThermalData';
+	con		: 'Console';
+	trap		: 'CommunicationOperations';
+--
+constant:
+--
+	cylinder_radius		: Radius;
+	joint_radius		: Radius;
+	head_radius		: Radius;
+	limb_transparency	: Numerical;
+	up_vector		: Point3D;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+read_table;
+register_oneself(ThermalDataSupplier)			- (i);
+remember_data_supplier(ThermalDataSupplier)		- (i);
+--
+unregister_oneself;
+unregister_oneself(ThermalDataSupplier)			- (i);
+--
+new_frame(Skeletons,BINARY)				- (i,i);
+reset;
+--
+create_list_of_nodes(NodeList)				- (o);
+create_main_group(Node)					- (o);
+--
+form_skeletons(
+	Skeletons,
+	'BufferedImage') = NodeList	- (i,i);
+--
+determ:
+--
+form_skeleton(
+	Skeleton,
+	'BufferedImage') = Node		- (i,i);
+form_spine(
+	SkeletonJoint,
+	SkeletonSpine,
+	'BufferedImage') = Node		- (i,i,i);
+form_arm(
+	SkeletonSpine,
+	SkeletonArm,
+	'BufferedImage',
+	TextLabel) = Node		- (i,i,i,i);
+form_hand(
+	SkeletonJoint,
+	SkeletonJoint,
+	SkeletonArm,
+	'BufferedImage',
+	TextLabel) = Node		- (i,i,i,i,i);
+form_leg(
+	SkeletonSpine,
+	SkeletonLeg,
+	'BufferedImage',
+	TextLabel) = Node		- (i,i,i,i);
+--
+form_link(
+	SkeletonJoint,
+	SkeletonJoint,
+	'BufferedImage',
+	TextLabel) = Node		- (i,i,i,i);
+form_joint(
+	SkeletonJoint,
+	'BufferedImage',
+	TextLabel) = Node		- (i,i,i);
+form_head(
+	SkeletonJoint,
+	'BufferedImage') = Node		- (i,i);
+--
+imperative:
+--
+select_link_color(
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	Point2D,
+	Point2D,
+	'BufferedImage',
+	TextLabel,
+	AppearanceAttributes)		- (i,i,i,i,i,i,o);
+--
+average_color(
+	INTEGER,
+	Numerical,
+	PointX,PointY,
+	PointX,PointY,
+	'BufferedImage',
+	INTEGER,INTEGER,INTEGER,
+	INTEGER,
+	INTEGER,INTEGER,INTEGER)
+	- (i,i, i,i,i,i, i, i,i,i, i, o,o,o);
+--
+select_joint_color(
+	SkeletonJointStatus,
+	Point2D,
+	'BufferedImage',
+	TextLabel,
+	MaterialAttributes)	- (i,i,i,i,o);
+--
+calc_rotation(Point3D) = Rotation			- (i);
+--
+normalize(Point3D) = Point3D				- (i);
+--
+cross(Point3D,Point3D) = Point3D			- (i,i);
+--
+angle(Point3D,Point3D) = Numerical			- (i,i);
+angle(Numerical) = Numerical				- (i);
+--
+dot(Point3D,Point3D) = Numerical			- (i,i);
+scale(Point3D,Numerical) = Point3D			- (i,i);
+length(Point3D) = Numerical				- (i);
+--
+PREDICATES:
+--
+determ:
+--
+alarm(	ExceptionName,
+	SYMBOL,
+	ThermalDataSupplier)		- (i,i,i);
+alarm(	ExceptionName,
+	SYMBOL,
+	Skeletons,
+	BINARY)				- (i,i,i,i);
+--
+imperative:
+--
+'-'(Numerical) = Numerical				- (i);
+'-'(Numerical,Numerical) = Numerical			- (i,i);
+'+'(Numerical,Numerical) = Numerical			- (i,i);
+'*'(Point3D,Point3D) = Numerical			- (i,i);
+'*'(Numerical,Numerical) = Numerical			- (i,i);
+'/'(Numerical,Numerical) = Numerical			- (i,i);
+sqrt(Numerical) = Numerical				- (i);
+power(Numerical,INTEGER) = Numerical			- (i,i);
+arccos(Numerical) = Numerical				- (i);
+round(PointX) = INTEGER					- (i);
+round(PointY) = INTEGER					- (i);
+]
+-----------------------------------------------------------------------
+interface 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	communicator	: 'Main';
+	graphic_window	: 'Canvas3D';
+	message_window	: 'Report';
+--
+[
+]
+-----------------------------------------------------------------------
+interface '3DDataSources' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= ThermalDataSupplier.
+--
+]
+-----------------------------------------------------------------------
+interface 'CurrentDataSupplier' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= ThermalDataSupplier.
+--
+]
+-----------------------------------------------------------------------
+interface 'ThermalData' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+ground:
+--
+TargetKey	= TextLabel.
+TargetValue	= value(INTEGER,INTEGER,INTEGER,INTEGER).
+--
+PREDICATES:
+--
+imperative:
+--
+average(TextLabel,
+	INTEGER,INTEGER,INTEGER,
+	INTEGER,INTEGER,INTEGER)	- (i,i,i,i,o,o,o);
+]
+-----------------------------------------------------------------------
+interface 'ThermalDataSupplier':
+[
+PREDICATES:
+--
+imperative:
+--
+register_consumer('Main')				- (i);
+forget_consumer('Main')					- (i);
+]
+-----------------------------------------------------------------------
+interface 'CommunicationOperations':
+[
+PREDICATES:
+--
+determ:
+--
+register_oneself(ThermalDataSupplier)			- (i);
+unregister_oneself(ThermalDataSupplier)			- (i);
+]
+-----------------------------------------------------------------------

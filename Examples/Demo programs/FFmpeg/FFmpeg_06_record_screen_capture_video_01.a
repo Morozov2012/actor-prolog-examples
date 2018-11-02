@@ -1,0 +1,71 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/ScreenCapture";
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	sampling_rate	= 10;
+--
+internal:
+--
+	canvas		= ('ScreenCapture');
+	image		= ('BufferedImage');
+	writer		= ('FFmpeg',
+				operating_mode='WRITING',
+				name="Test01.avi");
+	counter		= ('Counter');
+	con		= ('Console',
+				font_name='times',
+				font_size=170,
+				font_style='italic');
+--
+[
+goal:-!,
+	canvas ? get_image(image),
+	image ? get_size_in_pixels(Width1,Height1),
+	correct_size(Width1,Width2),
+	correct_size(Height1,Height2),
+	con ? writeln("Width: ",Width2),
+	con ? writeln("Height: ",Height2),
+	writer ? open({
+		codec_type: 'AVMEDIA_TYPE_VIDEO',
+		destination_image_width: Width2,
+		destination_image_height: Height2,
+		time_base: q(1,sampling_rate),
+		bit_rate: 1_000_000
+		}),
+	set_period(1/sampling_rate),
+	activate.
+--
+correct_size(Size,Size):-
+	?mod(Size,2) == 0,!.
+correct_size(Size1,Size2):-
+	Size2== Size1 + 11.
+--
+tick:-
+	N== counter?read_and_increase,
+	N <= 100,!,
+	con ? writeln("Frame: ",N),
+	canvas ? get_image(image),
+	writer ? write_image(image).
+tick:-!,
+	suspend,
+	writer ? close,
+	con ? writeln("Done.").
+]
+-----------------------------------------------------------------------
+class 'Counter' (specialized 'Database'):
+[
+read_and_increase = N :-
+	retract(N),!,
+	insert(N+1).
+read_and_increase = 1 :-
+	insert(2).
+]
+-----------------------------------------------------------------------

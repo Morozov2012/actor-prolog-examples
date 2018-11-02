@@ -1,0 +1,46 @@
+mesh(80,25)
+failure_color('Red','White')
+diagram_font("Arial",20)
+dialog_font("Arial",12)
+
+dialog '_Анализ_модели:_Какие_необходимы_посуда_и_инструменты?' (
+          "Посуда и инструменты",default,default,default,
+          centered,centered,default)
+     vbox(center)
+          listbox['Sort'](instruments,3000,20,9,[],[])
+          button(close,"&Закрыть")
+     end_of_vbox
+end_of_dialog
+
+dialog '_Выбрать_ягоды_и_фрукты' (
+          "Выбрать ягоды и фрукты",default,default,default,
+          centered,centered,default)
+     vbox(center)
+          listbox(1000,value_o1,20,4,
+               [
+               "Чёрная рябина",
+               "Яблоки \"Антоновка\"",
+               "Земляника"
+               ],
+               [
+               "Чёрная рябина"
+               ])
+          ok(close,"&Закрыть")
+     end_of_vbox
+end_of_dialog
+
+dialog 'НагретьСмесь' (
+          "Нагреть смесь",'Blue',default,default,
+          centered,centered,default)
+     vbox(center)
+          "Для выбранных ягод и фруктов "
+          text['AlignCenter'](fruits,15,1)
+          "время нагрева сахарной смеси "
+          hbox
+               "составляет"
+               text['AlignCenter'](time,3,1)
+               "мин"
+          end_of_hbox
+          ok(close,"&Закрыть")
+     end_of_vbox
+end_of_dialog

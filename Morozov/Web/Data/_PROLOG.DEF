@@ -1,0 +1,38 @@
+package "Morozov/Web/Data/_Prolog"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--            The "PROLOG" Actor Prolog package.             --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains the addresses of some Web resources --
+-- related to the logic programming and Prolog.              --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+import 'LogicProgrammingSites'
+	from "Morozov/Web/Data/Prolog";
+---------------------------------------------------------------
+interface '_Logic_Programming_Sites' (specialized '_Block'):
+--
+variable:
+--
+	value_o1		: WebAddressList;
+--
+	list_of_resources	: WebAddressList;
+--
+internal:
+--
+	world			: 'LogicProgrammingSites';
+--
+	con			: 'Report';
+--
+[
+PREDICATES:
+--
+visible:
+--
+nondeterm:
+--
+get_address= WebAddressList;
+--
+]
+---------------------------------------------------------------

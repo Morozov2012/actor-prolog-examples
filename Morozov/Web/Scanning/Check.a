@@ -1,0 +1,296 @@
+package "Morozov/Web/Scanning/Check":
+---------------------------------------------------------------
+--             The "CHECK" Actor Prolog package.             --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains an engine for analyzing Web Sites   --
+-- and discovering bad links.                                --
+---------------------------------------------------------------
+import 'ControlDialog'	from "Morozov/Web/Scanning/Control";
+import 'Scanner'	from "Morozov/Web/Scanning/Core";
+import 'ErrorMessages'	from "Morozov/Web/Scanning/Messages";
+import 'WebAddressRegistry'
+			from "Morozov/Web/Scanning/Counter";
+---------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+start_analysis(WebAddressList);
+--
+check_reference(
+	Level,
+	Node,
+	WebAddressList,
+	WebAddressList,
+	WebAddressList);
+check_HTML_text(
+	Level,
+	Node,
+	WebAddressList,
+	WebAddressList,
+	WebAddressList);
+--
+check_internal_references(
+	Level,
+	Node,
+	WebAddressList,
+	ReferenceList,
+	WebAddressList);
+--
+determ:
+--
+is_nonempty_list(ReferenceList);
+--
+imperative:
+--
+loop(Level,Node,WebAddressList,ReferenceList,WebAddressList);
+--
+safe_analyse_reference(
+	Level,Node,WebAddressList,WebAddress,WebAddressList);
+analyse_reference(
+	Level,Node,WebAddressList,WebAddress,WebAddressList);
+--
+determ:
+--
+replace_virtual_path_or_Fail(
+	WebAddressList,
+	WebAddress,
+	WebAddress)			- (i,i,o);
+replace_pattern_if_need(
+	WebAddressList,
+	WebAddressList,
+	WebAddress,
+	WebAddress)			- (i,i,i,o);
+--
+imperative:
+--
+check_leaf(Level,Node,WebAddressList,ContentParameters);
+--
+---------------------------------------------------------------
+class 'Check' (specialized 'Alpha'):
+--
+variable:
+--
+	location;
+	maximal_waiting_time;
+	domain;
+	use_max_depth;
+	max_depth;
+	virtual_resources;
+--
+internal:
+--
+	dialog	= ('ControlDialog',
+			variable:
+				location,
+			constant:
+				default_output_file
+					= "HOLES.HTML",
+			variable:
+				maximal_waiting_time,
+				domain,
+				use_max_depth,
+				max_depth,
+				virtual_resources,
+				output_device,
+			internal:
+				engine=self);
+--
+main_engine	= ('SpecialScanner',
+			variable:
+				location,
+				maximal_waiting_time,
+				domain,
+				use_max_depth,
+				max_depth,
+				virtual_resources,
+				report= output_device);
+--
+variable:
+--
+	output_device;
+--
+[
+goal:-!.
+--
+/*
+set_engine_mode(Mode,PageNumber):-
+	dialog ? set_engine_mode(Mode,PageNumber).
+*/
+--
+show(_*):-!,
+	dialog ? show().
+--
+open(URL):-
+	dialog ? put('location',URL),!,
+	dialog ? show.
+open(_*).
+--
+start(_*):-
+	[output_device,virtual_resources],
+	[maximal_waiting_time],
+	[use_max_depth,max_depth],!,
+	main_engine ? start.
+start(_*).
+]
+---------------------------------------------------------------
+-- The 'SpecialScanner' class is the most important one.     --
+-- This class implements collection and analysis of data.    --
+---------------------------------------------------------------
+class 'SpecialScanner' (specialized 'Scanner'):
+--
+variable:
+--
+	location;
+	domain;
+	use_max_depth;
+	max_depth;
+--
+	virtual_resources;
+--
+constant:
+--
+	case_sensitivity	= 'off';
+	revision_period		= 'none';
+	attempt_period		= 'none';
+--
+internal:
+--
+	diary;
+--
+variable:
+--
+	report;
+--
+internal:
+--
+	messages	= ('ErrorMessages',
+				variable:
+					report);
+--
+	old_nodes	= ('WebAddressRegistry');
+--
+[
+goal:-!.
+--
+start:-
+	old_nodes ? retract_all(),
+	diary ? clear,
+	diary ? show,
+	messages ? write_header,
+	start_analysis(virtual_resources),
+	messages ? flush_buffer,
+	messages ? write_footer,
+	diary ? show,
+	diary ? writeln("The analysis is completed.\n").
+--
+start_analysis(VirtualResources):-
+	check_reference(
+		1/*0*/,1,[],
+		?replace_all(?val("STRING",location),"\\","/"),
+		VirtualResources),
+	-- old_nodes ? insert(old(domain,location)),
+	fail.
+start_analysis(_).
+--
+check_reference(Level,_,_,_,_):-
+	use_max_depth == 'yes',
+	max_depth <= Level,!,
+	diary ? show,
+	diary ? writeln(".. The depth limit is exceeded.").
+check_reference(_,_,_,Name,_):-
+	resource_has_unknown_type(Name),!.
+check_reference(L,N,List,Name,VirtualResources):-
+	is_HTML_file(Name),!,
+	old_nodes ? insert(old(domain,Name)),
+	check_HTML_text(L,N,List,Name,VirtualResources).
+	-- old_nodes ? insert(old(domain,location)).
+check_reference(L,N,List,Name,_):-
+	old_nodes ? insert(old(domain,Name)),
+	Parameters== ?get_parameters(?cast("STRING",Name)),
+	check_leaf(L,N,[Name|List],Parameters).
+--
+check_HTML_text(L,N,List,Name,VR):-
+	search(	Name,
+		?replace_all(
+			?val("STRING",domain),"\\","/")),!,
+	HyperLinks== ?get_references(?cast("STRING",Name)),
+	check_internal_references(
+		L,N,[Name|List],HyperLinks,VR).
+check_HTML_text(L,N,List,Name,_):-
+	Parameters== ?get_parameters(?cast("STRING",Name)),
+	check_leaf(L,N,[Name|List],Parameters).
+--
+check_internal_references(_,_,_,[],_):-!.
+check_internal_references(Level,_,_,_,_):-
+	use_max_depth == 'yes',
+	max_depth <= Level,!,
+	diary ? show,
+	diary ? writeln(".. The depth limit is exceeded.").
+check_internal_references(Level,_,List,HyperLinks,VR):-
+	is_nonempty_list(HyperLinks),!,
+	diary ? show,
+	diary ? writeln(
+		".. I go to the next level of the tree."),
+	loop(Level+1,1,List,HyperLinks,VR).
+check_internal_references(L,N,List,Message,_):-
+	produce_message(L,N,List,Message).
+--
+is_nonempty_list([_|_]).
+--
+loop(Level,Number,List,[Name|Rest],VR):-!,
+	diary ? show,
+	diary ? writef(
+		"level %3d, N=%3d: %s",Level,Number,Name),
+	diary ? nl,
+	safe_analyse_reference(Level,Number,List,Name,VR),
+	loop(Level,Number+1,List,Rest,VR).
+loop(Level,_,_,_,_):-
+	messages ? flush_buffer(Level),
+	diary ? show,
+	diary ? writeln(
+		".. I return to the previous ",
+		"level of the tree.").
+--
+safe_analyse_reference(Level,Number1,List,Name,VR):-
+	analyse_reference(Level,Number1,List,Name,VR),
+	fail.
+safe_analyse_reference(_,_,_,_,_).
+--
+analyse_reference(_,_,_,Name,_):-
+	old_nodes ? find(old(domain,Name)),!,
+	diary ? show,
+	diary ? writeln("I already checked ",Name).
+analyse_reference(_,_,List,Name,_):-
+	contains(List,Name),!,
+	diary ? show,
+	diary ? writeln("A recursive reference ",Name).
+analyse_reference(L,N,List,Name1,VirtualResources):-
+	replace_virtual_path_or_Fail(
+		VirtualResources,Name1,Name2),!,
+	diary ? show,
+	diary ? writeln("A virtual resource ",Name1),
+	analyse_reference(L,N,List,Name2,VirtualResources).
+analyse_reference(Level,Number,List,Name,VR):-
+	check_reference(Level,Number,List,Name,VR).
+	-- old_nodes ? insert(old(domain,Name)).
+--
+replace_virtual_path_or_Fail([Item|OtherCases],Name1,Name2):-
+	replace_pattern_if_need(OtherCases,Item,Name1,Name2).
+--
+replace_pattern_if_need([Pattern|_],Item,Name1,Name2):-
+	Name2== ?replace(
+			?val("STRING",Name1),
+			?val("STRING",Pattern),
+			?val("STRING",Item)),!.
+replace_pattern_if_need([_|Rest],Item,Name1,Name2):-
+	replace_pattern_if_need(Rest,Item,Name1,Name2).
+--
+check_leaf(_,_,_,entry(_,_,_,_)):-!.
+check_leaf(_,_,_,catalog(_,_,_,_)):-!.
+check_leaf(L,N,List,Message):-
+	produce_message(L,N,List,Message).
+]
+---------------------------------------------------------------

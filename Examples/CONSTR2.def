@@ -1,0 +1,62 @@
+---------------------------------------------------------------------
+--      An example of Actor Prolog program.                        --
+--      (c) 2008, IRE RAS, Alexei A. Morozov.                      --
+---------------------------------------------------------------------
+--      Implementation of constraints in Actor Prolog.             --
+---------------------------------------------------------------------
+DOMAINS:
+--
+lazy:
+--
+Value	= REAL.
+--
+interface 'Main' (specialized 'Alpha'):
+con	: 'Console';
+[
+PREDICATES:
+--
+nondeterm:
+--
+add(Value,Value,Value)			- (o,i,i)(o,o,i)(o,o,o);
+add_ix(Value,Value)= Value		- (i,i)(i,o);
+add_ii(Value,Value)= Value;
+--
+sub_ix(Value,Value)= Value;
+sub_ii(Value,Value)= Value;
+add_negative_value_ix(Value,Value,Value,Value);
+--
+mult(Value,Value,Value);
+mult_ix(Value,Value)= Value;
+mult_ii(Value,Value)= Value;
+--
+div_ix(Value,Value)= Value;
+multiply_inverse_values(Value,Value,Value,Value,Value);
+div_ii(Value,Value)= Value;
+inv(Value)= Value;
+--
+determ:
+--
+ge(Value,Value);
+ge_ix(Value,Value);
+--
+nondeterm:
+--
+natural_number(Value,Value)= Value;
+--
+imperative:
+--
+'+'(Value,Value) = Value	- (i,i);
+'-'(Value,Value) = Value	- (i,i);
+'-'(Value) = Value		- (i);
+'*'(Value,Value) = Value	- (i,i);
+'/'(Value,Value) = Value	- (i,i);
+--
+determ:
+--
+'<'(Value,Value);
+'>'(Value,Value);
+'<>'(Value,Value);
+'<='(Value,Value);
+'>='(Value,Value);
+]
+---------------------------------------------------------------------

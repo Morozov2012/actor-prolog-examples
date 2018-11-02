@@ -1,0 +1,76 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+
+DOMAINS:
+reference:
+Text		= STRING.
+ground:
+MyDomain	= ('MyArray').
+
+class 'Main' (specialized 'Alpha'):
+my_array	: MyDomain	= 'MyArray'[..];
+w1				= ('MyWorld',my_array);
+[
+]
+
+class 'MyArray' (specialized 'BacktrackableArray'):
+[
+DOMAINS:
+reference:
+Target	= Text.
+]
+
+PREDICATES:
+imperative:
+test1(MyDomain)		- (i);
+test2(MyDomain)		- (i);
+write_text(Text)	- (i);
+
+class 'MyWorld' (specialized 'Console'):
+my_array	: MyDomain;
+[
+goal:-!,
+	test1(my_array),
+	test2(my_array),
+	test1(my_array).
+--
+test1(MY_ARRAY):-
+	set_color('RoyalBlue'),
+	write("Test 1:\n\n"),
+	set_color('default'),
+	R== MY_ARRAY[1000],!,
+	write("   MY_ARRAY[1000]= "),
+	write_text(R),
+	nl.
+test1(_):-
+	set_color('Red'),
+	writeln("I cannot access array element."),
+	set_color('default'),
+	nl.
+--
+test2(MY_ARRAY):-
+	set_color('RoyalBlue'),
+	write("Test 2:\n\n"),
+	set_color('default'),
+	MY_ARRAY[1000] == "Hello!",
+	write("   MY_ARRAY[1000]= "),
+	write_text(MY_ARRAY[1000]),!,
+	nl.
+test2(_):-
+	set_color('Red'),
+	writeln("I cannot access array element."),
+	set_color('default'),
+	nl.
+--
+write_text(Text):-
+	free(Text),!,
+	set_color('Violet'),
+	writeln(Text),
+	set_color('default').
+write_text(Text):-
+	set_color('DkGreen'),
+	writeln(Text),
+	set_color('default').
+]

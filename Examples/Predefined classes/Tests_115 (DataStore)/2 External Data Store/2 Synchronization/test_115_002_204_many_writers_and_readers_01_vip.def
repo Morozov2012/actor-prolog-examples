@@ -1,0 +1,102 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	number_of_agents	: INTEGER;
+--
+	writers	: 'WriterArray' of 'MyWriter';
+	readers	: 'ReaderArray' of 'MyReader';
+--
+internal:
+--
+	store	: 'DataStore';
+--
+	con	: 'Console';
+--
+[]
+-----------------------------------------------------------------------
+interface 'WriterArray' (specialized 'DynamicWorlds'):
+[
+PREDICATES:
+--
+nondeterm:
+--
+element(INTEGER*) = 'MyWriter'		- (_);
+]
+-----------------------------------------------------------------------
+interface 'ReaderArray' (specialized 'DynamicWorlds'):
+[
+PREDICATES:
+--
+nondeterm:
+--
+element(INTEGER*) = 'MyReader'		- (_);
+]
+-----------------------------------------------------------------------
+interface 'MyWriter' (specialized 'MyAgent'):
+[
+]
+-----------------------------------------------------------------------
+interface 'MyReader' (specialized 'MyAgent'):
+[
+]
+-----------------------------------------------------------------------
+interface 'MyAgent' (specialized 'Timer'):
+--
+constant:
+--
+	data_store	: 'DataStore';
+--
+internal:
+--
+	database	: 'MyDatabase';
+	con		: 'Report';
+--
+constant:
+--
+	target_width	: Width;
+	target_height	: Height;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+initiate(INTEGER,INTEGER)		- (i,i);
+--
+imperative:
+--
+'-'(Width,Width) = INTEGER		- (i,i);
+'-'(Height,Height) = INTEGER		- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	con	: 'Report';
+--
+[
+DOMAINS:
+--
+Target		= my_data(REAL).
+--
+PREDICATES:
+--
+imperative:
+--
+update_database;
+report_whether_database_is_updated;
+inspect_database;
+--
+modify_database;
+modify_database(REAL)			- (i);
+--
+check_database(Color)			- (i);
+report_checksum(REAL,Color)		- (i,i);
+]
+-----------------------------------------------------------------------

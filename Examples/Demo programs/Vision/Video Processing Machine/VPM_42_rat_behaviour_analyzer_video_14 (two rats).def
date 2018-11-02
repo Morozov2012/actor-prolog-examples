@@ -1,0 +1,776 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+VideoFrameNumber	= INTEGER; STRING.
+--
+IsMatureTrack		= YesNo.
+IsLastSegment		= 'no'; 'yes'.
+ObjectIdentifier	= INTEGER.
+--
+IsVisible		= 'visible'; 'invisible'.
+ShiffingIsDetected	= INTEGER.
+--
+-----------------------------------------------------------------------
+interface 'ControlDialog' (specialized 'Dialog'):
+--
+constant:
+--
+	subsampling		: INTEGER;
+--
+internal:
+--
+	video			: 'VideoReader';
+	vpm			: 'ExtendedVideoProcessingMachine';
+	timer			: 'Timer';
+	graphic_window		: 'Canvas2D';
+	text			: 'Text';
+	file			: 'File';
+	image1			: 'BufferedImage';
+	image2			: 'BufferedImage';
+	configuration		: 'ExperimentalSetting';
+	state			: 'ProgramState';
+	model			: 'VisualSceneModel';
+	protocol		: 'Protocol';
+	con			: 'Console';
+--
+variable:
+--
+	first_frame		: VideoFrameNumber;
+	last_frame		: VideoFrameNumber;
+--
+constant:
+--
+	maximal_number_of_rats	: INTEGER;
+	blob_distance		: REAL;
+	sniffing_distance	: REAL;
+	main_line_width		: INTEGER;
+	rectangle_line_width	: INTEGER;
+	small_circle_radius	: REAL;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_analyzer_file_name(STRING,STRING)		- (i,i);
+set_frame_rate(REAL)				- (i);
+set_inverse_transformation_matrix(
+	TransformationMatrix)			- (i);
+--
+process_file;
+detect_minimal_frame_number(INTEGER)		- (o);
+detect_maximal_frame_number(INTEGER)		- (o);
+--
+go_forward(INTEGER)				- (i);
+go_backward(INTEGER)				- (i);
+--
+play_or_pause_video;
+play_video;
+activate_reading_if_necessary;
+activate_reading;
+pause_reading;
+--
+seek_frame_number(INTEGER)			- (i);
+divide_list(INTEGER,PointList,PointList)	- (i,i,o);
+--
+frame_obtained;
+process_frame;
+data_transfer_completion;
+data_transfer_error(ExceptionName)		- (i);
+--
+draw_scene(FrameNumber,REAL,INTEGER)		- (i,i,i);
+--
+analyse_existing_tracks(
+	TrackList,TrackList,FrameNumber)	- (i,o,i);
+--
+determ:
+--
+analyse_existing_track(Track,FrameNumber)	- (i,i);
+--
+imperative:
+--
+analyse_new_tracks(TrackList,FrameNumber)	- (i,i);
+analyse_new_track(Track,FrameNumber)		- (i,i);
+--
+analyse_invisible_objects(FrameNumber)		- (i);
+--
+compute_arrow(FrameNumber)			- (i);
+--
+compute_arrow(
+	FrameNumber,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER,
+	INTEGER,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER,
+	INTEGER)		- (i,i,i,i,i,i,i,i,i,i,i,i,i);
+--
+update_protocol(INTEGER,FrameNumber)		- (i,i);
+show_recognition_results(REAL)			- (i);
+show_time_ratio_1(INTEGER,INTEGER)		- (i,i);
+show_time_ratio_2(REAL,REAL)			- (i,i);
+show_sensitivity(INTEGER,INTEGER)		- (i,i);
+show_specificity(INTEGER,INTEGER)		- (i,i);
+--
+determ:
+--
+get_current_coordinates(
+	TrackSegmentList,
+	INTEGER,
+	INTEGER,
+	INTEGER,
+	INTEGER,
+	INTEGER,
+	INTEGER)		- (i,o,o,o,o,o,o);
+get_current_blob_coordinates(
+	TrackOfBlob,
+	INTEGER,
+	INTEGER,
+	INTEGER,
+	INTEGER,
+	INTEGER,
+	INTEGER)		- (i,o,o,o,o,o,o);
+--
+imperative:
+--
+compute_AB(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	REAL,
+	PointX,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i,i,o,o);
+compute_AB(
+	PointX,
+	PointY,
+	PointY,
+	PointX,
+	PointY,
+	PointY,
+	REAL,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i,o,o);
+compute_AB(
+	PointY,
+	PointY,
+	PointY,
+	PointY,
+	PointY)			- (i,i,i,i,o);
+compute_target_distance(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	REAL)
+	- (i,i,i,i,i,i,i,i,i,i,i,i,o);
+--
+detect_sniffing(REAL,ShiffingIsDetected)	- (i,o);
+--
+check_whether_frame_is_marked_by_expert(
+	FrameNumber,ShiffingIsDetected)		- (i,o);
+--
+determ:
+--
+is_marked_by_expert(FrameNumber)		- (i);
+--
+imperative:
+--
+select_sniffing_color(
+	ShiffingIsDetected,
+	ShiffingIsDetected,
+	Color)			- (i,i,o);
+--
+draw_tracks(TrackList,PointX,PointY)		- (i,i,i);
+draw_track(Track,PointX,PointY)			- (i,i,i);
+--
+draw_track(
+	ObjectIdentifier,
+	TrackSegmentList,
+	YesNo,
+	PointX,
+	PointY)			- (i,i,i,i,i);
+--
+draw_invisible_objects(PointX,PointY)		- (i,i);
+select_line_style(INTEGER,PenAttributes)	- (i,o);
+--
+draw_invisible_object(
+	ObjectIdentifier,
+	PointX,
+	PointY,
+	PenAttributes,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+--
+draw_arrow(PointX,PointY)			- (i,i);
+--
+draw_arrow(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i);
+draw_arrow_label(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	REAL,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i);
+--
+draw_track_segments(
+	TrackSegmentList,
+	TrackSegment,
+	IsMatureTrack,
+	Color,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i);
+draw_track_segment(
+	TrackSegment,
+	TrackSegment,
+	IsLastSegment,
+	IsMatureTrack,
+	Color,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i,i);
+--
+draw_track_of_blob(
+	TrackOfBlob,
+	BlobCoordinates,
+	IsLastSegment,
+	IsMatureTrack,
+	Color,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i,i);
+draw_blob_rectangle(
+	BlobCoordinates,
+	IsMatureTrack,
+	Color,
+	INTEGER,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+select_dash_array(
+	IsMatureTrack,
+	PenAttributes)		- (i,o);
+draw_blob_link(
+	BlobCoordinates,
+	BlobCoordinates,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i);
+--
+draw_segment_link(
+	TrackSegment,
+	TrackSegment,
+	PointX,
+	PointY)			- (i,i,i,i);
+--
+draw_circle(PointX,PointY,REAL)			- (i,i,i);
+select_color(INTEGER,Color,Color)		- (i,o,o);
+--
+draw_legend(REAL)				- (i);
+--
+PREDICATES:
+--
+determ:
+--
+'<='(PointX,PointX)				- (i,i);
+'<='(PointY,PointY)				- (i,i);
+'>='(PointX,PointX)				- (i,i);
+'>='(PointY,PointY)				- (i,i);
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'*'(PointX,REAL) = REAL				- (i,i);
+'/'(PointX,PointX) = REAL			- (i,i);
+'/'(PointY,PointY) = REAL			- (i,i);
+'/'(PointY,PointX) = REAL			- (i,i);
+hypot(PointX,PointY) = REAL			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'VideoReader' (specialized 'FFmpeg'):
+--
+internal:
+--
+target_world;
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ExtendedVideoProcessingMachine'
+	(specialized 'VideoProcessingMachine'):
+[
+IMPERATIVES:
+--
+physical_coordinates(PointX,PointY,REAL,REAL)	- (i,i,o,o);
+]
+-----------------------------------------------------------------------
+interface 'ExperimentalSetting' (specialized 'Database'):
+--
+internal:
+--
+target_world	: 'ControlDialog';
+text		: 'Text';
+con		: 'Console';
+--
+[
+DOMAINS:
+--
+Target		= video_file_name(STRING);
+		  data_directory(STRING);
+		  file_name_format(STRING);
+		  frame_rate(REAL);
+		  video_sequence_beginning(INTEGER);
+		  video_sequence_size(INTEGER);
+		  inverse_transformation_matrix_for_slides(
+		  	TransformationMatrix);
+		  inverse_transformation_matrix_for_video(
+		  	TransformationMatrix);
+		  cage_polygon_for_slides(PointList);
+		  cage_polygon_for_video(PointList);
+		  ground_truth(FrameNumber,FrameNumber).
+--
+PREDICATES:
+--
+imperative:
+--
+load_experimental_setting(FileName)		- (i);
+--
+determ:
+--
+get_video_file_name(STRING)			- (o);
+get_data_directory(STRING)			- (o);
+get_file_name_format(STRING)			- (o);
+form_file_name(FrameNumber) = STRING		- (i);
+get_frame_rate(REAL)				- (o);
+get_video_sequence_beginning(INTEGER)		- (o);
+get_video_sequence_size(INTEGER)		- (o);
+get_inverse_transformation_matrix(
+	TransformationMatrix)			- (o);
+get_cage_polygon(PointList)			- (o);
+--
+ground_truth_does_exist;
+ground_truth_does_not_exist;
+--
+nondeterm:
+--
+get_ground_truth(FrameNumber,FrameNumber)	- (o,o);
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		: 'Timer';
+--
+[
+DOMAINS:
+--
+Target		= current_frame(INTEGER);
+		  frame_counter(INTEGER);
+		  stop_watch_time(INTEGER);
+		  global_counter(INTEGER);
+		  'reading_is_suspeneded'.
+--
+PREDICATES:
+--
+determ:
+--
+get_current_frame(INTEGER)			- (o);
+--
+imperative:
+--
+set_current_frame(INTEGER)			- (i);
+--
+reset_frame_counter;
+increase_frame_counter;
+get_frame_counter(INTEGER)			- (o);
+--
+increase_global_counter;
+get_global_counter(INTEGER)			- (o);
+--
+imperative:
+--
+suspend_reading;
+activate_reading;
+--
+determ:
+--
+reading_is_suspended;
+]
+-----------------------------------------------------------------------
+interface 'VisualSceneModel' (specialized 'Database'):
+--
+internal:
+--
+con		: 'Console';
+--
+[
+DOMAINS:
+--
+Target		= blob(	INTEGER,
+			PointX,
+		  	PointY,
+		  	FrameNumber,
+		  	REAL,		-- Traversed path
+		  	REAL);		-- Mean blob area
+		  object(
+		  	INTEGER,
+		  	ObjectIdentifier,
+		  	PointX,		-- Centroid X
+		  	PointY,		-- Centroid Y
+		  	FrameNumber,
+		  	IsVisible,
+		  	REAL,		-- Traversed path
+		  	REAL,		-- Mean area
+		  	PointX,		-- Center X
+		  	PointY,		-- Center Y
+		  	INTEGER,	-- Width
+		  	INTEGER);	-- Height
+		  object_counter(
+		  	ObjectIdentifier);
+		  largest_object(
+		  	ObjectIdentifier,
+		  	REAL);
+		  second_object(
+		  	ObjectIdentifier,
+		  	REAL);
+		  nearest_point(
+		  	INTEGER,
+		  	REAL,
+		  	PointX,
+		  	PointY,
+		  	REAL,		-- Traversed path
+		  	REAL);		-- Mean area
+		  arrow(
+			PointX,
+			PointY,
+			PointX,
+			PointY,
+			REAL,
+			ShiffingIsDetected,
+			ShiffingIsDetected,
+			Color).
+--
+PREDICATES:
+--
+imperative:
+--
+set_blob_position(
+	INTEGER,
+	PointX,
+	PointY,
+	FrameNumber,
+	REAL,
+	REAL)			- (i,i,i,i,i,i);
+set_object_position(
+	INTEGER,
+	ObjectIdentifier,
+	PointX,
+	PointY,
+	FrameNumber,
+	IsVisible,
+	REAL,
+	REAL,
+	PointX,
+	PointY,
+	INTEGER,
+	INTEGER)		- (i,i,i,i,i,i,i,i,i,i,i,i);
+--
+determ:
+--
+get_object_position(
+	INTEGER,
+	ObjectIdentifier,
+	PointX,
+	PointY,
+	REAL,
+	REAL,
+	PointX,
+	PointY,
+	INTEGER,
+	INTEGER)		- (i,o,o,o,o,o,o,o,o,o);
+--
+nondeterm:
+--
+find_object(
+	ObjectIdentifier,
+	PointX,
+	PointY,
+	FrameNumber,
+	REAL,
+	REAL,
+	PointX,
+	PointY,
+	INTEGER,
+	INTEGER)		- (o,o,o,o,o,o,o,o,o,o);
+--
+get_visible_object_position(
+	INTEGER,
+	ObjectIdentifier,
+	PointX,
+	PointY)			- (_,o,o,o);
+--
+nondeterm:
+--
+find_invisible_object(
+	INTEGER,
+	ObjectIdentifier,
+	PointX,
+	PointY,
+	REAL,
+	REAL)			- (o,o,o,o,o,o);
+--
+imperative:
+--
+register_new_object(
+	INTEGER,
+	PointX,
+	PointY,
+	FrameNumber,
+	REAL,
+	REAL,
+	PointX,
+	PointY,
+	INTEGER,
+	INTEGER,
+	ObjectIdentifier)	- (i,i,i,i,i,i,i,i,i,i,o);
+--
+crerate_new_identifier(ObjectIdentifier)	- (o);
+get_number_of_objects(ObjectIdentifier)		- (o);
+--
+determ:
+--
+find_nearest_object(
+	INTEGER,
+	INTEGER,
+	FrameNumber,
+	REAL,
+	ObjectIdentifier,
+	REAL,
+	REAL)			- (i,i,i,i,o,o,o);
+--
+find_nearest_blob(
+	PointX,
+	PointY,
+	FrameNumber,
+	REAL,
+	INTEGER,
+	PointX,
+	PointY,
+	REAL,
+	REAL)			- (i,i,i,i,o,o,o,o,o);
+--
+imperative:
+--
+reset_nearest_point;
+--
+update_nearest_point(
+	INTEGER,
+	REAL,
+	PointX,
+	PointY,
+	REAL,
+	REAL)			- (i,i,i,i,i,i);
+--
+determ:
+--
+get_nearest_point(
+	INTEGER,
+	REAL,
+	PointX,
+	PointY,
+	REAL,
+	REAL)			- (o,o,o,o,o,o);
+--
+imperative:
+--
+update_largest_object(ObjectIdentifier,REAL)	- (i,i);
+--
+determ:
+--
+is_largest_object(ObjectIdentifier)		- (i);
+--
+imperative:
+--
+find_second_object;
+reset_second_object;
+update_second_object(ObjectIdentifier,REAL)	- (i,i);
+--
+determ:
+--
+is_second_object(ObjectIdentifier)		- (i);
+--
+get_largest_object(
+	PointX,
+	PointY,
+	REAL,
+	REAL,
+	PointX,
+	PointY,
+	INTEGER,
+	INTEGER)		- (o,o,o,o,o,o,o,o);
+get_second_object(
+	PointX,
+	PointY,
+	REAL,
+	REAL,
+	PointX,
+	PointY,
+	INTEGER,
+	INTEGER)		- (o,o,o,o,o,o,o,o);
+--
+imperative:
+--
+set_arrow(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	REAL,
+	ShiffingIsDetected,
+	ShiffingIsDetected,
+	Color)			- (i,i,i,i,i,i,i,i);
+--
+determ:
+--
+get_arrow(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	REAL,
+	ShiffingIsDetected,
+	ShiffingIsDetected,
+	Color)			- (o,o,o,o,o,o,o,o);
+--
+sniffing_is_detected;
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+hypot(PointX,PointY) = REAL			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'Protocol' (specialized 'Database'):
+--
+internal:
+--
+file		: 'File';
+--
+[
+DOMAINS:
+--
+Target		=
+		frame(
+			INTEGER,	-- Time
+			INTEGER,	-- Frame number
+			REAL,		-- Path1 [meters]
+			REAL,		-- Area1 [pixels]
+			REAL,		-- Path2 [meters]
+			REAL,		-- Area2 [pixels]
+			REAL,		-- Distance
+			ShiffingIsDetected,
+			ShiffingIsDetected);
+		current_mode(
+			ShiffingIsDetected,
+			INTEGER);	-- Beginning Time
+		cumulative_interval(
+			ShiffingIsDetected,
+			INTEGER);	-- Total Time
+		true_positive_detections(INTEGER);
+		false_positive_detections(INTEGER);
+		true_negative_detections(INTEGER);
+		false_negative_detections(INTEGER).
+--
+PREDICATES:
+--
+imperative:
+--
+add_frame(
+	INTEGER,	-- Time
+	INTEGER,	-- Frame number
+	REAL,		-- Path1 [meters]
+	REAL,		-- Area1 [pixels]
+	REAL,		-- Path2 [meters]
+	REAL,		-- Area2 [pixels]
+	REAL,		-- Distance
+	ShiffingIsDetected,
+	ShiffingIsDetected)	- (i,i,i,i,i,i,i,i,i);
+--
+modify_counter_mode(ShiffingIsDetected,INTEGER)	- (i,i);
+--
+determ:
+--
+get_current_mode(ShiffingIsDetected,INTEGER)	- (o,o);
+--
+imperative:
+--
+modify_mode_if_necessary(
+	ShiffingIsDetected,
+	ShiffingIsDetected,
+	INTEGER,
+	INTEGER)		- (i,i,i,i);
+increase_cumulative_interval(
+	ShiffingIsDetected,INTEGER)		- (i,i);
+get_cumulative_interval(
+	ShiffingIsDetected,INTEGER)		- (i,o);
+--
+save_protocol(FileName)				- (i);
+--
+register_a_true_positive_detection;
+register_a_false_positive_detection;
+register_a_true_negative_detection;
+register_a_false_negative_detection;
+--
+get_number_of_TP_detections(INTEGER)		- (o);
+get_number_of_FP_detections(INTEGER)		- (o);
+get_number_of_TN_detections(INTEGER)		- (o);
+get_number_of_FN_detections(INTEGER)		- (o);
+]
+-----------------------------------------------------------------------

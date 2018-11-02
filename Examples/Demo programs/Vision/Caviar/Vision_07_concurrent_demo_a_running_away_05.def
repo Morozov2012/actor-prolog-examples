@@ -1,0 +1,234 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013-2017 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+DepthOfSearch		= INTEGER.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	data_directory			: STRING;
+	target_directory		: STRING;
+	inverse_transformation_matrix	: TransformationMatrix;
+	sampling_rate			: REAL;
+--
+	stage_one		: 'ImagePreprocessor';
+	stage_two		: 'ImageAnalyzer';
+--
+internal:
+--
+	low_level_analyzer	: 'ImageSubtractor';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ImagePreprocessor' (specialized 'Timer'):
+--
+constant:
+--
+	data_directory		: STRING;
+	target_directory	: STRING;
+	sampling_rate		: REAL;
+--
+	low_level_analyzer	: 'ImageSubtractor';
+	stage_two		: 'ImageAnalyzer';
+--
+internal:
+--
+	subtractor		: 'SynchronizedImageSubtractor';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	state			: 'ProgramState';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ImageAnalyzer' (specialized 'Alpha'):
+--
+constant:
+--
+	low_level_analyzer	: 'ImageSubtractor';
+--
+	sampling_rate		: REAL;
+	maximal_depth_of_search	: DepthOfSearch;
+	circle_radius		: REAL;
+
+--
+internal:
+--
+	subtractor		: 'SynchronizedImageSubtractor';
+	graphic_window		: 'Canvas2D';
+	prompt_window		: 'Report';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	timer			: 'Timer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+draw_scene;
+--
+draw_graphs(
+	PointX,
+	PointY,
+	GraphList,
+	FrameNumber)		- (i,i,i,i);
+--
+determ:
+--
+is_a_kind_of_a_running_away(
+	ConnectedGraph,
+	ConnectedGraph,
+	ConnectedGraphEdge,
+	ConnectedGraphEdge,
+	ConnectedGraphEdge)	- (i,i,o,o,o);
+contains_a_walking_person(
+	EdgeNumbers,
+	ConnectedGraph,
+	ConnectedGraphEdge,
+	DepthOfSearch)		- (i,i,o,i);
+is_a_walking_person(
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	ConnectedGraphEdge,
+	DepthOfSearch)		- (i,i,o,i);
+contains_a_running_person(
+	EdgeNumbers,
+	ConnectedGraph,
+	ConnectedGraphEdge,
+	DepthOfSearch)		- (i,i,o,i);
+is_a_running_person(
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	ConnectedGraphEdge,
+	DepthOfSearch)		- (i,i,o,i);
+--
+imperative:
+--
+draw_graph(
+	PointX,
+	PointY,
+	ConnectedGraph,
+	ConnectedGraph,
+	YesNo,
+	FrameNumber)		- (i,i,i,i,i,i);
+--
+draw_edge(
+	PointX,
+	PointY,
+	ConnectedGraphEdge,
+	ConnectedGraph,
+	YesNo,
+	FrameNumber)		- (i,i,i,i,i,i);
+--
+draw_origins(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	EdgeNumbers,
+	ConnectedGraph)		- (i,i,i,i,i,i);
+draw_origin(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	EdgeNumber,
+	ConnectedGraph)		- (i,i,i,i,i,i);
+draw_origin_arrow(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+--
+determ:
+--
+get_edge(
+	INTEGER,
+	ConnectedGraph,
+	ConnectedGraphEdge)	- (i,i,o);
+--
+imperative:
+--
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	TrackOfBlob,
+	YesNo)			- (i,i,i,i);
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	TrackOfBlob,
+	YesNo)			- (i,i,i,i,i,i);
+--
+select_line_color(YesNo,Color,INTEGER)		- (i,o,o);
+--
+draw_rectangle(	YesNo,
+		EdgeNumbers,
+		TrackOfBlob,
+		PointX,
+		PointY,
+		FrameNumber)	- (i,i,i,i,i,i);
+draw_rectangle(	TrackOfBlob,
+		PointX,
+		PointY,
+		FrameNumber)	- (i,i,i,i);
+--
+draw_circle(PointX,PointY)	- (i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)		- (o);
+get_current_frame(INTEGER)		- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)		- (i);
+set_current_frame(INTEGER)		- (i);
+]
+-----------------------------------------------------------------------

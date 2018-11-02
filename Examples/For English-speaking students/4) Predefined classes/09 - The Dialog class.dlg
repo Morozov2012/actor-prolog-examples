@@ -1,0 +1,22 @@
+
+dialog 'Main' ("Demo Dialog",'Red','White',20,10,4,'Green')
+
+vbox(left)
+	radiobuttons(2010)
+		padding(4,1)
+			radiobutton("First")
+			radiobutton("Second")
+			radiobutton("Third")
+		end_of_padding
+	end_of_radiobuttons
+end_of_vbox
+
+vbox(center)
+	button(1,"&Action 1")
+	scaling(1.7,2)
+		button(0,"&Close")
+	end_of_scaling
+	ok(2,"&Action 2")
+end_of_vbox
+
+end_of_dialog

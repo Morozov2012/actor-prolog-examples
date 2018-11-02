@@ -1,0 +1,461 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+-----------------------------------------------------------------------
+project: (('DialogHSBC'))
+-----------------------------------------------------------------------
+class 'DialogHSBC' (specialized 'Dialog'):
+--
+constant:
+--
+	data_directory =
+		"L:/= Video =/W_L_Object 10 07 2017/"
+		"22 object/2 session";
+--
+	file_name_format	= "time 17-07-10 15-16-42 %04d.jpg";
+	frame_rate		= 30.0;
+	subsampling		= 2;
+--
+constant:
+--
+-- Warning: This matrix corresponds to
+-- the "time 17-07-10 15-16-42.avi" data set only.
+--
+inverse_transformation_matrix	= [
+		[ 0.0011, 0.0000,0.0001],
+		[ 0.0000, 0.0010,0.0001],
+		[-0.0670,-0.0839,1.0000]];
+--
+internal:
+--
+	vpm		= ('VideoProcessingMachine',
+				minimal_training_interval= -1,
+				-- maximal_training_interval= 100,
+				horizontal_blob_border= 10,
+				vertical_blob_border= 10,
+				horizontal_extra_border_coefficient= -1.0,
+				vertical_extra_border_coefficient= -1.0,
+				minimal_blob_intersection_area= 1,
+				minimal_blob_size= 1,
+				maximal_blob_invisibility_interval= 30,
+				minimal_track_duration= 50,
+				maximal_track_retention_interval= 50,
+				inverse_transformation_matrix,
+				synthesized_image_transparency= 48);
+	timer		= ('SpecialTimer',
+				target_world= self);
+	graphic_window	= ('Canvas2D',
+				background_color= 'SystemControl',
+				y= 0,
+				height= 22);
+	text		= ('Text');
+	image1		= ('BufferedImage');
+	image2		= ('BufferedImage');
+	state		= ('ProgramState');
+	con		= ('Console');
+--
+variable:
+--
+	first_frame;
+	last_frame;
+	minimal_hue_1;
+	maximal_hue_1;
+	minimal_hue_2;
+	maximal_hue_2;
+	minimal_saturation;
+	maximal_saturation;
+	minimal_brightness;
+	maximal_brightness;
+	minimal_contrast;
+	maximal_contrast;
+--
+constant:
+--
+	circle_radius	= 0.005;
+--
+[
+goal:-!,
+	maximize,
+	Time0== timer?milliseconds(),
+	state ? set_beginning_time(Time0),
+	timer ? set_period(1/(frame_rate*2),0),
+	detect_minimal_file_number(1,MinFileNumber),
+	detect_maximal_file_number(1,MaxFileNumber,MinFileNumber),
+	put(1002,[MinFileNumber,MaxFileNumber]),
+	put(1004,[MinFileNumber,MaxFileNumber]),
+	put('first_frame',MinFileNumber),
+	put('last_frame',MaxFileNumber),
+	--put('minimal_hue_1',25),
+	--put('maximal_hue_1',70),
+	--put('minimal_hue_2',135),
+	--put('maximal_hue_2',180),
+	put('maximal_saturation',50),
+	put('maximal_brightness',150),
+	put('maximal_contrast',150),
+	modified_control(0),
+	timer ? activate.
+--
+detect_minimal_file_number(N,N):-
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N),
+	image1 ? does_exist(ImageToBeLoaded),!.
+detect_minimal_file_number(N1,N2):-
+	N1 < 1_000_000,!,
+	detect_minimal_file_number(N1+1,N2).
+detect_minimal_file_number(_,1).
+--
+detect_maximal_file_number(N1,N3,Min):-
+	N2== N1 + 1,
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N2),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	show_frame_range_if_necessary(Min,N2),
+	detect_maximal_file_number(N2,N3,Min).
+detect_maximal_file_number(N,N,_).
+--
+show_frame_range_if_necessary(Min,Max):-
+	?mod(Max,1000) == 0,!,
+	put(1004,[Min,Max]),
+	put('last_frame',Max).
+show_frame_range_if_necessary(_,_).
+--
+modified_control(_):-
+	MinimalHue1== ?val("INTEGER",?get('minimal_hue_1')),
+	MaximalHue1== ?val("INTEGER",?get('maximal_hue_1')),
+	MinimalHue2== ?val("INTEGER",?get('minimal_hue_2')),
+	MaximalHue2== ?val("INTEGER",?get('maximal_hue_2')),
+	MinimalSaturation==
+		?val("INTEGER",?get('minimal_saturation')),
+	MaximalSaturation==
+		?val("INTEGER",?get('maximal_saturation')),
+	MinimalBrightness==
+		?val("INTEGER",?get('minimal_brightness')),
+	MaximalBrightness==
+		?val("INTEGER",?get('maximal_brightness')),
+	MinimalContrast==
+		?val("INTEGER",?get('minimal_contrast')),
+	MaximalContrast==
+		?val("INTEGER",?get('maximal_contrast')),!,
+	vpm ? suspend_processing,
+	vpm ? retract_all_instructions,
+	L11== [	p(57,89),p(589,61),p(606,212),p(602,411),
+		p(357,409),p(217,421),p(51,417)],
+	divide_list(subsampling,L11,L12),
+	vpm ? msk_select_polygon(L12),
+	vpm ? msk_push_foreground('SELECT_NOTHING'),
+	vpm ? msk_add_foreground(
+		'HUE',MinimalHue1,MaximalHue1),
+	vpm ? msk_add_foreground(
+		'HUE',MinimalHue2,MaximalHue2),
+	vpm ? msk_pop_foreground('AND'),
+	vpm ? msk_select_foreground(
+		'SATURATION',MinimalSaturation,MaximalSaturation),
+	vpm ? msk_select_foreground(
+		'BRIGHTNESS',MinimalBrightness,MaximalBrightness),
+	vpm ? pxl_select_image_channel('BRIGHTNESS'),
+	vpm ? pxl_compute_gradient('MODULUS'),
+	vpm ? pxl_normalize_pixels(0,10),
+	vpm ? pxl_smooth_image(13),
+	vpm ? msk_select_foreground(MinimalContrast,MaximalContrast),
+	vpm ? msk_erode_foreground(5),
+	vpm ? msk_dilate_foreground(5),
+	vpm ? blb_extract_blobs('Rats','TWO_PASS_BLOB_EXTRACTION'),
+	vpm ? blb_select_superior_blob('FOREGROUND_AREA'),
+	-- vpm ? blb_fill_blobs,
+	-- vpm ? pxl_select_image_channel('HUE'),
+	-- vpm ? blb_compute_color_histograms(25),
+	vpm ? blb_track_blobs,
+	vpm ? trk_select_superior_track(
+		'NUMBER_OF_FRAMES','DESCENDING_ORDER'),
+	vpm ? pxl_select_image_channel('ALL'),
+	vpm ? process_now.
+--
+divide_list(K,[p(X,Y)|R1],[p(X/K,Y/K)|R2]):-!,
+	divide_list(K,R1,R2).
+divide_list(_,_,[]).
+--
+tick:-
+	T2== timer?milliseconds(),
+	state ? get_beginning_time(T1),
+	Delta== (T2 - T1) / 1000.0 * frame_rate,
+	N== ?convert_to_integer(?round(Delta)),
+	FFN== ?val("INTEGER",?get('first_frame')),!,
+	load_figure(N+FFN-1,T2).
+tick.
+--
+load_figure(N2,_):-
+	state ? get_current_frame(N1),
+	N1 == N2,!.
+load_figure(N,_):-
+	LFN== ?val("INTEGER",?get('last_frame')),
+	N <= LFN,
+	state ? set_current_frame(N),
+	ImageToBeLoaded==
+		data_directory + "/" +
+		text?format(file_name_format,N),
+	image1 ? does_exist(ImageToBeLoaded),!,
+	image1 ? load(	ImageToBeLoaded,
+			subsampling,subsampling,0,0),
+	vpm ? process_realtime_frame(image1),
+	state ? increase_global_counter,
+	draw_scene.
+load_figure(_,T2):-
+	state ? set_beginning_time(T2).
+--
+draw_scene:-
+	vpm ? commit,
+	graphic_window ? suspend_redrawing,
+	graphic_window ? clear,
+	-- vpm ? get_recent_image(image2),
+	-- vpm ? get_preprocessed_image(image2),
+	-- vpm ? get_background_image(image2),
+	-- vpm ? get_sigma_image(image2),
+	-- vpm ? get_foreground_image(image2),
+	vpm ? get_synthesized_image(image2),
+	graphic_window ? draw_image(image2,0,0,1,1),
+	vpm ? get_tracks(Tracks),
+	image2 ? get_size_in_pixels(IW,IH),
+	draw_tracks(Tracks,IW,IH),
+	draw_legend,
+	graphic_window ? draw_now.
+--
+draw_tracks([Track|Rest],IW,IH):-!,
+	draw_track(Track,IW,IH),
+	draw_tracks(Rest,IW,IH).
+draw_tracks(_,_,_).
+--
+draw_track({	identifier:Id,
+		is_mature:IsMature,
+		total_distance: Distance,
+		segments:Segments|_},
+		IW,IH):-
+	NC== ?mod(Id,26)+1,
+	select_color(NC,Color),
+	draw_first_blob_rectangle(Segments,IsMature,Color,IW,IH),
+	draw_track_segments(
+		Segments,{},IsMature,Distance,Color,IW,IH),
+	fail.
+draw_track(_,_,_).
+--
+select_color(1,'Green'):-!.
+select_color(2,'DkGreen'):-!.
+select_color(3,'Blue'):-!.
+select_color(4,'Cyan'):-!.
+select_color(5,'Magenta'):-!.
+select_color(6,'Yellow'):-!.
+select_color(7,'Orange'):-!.
+select_color(8,'Pink'):-!.
+select_color(9,'Violet'):-!.
+select_color(10,'Brown'):-!.
+select_color(11,'Maroon'):-!.
+select_color(12,'Purple'):-!.
+select_color(13,'Fuchsia'):-!.
+select_color(14,'Lime'):-!.
+select_color(15,'Olive'):-!.
+select_color(16,'Navy'):-!.
+select_color(17,'Teal'):-!.
+select_color(18,'Aqua'):-!.
+select_color(19,'Terracotta'):-!.
+select_color(20,'Lilac'):-!.
+select_color(21,'Gold'):-!.
+select_color(22,'Indigo'):-!.
+select_color(23,'RoyalBlue'):-!.
+select_color(24,'Lemon'):-!.
+select_color(25,'Emerald'):-!.
+select_color(_,'SkyBlue').
+--
+draw_first_blob_rectangle([Segment|_],IsMature,C,IW,IH):-
+	Segment == {coordinates:[Blob|_]|_},!,
+	draw_blob_rectangle(Blob,IsMature,-1.0,C,1,IW,IH).
+draw_first_blob_rectangle(_,_,_,_,_).
+--
+draw_track_segments([Segment2],Segment1,IsMature,D,C,IW,IH):-!,
+	draw_track_segment(
+		Segment2,Segment1,'yes',IsMature,D,C,IW,IH).
+draw_track_segments([Segment2|Rest],Segment1,IsMature,D,C,IW,IH):-
+	draw_track_segment(
+		Segment2,Segment1,'no',IsMature,D,C,IW,IH),
+	draw_track_segments(Rest,Segment2,IsMature,D,C,IW,IH).
+draw_track_segments([],_,_,_,_,_,_).
+--
+draw_track_segment(Segment2,Segment1,IsLast,IsMature,D,C,IW,IH):-
+	Segment2 == {coordinates:TrackOfBlob|_},!,
+	draw_track_of_blob(TrackOfBlob,{},IsLast,IsMature,D,C,IW,IH),
+	draw_segment_link(Segment2,Segment1,IW,IH).
+draw_track_segment(_,_,_,_,_,_,_,_).
+--
+draw_track_of_blob([Blob2],Blob1,'yes',IsMature,D,C,IW,IH):-!,
+	draw_blob_rectangle(Blob2,IsMature,D,C,3,IW,IH),
+	draw_blob_link(Blob2,Blob1,C,IW,IH).
+draw_track_of_blob([Blob2|Rest],Blob1,IsLast,IsMature,D,C,IW,IH):-!,
+	draw_blob_link(Blob2,Blob1,C,IW,IH),
+	draw_track_of_blob(Rest,Blob2,IsLast,IsMature,D,C,IW,IH).
+draw_track_of_blob(_,_,_,_,_,_,_,_).
+--
+draw_blob_rectangle(Blob,IsMature,Distance,Color,LW,IW,IH):-
+	Blob == {x:X0,y:Y0,width:W1,height:H1|_},
+	select_dash_array(IsMature,DashArray),
+	graphic_window ? set_pen(
+		{color:Color,lineWidth:LW|DashArray}),!,
+	graphic_window ? set_brush('off'),
+	X2== (X0 - W1 / 2) / IW,
+	Y2== (Y0 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	draw_blob_label(Distance,X0,Y0,IW,IH).
+draw_blob_rectangle(_,_,_,_,_,_,_).
+--
+select_dash_array('no',{dashArray:[3,5]}):-!.
+select_dash_array(_,{}).
+--
+draw_blob_label(Distance,_,_,_,_):-
+	Distance < 0,!.
+draw_blob_label(Distance,X0,Y0,IW,IH):-!,
+	Label== text? format("%3.0f[mm]",Distance*1000),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphic_window ? draw_text(X0/IW,Y0/IH,Label).
+--
+draw_blob_link(Blob2,Blob1,Color,IW,IH):-
+	Blob2== {centroid_x:X2a,centroid_y:Y2a|_},
+	Blob1== {centroid_x:X1a,centroid_y:Y1a|_},!,
+	X1b== X1a / IW,
+	Y1b== Y1a / IH,
+	X2b== X2a / IW,
+	Y2b== Y2a / IH,
+	graphic_window ? set_brush('off'),
+	graphic_window ? set_pen({color:Color,lineWidth:1}),
+	graphic_window ? draw_line(X1b,Y1b,X2b,Y2b).
+draw_blob_link(_,_,_,_,_).
+--
+draw_segment_link(Segment2,Segment1,IW,IH):-
+	Segment2== {centroid_x1:X2a,centroid_y1:Y2a|_},
+	Segment1== {centroid_x2:X1a,centroid_y2:Y1a|_},!,
+	X1r== X1a / IW,
+	Y1r== Y1a / IH,
+	X2r== X2a / IW,
+	Y2r== Y2a / IH,
+	graphic_window ? set_brush('Green'),
+	graphic_window ? set_pen({color:'Black',lineWidth:1}),
+	graphic_window ? draw_line(X1r,Y1r,X2r,Y2r),
+	draw_circle(X1r,Y1r),
+	draw_circle(X2r,Y2r).
+draw_segment_link(_,_,_,_).
+--
+draw_circle(X0,Y0):-
+	X1== X0 - circle_radius,
+	Y1== Y0 - circle_radius,
+	Width== circle_radius * 2,
+	Height== circle_radius * 2,
+	graphic_window ? draw_ellipse(X1,Y1,Width,Height).
+--
+draw_legend:-
+	state ? get_current_frame(FrameNumber),!,
+	state ? get_stopwatch_time(Delay),
+	state ? get_frame_counter(FrameQuantity),
+	state ? get_global_counter(GlobalCounter),
+	Time== Delay / 1000.0,
+	FrameRate== FrameQuantity / Time,
+	graphic_window ? set_brush('Red'),
+	graphic_window ? set_font({size:18}),
+	graphic_window ? set_text_alignment('LEFT','TOP'),
+	graphic_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %3.2f [sec]; Frame: %d (%d)",
+			Time,FrameNumber,GlobalCounter)),
+	graphic_window ? set_text_alignment('RIGHT','TOP'),
+	graphic_window ? draw_text(
+		0.98, 0.02,
+		text?format(
+			"Frame Rate: %3.2f [Hz]",
+			FrameRate)).
+draw_legend.
+]
+-----------------------------------------------------------------------
+class 'SpecialTimer' (specialized 'Timer'):
+--
+internal:
+--
+target_world;
+--
+[
+tick:-!,
+	target_world ? tick.
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		= ('Timer');
+--
+[
+CLAUSES:
+--
+get_beginning_time(Time):-
+	Item== ?match(beginning_time(_)),
+	Item == beginning_time(Time),!.
+--
+set_beginning_time(Time):-
+	retract_all(beginning_time(_)),
+	append(beginning_time(Time)),
+	reset_stopwatch,
+	reset_frame_counter.
+--
+get_current_frame(N):-
+	Item== ?match(current_frame(_)),
+	Item == current_frame(N),!.
+--
+set_current_frame(N):-
+	retract_all(current_frame(_)),
+	append(current_frame(N)),
+	increase_frame_counter.
+--
+reset_stopwatch:-
+	retract_all(stop_watch_time(_)),
+	append(stop_watch_time(timer?milliseconds())).
+--
+get_stopwatch_time(Delay):-
+	T2== timer?milliseconds(),
+	Item== ?match(stop_watch_time(_)),
+	Item == stop_watch_time(T1),!,
+	Delay== T2 - T1.
+get_stopwatch_time(0).
+--
+reset_frame_counter:-
+	retract_all(frame_counter(_)).
+--
+increase_frame_counter:-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!,
+	retract_all(frame_counter(_)),
+	append(frame_counter(N+1)).
+increase_frame_counter:-
+	append(frame_counter(1)).
+--
+get_frame_counter(N):-
+	Item== ?match(frame_counter(_)),
+	Item == frame_counter(N),!.
+get_frame_counter(0).
+--
+increase_global_counter:-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!,
+	retract_all(global_counter(_)),
+	append(global_counter(N+1)).
+increase_global_counter:-
+	append(global_counter(1)).
+--
+get_global_counter(N):-
+	Item== ?match(global_counter(_)),
+	Item == global_counter(N),!.
+get_global_counter(0).
+]
+-----------------------------------------------------------------------

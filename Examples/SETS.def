@@ -1,0 +1,30 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, IRE RAS, Alexei A. Morozov. --
+-- Underdetermined sets.                 --
+-------------------------------------------
+DOMAINS:
+--
+reference:
+--
+MySet		= {
+		  object:ObjectVariety,
+		  region:RegionName,
+		  name:ObjectName
+		  }.
+--
+ObjectVariety	= SYMBOL.
+RegionName	= STRING.
+ObjectName	= STRING.
+-------------------------------------------
+interface 'Main'
+(specialized 'DemoConsole'):
+--
+variable:
+--
+	value_A	: MySet;
+	value_B	: MySet;
+--
+[
+]
+-------------------------------------------

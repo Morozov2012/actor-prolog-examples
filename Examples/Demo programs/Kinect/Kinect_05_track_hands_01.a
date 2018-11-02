@@ -1,0 +1,421 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	name		= "Test001.k2j";
+--
+	operating_mode			= 'PLAYING';
+	maximal_chronicle_length	= 3; -- Seconds
+--
+	-- frame_type	= 'DEPTH_MAPS';
+	frame_type	= 'COLORED_DEPTH_MAPS';
+	-- frame_type	= 'INFRARED';
+	-- frame_type	= 'LONG_EXPOSURE_INFRARED';
+	-- frame_type	= 'MAPPED_COLOR';
+	-- frame_type	= 'POINT_CLOUDS';
+	-- frame_type	= 'COLOR';
+	-- frame_type	= 'DEVICE_TUNING';
+	-- frame_type	= 'NONE';
+--
+	people_index	= 'TINCTURE_PEOPLE';
+	-- people_index	= 'PAINT_PEOPLE';
+	-- people_index	= 'EXTRACT_PEOPLE';
+	-- people_index	= 'ADAPTIVELY_EXTRACT_PEOPLE';
+	-- people_index	= 'PROJECT_PEOPLE';
+	-- people_index	= 'NONE';
+--
+	circumscription_mode = [
+			'TOTAL_RECTANGLES',
+			'SKELETON_RECTANGLES',
+			'TOTAL_PARALLELEPIPEDS',
+			'SKELETON_PARALLELEPIPEDS'
+			-- 'NONE'
+			];
+--
+	-- skeletons_mode	= 'DETECT_SKELETONS';
+	skeletons_mode		= 'DETECT_AND_TRACK_SKELETONS';
+	-- skeletons_mode	= 'NONE';
+--
+	displaying_mode	= {
+		frame_type,
+		people_index,
+		circumscription:circumscription_mode,
+		skeletons:skeletons_mode};
+--
+	color_map	= {	'name':color_map_name,
+				size:2400,
+				reverse_scale:'yes',
+				reverse_minimal_value:'yes',
+				reverse_maximal_value:'no',
+				tincturing_coefficient:2
+				};
+	-- color_map	= 'JET';
+	-- color_map	= [];
+	-- color_map	= ['Magenta','Red','Orange','Yellow','Gray'];
+--
+	-- color_map_name	= 'AUTUMN';
+	-- color_map_name	= 'BONE';
+	-- color_map_name	= 'BRIGHT_RAINBOW';
+	-- color_map_name	= 'COOL';
+	-- color_map_name	= 'COPPER';
+	-- color_map_name	= 'GRAY';
+	-- color_map_name	= 'HOT';
+	-- color_map_name	= 'HSV';
+	-- color_map_name	= 'JET';
+	color_map_name		= 'OCEAN';
+	-- color_map_name	= 'PINK';
+	-- color_map_name	= 'PRISM';
+	-- color_map_name	= 'SOFT_RAINBOW';
+	-- color_map_name	= 'SPRING';
+	-- color_map_name	= 'SUMMER';
+	-- color_map_name	= 'WINTER';
+--
+	-- people_colors	= [	'Red','Green','Blue',
+	--				'Yellow','Magenta','Cyan'];
+	-- people_colors	= {	palette:['Green'],
+	--				tincturingCoefficient:1
+	--				};
+	-- people_colors	= [];
+	people_colors		= ['Green'];
+--
+internal:
+--
+	window	= ('Canvas2D',
+		background_color='SystemControl');
+	image	= ('BufferedImage');
+	con	= ('Console');
+--
+constant:
+--
+	ellipse_radius	= 10;
+--
+[
+goal:-!,
+	window ? show,
+	start.
+--
+frame_obtained:-
+	commit,!,
+	get_recent_frame_number(FrameNumber),
+	get_recent_image(image),
+	get_tracks(Tracks),
+	get_image_size_in_pixels(IW,IH,frame_type),
+	window ? suspend_redrawing,
+	window ? clear,
+	window ? draw_image(image,0,0,1,1),
+	draw_tracks(IW,IH,Tracks,frame_type,FrameNumber),
+	window ? draw_now.
+--
+get_image_size_in_pixels(IW,IH,'COLOR'):-!,
+	get_color_image_size_in_pixels(IW,IH).
+get_image_size_in_pixels(IW,IH,_):-
+	get_depth_image_size_in_pixels(IW,IH).
+-----------------------------------------------------------------------
+draw_tracks(IW,IH,[Track|Rest],FrameType,CFN):-
+	Track == {is_complete:'no',skeletons:Skeletons|_},!,
+	draw_skeletons(IW,IH,Skeletons,{},FrameType),
+	draw_tracks(IW,IH,Rest,FrameType,CFN).
+draw_tracks(IW,IH,[_|Rest],FrameType,CFN):-!,
+	draw_tracks(IW,IH,Rest,FrameType,CFN).
+draw_tracks(_,_,_,_,_).
+-----------------------------------------------------------------------
+draw_skeletons(IW,IH,[Skeleton2],Skeleton1,FrameType):-!,
+	draw_skeleton(IW,IH,Skeleton2,FrameType),
+	draw_hand_trajectories(IW,IH,Skeleton1,Skeleton2,FrameType),
+	draw_parallelepipeds(IW,IH,Skeleton2,FrameType),
+	draw_rectangles(IW,IH,Skeleton2,FrameType).
+draw_skeletons(IW,IH,[Skeleton2|Rest],Skeleton1,FrameType):-!,
+	draw_hand_trajectories(IW,IH,Skeleton1,Skeleton2,FrameType),
+	draw_skeletons(IW,IH,Rest,Skeleton2,FrameType).
+draw_skeletons(_,_,_,_,_).
+--
+draw_skeleton(IW,IH,Skeleton,FrameType):-
+	Skeleton == {
+		head: Head,
+		spine: Spine,
+		left_arm: LeftArm,
+		right_arm: RightArm,
+		left_leg: LeftLeg,
+		right_leg: RightLeg
+		|_},
+	draw_spine(IW,IH,Head,Spine,FrameType),
+	draw_arm(IW,IH,Spine,LeftArm,FrameType),
+	draw_arm(IW,IH,Spine,RightArm,FrameType),
+	draw_leg(IW,IH,Spine,LeftLeg,FrameType),
+	draw_leg(IW,IH,Spine,RightLeg,FrameType),
+	fail.
+draw_skeleton(_,_,_,_).
+--
+draw_spine(IW,IH,Head,Spine,FrameType):-
+	Spine == {
+		neck: Neck,
+		shoulder: Shoulder,
+		mid: Mid,
+		base: Base
+		|_},!,
+	draw_link(IW,IH,Head,Neck,FrameType),
+	draw_link(IW,IH,Neck,Shoulder,FrameType),
+	draw_link(IW,IH,Shoulder,Mid,FrameType),
+	draw_link(IW,IH,Mid,Base,FrameType).
+draw_spine(_,_,_,_,_).
+--
+draw_arm(IW,IH,Spine,Arm,FrameType):-
+	Spine == {shoulder:SpineShoulder|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	draw_link(IW,IH,SpineShoulder,ArmShoulder,FrameType),
+	draw_link(IW,IH,ArmShoulder,Elbow,FrameType),
+	draw_link(IW,IH,Elbow,Wrist,FrameType),
+	draw_link(IW,IH,Wrist,Hand,FrameType),
+	draw_hand(IW,IH,Wrist,Hand,Rest,FrameType).
+draw_arm(IW,IH,Spine,Arm,FrameType):-
+	Spine == {neck:Neck|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	draw_link(IW,IH,Neck,ArmShoulder,FrameType),
+	draw_link(IW,IH,ArmShoulder,Elbow,FrameType),
+	draw_link(IW,IH,Elbow,Wrist,FrameType),
+	draw_link(IW,IH,Wrist,Hand,FrameType),
+	draw_hand(IW,IH,Wrist,Hand,Rest,FrameType).
+draw_arm(_,_,_,_,_).
+--
+draw_hand(IW,IH,Wrist,Hand,Rest,FrameType):-
+	Rest == {tip:Tip,thumb:Thumb|_},!,
+	draw_link(IW,IH,Wrist,Thumb,FrameType),
+	draw_link(IW,IH,Hand,Tip,FrameType).
+draw_hand(_,_,_,_,_,_).
+--
+draw_leg(IW,IH,Spine,Leg,FrameType):-
+	Spine == {base:Base|_},
+	Leg == {
+		hip: Hip,
+		knee: Knee,
+		ankle: Ankle,
+		foot: Foot
+		|_},!,
+	draw_link(IW,IH,Base,Hip,FrameType),
+	draw_link(IW,IH,Hip,Knee,FrameType),
+	draw_link(IW,IH,Knee,Ankle,FrameType),
+	draw_link(IW,IH,Ankle,Foot,FrameType).
+draw_leg(_,_,_,_,_).
+--
+draw_link(IW,IH,Joint1,Joint2,FrameType):-
+	FrameType == 'COLOR',
+	Joint1 == {
+		status:Status1,
+		position:{mapping2:p(Joint1X1,Joint1Y1)|_}|_},
+	Joint2 == {
+		status:Status2,
+		position:{mapping2:p(Joint2X1,Joint2Y1)|_}|_},!,
+	select_line_width(Status1,Status2,LineWidth),
+	window ? set_pen(
+		{color:'DkGreen',lineWidth:LineWidth}),
+	Joint1X2== Joint1X1 / IW,
+	Joint1Y2== Joint1Y1 / IH,
+	Joint2X2== Joint2X1 / IW,
+	Joint2Y2== Joint2Y1 / IH,
+	window ? draw_line(
+		Joint1X2,Joint1Y2,Joint2X2,Joint2Y2),
+	draw_joint(IW,IH,Joint1,FrameType),
+	draw_joint(IW,IH,Joint2,FrameType).
+draw_link(IW,IH,Joint1,Joint2,FrameType):-
+	Joint1 == {
+		status:Status1,
+		position:{mapping1:p(Joint1X1,Joint1Y1)|_}|_},
+	Joint2 == {
+		status:Status2,
+		position:{mapping1:p(Joint2X1,Joint2Y1)|_}|_},!,
+	select_line_width(Status1,Status2,LineWidth),
+	window ? set_pen(
+		{color:'DkGreen',lineWidth:LineWidth}),
+	Joint1X2== Joint1X1 / IW,
+	Joint1Y2== Joint1Y1 / IH,
+	Joint2X2== Joint2X1 / IW,
+	Joint2Y2== Joint2Y1 / IH,
+	window ? draw_line(
+		Joint1X2,Joint1Y2,Joint2X2,Joint2Y2),
+	draw_joint(IW,IH,Joint1,FrameType),
+	draw_joint(IW,IH,Joint2,FrameType).
+draw_link(_,_,_,_,_).
+--
+select_line_width('TRACKED','TRACKED',25):-!.
+select_line_width(_,_,10).
+--
+draw_joint(IW,IH,Joint,'COLOR'):-
+	Joint == {position:{mapping2:p(X1,Y1)|_}|_},!,
+	window ? set_brush('Orange'),
+	window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	window ? set_text_alignment('CENTER','CENTER'),
+	X2== (X1 - ellipse_radius) / IW,
+	Y2== (Y1 - ellipse_radius) / IH,
+	W2== ellipse_radius*2 / IW,
+	H2== ellipse_radius*2 / IH,
+	window ? draw_ellipse(X2,Y2,W2,H2).
+draw_joint(IW,IH,Joint,_):-
+	Joint == {position:{mapping1:p(X1,Y1)|_}|_},!,
+	window ? set_brush('Orange'),
+	window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	window ? set_text_alignment('CENTER','CENTER'),
+	X2== (X1 - ellipse_radius) / IW,
+	Y2== (Y1 - ellipse_radius) / IH,
+	W2== ellipse_radius*2 / IW,
+	H2== ellipse_radius*2 / IH,
+	window ? draw_ellipse(X2,Y2,W2,H2).
+draw_joint(_,_,_,_).
+-----------------------------------------------------------------------
+draw_hand_trajectories(IW,IH,Skeleton1,Skeleton2,FrameType):-
+	Skeleton1 == {
+		left_arm:{hand:LeftHand1|_},
+		right_arm:{hand:RightHand1|_}
+		|_},
+	Skeleton2 == {
+		left_arm:{hand:LeftHand2|_},
+		right_arm:{hand:RightHand2|_}
+		|_},!,
+	draw_trajectory_segment(
+		IW,IH,
+		LeftHand1,
+		LeftHand2,
+		color4(0,0,1,0.5),
+		FrameType),
+	draw_trajectory_segment(
+		IW,IH,
+		RightHand1,
+		RightHand2,
+		color4(1,0,0,0.5),
+		FrameType).
+draw_hand_trajectories(_,_,_,_,_).
+--
+draw_trajectory_segment(IW,IH,Joint1,Joint2,Color,FrameType):-
+	FrameType == 'COLOR',
+	Joint1 == {
+		status:'TRACKED',
+		position:{mapping2:p(Joint1X1,Joint1Y1)|_}|_},
+	Joint2 == {
+		status:'TRACKED',
+		position:{mapping2:p(Joint2X1,Joint2Y1)|_}|_},!,
+	window ? set_pen({color:Color,lineWidth:10}),
+	Joint1X2== Joint1X1 / IW,
+	Joint1Y2== Joint1Y1 / IH,
+	Joint2X2== Joint2X1 / IW,
+	Joint2Y2== Joint2Y1 / IH,
+	window ? draw_line(
+		Joint1X2,Joint1Y2,Joint2X2,Joint2Y2).
+draw_trajectory_segment(IW,IH,Joint1,Joint2,Color,_):-
+	Joint1 == {
+		status:'TRACKED',
+		position:{mapping1:p(Joint1X1,Joint1Y1)|_}|_},
+	Joint2 == {
+		status:'TRACKED',
+		position:{mapping1:p(Joint2X1,Joint2Y1)|_}|_},!,
+	window ? set_pen({color:Color,lineWidth:10}),
+	Joint1X2== Joint1X1 / IW,
+	Joint1Y2== Joint1Y1 / IH,
+	Joint2X2== Joint2X1 / IW,
+	Joint2Y2== Joint2Y1 / IH,
+	window ? draw_line(
+		Joint1X2,Joint1Y2,Joint2X2,Joint2Y2).
+draw_trajectory_segment(_,_,_,_,_,_).
+-----------------------------------------------------------------------
+draw_parallelepipeds(IW,IH,Skeleton,FrameType):-
+	Skeleton == {total_parallelepiped:TotalParallelepiped|_},
+	draw_parallelepiped(
+		IW,IH,TotalParallelepiped,FrameType,'Blue',3),
+	fail.
+draw_parallelepipeds(IW,IH,Skeleton,FrameType):-
+	Skeleton == {skeleton_parallelepiped:SkeletonParallelepiped|_},
+	draw_parallelepiped(
+		IW,IH,SkeletonParallelepiped,FrameType,'Violet',3),
+	fail.
+draw_parallelepipeds(_,_,_,_).
+--
+draw_parallelepiped(IW,IH,Parallelepiped,FrameType,Color,LineWidth):-
+	Parallelepiped == {
+		vertex11: V11,
+		vertex12: V12,
+		vertex13: V13,
+		vertex14: V14,
+		vertex21: V21,
+		vertex22: V22,
+		vertex23: V23,
+		vertex24: V24
+		|_},
+	draw_line(IW,IH,V11,V12,FrameType,Color,LineWidth,{}),
+	draw_line(IW,IH,V12,V13,FrameType,Color,LineWidth,{}),
+	draw_line(IW,IH,V13,V14,FrameType,Color,LineWidth,{}),
+	draw_line(IW,IH,V14,V11,FrameType,Color,LineWidth,{}),
+	DashArray== {dashArray:[10,10]},
+	draw_line(IW,IH,V21,V22,FrameType,Color,LineWidth,DashArray),
+	draw_line(IW,IH,V22,V23,FrameType,Color,LineWidth,DashArray),
+	draw_line(IW,IH,V23,V24,FrameType,Color,LineWidth,DashArray),
+	draw_line(IW,IH,V24,V21,FrameType,Color,LineWidth,DashArray),
+	draw_line(IW,IH,V11,V21,FrameType,Color,LineWidth,DashArray),
+	draw_line(IW,IH,V12,V22,FrameType,Color,LineWidth,DashArray),
+	draw_line(IW,IH,V13,V23,FrameType,Color,LineWidth,DashArray),
+	draw_line(IW,IH,V14,V24,FrameType,Color,LineWidth,DashArray),
+	fail.
+draw_parallelepiped(_,_,_,_,_,_).
+-----------------------------------------------------------------------
+draw_rectangles(IW,IH,Skeleton,FrameType):-
+	Skeleton == {total_rectangle:TotalRectangle|_},
+	draw_rectangle(IW,IH,TotalRectangle,FrameType,'Orange',5),
+	fail.
+draw_rectangles(IW,IH,Skeleton,FrameType):-
+	Skeleton == {skeleton_rectangle:SkeletonRectangle|_},
+	draw_rectangle(IW,IH,SkeletonRectangle,FrameType,'Red',5),
+	fail.
+draw_rectangles(_,_,_,_).
+--
+draw_rectangle(IW,IH,Rectangle,FrameType,Color,LineWidth):-
+	Rectangle == {
+		vertex1: V1,
+		vertex2: V2,
+		vertex3: V3,
+		vertex4: V4
+		|_},
+	draw_line(IW,IH,V1,V2,FrameType,Color,LineWidth,{}),
+	draw_line(IW,IH,V2,V3,FrameType,Color,LineWidth,{}),
+	draw_line(IW,IH,V3,V4,FrameType,Color,LineWidth,{}),
+	draw_line(IW,IH,V4,V1,FrameType,Color,LineWidth,{}),
+	fail.
+draw_rectangle(_,_,_,_,_,_).
+-----------------------------------------------------------------------
+draw_line(IW,IH,Vertex1,Vertex2,FrameType,Color,LineWidth,DashArray):-
+	FrameType == 'COLOR',
+	Vertex1 == {mapping2:p(Vertex1X1,Vertex1Y1)|_},
+	Vertex2 == {mapping2:p(Vertex2X1,Vertex2Y1)|_},
+	window ? set_pen({color:Color,lineWidth:LineWidth|DashArray}),!,
+	Vertex1X2== Vertex1X1 / IW,
+	Vertex1Y2== Vertex1Y1 / IH,
+	Vertex2X2== Vertex2X1 / IW,
+	Vertex2Y2== Vertex2Y1 / IH,
+	window ? draw_line(Vertex1X2,Vertex1Y2,Vertex2X2,Vertex2Y2).
+draw_line(IW,IH,Vertex1,Vertex2,_,Color,LineWidth,DashArray):-
+	Vertex1 == {mapping1:p(Vertex1X1,Vertex1Y1)|_},
+	Vertex2 == {mapping1:p(Vertex2X1,Vertex2Y1)|_},
+	window ? set_pen({color:Color,lineWidth:LineWidth|DashArray}),!,
+	Vertex1X2== Vertex1X1 / IW,
+	Vertex1Y2== Vertex1Y1 / IH,
+	Vertex2X2== Vertex2X1 / IW,
+	Vertex2Y2== Vertex2Y1 / IH,
+	window ? draw_line(Vertex1X2,Vertex1Y2,Vertex2X2,Vertex2Y2).
+draw_line(_,_,_,_,_,_,_,_).
+]
+-----------------------------------------------------------------------

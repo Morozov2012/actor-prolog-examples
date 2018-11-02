@@ -1,0 +1,70 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  QSORT                                                            --
+--                                                                   --
+--  David H.D. Warren                                                --
+--                                                                   --
+--  Quicksort a list of 50 integers                                  --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  2015.06.28 02:32                                                 --
+--  Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB         --
+--  Windows7 - PM.64 (RUS)                                           --
+--  ========================================================         --
+--  AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                           --
+--                                                                   --
+--  g:\temp1\jv>java -version                                        --
+--  java version "1.7.0_80"                                          --
+--  Java(TM) SE Runtime Environment (build 1.7.0_80-b15)             --
+--  Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)  --
+--                                                                   --
+--  java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation            --
+--  -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch       --
+--                                                                   --
+--  1000000 iterations take 43129 msec                               --
+--  0.043129 milliseconds per iteration                              --
+--                                                                   --
+--  EXE file:                                                        --
+--                                                                   --
+--  1000000 iterations take 8010 msec                                --
+--  0.00801 milliseconds per iteration                               --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities' from "HARNESS";
+-----------------------------------------------------------------------
+PREDICATES:
+--
+imperative:
+--
+qsort(TestData,TestData,TestData)		- (i,o,i);
+partition(TestData,INTEGER,TestData,TestData)	- (i,i,o,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+[
+benchmark(Data,Out):-
+	qsort(Data,Out,[]).
+--
+data([	27,74,17,33,94,18,46,83,65, 2,
+	32,53,28,85,99,47,28,82, 6,11,
+	55,29,39,81,90,37,10, 0,66,51,
+	 7,21,85,27,31,63,75, 4,95,99,
+	11,28,61,74,18,92,40,53,59, 8]):-!.
+--
+qsort([],R,R).
+qsort([X|L],R,R0):-
+	partition(L,X,L1,L2),
+	qsort(L2,R1,R0),
+	qsort(L1,R,[X|R1]).
+--
+partition([],_,[],[]).
+partition([X|L],Y,[X|L1],L2):-
+	X <= Y,!,
+	partition(L,Y,L1,L2).
+partition([X|L],Y,L1,[X|L2]):-
+	partition(L,Y,L1,L2).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,140 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+test5;
+--
+-----------------------------------------------------------------------
+class 'MyHashMap' (specialized 'LinkedHashMap'):
+[
+DOMAINS:
+--
+TargetValue	= f(R,S,T).
+R		= REAL.
+S		= SYMBOL.
+T		= STRING.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyHashMap');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5.
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("I will store data items."),
+	set_color('default'),
+	store ? put(1000,f(3.14,'symbol1',"Text1")),
+	store ? put(1000,f(7.00,'symbol1',"Text1")),
+	store ? put(1000,f(3.14,'symbol1',"Text1")),
+	store ? put(3000,f(3.14,'symbol1',"Text1")),
+	store ? put(1000,f(3.14,'symbol2',"Text1")),
+	store ? put(1000,f(3.14,'symbol1',"Text2")),
+	store ? put(5000,f(9.00,'symbol1',"Text3")),
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+--
+test2:-
+	set_color('RoyalBlue'),
+	writeln("I will retrieve data items:"),
+	set_color('Blue'),
+	store ? find(Item),
+		writeln("\t",Item),
+		fail.
+test2:-
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("I will retrieve data items:"),
+	set_color('default'),
+	Key1== 1000,
+	Value1== store?get(Key1),
+	set_color('Orange'),
+	write("\t",Key1),
+	set_color('default'),
+	write(" -> "),
+	set_color('Blue'),
+	writeln(Value1),
+	Key2== 3000,
+	Value2== store?get(Key2),
+	set_color('Orange'),
+	write("\t",Key2),
+	set_color('default'),
+	write(" -> "),
+	set_color('Blue'),
+	writeln(Value2),
+	Key3== 5000,
+	Value3== store?get(Key3),!,
+	set_color('Orange'),
+	write("\t",Key3),
+	set_color('default'),
+	write(" -> "),
+	set_color('Blue'),
+	writeln(Value3),
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+test3:-
+	set_color('Red'),
+	writeln("Failure!"),
+	set_color('default').
+--
+test4:-
+	set_color('RoyalBlue'),
+	writeln("I will check hash map:"),
+	set_color('Orange'),
+	Key1== 1000,
+	store ? get(Key1),
+	writeln("\tThe ",Key1," key does exist."),
+	Key2== 3000,
+	store ? get(Key2),
+	writeln("\tThe ",Key2," key does exist."),
+	Key3== 5000,
+	store ? get(Key3),
+	writeln("\tThe ",Key3," key does exist."),!,
+	set_color('DkGreen'),
+	writeln("Done."),
+	set_color('default').
+test4:-
+	set_color('Red'),
+	writeln("Failure!"),
+	set_color('default').
+--
+test5:-
+	set_color('RoyalBlue'),
+	writeln("I will try to retrieve non-existent data item:"),
+	set_color('Orange'),
+	Key1== 7000,
+	writeln("\tKey: ",Key1),
+	Value1== store?get(Key1),!,
+	set_color('Red'),
+	writeln("\t",Key1," -> ",Value1),
+	set_color('default').
+test5:-
+	set_color('DkGreen'),
+	writeln("\tThis key does not exist in the map."),
+	set_color('default').
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,63 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+D1	= f(INTEGER,D2).
+D2	= D3*.
+D3	= {a:REAL,b:SYMBOL,c:STRING}.
+List1	= D1*.
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+report_term_list(INTEGER,List1)		- (i,i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1.
+--
+test0:-
+	con ? writeln("Test 0:"),
+	T1==	"f(1,[])"
+		"f(2,[{}])"
+		"f(3,[{a:3.14}])"
+		"f(4,[{b:'name',c:\"Text\"}])"
+		"f(5,[{a:100.0,b:'name',c:\"Text\"}])",
+	con ? writeln("\tInput:  ",T1," (string)"),
+	?string_to_terms(T1),!,
+	con ? writeln("\tO.K.").
+test0:-
+	con ? writeln("\tFailure").
+--
+test1:-
+	con ? writeln("Test 1:"),
+	T1==	"f(1,[])"
+		"f(2,[{}])"
+		"f(3,[{a:3.14}])"
+		"f(4,[{b:'name',c:\"Text\"}])"
+		"f(5,[{a:100.0,b:'name',c:\"Text\"}])",
+	con ? writeln("\tInput:  ",T1," (string)"),
+	L== ?cast("List1",?string_to_terms(T1)),!,
+	con ? writeln("\tResult:"),
+	report_term_list(1,L).
+test1:-
+	con ? writeln("\tFailure").
+--
+report_term_list(N,[Term|Rest]):-!,
+	con ? writeln("\t\t",N,") ",Term),
+	report_term_list(N+1,Rest).
+report_term_list(_,_).
+]

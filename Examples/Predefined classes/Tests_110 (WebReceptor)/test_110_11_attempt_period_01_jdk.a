@@ -1,0 +1,32 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+r	= ('WebReceptor',
+		-- attempt_period= 'default',
+		-- attempt_period= 'any',
+		attempt_period= seconds(1),
+		-- attempt_period= minutes(0.05),
+		-- attempt_period= hours(1),
+		-- attempt_period= days(1),
+		-- attempt_period= weeks(1),
+		-- attempt_period= months(0.1),
+		-- attempt_period= years(0.001),
+		-- attempt_period= 0.001,
+		revision_period= seconds(5),
+		maximal_waiting_time= 1.0,
+		location=
+			"data/report1.html");
+		/*
+		location=
+			"http://www.cplire.ru/Lab144/index.html");
+		*/
+--
+[
+goal:-
+	Parameters== r ? get_parameters(),
+	writeln(Parameters).
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,34 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- REAL.                                 --
+--                                       --
+-- Questions: What are real (float)      --
+-- numbers? When the real numbers are    --
+-- more appropriate than the integer     --
+-- numbers? How can one declare a        --
+-- real argument of a predicate? How can --
+-- one create a new domain that is a     --
+-- kind of real numbers?                 --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+Temperature	= REAL.
+
+PREDICATES:
+
+p(Temperature)	- (i);
+
+CLAUSES:
+
+goal:-
+	p(36.6).
+
+p(N):-
+	writeln(N).

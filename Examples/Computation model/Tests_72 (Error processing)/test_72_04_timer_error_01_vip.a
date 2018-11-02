@@ -1,0 +1,74 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+constant:
+--
+	test1	= (('Test1',
+			time_delay=1));
+	test2	= (('Test2',
+			time_delay=3));
+	test3	= (('Test3',
+			time_delay=5));
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Test1' (specialized 'Test'):
+--
+con;
+--
+[
+alarm(Exception):-!,
+	con ? set_color('Orange'),
+	con ? writeln("Test1: ",Exception).
+]
+
+class 'Test2' (specialized 'Test'):
+--
+con;
+--
+[
+alarm(Exception):-!,
+	con ? set_color('Red'),
+	con ? writeln("Test2: ",Exception),
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Test3' (specialized 'Test'):
+--
+con;
+--
+[
+alarm(Exception):-!,
+	con ? set_color('Purple'),
+	con ? writeln("Test3: ",Exception),
+	break('failure3').
+]
+-----------------------------------------------------------------------
+class 'Test' (specialized 'Timer'):
+--
+constant:
+--
+	time_delay	: INTEGER;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	delay(time_delay).
+--
+tick:-!,
+	con ? set_color('Blue'),
+	con ? writeln("Tick"),
+	break('user_defined_error').
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,147 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+test9;
+test10;
+test11;
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6,
+	test7,
+	test8,
+	test9,
+	test10,
+	test11,
+	Text== ?get_string(),
+	con ? writeln(Text).
+--
+test0:-
+	writeln("Test 0: %s"),
+	?format("%s","Hello World !").
+--
+test1:-
+	writeln("Test 1: %s"),
+	write(?format("\t%%s: %s %s%s\n","Hello","World","!")),
+	write(?format("\t%%s       : >>>%s<<<\n","ABCDE")),
+	write(?format("\t%%10s     : >>>%10s<<<\n","ABCDE")),
+	-- write(?format("\t%%010s    : >>>%010s<<<\n","ABCDE")),
+	write(?format("\t%%-10s    : >>>%-10s<<<\n","ABCDE")),
+	write(?format("\t%%-010s   : >>>%-10s<<<\n","ABCDE")),
+	write(?format("\t%%s: >>>%s<<<\n",'symbol')),
+	write(?format("\t%%s: >>>%s<<<\n",structure(1,3.0,"string",'symbol'))),
+	write(?format("\t%%s: >>>%s<<<\n",[1,3.0,"string",'symbol'])),
+	write(?format("\t%%s: >>>%s<<<\n",{a:1,b:3.0,c:"string",d:'symbol'})).
+--
+test2:-
+	writeln("Test 2: >>>%s"),
+	write(?format("\t%%s       : >>>%s<<<\n","ABCDE")),
+	write(?format("\t%%10.3s   : >>>%10.3s<<<\n","ABCDE")),
+	-- write(?format("\t%%010.3s  : >>>%010.3s<<<\n","ABCDE")),
+	write(?format("\t%%-10.3s  : >>>%-10.3s<<<\n","ABCDE")),
+	write(?format("\t%%-010.3s : >>>%-10.3s<<<\n","ABCDE")).
+--
+test3:-
+	writeln("Test 3: >>>%d"),
+	write(?format("\t%%d    : >>>%d<<<\n",100)),
+	write(?format("\t%%15d  : >>>%15d<<<\n",100)),
+	-- write(?format("\t%%15.1d  : >>>%15.1d<<<\n",100)),
+	write(?format("\t%%015d : >>>%015d<<<\n",100)),
+	write(?format("\t%%-15d : >>>%-15d<<<\n",100)).
+	-- write(?format("\t%%-015d: >>>%-015d<<<\n",100)).
+--
+test4:-
+	writeln("Test 4: >>>%f"),
+	write(?format("\t%%f    : >>>%f<<<\n",100.0)),
+	write(?format("\t%%15f  : >>>%15f<<<\n",100.0)),
+	write(?format("\t%%015f : >>>%015f<<<\n",100.0)),
+	write(?format("\t%%-15f : >>>%-15f<<<\n",100.0)).
+	-- write(?format("\t%%-015f: >>>%-015f<<<\n",100.0)).
+--
+test5:-
+	writeln("Test 5: >>>%f"),
+	write(?format("\t%%f      : >>>%f<<<\n",?pi)),
+	write(?format("\t%%15.3f  : >>>%15.3f<<<\n",?pi)),
+	write(?format("\t%%015.3f : >>>%015.3f<<<\n",?pi)),
+	write(?format("\t%%-15.3f : >>>%-15.3f<<<\n",?pi)).
+	-- write(?format("\t%%-015.3f: >>>%-015.3f<<<\n",?pi)).
+--
+test6:-
+	writeln("Test 6: >>>%e"),
+	write(?format("\t%%e      : >>>%e<<<\n",?pi)),
+	write(?format("\t%%25e    : >>>%25e<<<\n",?pi)),
+	write(?format("\t%%15.3e  : >>>%15.3e<<<\n",?pi)),
+	write(?format("\t%%015.3e : >>>%015.3e<<<\n",?pi)),
+	write(?format("\t%%-15.3e : >>>%-15.3e<<<\n",?pi)).
+	-- write(?format("\t%%-015.3e: >>>%-015.3e<<<\n",?pi)).
+--
+test7:-
+	writeln("Test 7: >>>%g"),
+	write(?format("\t%%g      : >>>%g<<<\n",?pi)),
+	write(?format("\t%%25g    : >>>%25g<<<\n",?pi)),
+	write(?format("\t%%15.3g  : >>>%15.3g<<<\n",?pi)),
+	write(?format("\t%%015.3g : >>>%015.3g<<<\n",?pi)),
+	write(?format("\t%%-15.3g : >>>%-15.3g<<<\n",?pi)).
+	-- write(?format("\t%%-015.3g: >>>%-015.3g<<<\n",?pi)).
+--
+test8:-
+	writeln("Test 8: >>>%x"),
+	write(?format("\t%%x    : >>>%x<<<\n",111)),
+	-- write(?format("\t%%x    : >>>%x<<<\n",111.0)),
+	write(?format("\t%%15x  : >>>%15x<<<\n",111)),
+	write(?format("\t%%015x : >>>%015x<<<\n",111)),
+	write(?format("\t%%-15x : >>>%-15x<<<\n",111)).
+	-- write(?format("\t%%-015x: >>>%-015x<<<\n",111)).
+--
+test9:-
+	writeln("Test 9: >>>%X"),
+	write(?format("\t%%X    : >>>%X<<<\n",111)),
+	-- write(?format("\t%%x    : >>>%x<<<\n",111.0)),
+	write(?format("\t%%15X  : >>>%15X<<<\n",111)),
+	write(?format("\t%%015X : >>>%015X<<<\n",111)),
+	write(?format("\t%%-15X : >>>%-15X<<<\n",111)).
+	-- write(?format("\t%%-015X: >>>%-015X<<<\n",111)).
+--
+test10:-
+	writeln("Test 10: >>>%o"),
+	write(?format("\t%%o    : >>>%o<<<\n",111)),
+	write(?format("\t%%15o  : >>>%15o<<<\n",111)),
+	write(?format("\t%%015o : >>>%015o<<<\n",111)),
+	write(?format("\t%%-15o : >>>%-15o<<<\n",111)).
+	-- write(?format("\t%%-015o: >>>%-015o<<<\n",111)).
+--
+test11:-
+	writeln("Test 11: >>>%c"),
+	write(?format("\t%%c    : >>>%c<<<\n",100)),
+	write(?format("\t%%15c  : >>>%15c<<<\n",100)),
+	-- write(?format("\t%%015c : >>>%015c<<<\n",100)),
+	write(?format("\t%%-15c : >>>%-15c<<<\n",100)).
+	-- write(?format("\t%%-015c: >>>%-015c<<<\n",100)).
+]

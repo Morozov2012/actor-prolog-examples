@@ -1,0 +1,37 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Structures.                           --
+--                                       --
+-- Questions: What are structures? How   --
+-- can one declare a structure argument  --
+-- of a predicate? How can one create a  --
+-- new domain that is a kind of a        --
+-- structure?                            --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+MyDate	= date(INTEGER,INTEGER,INTEGER).
+MyTime	= time(INTEGER,INTEGER,INTEGER).
+Lecture	= lecture(Name,MyDate,MyTime).
+Name	= 'LP & AI'; 'Mathematics'.
+
+PREDICATES:
+
+p(Lecture)	- (i);
+
+CLAUSES:
+
+goal:-
+	T1== date(2015,04,21),
+	T2== time(10,0,0),
+	p(lecture('LP & AI',T1,T2)).
+
+p(X):-
+	writeln(X).

@@ -1,0 +1,46 @@
+---------------------------------------------------
+--                                               --
+--             Actor Prolog lessons              --
+--          (c) 2015 Alexei A. Morozov           --
+--                                               --
+-- The topic: Basics of the structured logic     --
+-- programming. Combination of basic ideas.      --
+--                                               --
+-- The task: generate all possible permutations  --
+-- of a list.                                    --
+--                                               --
+-- Basic ideas to be used:                       --
+-- 1) Output assembling a list.                  --
+-- 2) Deleting an arbitrary element from a list. --
+-- 3) Backtracking.                              --
+--                                               --
+---------------------------------------------------
+
+DOMAINS:
+
+List	= INTEGER*.
+
+PREDICATES:
+
+nondeterm:
+
+list_permutation(List,List)		- (i,o);
+delete_one_element(List,INTEGER,List)	- (i,o,o);
+
+CLAUSES:
+
+goal:-
+	L1== [1,2,3],
+	writeln("L1=",L1),nl,
+	list_permutation(L1,L2),
+		writeln("L2=",L2),
+		fail.
+
+list_permutation(List1,[Head|Rest]):-
+	delete_one_element(List1,Head,List2),
+	list_permutation(List2,Rest).
+list_permutation([],[]).
+
+delete_one_element([Head|Rest],Head,Rest).
+delete_one_element([Head|Rest1],H,[Head|Rest2]):-
+	delete_one_element(Rest1,H,Rest2).

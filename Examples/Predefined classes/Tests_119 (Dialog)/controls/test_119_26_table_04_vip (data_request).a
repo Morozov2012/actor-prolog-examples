@@ -1,0 +1,62 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+S_LIST		= STRING*.
+--
+reference:
+--
+R_STRING	= STRING.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+w	= ('MyDialog');
+--
+[
+goal:-!,
+	w ? show.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+variable:
+--
+	my_objects	: R_STRING;
+--
+internal:
+--
+con	= ('Console');
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+data_table(R_STRING,S_LIST)	- (i,o);
+--
+CLAUSES:
+--
+data_request("TABLE1")= List :-!,
+	data_table(my_objects,List).
+--
+data_table("Fruits",["Cherry","red","sweet",""]).
+data_table("Vegetables",["Potatoes","yellow","tasty",""]).
+data_table("Fruits",["Strawberry","red","sweet","nice"]).
+data_table("Vegetables",["Melon","yellow","sweet","nice"]).
+data_table("Flowers",["Blue Cornflower","blue","","nice"]).
+data_table("Fruits",["Grapes","green","sweet",""]).
+data_table("Fruits",["Blackberry","black","sour","nice"]).
+data_table("Flowers",["Camomile","white","","nice"]).
+data_table("Fruits",["Durian","","nice","disgustful"]).
+data_table("Fruits",["Lemon","yellow","sour","nice"]).
+data_table("Flowers",["Jasmine","white","","strong"]).
+data_table("Vegetables",["Cucumber","green","nice",""]).
+data_table("Fruits",["Banana","yellow","sweet",""]).
+]
+-----------------------------------------------------------------------

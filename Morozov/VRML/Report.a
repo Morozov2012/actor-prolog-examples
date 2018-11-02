@@ -1,0 +1,493 @@
+package "Morozov/VRML/Report":
+-----------------------------------------------------------------------
+--                                                                   --
+--              The "VRML/REPORT" Actor Prolog package.              --
+--             (c) 2002-2007, IRE RAS, Alexei A. Morozov.            --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package is intended for creation of VRML reports.            --
+-----------------------------------------------------------------------
+import 'Report_Mode'	from "Morozov/VRML/Mode";
+import 'Web_Analyzer'	from "Morozov/VRML/Analysis";
+import 'VRML_Toolbox'	from "Morozov/VRML/Toolbox";
+import 'Trajectory'	from "Morozov/VRML/Path";
+import 'ShortName'	from "Morozov/VRML/Names";
+-----------------------------------------------------------------------
+class 'Jewel_Report':
+--
+internal:
+--
+	mode		= ('Report_Mode');
+--
+	analyzer	= ('Web_Analyzer',
+				mode);
+--
+	generator	= ('VRML_Generator',
+				mode,
+				analyzer);
+--
+	target_files	= ('TargetFilesDatabase');
+	file_operations	= ('File');
+--
+	con		= ('Console');
+--
+[
+goal:-!.
+--
+create_report(InputFile,Mode,Path):-
+	analyzer ? analyze_data(InputFile),
+	analyzer ? report_results,
+	mode ? set_parameters(Mode),
+	create_name_of_target_file(InputFile,Path,TargetFile),
+	con ? writeln("Target file: ",TargetFile),
+	target_files ? append(target_file(TargetFile)),
+	generator ? generate_scene(TargetFile),
+	fail.
+create_report(_,_,_).
+--
+create_name_of_target_file(InputFile,Path,TargetName):-
+	file_operations ? extract_path(InputFile,_,ShortName),
+	file_operations ? extract_extension(ShortName,Name,_),
+	TargetFile== file_operations ? replace_extension(Name,".wrl"),
+	FullName== file_operations ? format("%s\\%s",Path,TargetFile),
+	TargetName== file_operations ? lower(FullName).
+--
+get_any_target_file(FileName):-
+	target_files ? find(Record),
+	Record == target_file(FileName).
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'VRML_Generator' (specialized 'Alpha'):
+--
+internal:
+--
+	mode;
+	analyzer;
+--
+	target_file	= ('TargetFile',
+				variable: name);
+--
+variable:
+--
+	name;
+--
+internal:
+--
+	toolbox		= ('VRML_Toolbox',
+				output=target_file,
+				mode);
+--
+	path		= ('Trajectory',
+				output=toolbox);
+--
+	text_operations	= ('Text');
+	name_operations	= ('ShortName');
+	con		= ('Console');
+--
+[
+goal:-!.
+--
+generate_scene(name):-!,
+	path ? reset,
+	target_file ? open('writing'),
+	generate_all_elements_of_scene,
+	target_file ? close.
+generate_scene(_):-
+	break('Error in generate_scene.').
+generate_scene(_).
+--
+generate_all_elements_of_scene:-
+	toolbox ? write_Heading,
+	toolbox ? write_WorldInfo,
+	toolbox ? write_NavigationInfo,
+	toolbox ? write_Background,
+	toolbox ? write_Fog,
+	toolbox ? write_Dashboard,
+	fail.
+generate_all_elements_of_scene:-
+	generate_items,
+	fail.
+generate_all_elements_of_scene:-
+	mode ? use_flying_camera,
+	path ? write_MovingViewpoint(0),
+	toolbox ? write_Viewpoint(0),
+	toolbox ? shift(0,0,"ROUTE SENSOR1.isActive TO SVP.set_bind"),
+	fail.
+generate_all_elements_of_scene:-
+	toolbox ? write_Viewpoint(0),
+	fail.
+generate_all_elements_of_scene:-
+	mode ? use_Fog,
+	toolbox ? shift(
+		0,0,"ROUTE SENSOR1.isActive TO NoFog.set_bind"),
+	fail.
+generate_all_elements_of_scene:-
+	toolbox ? write_Dashboard_Route,
+	fail.
+generate_all_elements_of_scene:-
+	toolbox ? write_PointLight(0,1,"1 1 1",17),
+	toolbox ? write_PointLight(0,2,"1 1 1",11),
+	toolbox ? write_PointLight(0,3,"1 1 1",7),
+	toolbox ? write_PointLight(0,3,"1 1 1",3),
+	fail.
+generate_all_elements_of_scene:-
+	mode ? enable_navigation,
+	toolbox ? write_PointLight(0),
+	fail.
+generate_all_elements_of_scene.
+-----------------------------------------------------------------------
+generate_items:-
+	toolbox ? shift(0,0,"DEF SENSOR1 SphereSensor{"),
+	toolbox ? shift(0,0,"}"),
+	toolbox ? shift(0,0,"DEF TRAN1 Transform{"),
+	toolbox ? shift(0,1,"children ["),
+	fail.
+generate_items:-
+	write_Axis(2),
+	fail.
+generate_items:-
+	analyzer ? get_item(Name,Address,Date,HyperLinks,Hue,Item),
+	analyzer ? select_Y_parameter(Item,Index),
+	analyzer ? scale_number(Name,Z),
+	analyzer ? scale_date(Date,X),
+	Y== ?convert_to_real(Index),
+	analyzer ? scale_size(Y,Height),
+	analyzer ? scale_value(HyperLinks,V),
+	make_description(Name,Date,Y,HyperLinks,Description),
+	write_VBox(2,Name,Address,X,Z,Height,Description,V,Hue),
+	register_viewpoint_position(Name,X,Z,Height),
+	fail.
+generate_items:-
+	mode ? use_flying_camera,
+	path ? write_ViewpointPath(2),
+	fail.
+generate_items:-
+	toolbox ? shift(0,1,"]"),
+	toolbox ? shift(0,0,"}"),
+	toolbox ? shift(0,0,
+		"ROUTE SENSOR1.rotation_changed TO TRAN1.rotation"),
+	fail.
+generate_items.
+-----------------------------------------------------------------------
+make_description(Name,Date,Y,HyperLinks,Description):-
+	analyzer ? is_keyword_scene,!,
+	make_description(Name,Date,Y,'size',HyperLinks,Description).
+make_description(Name,Date,Y,HyperLinks,Description):-
+	analyzer ? get_units(Units),
+	make_description(Name,Date,Y,Units,HyperLinks,Description).
+--
+make_description(Name,Date,Y,Units,HyperLinks,Description):-
+	scene_unit_to_string(Units,Text),
+	make_description(
+		Name,Date,Y,Units,Text,HyperLinks,Description).
+--
+make_description(Name,Date,Y,'hyper_links',_,_,Description):-
+	date_to_string(Date,DS),
+	size_to_string(Y,SS),
+	Description== text_operations ? format(
+		"%s \"%s [%s %s; %s %s]\"",
+		"description",
+		Name,
+		"recent update",DS,
+		SS,"links to ouside"),!.
+make_description(Name,Date,Y,_,Units,HyperLinks,Description):-
+	date_to_string(Date,DS),
+	size_to_string(Y,SS),
+	Description== text_operations ? format(
+		"%s \"%s [%s %s; %s %s; %d %s]\"",
+		"description",
+		Name,
+		"recent update",DS,
+		SS,Units,
+		text_operations ? convert_to_integer(HyperLinks),
+		"links to ouside"),!.
+make_description(_,_,_,_,_,_,_):-
+	break('Error in make_description.').
+make_description(_,_,_,_,_,_,"").
+--
+scene_unit_to_string('letters',"bytes"):-!.
+scene_unit_to_string('size',"times"):-!.
+scene_unit_to_string('pages',"pages"):-!.
+scene_unit_to_string('hyper_links',"hyperlinks"):-!.
+scene_unit_to_string('pictures',"figures"):-!.
+scene_unit_to_string('other_links',"binary files"):-!.
+scene_unit_to_string('errors',"errors").
+--
+date_to_string(date(Year,Month,Day),DS):-
+	string(Month),!,
+	DS== text_operations ? format("%d-%s-%d",Day,Month,Year).
+date_to_string(date(Year,Month,Day),DS):-!,
+	month_to_string(Month,MS),
+	DS== text_operations ? format("%d-%s-%d",Day,MS,Year).
+date_to_string(_,"?").
+--
+month_to_string(1,"Jan"):-!.
+month_to_string(2,"Feb"):-!.
+month_to_string(3,"Mar"):-!.
+month_to_string(4,"Apr"):-!.
+month_to_string(5,"May"):-!.
+month_to_string(6,"Jun"):-!.
+month_to_string(7,"Jul"):-!.
+month_to_string(8,"Aug"):-!.
+month_to_string(9,"Sep"):-!.
+month_to_string(10,"Oct"):-!.
+month_to_string(11,"Nov"):-!.
+month_to_string(12,"Dec"):-!.
+month_to_string(_,_):-
+	break('Error in month_to_string.').
+month_to_string(_,"").
+--
+size_to_string(Size,SS):-
+	SS== text_operations ? format("%d",?round(Size)).
+-----------------------------------------------------------------------
+write_Axis(S):-
+	--
+	analyzer ? get_absolute_depth_of_graph(MaxX),
+	analyzer ? get_real_absolute_height(MaxY),
+	analyzer ? get_absolute_width_of_graph(MaxZ),
+	--
+	analyzer ? get_base_depth_of_graph(MinX),
+	analyzer ? get_real_base_height(MinY),
+	analyzer ? get_base_width_of_graph(MinZ),
+	--
+	toolbox ? shift(S,0,"Shape{"),
+	toolbox ? shift(S,1,"geometry IndexedLineSet{"),
+	toolbox ? shift(S,2,"coord Coordinate{"),
+	toolbox ? shift(S,3,"point ["),
+	toolbox ? shift(S,4,"",MinX," ",MinY," ",MinZ,","),
+	toolbox ? shift(S,4,"",MaxX," ",MinY," ",MinZ,","),
+	toolbox ? shift(S,4,"",MinX," ",MaxY," ",MinZ,","),
+	toolbox ? shift(S,4,"",MinX," ",MinY," ",MaxZ,","),
+	toolbox ? shift(S,4,"",MaxX," ",MaxY," ",MinZ,","),
+	toolbox ? shift(S,4,"",MaxX," ",MinY," ",MaxZ,","),
+	toolbox ? shift(S,4,"",MinX," ",MaxY," ",MaxZ,""),
+	toolbox ? shift(S,3,"]"),
+	toolbox ? shift(S,2,"}"),
+	toolbox ? shift(S,2,"coordIndex ["),
+	toolbox ? shift(S,3,"0 1 -1 0 2 -1 0 3 -1"),
+	toolbox ? shift(S,3,"2 6 -1 3 6 -1 2 4 -1"),
+	toolbox ? shift(S,3,"1 4 -1 3 5 -1 1 5 -1"),
+	toolbox ? shift(S,2,"]"),
+	toolbox ? shift(S,1,"}"),
+	toolbox ? shift(S,1,"appearance Appearance{"),
+	toolbox ? shift(S,2,"material Material{"),
+	write_SystemColor(S),
+	toolbox ? shift(S,2,"}"),
+	toolbox ? shift(S,1,"}"),
+	toolbox ? shift(S,0,"}"),
+	fail.
+write_Axis(S):-
+	--
+	analyzer ? get_base_depth_of_graph(MinX),
+	analyzer ? get_real_absolute_height(MaxY),
+	analyzer ? get_base_width_of_graph(MinZ),
+	--
+	toolbox ? shift(S,0,"Transform{"),
+	toolbox ? shift(S,1,"translation ",MinX," ",MaxY," ",MinZ),
+	toolbox ? shift(S,1,"children["),
+	toolbox ? shift(S,2,"Shape{"),
+	toolbox ? shift(S,3,"geometry Text{"),
+	toolbox ? shift(S,4,"string [\"Size\"]"),
+	toolbox ? shift(S,4,"fontStyle FontStyle{"),
+	toolbox ? shift(S,5,"family \"SANS\""),
+	toolbox ? shift(S,5,"size 0.5"),
+	toolbox ? shift(S,4,"}"),
+	toolbox ? shift(S,3,"}"),
+	toolbox ? shift(S,2,"}"),
+	toolbox ? shift(S,1,"]"),
+	toolbox ? shift(S,0,"}"),
+	--
+	fail.
+write_Axis(S):-
+	--
+	analyzer ? get_absolute_depth_of_graph(MaxX),
+	analyzer ? get_real_base_height(MinY),
+	analyzer ? get_base_width_of_graph(MinZ),
+	--
+	toolbox ? shift(S,0,"Transform{"),
+	toolbox ? shift(S,1,"translation ",MaxX," ",MinY," ",MinZ),
+	toolbox ? shift(S,1,"children["),
+	toolbox ? shift(S,2,"Shape{"),
+	toolbox ? shift(S,3,"geometry Text{"),
+	toolbox ? shift(S,4,"string [\"Date\"]"),
+	toolbox ? shift(S,4,"fontStyle FontStyle{"),
+	toolbox ? shift(S,5,"family \"SANS\""),
+	toolbox ? shift(S,5,"size 0.5"),
+	toolbox ? shift(S,4,"}"),
+	toolbox ? shift(S,3,"}"),
+	toolbox ? shift(S,2,"}"),
+	toolbox ? shift(S,1,"]"),
+	toolbox ? shift(S,0,"}"),
+	--
+	fail.
+write_Axis(S):-
+	--
+	analyzer ? get_selected_keyword(Keyword),
+	analyzer ? get_base_width_of_graph(MinZ),
+	calculate_size_of_text(Keyword,Size),
+	--
+	toolbox ? shift(S,0,"Transform{"),
+	toolbox ? shift(S,1,"translation 0 0 ",MinZ,""),
+	toolbox ? shift(S,1,"children["),
+	toolbox ? shift(S,2,"Shape{"),
+	toolbox ? shift(S,3,"geometry Text{"),
+	F1== text_operations ? format("string [\"%s\"]",Keyword),
+	toolbox ? shift(S,4,F1),
+	toolbox ? shift(S,4,"fontStyle FontStyle{"),
+	toolbox ? shift(S,5,"family \"SANS\""),
+	toolbox ? shift(S,5,"size ",Size,""),
+	toolbox ? shift(S,5,"justify \"MIDDLE\""),
+	toolbox ? shift(S,4,"}"),
+	toolbox ? shift(S,3,"}"),
+	toolbox ? shift(S,2,"}"),
+	toolbox ? shift(S,1,"]"),
+	toolbox ? shift(S,0,"}"),
+	--
+	fail.
+write_Axis(S):-
+	--
+	analyzer ? get_absolute_depth_of_graph(MaxX),
+	analyzer ? get_real_absolute_height(MaxY),
+	analyzer ? get_absolute_width_of_graph(MaxZ),
+	--
+	analyzer ? get_base_depth_of_graph(MinX),
+	analyzer ? get_real_base_height(MinY),
+	analyzer ? get_base_width_of_graph(MinZ),
+	--
+	toolbox ? shift(S,0,"Shape{"),
+	toolbox ? shift(S,1,"geometry IndexedFaceSet{"),
+	toolbox ? shift(S,2,"coord Coordinate{"),
+	toolbox ? shift(S,3,"point ["),
+	toolbox ? shift(S,4,"",MinX," ",MinY," ",MinZ,","),
+	toolbox ? shift(S,4,"",MaxX," ",MinY," ",MinZ,","),
+	toolbox ? shift(S,4,"",MinX," ",MaxY," ",MinZ,","),
+	toolbox ? shift(S,4,"",MinX," ",MinY," ",MaxZ,","),
+	toolbox ? shift(S,4,"",MaxX," ",MaxY," ",MinZ,","),
+	toolbox ? shift(S,4,"",MaxX," ",MinY," ",MaxZ,","),
+	toolbox ? shift(S,4,"",MinX," ",MaxY," ",MaxZ,""),
+	toolbox ? shift(S,4,"",MaxX," ",MaxY," ",MaxZ,""),
+	toolbox ? shift(S,3,"]"),
+	toolbox ? shift(S,2,"}"),
+	toolbox ? shift(S,2,"coordIndex ["),
+	toolbox ? shift(S,3,"0 1 4 2 -1"),
+	toolbox ? shift(S,3,"0 2 6 3 -1"),
+	toolbox ? shift(S,3,"0 3 5 1 -1"),
+	write_front_planes_if_need(S),
+	toolbox ? shift(S,2,"]"),
+	toolbox ? shift(S,1,"}"),
+	toolbox ? shift(S,1,"appearance Appearance{"),
+	toolbox ? shift(S,2,"material Material{"),
+	toolbox ? shift(S,3,"diffuseColor 0 0 0"),
+	toolbox ? shift(S,3,"emissiveColor 0 0 0"),
+	toolbox ? shift(S,3,"transparency 1"),
+	toolbox ? shift(S,2,"}"),
+	toolbox ? shift(S,1,"}"),
+	toolbox ? shift(S,0,"}"),
+	--
+	fail.
+write_Axis(_).
+--
+write_SystemColor(S):-
+	mode ? use_LightPanel,!,
+	toolbox ? shift(S,3,"emissiveColor 0 0 0").
+write_SystemColor(S):-
+	toolbox ? shift(S,3,"emissiveColor 1 1 1").
+--
+calculate_size_of_text(Keyword,0.8):-
+	Length== text_operations ? length(?cast("STRING",Keyword)),
+	Length < 12,!.
+calculate_size_of_text(_,0.5).
+--
+write_front_planes_if_need(S):-
+	mode ? draw_front_planes,!,
+	toolbox ? shift(S,1,"7 6 2 4 -1"),
+	toolbox ? shift(S,1,"7 4 1 5 -1"),
+	toolbox ? shift(S,1,"7 5 3 6 -1").
+write_front_planes_if_need(_).
+-----------------------------------------------------------------------
+write_VBox(S1,Name,Address,X1,Z1,Height,Description,Value,Hue):-
+	--
+	analyzer ? get_real_width_of_item(Width1),
+	analyzer ? get_base_depth_of_graph(BaseDepth),
+	analyzer ? get_base_width_of_graph(BaseWidth),
+	--
+	/* 2010.12.17
+	X2== BaseDepth + ?round(?cast("REAL",X1) * 100.0) / 100,
+	X2== BaseDepth + ?round(?convert_to_real(X1) * 100.0) / 100,
+	*/
+	X2== BaseDepth + ?round(X1 * 100.0) / 100,
+	analyzer ? get_real_base_height(Y2),
+	Z2== BaseWidth + ?round(Z1 * 100.0) / 100,
+	--
+	toolbox ? shift(S1,0,"Transform{"),
+	toolbox ? shift(S1,1,"translation ",X2," ",Y2," ",Z2,""),
+	toolbox ? shift(S1,1,"children["),
+	--
+	toolbox ? shift(S1,2,"Anchor{"),
+	toolbox ? shift(S1,3,"children["),
+	--
+	S2== S1 + 4,
+	toolbox ? write_shape_of_VBox(
+		S2,Name,Width1,Height,Value,Hue),
+	check_type_of_scene(UseWhiteLabels),
+	toolbox ? write_title_of_VBox(
+		S2,Name,Width1,Height,UseWhiteLabels),
+	--
+	toolbox ? shift(S1,3,"]"),
+	--
+	toolbox ? shift(S1,3,Description),
+	toolbox ? shift(S1,3,"url ["),
+	--
+	make_URL(Name,Address,URL),
+	--
+	toolbox ? shift(S1,4,URL),
+	toolbox ? shift(S1,3,"]"),
+	toolbox ? shift(S1,2,"}"),
+	--
+	toolbox ? shift(S1,1,"]"),
+	toolbox ? shift(S1,0,"}").
+--
+check_type_of_scene('yes'):-
+	analyzer ? is_selected_keyword_scene,!.
+check_type_of_scene('no').
+--
+make_URL(_,Address,URL):-
+	analyzer ? is_general_keyword_scene,!,
+	URL== text_operations ? format("\"%s\"",Address).
+make_URL(Name,_,URL):-
+	name_operations ? make_short_name(6,?cast("STRING",Name),IFN1),
+	IFN2== "../i_" + text_operations ? lower(IFN1) + ".html",
+	URL== text_operations ? format("\"%s\"",IFN2).
+-----------------------------------------------------------------------
+register_viewpoint_position(Name,X1,Z1,Height):-
+	mode ? use_flying_camera,!,
+	analyzer ? get_real_width_of_item(Width),
+	analyzer ? get_real_base_height(BaseHeight),
+	analyzer ? get_base_depth_of_graph(BaseDepth),
+	analyzer ? get_base_width_of_graph(BaseWidth),
+	/* 2010.12.17
+	X2== ?round(?cast("REAL",(BaseDepth+X1)*100.0))/100.0,
+	*/
+	X2== ?round((BaseDepth+X1)*100.0)/100.0,
+	Y2== ?round((BaseHeight+Height+Width)*100.0)/100.0,
+	Z2== ?round((BaseWidth+Z1)*100.0)/100.0,
+	path ? add_viewpoint_position(Name,X2,Y2,Z2).
+register_viewpoint_position(_,_,_,_).
+]
+-----------------------------------------------------------------------
+class 'TargetFilesDatabase' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------
+class 'TargetFile' (specialized 'File'):
+--
+variable:
+--
+	name;
+--
+[
+]
+-----------------------------------------------------------------------

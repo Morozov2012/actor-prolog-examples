@@ -1,0 +1,76 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+--                                                                   --
+-- This is a demonstration of using the keyboard for interaction     --
+-- in a Java 3D scene.                                               --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Java3D";
+
+class 'Main' (specialized 'Canvas3D'):
+--
+constant:
+--
+	y	= 0;
+	height	= 22;
+--
+internal:
+--
+angle	= ('Counter');
+--
+con	= ('Console',
+		y= 22,
+		height= 3);
+--
+[
+goal:-!,
+	show([
+		'TransformGroup'({
+			allowTransformWrite: 'yes',
+			allowTransformRead: 'yes',
+			branches: [
+				'ColorCube'({
+					scale: 0.4
+					}),
+				'CustomizedBehavior'({
+					name: "UserInput",
+					wakeupOn: 'KEY_PRESSED',
+					schedulingBounds: 'BoundingSphere'({})
+					})
+				],
+			label: "TargetObject"
+			})
+		]),
+	con ? writeln(	"Double click on the cube and strike "
+			"any key to rotate it.").
+--
+action("UserInput"):-!,
+	Angle== angle ? increase(),
+	set_transform("TargetObject",'Transform3D'({rotY:Angle})).
+]
+
+class 'Counter' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	= Angle.
+--
+PREDICATES:
+--
+imperative:
+--
+increase = Target;
+--
+'+'(Angle,Angle) = Angle	- (i,i);
+--
+CLAUSES:
+--
+increase() = V2 :-
+	retract(V1),!,
+	V2== V1 + 0.1,
+	insert(V2).
+increase() = V2 :-
+	V2== 0.1,
+	insert(V2).
+]

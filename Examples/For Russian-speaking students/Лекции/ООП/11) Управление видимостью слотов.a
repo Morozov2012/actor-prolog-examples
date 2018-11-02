@@ -1,0 +1,25 @@
+
+project: (('Main',
+		x=100))
+
+interface 'Main' (specialized 'Alpha'):
+--
+-- visible:
+-- private:
+--
+x	: INTEGER;
+--
+private:
+--
+y	: REAL;
+--
+[
+]
+
+class 'Main' (specialized 'Alpha'):
+--
+x	= 1;
+y	= 3.14;
+--
+[
+]

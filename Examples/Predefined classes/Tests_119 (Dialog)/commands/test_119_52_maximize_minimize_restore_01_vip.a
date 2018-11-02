@@ -1,0 +1,48 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support these operations.
+--
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	dialog	= ('MyDialog');
+	con	= ('Console');
+--
+[
+goal:-!,
+	set_period(1.5),
+	activate.
+--
+tick:-
+	dialog ? is_minimized(),!,
+	con ? writeln("I will maximize the dialog box."),
+	dialog ? maximize.
+tick:-
+	dialog ? is_maximized(),!,
+	con ? writeln("I will restore the dialog box."),
+	dialog ? restore.
+tick:-
+	dialog ? is_restored(),!,
+	con ? writeln("I will minimize the dialog box."),
+	dialog ? minimize.
+tick:-!,
+	con ? writeln("The dialog box is created.").
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+[
+goal:-!,
+	show.
+--
+action("action1"):-!,
+	maximize.
+action("action2"):-!,
+	minimize.
+action("action3"):-!,
+	restore.
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,1773 @@
+KIT ;
+  IDL VERSION 1.2.8 ;
+  TITLE 'JAM-MAKING' ;
+  AUTHOR 'Alexei A. Morozov' ;
+  CREATION DATE 19/3/1999 ;
+  PROJECT NAME 'Actor Prolog' ;
+
+  MODEL 'JAM-MAKING'
+    {LWI
+    F 0 -13 0 0 0 400
+      0 0 0 204 3 2 1 18
+      100 'Times New Roman'
+    F 1 -24 0 0 0 400
+      0 0 0 204 3 2 1 18
+      180 'Times New Roman'
+    F 2 -16 0 0 0 400
+      0 0 0 204 3 2 1 18
+      120 'Times New Roman'
+    F 3 -13 0 900 900 400
+      0 0 0 204 3 2 1 18
+      100 'Times New Roman'
+    F 4 -11 0 0 0 400
+      0 0 0 0 3 2 1 49
+      80 'Courier New'
+    D 0 0 0 0 0 1 0 0 4
+    G 0 1
+    T 'PUBLICATION'
+    R 60
+    M 0  }
+ ;
+    AUTHOR 'Alexei A. Morozov' ;
+    PROJECT NAME 'Actor Prolog' ;
+
+    DIAGRAM GRAPHIC A-0 ;
+      AUTHOR 'Alexei A. Morozov' ;
+      CREATION DATE 19/3/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'JAM-MAKING' ;
+      STATUS PUBLICATION ;
+
+      BOX 0 ;
+        NAME '{LWI I 0 255 255 255}JAM-MAKING' ;
+        BOX COORDINATES (0,33173;0,65831) (0,66346;0,32915) ;
+        DETAIL REFERENCE N A0 ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER ;
+        PATH (0,01923;0,37618) (0,33173;0,37618) ;
+        LABEL '{LWI I 0 255 255 }Berries and fruits' ;
+        LABEL COORDINATES (0,02019;0,37304) ;
+        SINK BOX 0I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER ;
+        PATH (0,01923;0,45455) (0,33173;0,45455) ;
+        LABEL '{LWI I 0 255 255 }Sugar' ;
+        LABEL COORDINATES (0,02115;0,45141) ;
+        SINK BOX 0I2 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER ;
+        PATH (0,01923;0,53292) (0,33173;0,53292) ;
+        LABEL '{LWI I 0 255 255 }Drinking water' ;
+        LABEL COORDINATES (0,02019;0,52978) ;
+        SINK BOX 0I3 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BORDER ;
+        PATH (0,01923;0,61129) (0,33173;0,61129) ;
+        LABEL '{LWI I 0 255 255 }Jam-jars and lids' ;
+        LABEL COORDINATES (0,02115;0,60815) ;
+        SINK BOX 0I4 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BORDER ;
+        PATH (0,11058;0,96395) (0,11058;0,76803) (0,36538;0,76803) (0,36538;0,
+65831) ;
+        LABEL '{LWI I 0 255 255 }Source of running water<CR>(advisably)' ;
+        LABEL COORDINATES (0,02115;0,73041) ;
+        SINK BOX 0M1 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BORDER ;
+        PATH (0,22115;0,96395) (0,22115;0,83856) (0,43269;0,83856) (0,43269;0,
+65831) ;
+        LABEL '{LWI I 0 255 255 }Cooking battery' ;
+        LABEL COORDINATES (0,22500;0,83542) ;
+        SINK TUNNEL  {LWI Q}BOX 0M2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BORDER ;
+        PATH (0,41346;0,03135) (0,41346;0,32915) ;
+        LABEL '{LWI I 0 255 255 }Jam-making<CR>regulations' ;
+        LABEL COORDINATES (0,25192;0,16144) ;
+        SINK TUNNEL  {LWI Q}BOX 0C1 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BORDER ;
+        PATH (0,50000;0,96395) (0,50000;0,65831) ;
+        LABEL '{LWI I 0 255 255 }Gas-stove or electric range' ;
+        LABEL COORDINATES (0,24904;0,96082) ;
+        SINK BOX 0M3 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BORDER ;
+        PATH (0,56731;0,96395) (0,56731;0,65831) ;
+        LABEL '{LWI I 0 255 255 }Baking soda' ;
+        LABEL COORDINATES (0,61250;0,96238) ;
+        SINK BOX 0M4 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BORDER ;
+        PATH (0,57692;0,03135) (0,57692;0,32915) ;
+        LABEL '{LWI I 0 255 255 }Safety measures' ;
+        LABEL COORDINATES (0,62404;0,16144) ;
+        SINK TUNNEL  {LWI Q}BOX 0C2 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BORDER ;
+        PATH (0,84135;0,96395) (0,84135;0,81505) (0,63462;0,81505) (0,63462;0,
+65831) ;
+        LABEL '{LWI I 0 255 255 }Canning equipment (optional)' ;
+        LABEL COORDINATES (0,66442;0,76646) ;
+        SINK BOX 0M5 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 0O1 ;
+        PATH (0,66346;0,49373) (0,97596;0,49373) ;
+        LABEL '{LWI I 0 255 255 }Jam in jars' ;
+        LABEL COORDINATES (0,74519;0,49060) ;
+        SINK BORDER ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A0 ;
+      AUTHOR 'Alexei A. Morozov' ;
+      CREATION DATE 19/3/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'JAM-MAKING' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Choose<CR>berries and<CR>fruits' ;
+        BOX COORDINATES (0,11538;0,16458) (0,20192;0,07053)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Sterilize<CR>jars and<CR>lids' ;
+        BOX COORDINATES (0,18269;0,56426) (0,26923;0,47022) ;
+        DETAIL REFERENCE N A2 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Prepare<CR>berries and<CR>fruits' ;
+        BOX COORDINATES (0,30288;0,32132) (0,38942;0,22727) ;
+        DETAIL REFERENCE N A3 ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Boil berries and<CR>fruits with sugar<CR><C
+R>#XOR BLOCK#' ;
+        BOX COORDINATES (0,44712;0,50157) (0,57212;0,34483) ;
+        DETAIL REFERENCE N A4 ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 0 255 255 255}Cool jam' ;
+        BOX COORDINATES (0,62019;0,66614) (0,72596;0,54075)  ;
+      ENDBOX ;
+
+      BOX 6 ;
+        NAME '{LWI I 2 255 255 255}Analysis of model:<CR><CR>What kitchen<CR>u
+tensils are we<CR>need?' ;
+        BOX COORDINATES (0,72115;0,22727) (0,88462;0,03918)  ;
+      ENDBOX ;
+
+      BOX 7 ;
+        NAME '{LWI I 0 255 255 255}Pour jam<CR>into jars' ;
+        BOX COORDINATES (0,81250;0,84639) (0,90865;0,70533)  ;
+      ENDBOX ;
+
+      ARROWSEG 16 ;
+        SOURCE BORDER I1 (0,00481;0,12539) ;
+        PATH (0,01923;0,11755) (0,11538;0,11755) ;
+        LABEL '{LWI I 0 255 255 }Berries and<CR>fruits' ;
+        LABEL COORDINATES (0,01635;0,07680) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 20 ;
+        SOURCE BORDER I2 (0,00481;0,28213) ;
+        PATH (0,01923;0,27429) (0,30288;0,27429) ;
+        LABEL '{LWI I 0 255 255 }Sugar' ;
+        LABEL COORDINATES (0,01635;0,26489) ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BORDER I3 (0,00481;0,40752) ;
+        PATH (0,01923;0,39969) (0,12981;0,39969) ;
+        LABEL '{LWI I 0 255 255 }Drinking<CR>water' ;
+        LABEL COORDINATES (0,01635;0,36050) ;
+        SINK BRANCH 18 19 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BORDER I4 (0,00481;0,54075) ;
+        PATH (0,01923;0,53292) (0,18269;0,53292) ;
+        LABEL '{LWI I 0 255 255 }Jam-jars and lids' ;
+        LABEL COORDINATES (0,01635;0,51881) ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BORDER M4 (0,18750;0,98433) ;
+        PATH (0,19712;0,96395) (0,19712;0,56426) ;
+        LABEL '{LWI I 0 255 255 }Baking<CR>soda' ;
+        LABEL COORDINATES (0,11731;0,93103) ;
+        SQUIGGLE COORDINATES (0,17500;0,93260) (0,19712;0,90125) ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BORDER M3 (0,31731;0,98433) ;
+        PATH (0,32692;0,96395) (0,32692;0,71317) ;
+        LABEL '{LWI I 0 255 255 }Gas-stove or electric<CR>range' ;
+        LABEL COORDINATES (0,22788;0,93103) ;
+        SQUIGGLE COORDINATES (0,29712;0,94044) (0,32692;0,92476) ;
+        SINK BRANCH 9 8 13 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M1 (0,35577;0,98433) ;
+        PATH (0,36538;0,96395) (0,36538;0,82288) ;
+        LABEL '{LWI I 0 255 255 }Source of running water<CR>(advisably)' ;
+        LABEL COORDINATES (0,39327;0,93417) ;
+        SQUIGGLE COORDINATES (0,39327;0,94514) (0,36538;0,90125) ;
+        SINK BRANCH 2 3 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BORDER M5 (0,85096;0,98433) ;
+        PATH (0,86058;0,96395) (0,86058;0,84639) ;
+        LABEL '{LWI I 0 255 255 }Canning equipment (optional)' ;
+        LABEL COORDINATES (0,68077;0,92476) ;
+        SQUIGGLE COORDINATES (0,83462;0,91379) (0,86058;0,90909) ;
+        SINK BOX 7M1 ;
+      ENDSEG ;
+
+      ARROWSEG 17 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,20192;0,11755) (0,25962;0,11755) (0,25962;0,24295) (0,30288;0,
+24295) ;
+        LABEL '{LWI I 0 255 255 }Hand-picked berries and<CR>fruits' ;
+        LABEL COORDINATES (0,27500;0,09248) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 15 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,38942;0,27429) (0,43269;0,27429) (0,43269;0,42320) (0,44712;0,
+42320) ;
+        LABEL '{LWI I 0 255 255 }Sugar mixture' ;
+        LABEL COORDINATES (0,44423;0,24922) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 14 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,57212;0,42320) (0,59615;0,42320) (0,59615;0,60345) ;
+        LABEL '{LWI I 0 255 255 }Ready (hot)<CR>jam' ;
+        LABEL COORDINATES (0,61346;0,40596) ;
+        SINK BRANCH 21 22 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,26923;0,51724) (0,40385;0,51724) (0,40385;0,80721) (0,81250;0,
+80721) ;
+        LABEL '{LWI I 0 255 255 }Sterile jars and lids' ;
+        LABEL COORDINATES (0,47981;0,79310) ;
+        SINK BOX 7I2 ;
+      ENDSEG ;
+
+      ARROWSEG 24 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,72596;0,60345) (0,75000;0,60345) (0,75000;0,75235) ;
+        LABEL '{LWI I 0 255 255 }Cooled jam' ;
+        LABEL COORDINATES (0,76154;0,59404) ;
+        SINK JOIN 23 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BOX 7O1 ;
+        PATH (0,90865;0,77586) (0,97596;0,77586) ;
+        LABEL '{LWI I 0 255 255 }Jam in<CR>jars' ;
+        LABEL COORDINATES (0,93269;0,73041) ;
+        SINK BORDER O1 (0,97885;0,78370) ;
+      ENDSEG ;
+
+      ARROWSEG 22 ;
+        SOURCE BRANCH 14 ;
+        PATH (0,59615;0,60345) (0,62019;0,60345) ;
+        LABEL 'Cooled jam' ;
+        SINK BOX 5I1 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,32692;0,71317) (0,50962;0,71317) (0,50962;0,50157) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 4M1 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,32692;0,71317) (0,25481;0,71317) (0,25481;0,56426) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 2M3 ;
+      ENDSEG ;
+
+      ARROWSEG 23 ;
+        SOURCE JOIN 21 24 ;
+        PATH (0,75000;0,75235) (0,81250;0,75235) ;
+        LABEL '{LWI I 0 255 255 }Ready<CR>jam' ;
+        LABEL COORDINATES (0,76346;0,70533) ;
+        SQUIGGLE COORDINATES (0,76346;0,70846) (0,77885;0,75235) ;
+        SINK BOX 7I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,36538;0,82288) (0,22596;0,82288) (0,22596;0,56426) ;
+        LABEL 'Source of running water (advisably)' ;
+        SINK BOX 2M2 ;
+      ENDSEG ;
+
+      ARROWSEG 18 ;
+        SOURCE BRANCH 11 ;
+        PATH (0,12981;0,39969) (0,12981;0,49373) (0,18269;0,49373) ;
+        LABEL 'Drinking water' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 19 ;
+        SOURCE BRANCH 11 ;
+        PATH (0,12981;0,39969) (0,12981;0,30564) (0,30288;0,30564) ;
+        LABEL 'Drinking water' ;
+        SINK BOX 3I3 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,32692;0,71317) (0,32692;0,32132) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 3M1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,36538;0,82288) (0,36538;0,32132) ;
+        LABEL 'Source of running water (advisably)' ;
+        SINK BOX 3M2 ;
+      ENDSEG ;
+
+      ARROWSEG 21 ;
+        SOURCE BRANCH 14 ;
+        PATH (0,59615;0,60345) (0,59615;0,75235) (0,75000;0,75235) ;
+        LABEL 'Cooled jam' ;
+        SINK JOIN 23 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A2 ;
+      CREATION DATE 19/3/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Sterilize jars and lids' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Wash up<CR>jars and lids' ;
+        BOX COORDINATES (0,12019;0,27429) (0,25000;0,13323)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Boil some water<CR>in a kettle' ;
+        BOX COORDINATES (0,28846;0,75235) (0,42308;0,61129)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Cleanse lids<CR>by boiling water' ;
+        BOX COORDINATES (0,43269;0,43887) (0,56250;0,29781)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Cleanse jam-jars<CR>by boiled water' ;
+        BOX COORDINATES (0,54327;0,64263) (0,67308;0,50157)  ;
+      ENDBOX ;
+
+      BOX 5 ;
+        NAME '{LWI I 0 255 255 255}Dry jam-jars<CR>and lids' ;
+        BOX COORDINATES (0,76923;0,83072) (0,89904;0,68966)  ;
+      ENDBOX ;
+
+      ARROWSEG 6 ;
+        SOURCE BORDER I2 (0,00481;0,21160) ;
+        PATH (0,01923;0,20376) (0,12019;0,20376) ;
+        LABEL '{LWI I 0 255 255 }Jam-jars and<CR>lids' ;
+        LABEL COORDINATES (0,01635;0,14577) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BORDER I1 (0,00481;0,40752) ;
+        PATH (0,01923;0,39969) (0,25000;0,39969) ;
+        LABEL '{LWI I 0 255 255 }Drinking water' ;
+        LABEL COORDINATES (0,01635;0,39185) ;
+        SINK BRANCH 4 16 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER M1 (0,14423;0,98433) ;
+        PATH (0,15385;0,96395) (0,15385;0,27429) ;
+        LABEL '{LWI I 0 255 255 }Baking<CR>soda' ;
+        LABEL COORDINATES (0,05673;0,93887) ;
+        SQUIGGLE COORDINATES (0,11442;0,92947) (0,15385;0,92476) ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 17 ;
+        SOURCE BORDER M2 (0,20673;0,98433) ;
+        PATH (0,21635;0,96395) (0,21635;0,27429) ;
+        LABEL '{LWI I 0 255 255 }Source of running water<CR>(advisably)' ;
+        LABEL COORDINATES (0,23558;0,93730) ;
+        SQUIGGLE COORDINATES (0,23558;0,92633) (0,21635;0,92476) ;
+        SINK BOX 1M2 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BORDER M3 (0,48558;0,98433) ;
+        PATH (0,49519;0,96395) (0,49519;0,83072) ;
+        LABEL '{LWI I 0 255 255 }Gas-stove or electric range' ;
+        LABEL COORDINATES (0,51250;0,93574) ;
+        SQUIGGLE COORDINATES (0,51250;0,92476) (0,49519;0,92476) ;
+        SINK BRANCH 1 7 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,25000;0,23511) (0,29327;0,23511) (0,29327;0,33699) ;
+        LABEL 'Washed lids' ;
+        SINK BRANCH 15 14 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,56250;0,36834) (0,73558;0,36834) (0,73558;0,72884) (0,76923;0,
+72884) ;
+        LABEL '{LWI I 0 255 255 }Sterile lids' ;
+        LABEL COORDINATES (0,68077;0,34483) ;
+        SINK BOX 5I1 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,67308;0,57210) (0,69712;0,57210) (0,69712;0,79154) (0,76923;0,
+79154) ;
+        LABEL '{LWI I 0 255 255 }Sterile jam-jars' ;
+        LABEL COORDINATES (0,63077;0,84953) ;
+        SQUIGGLE COORDINATES (0,69712;0,82602) (0,71635;0,79154) ;
+        SINK BOX 5I2 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,42308;0,68182) (0,60577;0,68182) (0,60577;0,64263) ;
+        LABEL '{LWI I 0 255 255 }Boiling water in the<CR>kettle' ;
+        LABEL COORDINATES (0,51538;0,76803) ;
+        SQUIGGLE COORDINATES (0,55769;0,74451) (0,58654;0,68182) ;
+        SINK BOX 4M1 ;
+      ENDSEG ;
+
+      ARROWSEG 18 ;
+        SOURCE BOX 5O1 ;
+        PATH (0,89904;0,76019) (0,97596;0,76019) ;
+        LABEL '{LWI I 0 255 255 }Sterile jars and lids' ;
+        LABEL COORDINATES (0,84231;0,65204) ;
+        SQUIGGLE COORDINATES (0,90962;0,65517) (0,92788;0,76019) ;
+        SINK BORDER O1 (0,97885;0,76803) ;
+      ENDSEG ;
+
+      ARROWSEG 14 ;
+        SOURCE BRANCH 9 ;
+        PATH (0,29327;0,33699) (0,43269;0,33699) ;
+        LABEL '{LWI I 0 255 255 }Washed lids' ;
+        LABEL COORDINATES (0,32981;0,29154) ;
+        SQUIGGLE COORDINATES (0,36154;0,29467) (0,35096;0,33699) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 13 ;
+        PATH (0,25000;0,39969) (0,43269;0,39969) ;
+        LABEL 'Drinking water' ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BRANCH 12 ;
+        PATH (0,49519;0,83072) (0,35577;0,83072) (0,35577;0,75235) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+      ARROWSEG 16 ;
+        SOURCE BRANCH 13 ;
+        PATH (0,25000;0,39969) (0,25000;0,68182) (0,28846;0,68182) ;
+        LABEL 'Drinking water' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 15 ;
+        SOURCE BRANCH 9 ;
+        PATH (0,29327;0,33699) (0,29327;0,57210) (0,54327;0,57210) ;
+        LABEL '{LWI I 0 255 255 }Washed jam-jars' ;
+        LABEL COORDINATES (0,31923;0,52508) ;
+        SQUIGGLE COORDINATES (0,36250;0,52821) (0,35577;0,57210) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BRANCH 12 ;
+        PATH (0,49519;0,83072) (0,49519;0,43887) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 3M1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A4 ;
+      CREATION DATE 19/3/1999 ;
+      REVISION DATE 27/1/2003 ;
+      TITLE 'Boil berries and fruits with sugar  #XOR BLOCK#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Boiling cycle for<CR>hard berries and fruit
+s' ;
+        BOX COORDINATES (0,27885;0,43103) (0,43269;0,24295) ;
+        DETAIL REFERENCE N A41 ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Boiling cycle for<CR>soft berries and fruit
+s' ;
+        BOX COORDINATES (0,58654;0,69749) (0,74038;0,50940) ;
+        DETAIL REFERENCE N A42 ;
+      ENDBOX ;
+
+      ARROWSEG 9 ;
+        SOURCE BORDER I1 (0,00481;0,34483) ;
+        PATH (0,01923;0,33699) (0,16346;0,33699) ;
+        LABEL '{LWI I 0 255 255 }Sugar mixture' ;
+        LABEL COORDINATES (0,02212;0,31191) ;
+        SINK BRANCH 3 4 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M1 (0,50000;0,98433) ;
+        PATH (0,50962;0,96395) (0,50962;0,83856) ;
+        LABEL '{LWI I 0 255 255 }Gas-stove or electric range' ;
+        LABEL COORDINATES (0,32115;0,95298) ;
+        SINK BRANCH 7 8 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,43269;0,33699) (0,83654;0,33699) (0,83654;0,59561) ;
+        LABEL 'Ready (hot) jam' ;
+        SINK JOIN 5 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,74038;0,59561) (0,83654;0,59561) ;
+        LABEL 'Ready (hot) jam' ;
+        SINK JOIN 5 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 9 ;
+        PATH (0,16346;0,33699) (0,27885;0,33699) ;
+        LABEL 'Sugar mixture' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE JOIN 2 6 ;
+        PATH (0,83654;0,59561) (0,97596;0,59561) ;
+        LABEL '{LWI I 0 255 255 }Ready (hot) jam' ;
+        LABEL COORDINATES (0,85096;0,55172) ;
+        SINK BORDER O1 (0,97885;0,60345) ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,50962;0,83856) (0,66346;0,83856) (0,66346;0,69749) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,50962;0,83856) (0,35577;0,83856) (0,35577;0,43103) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 9 ;
+        PATH (0,16346;0,33699) (0,16346;0,60345) (0,58654;0,60345) ;
+        LABEL 'Sugar mixture' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A41 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Boiling cycle for hard berries and fruits' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Heat the mixture' ;
+        BOX COORDINATES (0,16346;0,30564) (0,33654;0,14107)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Suspend the process' ;
+        BOX COORDINATES (0,50000;0,56426) (0,67308;0,39969)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Check if jam is ready<CR>[for hard berries 
+and fruits]' ;
+        BOX COORDINATES (0,60577;0,79937) (0,77885;0,63480)  ;
+      ENDBOX ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I1 (0,00481;0,26646) ;
+        PATH (0,01923;0,25862) (0,16346;0,25862) ;
+        LABEL '{LWI I 0 255 255 }Sugar mixture' ;
+        LABEL COORDINATES (0,02212;0,31191) ;
+        SINK BOX 1I2 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M1 (0,24038;0,98433) ;
+        PATH (0,25000;0,96395) (0,25000;0,30564) ;
+        LABEL '{LWI I 0 255 255 }Gas-stove or electric range' ;
+        LABEL COORDINATES (0,27404;0,94044) ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,33654;0,19592) (0,43750;0,19592) (0,43750;0,47806) (0,50000;0,
+47806) ;
+        LABEL '{LWI I 0 255 255 }Heated mixture (after<CR>the 1-st or the 2-nd
+<CR>heating)' ;
+        LABEL COORDINATES (0,46442;0,24765) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 1O2 ;
+        PATH (0,33654;0,25862) (0,37500;0,25862) (0,37500;0,71317) (0,60577;0,
+71317) ;
+        LABEL '{LWI I 0 255 255 }Heated mixture (after the 3-rd heating)' ;
+        LABEL COORDINATES (0,30481;0,80564) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,67308;0,47806) (0,87981;0,47806) ;
+        LABEL 'Cooled berries and fruits in syrup' ;
+        SINK JOIN 8 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,77885;0,68966) (0,87981;0,68966) (0,87981;0,47806) ;
+        LABEL 'Cooled berries and fruits in syrup' ;
+        SINK JOIN 8 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 3O2 ;
+        PATH (0,77885;0,75235) (0,97596;0,75235) ;
+        LABEL '{LWI I 0 255 255 }Ready (hot) jam' ;
+        LABEL COORDINATES (0,83462;0,84483) ;
+        SQUIGGLE COORDINATES (0,88077;0,82132) (0,86538;0,75235) ;
+        SINK BORDER O1 (0,97885;0,76019) ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE JOIN 9 6 ;
+        PATH (0,87981;0,47806) (0,87981;0,07837) (0,11538;0,07837) (0,11538;0,
+19592) (0,16346;0,19592) ;
+        LABEL '{LWI I 0 255 255 }Cooled berries and fruits in syrup' ;
+        LABEL COORDINATES (0,57308;0,05799) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A3 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Prepare berries and fruits' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Wash berries and fruits' ;
+        BOX COORDINATES (0,23077;0,42320) (0,46154;0,21160)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Prepare sugar mixture<CR>#XOR BLOCK#' ;
+        BOX COORDINATES (0,53846;0,72884) (0,76923;0,51724) ;
+        DETAIL REFERENCE N A32 ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER I1 (0,00481;0,32132) ;
+        PATH (0,01923;0,31348) (0,23077;0,31348) ;
+        LABEL '{LWI I 0 255 255 }Hand-picked berries<CR>and fruits' ;
+        LABEL COORDINATES (0,01635;0,26646) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BORDER I2 (0,00481;0,63480) ;
+        PATH (0,01923;0,62696) (0,53846;0,62696) ;
+        LABEL '{LWI I 0 255 255 }Sugar' ;
+        LABEL COORDINATES (0,01635;0,61755) ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BORDER I3 (0,00481;0,69749) ;
+        PATH (0,01923;0,68966) (0,53846;0,68966) ;
+        LABEL '{LWI I 0 255 255 }Drinking water' ;
+        LABEL COORDINATES (0,01635;0,68339) ;
+        SINK BOX 2I3 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M2 (0,33654;0,98433) ;
+        PATH (0,34615;0,96395) (0,34615;0,42320) ;
+        LABEL '{LWI I 0 255 255 }Source of running water<CR>(advisably)' ;
+        LABEL COORDINATES (0,37115;0,92947) ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BORDER M1 (0,64423;0,98433) ;
+        PATH (0,65385;0,96395) (0,65385;0,72884) ;
+        LABEL '{LWI I 0 255 255 }Gas-stove or electric range' ;
+        LABEL COORDINATES (0,68077;0,92633) ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,46154;0,31348) (0,50000;0,31348) (0,50000;0,56426) (0,53846;0,
+56426) ;
+        LABEL '{LWI I 0 255 255 }Clean berries and fruits' ;
+        LABEL COORDINATES (0,51827;0,29310) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,76923;0,61912) (0,97596;0,61912) ;
+        LABEL '{LWI I 0 255 255 }Sugar mixture' ;
+        LABEL COORDINATES (0,81923;0,60502) ;
+        SINK BORDER O1 (0,97885;0,62696) ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A32 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Prepare sugar mixture #XOR BLOCK#' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Prepare some mixture of<CR>hard berries and
+ sugar' ;
+        BOX COORDINATES (0,25481;0,32915) (0,42788;0,16458) ;
+        DETAIL REFERENCE N A321 ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Prepare some mixture<CR>of large fruits and
+ sugar' ;
+        BOX COORDINATES (0,42788;0,57210) (0,60096;0,40752) ;
+        DETAIL REFERENCE N A322 ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Prepare some mixture<CR>of soft berries and
+ sugar' ;
+        BOX COORDINATES (0,54327;0,79937) (0,71635;0,63480) ;
+        DETAIL REFERENCE N A323 ;
+      ENDBOX ;
+
+      ARROWSEG 2 ;
+        SOURCE BORDER I1 (0,00481;0,20376) ;
+        PATH (0,01923;0,19592) (0,19712;0,19592) ;
+        LABEL '{LWI I 0 255 255 }Clean berries and fruits' ;
+        LABEL COORDINATES (0,01827;0,18966) ;
+        SINK BRANCH 3 4 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BORDER I2 (0,00481;0,25862) ;
+        PATH (0,01923;0,25078) (0,14423;0,25078) ;
+        LABEL '{LWI I 0 255 255 }Sugar' ;
+        LABEL COORDINATES (0,01827;0,24451) ;
+        SINK BRANCH 15 14 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BORDER I3 (0,00481;0,31348) ;
+        PATH (0,01923;0,30564) (0,09615;0,30564) ;
+        LABEL '{LWI I 0 255 255 }Drinking water' ;
+        LABEL COORDINATES (0,01827;0,29937) ;
+        SINK BRANCH 18 19 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BORDER M1 (0,33173;0,98433) ;
+        PATH (0,34135;0,96395) (0,34135;0,32915) ;
+        LABEL '{LWI I 0 255 255 }Gas-stove or electric range' ;
+        LABEL COORDINATES (0,36442;0,94671) ;
+        SQUIGGLE COORDINATES (0,36442;0,94044) (0,34135;0,93260) ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,42788;0,24295) (0,75962;0,24295) (0,75962;0,48589) ;
+        LABEL 'Sugar mixture' ;
+        SINK JOIN 9 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,60096;0,48589) (0,75962;0,48589) ;
+        LABEL 'Sugar mixture' ;
+        SINK JOIN 9 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,71635;0,71317) (0,75962;0,71317) ;
+        LABEL 'Sugar mixture' ;
+        SINK JOIN 7 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,19712;0,19592) (0,25481;0,19592) ;
+        LABEL 'Clean berries and fruits' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 15 ;
+        SOURCE BRANCH 12 ;
+        PATH (0,14423;0,25078) (0,25481;0,25078) ;
+        LABEL 'Sugar' ;
+        SINK BOX 1I2 ;
+      ENDSEG ;
+
+      ARROWSEG 18 ;
+        SOURCE BRANCH 13 ;
+        PATH (0,09615;0,30564) (0,25481;0,30564) ;
+        LABEL 'Drinking water' ;
+        SINK BOX 1I3 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,19712;0,43887) (0,42788;0,43887) ;
+        LABEL 'Clean berries and fruits' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 16 ;
+        SOURCE BRANCH 14 ;
+        PATH (0,14423;0,49373) (0,42788;0,49373) ;
+        LABEL 'Sugar' ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE JOIN 1 9 ;
+        PATH (0,75962;0,71317) (0,97596;0,71317) ;
+        LABEL '{LWI I 0 255 255 }Sugar mixture' ;
+        LABEL COORDINATES (0,85577;0,70690) ;
+        SINK BORDER O1 (0,97885;0,72100) ;
+      ENDSEG ;
+
+      ARROWSEG 19 ;
+        SOURCE BRANCH 13 ;
+        PATH (0,09615;0,30564) (0,09615;0,54859) (0,42788;0,54859) ;
+        LABEL 'Drinking water' ;
+        SINK BOX 2I3 ;
+      ENDSEG ;
+
+      ARROWSEG 14 ;
+        SOURCE BRANCH 12 ;
+        PATH (0,14423;0,25078) (0,14423;0,49373) ;
+        LABEL 'Sugar' ;
+        SINK BRANCH 17 16 ;
+      ENDSEG ;
+
+      ARROWSEG 17 ;
+        SOURCE BRANCH 14 ;
+        PATH (0,14423;0,49373) (0,14423;0,75235) (0,54327;0,75235) ;
+        LABEL 'Sugar' ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,19712;0,43887) (0,19712;0,68182) (0,54327;0,68182) ;
+        LABEL 'Clean berries and fruits' ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BRANCH 2 ;
+        PATH (0,19712;0,19592) (0,19712;0,43887) ;
+        LABEL 'Clean berries and fruits' ;
+        SINK BRANCH 6 5 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE JOIN 10 8 ;
+        PATH (0,75962;0,48589) (0,75962;0,71317) ;
+        LABEL 'Sugar mixture' ;
+        SINK JOIN 7 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A321 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Prepare some mixture of hard berries and sugar' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Boil some water<CR>in the saucepan' ;
+        BOX COORDINATES (0,12981;0,28213) (0,25962;0,14107)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Prepare some syrup' ;
+        BOX COORDINATES (0,25000;0,72100) (0,37981;0,57994)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Blanch<CR>berries' ;
+        BOX COORDINATES (0,40865;0,47022) (0,53846;0,32915)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Put berries<CR>in syrup' ;
+        BOX COORDINATES (0,70673;0,79937) (0,83654;0,65831)  ;
+      ENDBOX ;
+
+      ARROWSEG 4 ;
+        SOURCE BORDER I3 (0,00481;0,21944) ;
+        PATH (0,01923;0,21160) (0,10096;0,21160) ;
+        LABEL '{LWI I 0 255 255 }Drinking water' ;
+        LABEL COORDINATES (0,01442;0,20533) ;
+        SINK BRANCH 9 10 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,43887) ;
+        PATH (0,01923;0,43103) (0,40865;0,43103) ;
+        LABEL '{LWI I 0 255 255 }Clean berries<CR>and fruits' ;
+        LABEL COORDINATES (0,01442;0,36834) ;
+        SINK BOX 3I2 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I2 (0,00481;0,68966) ;
+        PATH (0,01923;0,68182) (0,25000;0,68182) ;
+        LABEL '{LWI I 0 255 255 }Sugar' ;
+        LABEL COORDINATES (0,01442;0,66928) ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BORDER M1 (0,30288;0,98433) ;
+        PATH (0,31250;0,96395) (0,31250;0,83072) ;
+        LABEL '{LWI I 0 255 255 }Gas-stove or electric range' ;
+        LABEL COORDINATES (0,32500;0,94671) ;
+        SINK BRANCH 11 12 13 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,25962;0,21160) (0,32692;0,21160) (0,32692;0,36834) (0,40865;0,
+36834) ;
+        LABEL '{LWI I 0 255 255 }Boiling water' ;
+        LABEL COORDINATES (0,34519;0,20690) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,53846;0,39969) (0,62019;0,39969) (0,62019;0,69749) (0,70673;0,
+69749) ;
+        LABEL '{LWI I 0 255 255 }Warmed up<CR>berries' ;
+        LABEL COORDINATES (0,64423;0,54859) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,37981;0,65831) (0,53365;0,65831) (0,53365;0,76019) (0,70673;0,
+76019) ;
+        LABEL '{LWI I 0 255 255 }Syrup' ;
+        LABEL COORDINATES (0,54615;0,65831) ;
+        SINK BOX 4I2 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,83654;0,72884) (0,97596;0,72884) ;
+        LABEL '{LWI I 0 255 255 }Sugar mixture' ;
+        LABEL COORDINATES (0,86442;0,71787) ;
+        SINK BORDER O1 (0,97885;0,73668) ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,10096;0,21160) (0,12981;0,21160) ;
+        LABEL 'Drinking water' ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 12 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,31250;0,83072) (0,19231;0,83072) (0,19231;0,28213) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 13 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,31250;0,83072) (0,47115;0,83072) (0,47115;0,47022) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 3M1 ;
+      ENDSEG ;
+
+      ARROWSEG 10 ;
+        SOURCE BRANCH 4 ;
+        PATH (0,10096;0,21160) (0,10096;0,61912) (0,25000;0,61912) ;
+        LABEL 'Drinking water' ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 11 ;
+        SOURCE BRANCH 5 ;
+        PATH (0,31250;0,83072) (0,31250;0,72100) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 2M1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A322 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Prepare some mixture of large fruits and sugar' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Cut fruits into lobules' ;
+        BOX COORDINATES (0,12981;0,28213) (0,25962;0,14107)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Sprinkle with sugar<CR>[for large fruits]' 
+;
+        BOX COORDINATES (0,30288;0,46238) (0,43269;0,32132)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Suspend the process<CR>for 6-8 hours<CR>[fo
+r large fruits]' ;
+        BOX COORDINATES (0,48558;0,67398) (0,64423;0,50157)  ;
+      ENDBOX ;
+
+      BOX 4 ;
+        NAME '{LWI I 0 255 255 255}Add some water<CR>in the mixture' ;
+        BOX COORDINATES (0,69231;0,84639) (0,82212;0,70533)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,21944) ;
+        PATH (0,01923;0,21160) (0,12981;0,21160) ;
+        LABEL '{LWI I 0 255 255 }Clean berries and<CR>fruits' ;
+        LABEL COORDINATES (0,01635;0,16928) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I2 (0,00481;0,43103) ;
+        PATH (0,01923;0,42320) (0,30288;0,42320) ;
+        LABEL '{LWI I 0 255 255 }Sugar' ;
+        LABEL COORDINATES (0,01538;0,39969) ;
+        SINK BOX 2I2 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BORDER I3 (0,00481;0,81505) ;
+        PATH (0,01923;0,80721) (0,69231;0,80721) ;
+        LABEL '{LWI I 0 255 255 }Drinking water' ;
+        LABEL COORDINATES (0,01538;0,78370) ;
+        SINK BOX 4I2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,25962;0,21160) (0,28365;0,21160) (0,28365;0,36050) (0,30288;0,
+36050) ;
+        LABEL '{LWI I 0 255 255 }Cut fruits' ;
+        LABEL COORDINATES (0,30096;0,19592) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,43269;0,39185) (0,45673;0,39185) (0,45673;0,58777) (0,48558;0,
+58777) ;
+        LABEL '{LWI I 0 255 255 }Cut fruits with sugar' ;
+        LABEL COORDINATES (0,47500;0,38088) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,64423;0,58777) (0,66346;0,58777) (0,66346;0,74451) (0,69231;0,
+74451) ;
+        LABEL '{LWI I 0 255 255 }Fruits yielding juice' ;
+        LABEL COORDINATES (0,68173;0,57524) ;
+        SINK BOX 4I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 4O1 ;
+        PATH (0,82212;0,77586) (0,97596;0,77586) ;
+        LABEL '{LWI I 0 255 255 }Sugar mixture' ;
+        LABEL COORDINATES (0,86154;0,76019) ;
+        SINK BORDER O1 (0,97885;0,78370) ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A323 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Prepare some mixture of soft berries and sugar' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Sprinkle with sugar<CR>[for soft berries]' 
+;
+        BOX COORDINATES (0,20192;0,41536) (0,41346;0,20376)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Suspend the process<CR>for 6-8 hours<CR>[fo
+r soft berries]' ;
+        BOX COORDINATES (0,57692;0,72884) (0,80769;0,51724)  ;
+      ENDBOX ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER I1 (0,00481;0,26646) ;
+        PATH (0,01923;0,25862) (0,20192;0,25862) ;
+        LABEL '{LWI I 0 255 255 }Clean berries<CR>and fruits' ;
+        LABEL COORDINATES (0,02019;0,19592) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I2 (0,00481;0,36834) ;
+        PATH (0,01923;0,36050) (0,20192;0,36050) ;
+        LABEL '{LWI I 0 255 255 }Sugar' ;
+        LABEL COORDINATES (0,02019;0,33856) ;
+        SINK BOX 1I2 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,41346;0,30564) (0,49519;0,30564) (0,49519;0,61912) (0,57692;0,
+61912) ;
+        LABEL '{LWI I 0 255 255 }Berries with sugar' ;
+        LABEL COORDINATES (0,49904;0,27116) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,80769;0,61912) (0,97596;0,61912) ;
+        LABEL '{LWI I 0 255 255 }Sugar mixture' ;
+        LABEL COORDINATES (0,82788;0,57053) ;
+        SINK BORDER O1 (0,97885;0,62696) ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GRAPHIC A42 ;
+      CREATION DATE 2/4/1999 ;
+      REVISION DATE 28/1/2003 ;
+      TITLE 'Boiling cycle for soft berries and fruits' ;
+      STATUS PUBLICATION ;
+
+      BOX 1 ;
+        NAME '{LWI I 0 255 255 255}Main phase<CR>of boiling' ;
+        BOX COORDINATES (0,15385;0,32915) (0,32692;0,16458)  ;
+      ENDBOX ;
+
+      BOX 2 ;
+        NAME '{LWI I 0 255 255 255}Check if jam<CR>is ready<CR>[for soft berri
+es]' ;
+        BOX COORDINATES (0,39423;0,53292) (0,56731;0,36834)  ;
+      ENDBOX ;
+
+      BOX 3 ;
+        NAME '{LWI I 0 255 255 255}Supplementary phase<CR>of boiling' ;
+        BOX COORDINATES (0,64423;0,77586) (0,81731;0,61129)  ;
+      ENDBOX ;
+
+      ARROWSEG 3 ;
+        SOURCE BORDER I1 (0,00481;0,25078) ;
+        PATH (0,01923;0,24295) (0,15385;0,24295) ;
+        LABEL '{LWI I 0 255 255 }Sugar mixture' ;
+        LABEL COORDINATES (0,01923;0,20846) ;
+        SINK BOX 1I1 ;
+      ENDSEG ;
+
+      ARROWSEG 1 ;
+        SOURCE BORDER M1 (0,46154;0,98433) ;
+        PATH (0,47115;0,96395) (0,47115;0,87774) ;
+        LABEL '{LWI I 0 255 255 }Gas-stove or electric range' ;
+        LABEL COORDINATES (0,48654;0,95141) ;
+        SINK BRANCH 8 9 ;
+      ENDSEG ;
+
+      ARROWSEG 4 ;
+        SOURCE BOX 1O1 ;
+        PATH (0,32692;0,24295) (0,35577;0,24295) (0,35577;0,44671) (0,39423;0,
+44671) ;
+        LABEL '{LWI I 0 255 255 }Heated berries and<CR>fruits with<CR>sugar' ;
+
+        LABEL COORDINATES (0,38077;0,20846) ;
+        SINK BOX 2I1 ;
+      ENDSEG ;
+
+      ARROWSEG 7 ;
+        SOURCE BOX 2O1 ;
+        PATH (0,56731;0,43103) (0,85577;0,43103) (0,85577;0,68966) ;
+        LABEL 'Ready (hot) jam' ;
+        SINK JOIN 6 ;
+      ENDSEG ;
+
+      ARROWSEG 5 ;
+        SOURCE BOX 2O2 ;
+        PATH (0,56731;0,48589) (0,61058;0,48589) (0,61058;0,68966) (0,64423;0,
+68966) ;
+        LABEL '{LWI I 0 255 255 }Heated berries and fruits<CR>with sugar' ;
+        LABEL COORDINATES (0,62788;0,55172) ;
+        SINK BOX 3I1 ;
+      ENDSEG ;
+
+      ARROWSEG 2 ;
+        SOURCE BOX 3O1 ;
+        PATH (0,81731;0,68966) (0,85577;0,68966) ;
+        LABEL 'Ready (hot) jam' ;
+        SINK JOIN 6 ;
+      ENDSEG ;
+
+      ARROWSEG 6 ;
+        SOURCE JOIN 2 7 ;
+        PATH (0,85577;0,68966) (0,97596;0,68966) ;
+        LABEL '{LWI I 0 255 255 }Ready (hot) jam' ;
+        LABEL COORDINATES (0,84519;0,78056) ;
+        SQUIGGLE COORDINATES (0,89327;0,75705) (0,89904;0,68966) ;
+        SINK BORDER O1 (0,97885;0,69749) ;
+      ENDSEG ;
+
+      ARROWSEG 8 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,47115;0,87774) (0,24038;0,87774) (0,24038;0,32915) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 1M1 ;
+      ENDSEG ;
+
+      ARROWSEG 9 ;
+        SOURCE BRANCH 1 ;
+        PATH (0,47115;0,87774) (0,73077;0,87774) (0,73077;0,77586) ;
+        LABEL 'Gas-stove or electric range' ;
+        SINK BOX 3M1 ;
+      ENDSEG ;
+
+    ENDDIAGRAM ;
+
+    DIAGRAM GLOSSARY A0G {LWI A 
+      TERM 'JAM-MAKING'
+      ''
+      N 'This is my favorite program. It helps to cook black rowan, apple, and
+ strawberry jam. Actually I wrote this program to train myself in carrying out
+ SADT interview. For that I have asked my mother to tell me how one should coo
+k a jam. I made an effort to draw the model as detailed as possible; thus the 
+interview has lengthened about two days. The result was unexpected for both of
+ us. My mother was very surprised when I have showed her the total list of coo
+king battery that she usually uses for cooking ordinary jam. Besides I have le
+arned to cook a little. Mother, thank you for the help!'
+      A 'Alexei A. Morozov'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Sterilize jars and lids'
+      ''
+      N 'Sterilize jars and lids.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Prepare berries and fruits'
+      ''
+      N 'Clean berries and fruits. Cut and blanch (warm up) them if necessary.
+ Prepare some mixture of berries and fruits with sugar.'
+      S 'PUBLICATION'
+      C 255 1 255
+      F 1.000000
+      TERM 'Boil berries and fruits with sugar  #XOR BLOCK#'
+      ''
+      N 'Boil berries and fruits with sugar.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Pour jam into jars'
+      ''
+      N 'Pour ready jam into the jars and cover the jars (one can scoop the ja
+m by a spoon).'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Wash up jars and lids'
+      ''
+      N 'Wipe all the surface of the jars and the lids by soda. Then wash off 
+the soda by water.'
+      S 'PUBLICATION'
+      C 255 10 255
+      F 1.000000
+      TERM 'Cleanse jam-jars by boiled water'
+      ''
+      N 'Sterilize all the surface of a jar by boiling water.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Cleanse lids by boiling water'
+      ''
+      N 'Boil the lids during 2 minutes.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Dry jam-jars and lids'
+      ''
+      N 'Turn upside-down a jar. Keep the jars and the lids at the room temper
+ature till they become dried up (the process can take about 1 hour).'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Suspend the process'
+      ''
+      N 'Cool the mixture at the room temperature during 6-8 hours.'
+      S 'PUBLICATION'
+      C 255 12 255
+      F 1.000000
+      TERM 'Analysis of model:  What kitchen utensils are we need?'
+      ''
+      N 'Analyze the model and determine the total list of necessary kitchen u
+tensils.'
+      S 'PUBLICATION'
+      C 255 3 255
+      F 1.000000
+      TERM 'Boil some water in a kettle'
+      ''
+      N 'Boil the water in the kettle till a simmer.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Choose berries and fruits'
+      ''
+      N 'Choose berries and fruits for jam-making. Check quality of the food v
+isually.'
+      S 'PUBLICATION'
+      C 255 3 255
+      F 1.000000
+      TERM 'Wash berries and fruits'
+      ''
+      N 'Clean berries and fruits in the colander. It is advisable to use runn
+ing water. Check cleanness of the food visually.'
+      S 'PUBLICATION'
+      C 255 10 255
+      F 1.000000
+      TERM 'Prepare sugar mixture #XOR BLOCK#'
+      ''
+      N 'Prepare some sugar mixture.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Prepare some mixture of hard berries and sugar'
+      ''
+      N 'Prepare some mixture of<CR>hard berries and sugar.'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Prepare some mixture of large fruits and sugar'
+      ''
+      N 'Prepare some mixture<CR>of large fruits and sugar.'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Prepare some mixture of soft berries and sugar'
+      ''
+      N 'Prepare some mixture<CR>of soft berries and sugar.'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Boil some water in the saucepan'
+      ''
+      N 'Boil the water in the saucepan till a simmer.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Blanch berries'
+      ''
+      N 'Put the berries in the colander to the boiling water 2-3 times. The t
+otal time of warming is about 2 minutes.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Prepare some syrup'
+      ''
+      N 'Mix up 1-2 glasses of water with 1 kilogram of sugar. Boil the mixtur
+e till the sugar turn into homogeneous fluid paste. Stir the mixture by a spoo
+n to prevent the sugar from sticking.'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Put berries in syrup'
+      ''
+      N 'Put berries in the syrup.'
+      S 'PUBLICATION'
+      C 255 1 255
+      F 1.000000
+      TERM 'Cut fruits into lobules'
+      ''
+      N 'Cut a small fruit to 4 lobules. One should cut a large fruit to great
+er number of lobules.'
+      S 'PUBLICATION'
+      C 255 1 255
+      F 1.000000
+      TERM 'Sprinkle with sugar [for large fruits]'
+      ''
+      N 'Sprinkle fragmented fruits with sugar in ratio 1-1.2 kilograms of sug
+ar to 1 kilogram of fruits.'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Suspend the process for 6-8 hours [for large fruits]'
+      ''
+      N 'Suspend the process for 6-8 hours.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Add some water in the mixture'
+      ''
+      N 'Add some water in the mixture in ratio 1 glass of water to 1 kilogram
+ of fruits.'
+      S 'PUBLICATION'
+      C 255 10 255
+      F 1.000000
+      TERM 'Sprinkle with sugar [for soft berries]'
+      ''
+      N 'Sprinkle fruits with sugar.'
+      S 'PUBLICATION'
+      C 255 4 255
+      F 1.000000
+      TERM 'Suspend the process for 6-8 hours [for soft berries]'
+      ''
+      N 'Suspend the process for 6-8 hours.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Boiling cycle for hard berries and fruits'
+      ''
+      N 'It is boiling cycle for hard berries and fruits.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Boiling cycle for soft berries and fruits'
+      ''
+      N 'It is boiling cycle for soft berries and fruits.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Heat the mixture'
+      ''
+      N 'Boil the mixture till a simmer and boil it during 3-5 minutes. The ex
+act time periods are the following: a) 5 minutes for apples, b) 3 minutes for 
+black rowan. At the last stage boil it for readiness. Stir jam by a spoon to e
+nsure homogeneity of the paste.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Cool jam'
+      ''
+      N 'Cool the jam till it get cold (it takes about 3 hours).'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Check if jam is ready [for hard berries and fruits]'
+      ''
+      N 'Check readiness of the jam with the help of the following rule: a dro
+p of ready jam should not spread on a saucer. It is a supplementary rule for a
+pples: it is desirable that apples become transparent ones.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Main phase of boiling'
+      ''
+      N 'At first boil the mixture on a weak fire. Stir slowly the mixture by 
+a spoon till a complete dilution of the sugar in the flowed out juice (determi
+ne the time of boiling visually). Then intensify the fire and boil the mixture
+ about 10 minutes.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+      TERM 'Check if jam is ready [for soft berries]'
+      ''
+      N 'Check readiness of the jam with the help of the following rule: a dro
+p of ready jam should not spread on a saucer.'
+      S 'PUBLICATION'
+      C 255 5 255
+      F 1.000000
+      TERM 'Supplementary phase of boiling'
+      ''
+      N 'Boil the mixture during extra 5 minutes.'
+      S 'PUBLICATION'
+      C 255 0 255
+      F 1.000000
+     ENDGLOSS } ;
+     GLOSSARY ;
+      TERM 'Heated berries and fruits with sugar'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Jam-jars and lids'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Sterile jars and lids'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Boiling water'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Warmed up berries'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Syrup'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Washed jam-jars'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Washed lids'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Sterile jam-jars'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Sterile lids'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Boiling water in the kettle'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Heated mixture (after the 1-st or the 2-nd heating)'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Sugar mixture'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Clean berries and fruits'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Cut fruits'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Cut fruits with sugar'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Fruits yielding juice'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Berries with sugar'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Heated mixture (after the 3-rd heating)'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Cooled berries and fruits in syrup'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Ready jam'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Cooled jam'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Ready (hot) jam'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Jam-making regulations'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Safety measures'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Jam in jars'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Berries and fruits'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Sugar'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Drinking water'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Source of running water (advisably)'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Cooking battery'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Gas-stove or electric range'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Baking soda'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Canning equipment (optional)'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+      TERM 'Hand-picked berries and fruits'
+      ''
+      {LWI S 'PUBLICATION'
+      C 255 255
+ } ;
+     ENDGLOSS ;
+    ENDDIAGRAM ;
+  ENDMODEL ;
+
+ENDKIT ;

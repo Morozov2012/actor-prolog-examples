@@ -1,0 +1,32 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Underdetermined sets.                 --
+--                                       --
+-- Questions: What are underdetermined   --
+-- sets? How can one declare a set       --
+-- argument of a predicate? How can one  --
+-- create a new domain that is a kind of --
+-- an underdetermined set?               --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+Person	= {name:STRING,age:INTEGER}.
+
+PREDICATES:
+
+p(Person)	- (i);
+
+CLAUSES:
+
+goal:-
+	p({name:"Ivan",age:21}).
+
+p(X):-
+	writeln(X).

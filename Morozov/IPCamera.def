@@ -1,0 +1,38 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2018 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/IPCamera":
+
+import 'VideoBuffer' from "Morozov/VideoBuffer";
+import 'BufferedImage' from "Morozov/Java2D";
+import "Morozov/Vision";
+
+--------------------------------------------------------------------
+-- The 'IPCamera' class is specialized class 'VideoBuffer'.       --
+--------------------------------------------------------------------
+
+interface 'IPCamera' (specialized 'VideoBuffer'):
+
+camera_url				: STRING;
+
+[
+PREDICATES:
+--
+imperative:
+--
+get_recent_frame_number(FrameNumber)			- (o);
+get_recent_frame_time(INTEGER)				- (o);
+get_recent_frame_relative_time(INTEGER)			- (o);
+get_recent_frame_rate(REAL)				- (o);
+--
+imperative:
+--
+get_recent_image('BufferedImage')			- (i);
+--
+get_image_size_in_pixels(INTEGER,INTEGER)		- (o,o);
+--
+set_camera_url(STRING)					- (i);
+get_camera_url() = STRING;
+]

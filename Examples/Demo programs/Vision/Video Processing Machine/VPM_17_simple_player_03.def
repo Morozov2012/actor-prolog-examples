@@ -1,0 +1,359 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+VideoFrameNumber	= INTEGER; STRING.
+--
+/*
+Hue			= INTEGER; STRING.
+Saturation		= INTEGER; STRING.
+Brightness		= INTEGER; STRING.
+Contrast		= INTEGER; STRING.
+*/
+ShiffingIsDetected	= INTEGER.
+--
+-----------------------------------------------------------------------
+interface 'DialogHSB' (specialized 'Dialog'):
+--
+constant:
+--
+	data_directory		: STRING;
+	file_name_format	: STRING;
+	frame_rate		: REAL;
+	subsampling		: INTEGER;
+--
+	inverse_transformation_matrix	: TransformationMatrix;
+--
+internal:
+--
+	vpm			: 'VideoProcessingMachine';
+	timer			: 'SpecialTimer';
+	graphic_window		: 'Canvas2D';
+	text			: 'Text';
+	image1			: 'BufferedImage';
+	image2			: 'BufferedImage';
+	state			: 'ProgramState';
+	accumulator		: 'Accumulator';
+	protocol		: 'Protocol';
+	con			: 'Console';
+--
+variable:
+--
+	first_frame		: VideoFrameNumber;
+	last_frame		: VideoFrameNumber;
+--
+constant:
+--
+	circle_radius		: REAL;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+detect_minimal_file_number(INTEGER,INTEGER)	- (i,o);
+detect_maximal_file_number
+	(INTEGER,INTEGER,INTEGER)		- (i,o,i);
+show_frame_range_if_necessary(INTEGER,INTEGER)	- (i,i);
+--
+go_forward(INTEGER)				- (i);
+go_backward(INTEGER)				- (i);
+--
+play_or_pause_video;
+play_video;
+activate_timer;
+pause_video;
+--
+divide_list(INTEGER,PointList,PointList)	- (i,i,o);
+--
+tick;
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+--
+draw_scene(FrameNumber)				- (i);
+--
+draw_chronicle(
+	BlobChronicle,
+	FrameNumber,
+	PointX,
+	PointY)			- (i,i,i,i);
+draw_dynamic_object(
+	BlobType,
+	BlobChronicle,
+	PointX,
+	PointY)			- (i,i,i,i);
+draw_static_object(
+	BlobType,
+	BlobChronicle,
+	PointX,
+	PointY)			- (i,i,i,i);
+compute_object_color(
+	BlobType,
+	Color)			- (i,o);
+draw_arrows(
+	BlobChronicle,
+	FrameNumber,
+	PointX,
+	PointY)			- (i,i,i,i);
+--
+detect_sniffing(
+	REAL,REAL,REAL,REAL,ShiffingIsDetected)	- (i,i,i,i,o);
+fuzzy_metrics(REAL,REAL,REAL) = REAL		- (i,i,i);
+select_sniffing_color(
+	ShiffingIsDetected,FrameNumber,Color)	- (i,i,o);
+--
+determ:
+--
+is_marked_by_expert(FrameNumber)		- (i);
+--
+nondeterm:
+--
+ground_truth(FrameNumber,FrameNumber)		- (o,o);
+--
+imperative:
+--
+select_object(
+	Blob,Blob,Blob,
+	Blob,REAL,REAL,REAL)	- (i,i,i,o,o,o,o);
+select_nearest_object(
+	Blob,REAL,REAL,REAL,
+	Blob,REAL,REAL,REAL,
+	Blob,REAL,REAL,REAL)	- (i,i,i,i,i,i,i,i,o,o,o,o);
+--
+determine_nearest_point(
+	Blob,Blob,
+	REAL,REAL,REAL)		- (i,i,o,o,o);
+determine_nearest_point(
+	PointX,PointY,
+	REAL,REAL,
+	REAL,REAL,
+	REAL,REAL,REAL)		- (i,i,i,i,i,i,o,o,o);
+--
+compute_angle(Blob,Blob,REAL,REAL,REAL)		- (i,i,i,i,o);
+--
+compute_distance(Blob,Blob,REAL)		- (i,i,o);
+compute_distance(Blob,REAL,REAL,REAL)		- (i,i,i,o);
+--
+compute_physical_distance(
+	PointX,PointY,
+	PointX,PointY,REAL)	- (i,i,i,i,o);
+--
+compute_velocity_of_body(
+	BlobChronicle,
+	REAL,REAL,
+	INTEGER,
+	REAL,
+	INTEGER,
+	INTEGER,
+	REAL)			- (i,i,i,i,i,i,i,o);
+--
+convert_integer_to_real(PointX,REAL)		- (i,o);
+convert_integer_to_real(PointY,REAL)		- (i,o);
+--
+convert_numerical_to_integer(PointX,INTEGER)	- (i,o);
+convert_numerical_to_integer(PointY,INTEGER)	- (i,o);
+--
+determ:
+--
+get_blob_of_type(BlobType,BlobList,Blob)	- (i,i,o);
+get_recent_blob_of_type
+	(BlobType,BlobChronicle,INTEGER,Blob)	- (i,i,i,o);
+--
+imperative:
+--
+draw_circle(PointX,PointY,REAL)			- (i,i,i);
+draw_text_label(PointX,PointY,STRING)		- (i,i,i);
+show_recognition_results;
+draw_legend;
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,REAL) = REAL				- (i,i);
+'-'(PointY,REAL) = REAL				- (i,i);
+'-'(REAL,PointX) = REAL				- (i,i);
+'-'(REAL,PointY) = REAL				- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+--
+determ:
+--
+'>'(PointX,REAL)				- (i,i);
+'>'(PointY,REAL)				- (i,i);
+'>'(REAL,PointX)				- (i,i);
+'>'(REAL,PointY)				- (i,i);
+'<'(PointX,REAL)				- (i,i);
+'<'(PointY,REAL)				- (i,i);
+'<'(REAL,PointX)				- (i,i);
+'<'(REAL,PointY)				- (i,i);
+'>='(PointX,REAL)				- (i,i);
+'>='(PointY,REAL)				- (i,i);
+'>='(REAL,PointX)				- (i,i);
+'>='(REAL,PointY)				- (i,i);
+'<='(PointX,REAL)				- (i,i);
+'<='(PointY,REAL)				- (i,i);
+'<='(REAL,PointX)				- (i,i);
+'<='(REAL,PointY)				- (i,i);
+--
+imperative:
+--
+round(PointX) = INTEGER				- (i);
+round(PointY) = INTEGER				- (i);
+trunc(PointX) = INTEGER				- (i);
+trunc(PointY) = INTEGER				- (i);
+]
+-----------------------------------------------------------------------
+interface 'SpecialTimer' (specialized 'Timer'):
+--
+internal:
+--
+target_world	: 'DialogHSB';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		: 'Timer';
+--
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER);
+		  frame_counter(INTEGER);
+		  stop_watch_time(INTEGER);
+		  global_counter(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)			- (o);
+get_current_frame(INTEGER)			- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)			- (i);
+set_current_frame(INTEGER)			- (i);
+--
+reset_stopwatch;
+get_stopwatch_time(INTEGER)			- (o);
+--
+reset_frame_counter;
+increase_frame_counter;
+get_frame_counter(INTEGER)			- (o);
+--
+increase_global_counter;
+get_global_counter(INTEGER)			- (o);
+]
+-----------------------------------------------------------------------
+interface 'Accumulator' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= accumulated_sum(BlobType,SYMBOL,INTEGER,REAL).
+--
+PREDICATES:
+--
+imperative:
+--
+add_value(BlobType,SYMBOL,REAL)			- (i,i,i);
+--
+determ:
+--
+get_average_value(BlobType,SYMBOL,REAL)		- (i,i,o);
+]
+-----------------------------------------------------------------------
+interface 'Protocol' (specialized 'Database'):
+--
+internal:
+--
+file		: 'File';
+--
+[
+DOMAINS:
+--
+Target		=
+		frame(
+			INTEGER,	-- Time
+			INTEGER,	-- Frame Number
+			REAL,		-- Distance1 [meters]
+			REAL,		-- Distance2 [meters]
+			REAL,		-- Angle [degrees]
+			REAL,		-- Velocity [m/sec]
+			ShiffingIsDetected);
+		current_mode(
+			ShiffingIsDetected,
+			INTEGER);	-- Beginning Time
+		cumulative_interval(
+			ShiffingIsDetected,
+			INTEGER);	-- Total Time
+		true_positive_detections(INTEGER);
+		false_positive_detections(INTEGER);
+		true_negative_detections(INTEGER);
+		false_negative_detections(INTEGER).
+--
+PREDICATES:
+--
+imperative:
+--
+add_frame(
+	INTEGER,	-- Time
+	INTEGER,	-- Frame Number
+	REAL,		-- Distance1 [meters]
+	REAL,		-- Distance2 [meters]
+	REAL,		-- Angle [degrees]
+	REAL,		-- Velocity [m/sec]
+	ShiffingIsDetected)	- (i,i,i,i,i,i,i);
+--
+modify_counter_mode(ShiffingIsDetected,INTEGER)		- (i,i);
+--
+determ:
+--
+get_current_mode(ShiffingIsDetected,INTEGER)		- (o,o);
+--
+imperative:
+--
+modify_mode_if_necessary(
+	ShiffingIsDetected,
+	ShiffingIsDetected,
+	INTEGER,
+	INTEGER)		- (i,i,i,i);
+increase_cumulative_interval(
+	ShiffingIsDetected,
+	INTEGER)		- (i,i);
+--
+get_cumulative_interval(ShiffingIsDetected,INTEGER)	- (i,o);
+--
+save_protocol(FileName)					- (i);
+--
+register_a_true_positive_detection;
+register_a_false_positive_detection;
+register_a_true_negative_detection;
+register_a_false_negative_detection;
+--
+get_number_of_true_positive_detections(INTEGER)		- (o);
+get_number_of_false_positive_detections(INTEGER)	- (o);
+get_number_of_true_negative_detections(INTEGER)		- (o);
+get_number_of_false_negative_detections(INTEGER)	- (o);
+]
+-----------------------------------------------------------------------

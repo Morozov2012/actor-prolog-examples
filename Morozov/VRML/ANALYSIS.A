@@ -1,0 +1,478 @@
+package "Morozov/VRML/Analysis":
+-----------------------------------------------------------------------
+--                                                                   --
+--             The "VRML/ANALYSIS" Actor Prolog package.             --
+--             (c) 2002-2007, IRE RAS, Alexei A. Morozov.            --
+--                                                                   --
+-----------------------------------------------------------------------
+-- This package is intended for analyzing tables of the attributes   --
+-- of Web Sites.                                                     --
+-----------------------------------------------------------------------
+import 'Report_Mode'	from "Morozov/VRML/Mode";
+import 'ResultTable'	from "Morozov/VRML/Items";
+-----------------------------------------------------------------------
+class 'Web_Analyzer' (specialized 'Alpha'):
+--
+internal:
+--
+	mode;
+--
+	main_table		= ('ResultTable');
+	counters		= ('ItemCounter');
+--
+	con			= ('Console');
+--
+constant:
+--
+	absolute_depth_of_graph			= 2.5;
+	base_depth_of_graph			= -2.5;
+--
+	absolute_width_of_graph			= 2.5;
+	base_width_of_graph			= -2.5;
+--
+	default_absolute_height_of_graph	= 1.7;
+	default_base_height_of_graph		= -1.7;
+--
+[
+goal:-!.
+--
+analyze_data(FileName):-
+	reset_analyzer,
+	main_table ? load(FileName),
+	analyze_table,
+	counters ? save("COUNT.LOG").
+--
+reset_analyzer:-
+	main_table ? retract_all(),
+	counters ? retract_all().
+--
+analyze_table:-
+	main_table ? find(Item),
+	Item == item(Name,_,Date,_,_,HyperLinks,_,_,_,_,_,_),
+	-- con ? writeln(Name),
+	select_Y_parameter(Item,Index),
+	increase_number_of_items(Name),
+	Y== ?convert_to_real(Index),
+	refine_min_size(Y),
+	refine_max_size(Y),
+	refine_min_date(Date),
+	refine_max_date(Date),
+	refine_min_value(HyperLinks),
+	refine_max_value(HyperLinks),
+	fail.
+analyze_table:-
+	determine_width_of_item,
+	determine_absolute_height,
+	determine_size_scaling_mode,
+	determine_value_scaling_mode,
+	fail.
+analyze_table.
+-----------------------------------------------------------------------
+select_Y_parameter(item(_,_,_,_,_,_,_,_,_,_,Index,_),Index):-
+	is_keyword_scene,!.
+select_Y_parameter(item(_,_,_,Pages,_,_,_,_,_,_,_,_),Pages):-
+	main_table ? find(Record),
+	Record == compare(_,'pages'),!.
+select_Y_parameter(item(_,_,_,_,Size,_,_,_,_,_,_,_),Size):-
+	main_table ? find(Record),
+	Record == compare(_,'letters'),!.
+select_Y_parameter(item(_,_,_,_,_,Links,_,_,_,_,_,_),Links):-
+	main_table ? find(Record),
+	Record == compare(_,'hyper_links'),!.
+select_Y_parameter(item(_,_,_,_,_,_,Pictures,_,_,_,_,_),Pictures):-
+	main_table ? find(Record),
+	Record == compare(_,'pictures'),!.
+select_Y_parameter(item(_,_,_,_,_,_,_,Links,_,_,_,_),Links):-
+	main_table ? find(Record),
+	Record == compare(_,'other_links'),!.
+select_Y_parameter(item(_,_,_,_,_,_,_,_,Errors,_,_,_),Errors):-
+	main_table ? find(Record),
+	Record == compare(_,'errors'),!.
+select_Y_parameter(_,_):-
+	break('Error in select_Y_parameter.').
+select_Y_parameter(_,0).
+-----------------------------------------------------------------------
+increase_number_of_items(Name):-
+	counters ? retract(number_of_items(N1)),!,
+	N2== N1 + 1,
+	counters ? insert(number_of_items(N2)),
+	counters ? append(item_number(Name,N2)).
+increase_number_of_items(Name):-
+	counters ? insert(number_of_items(1)),
+	counters ? append(item_number(Name,1)).
+/**/
+get_number_of_items(N):-
+	counters ? find(number_of_items(N)),!.
+get_number_of_items(0).
+-----------------------------------------------------------------------
+refine_min_size(Size2):-
+	counters ? find(Record),
+	Record == min_size(Size1),!,
+	refine_min_size(Size2,Size1).
+refine_min_size(Size2):-
+	counters ? insert(min_size(Size2)).
+--
+refine_min_size(Size2,Size1):-
+	Size1 > Size2,
+	counters ? retract(min_size(Size1)),!,
+	counters ? insert(min_size(Size2)).
+refine_min_size(_,_).
+-----------------------------------------------------------------------
+refine_max_size(Size2):-
+	counters ? find(Record),
+	Record == max_size(Size1),!,
+	refine_max_size(Size2,Size1).
+refine_max_size(Size2):-
+	counters ? insert(max_size(Size2)).
+--
+refine_max_size(Size2,Size1):-
+	Size1 < Size2,
+	counters ? retract(max_size(Size1)),!,
+	counters ? insert(max_size(Size2)).
+refine_max_size(_,_).
+-----------------------------------------------------------------------
+refine_min_date('no_date'):-!.
+refine_min_date(Date2):-
+	counters ? find(Record),
+	Record == min_date(Date1),
+	Date1 > Date2,!,
+	counters ? retract_all(min_date(Date1)),
+	counters ? insert(min_date(Date2)).
+refine_min_date(_):-
+	counters ? find(Record),
+	Record == min_date(_),!.
+refine_min_date(Date2):-
+	counters ? insert(min_date(Date2)).
+-----------------------------------------------------------------------
+refine_max_date('no_date'):-!.
+refine_max_date(Date2):-
+	counters ? find(Record),
+	Record == max_date(Date1),
+	Date1 < Date2,!,
+	counters ? retract_all(max_date(Date1)),
+	counters ? insert(max_date(Date2)).
+refine_max_date(_):-
+	counters ? find(Record),
+	Record == max_date(_),!.
+refine_max_date(Date2):-
+	counters ? insert(max_date(Date2)).
+-----------------------------------------------------------------------
+refine_min_value(Value2):-
+	counters ? find(min_value(Value1)),!,
+	refine_min_value(Value2,Value1).
+refine_min_value(Value2):-
+	counters ? insert(min_value(Value2)).
+--
+refine_min_value(Value2,Value1):-
+	Value1 > Value2,!,
+	counters ? retract_all(min_value(Value1)),
+	counters ? insert(min_value(Value2)).
+refine_min_value(_,_).
+-----------------------------------------------------------------------
+refine_max_value(Value2):-
+	counters ? find(max_value(Value1)),!,
+	refine_max_value(Value2,Value1).
+refine_max_value(Value2):-
+	counters ? insert(max_value(Value2)).
+--
+refine_max_value(Value2,Value1):-
+	Value1 < Value2,!,
+	counters ? retract_all(max_value(Value1)),
+	counters ? insert(max_value(Value2)).
+refine_max_value(_,_).
+-----------------------------------------------------------------------
+determine_width_of_item:-
+	get_number_of_items(TotalNumber),
+	determine_width_of_item(TotalNumber).
+--
+determine_width_of_item(TotalNumber):-
+	TotalNumber <= 1,!,
+	Width==	?round(
+		(absolute_width_of_graph - base_width_of_graph) /
+			2 * 100.0) / 100.0,
+	counters ? insert(width_of_item(Width)).
+determine_width_of_item(TotalNumber):-
+	MaxValue== (absolute_width_of_graph - base_width_of_graph) /
+			?cast("INTEGER",TotalNumber) * 100.0,
+	Width1== ?round(MaxValue) / 100.0,
+	maximize_width(Width1,Width2),
+	counters ? insert(width_of_item(Width2)).
+--
+maximize_width(Width0,Width1):-
+	Min== ?round(
+		(absolute_width_of_graph - base_width_of_graph) /
+		20.0 * 100.0) / 100.0,
+	Width0 < Min,!,
+	minimize_width(Width0,Min,Width1).
+maximize_width(Width,Width).
+--
+minimize_width(Width,Min,Width):-
+	mode ? minimize_width_of_items,
+	Min >= Width,!.
+minimize_width(_,Min,Min).
+--
+get_real_width_of_item(Width):-
+	counters ? find(Record),
+	Record == width_of_item(Width),!.
+get_real_width_of_item(_):-
+	break('Error in get_real_width_of_item.').
+get_real_width_of_item(0.0).
+-----------------------------------------------------------------------
+determine_absolute_height:-
+	mode ? accomodate_height_of_graph,
+	get_real_width_of_item(Width),
+	--
+	H0== default_absolute_height_of_graph
+		- default_base_height_of_graph,
+	--
+	C== H0 / Width,
+	C > 14,!,
+	AH== ?round(Width * 7 * 100.0) / 100.0,
+	BH== ?round(-(Width) * 7 * 100.0) / 100.0,
+	--
+	counters ? insert(absolute_height_of_graph(AH)),
+	counters ? insert(base_height_of_graph(BH)).
+determine_absolute_height:-
+	counters ? insert(absolute_height_of_graph(
+		?cast("ItemHeight",default_absolute_height_of_graph))),
+	counters ? insert(base_height_of_graph(
+		?cast("ItemHeight",default_base_height_of_graph))).
+--
+get_real_absolute_height(Height):-
+	counters ? find(Record),
+	Record == absolute_height_of_graph(Height),!.
+get_real_absolute_height(_):-
+	break('Error in get_real_absolute_height.').
+get_real_absolute_height(0.0).
+--
+get_real_base_height(Height):-
+	counters ? find(Record),
+	Record == base_height_of_graph(Height),!.
+get_real_base_height(_):-
+	break('Error in get_real_base_height.').
+get_real_base_height(0.0).
+-----------------------------------------------------------------------
+determine_size_scaling_mode:-
+	counters ? find(Record1),
+	Record1 == min_size(MinSize),
+	counters ? find(Record2),
+	Record2 == max_size(MaxSize),!,
+	determine_size_scaling_mode(MinSize,MaxSize,Mode),
+	counters ? insert(mode_of_size_scaling(Mode)).
+determine_size_scaling_mode:-
+	counters ? insert(mode_of_size_scaling(0)).
+--
+determine_size_scaling_mode(MinSize,MaxSize,2):-
+	MaxSize > MinSize * 50.0,!,
+	con ? writeln("Size scaling Mode: ",2).
+determine_size_scaling_mode(MinSize,MaxSize,1):-
+	MaxSize > MinSize * 10.0,!,
+	con ? writeln("Size scaling Mode: ",1).
+determine_size_scaling_mode(_,_,0):-
+	con ? writeln("Size scaling Mode: ",0).
+--
+get_mode_of_size_scaling(Mode):-
+	counters ? find(Record),
+	Record == mode_of_size_scaling(Mode),!.
+get_mode_of_size_scaling(_):-
+	break('Error in get_mode_of_size_scaling.').
+get_mode_of_size_scaling(0).
+-----------------------------------------------------------------------
+determine_value_scaling_mode:-
+	counters ? find(min_value(MinValue)),
+	counters ? find(max_value(MaxValue)),!,
+	determine_value_scaling_mode(MinValue,MaxValue,Mode),
+	counters ? insert(mode_of_value_scaling(Mode)).
+determine_value_scaling_mode:-
+	counters ? insert(mode_of_value_scaling(0)).
+--
+determine_value_scaling_mode(MinValue,MaxValue,2):-
+	MaxValue > ?cast("INTEGER",MinValue) * 50.0,!,
+	con ? writeln("Value scaling Mode: ",2).
+determine_value_scaling_mode(MinValue,MaxValue,1):-
+	MaxValue > ?cast("INTEGER",MinValue) * 10.0,!,
+	con ? writeln("Value scaling Mode: ",1).
+determine_value_scaling_mode(_,_,0):-
+	con ? writeln("Value scaling Mode: ",0).
+--
+get_mode_of_value_scaling(Mode):-
+	counters ? find(Record),
+	Record == mode_of_value_scaling(Mode),!.
+get_mode_of_value_scaling(_):-
+	break('Error in get_mode_of_value_scaling.').
+get_mode_of_value_scaling(0).
+-----------------------------------------------------------------------
+report_results:-
+	counters ? find(number_of_items(N)),
+	con ? writeln("Total number of items: ",N),
+	fail.
+report_results:-
+	counters ? find(Record),
+	Record == max_size(Size),
+	con ? writeln("Max Size: ",Size),
+	fail.
+report_results:-
+	counters ? find(Record),
+	Record == min_date(Date),
+	con ? writeln("Min Date: ",Date),
+	fail.
+report_results:-
+	counters ? find(Record),
+	Record == max_date(Date),
+	con ? writeln("Max Date: ",Date),
+	fail.
+report_results:-
+	counters ? find(Record),
+	Record == width_of_item(Width),
+	con ? writeln("Width of item: ",Width),
+	fail.
+report_results:-
+	counters ? find(Record),
+	Record == absolute_height_of_graph(AH),
+	con ? writeln("Absolute height of graph: ",AH),
+	fail.
+report_results:-
+	counters ? find(Record),
+	Record == base_height_of_graph(BH),
+	con ? writeln("Base height of graph: ",BH),
+	fail.
+report_results:-
+	counters ? find(Record),
+	Record == mode_of_size_scaling(Mode),
+	con ? writeln("Mode of size scaling: ",Mode),
+	fail.
+report_results:-
+	counters ? find(Record),
+	Record == mode_of_value_scaling(Mode),
+	con ? writeln("Mode of value scaling: ",Mode),
+	fail.
+report_results.
+-----------------------------------------------------------------------
+get_item(Name,Address,Date,HyperLinks,Hue,Item):-
+	main_table ? find(Item),
+	Item == item(	Name,Address,Date,
+			_/*Pages*/,_/*Size*/,
+			HyperLinks,_/*Pictures*/,
+			_/*Binaries*/,_/*Errors*/,
+			_,_/*Index*/,Hue).
+-----------------------------------------------------------------------
+is_keyword_scene:-
+	is_selected_keyword_scene,!.
+is_keyword_scene:-
+	main_table ? find('all_keywords'),!.
+--
+is_selected_keyword_scene:-
+	main_table ? find(Record),
+	Record == selected_keyword(_,_),!.
+--
+is_general_keyword_scene:-
+	main_table ? find('all_keywords'),!.
+--
+get_units(Units):-
+	main_table ? find(Record),
+	Record == compare(_,Units),!.
+get_units(_):-
+	break('Error in get_units.').
+get_units('size').
+-----------------------------------------------------------------------
+get_absolute_depth_of_graph(absolute_depth_of_graph).
+get_absolute_width_of_graph(absolute_width_of_graph).
+get_base_depth_of_graph(base_depth_of_graph).
+get_base_width_of_graph(base_width_of_graph).
+-----------------------------------------------------------------------
+get_selected_keyword(Keyword):-
+	main_table ? find(Record),
+	Record == selected_keyword(Keyword,_),!.
+-----------------------------------------------------------------------
+scale_number(Name,Z):-
+	counters ? find(item_number(Name,N)),!,
+	get_real_width_of_item(ItemWidth),
+	IW2== ItemWidth / 2,
+	get_number_of_items(TotalNumber),
+	scale_number(N,TotalNumber,IW2,Z).
+scale_number(_,_):-
+	break('Error in scale_number.').
+scale_number(_,0.0).
+--
+scale_number(_,TotalNumber,_,Z):-
+	TotalNumber <= 1,!,
+	Z== (absolute_width_of_graph - base_width_of_graph) / 2.
+scale_number(N,TotalNumber,IW2,Z):-
+	ZMax== absolute_width_of_graph - IW2 * 1.02,
+	ZMin== base_width_of_graph + IW2,
+	Z==	(?cast("INTEGER",N) - 1) /
+		(?cast("INTEGER",TotalNumber) - 1) *
+		(ZMax - ZMin) + IW2.
+-----------------------------------------------------------------------
+scale_date('no_date',X):-
+	counters ? find(Record1),
+	Record1 == min_date(Min),
+	counters ? find(Record2),
+	Record2 == max_date(Max),
+	Max <> Min,!,
+	scale_date(Min,Max,Max,X).
+scale_date(Date,X):-
+	counters ? find(Record1),
+	Record1 == min_date(Min),
+	counters ? find(Record2),
+	Record2 == max_date(Max),
+	Max <> Min,!,
+	scale_date(Min,Max,Date,X).
+scale_date(_,X):-
+	X== (absolute_depth_of_graph - base_depth_of_graph) / 2.
+--
+scale_date(Min,Max,Date,F):-
+	get_real_width_of_item(ItemWidth),
+	IW2== ItemWidth / 2,
+	C== (Date - Min) / (Max - Min),
+	C2== C * C,
+	C4== C2 * C2,
+	MaxF== absolute_depth_of_graph - IW2 * 1.02,
+	MinF== base_depth_of_graph + IW2,
+	F== (MaxF - MinF) * C4 + IW2.
+-----------------------------------------------------------------------
+scale_size(Size,Y):-
+	get_real_width_of_item(Width),
+	get_real_absolute_height(AbsoluteHeight),
+	get_real_base_height(BaseHeight),
+	counters ? find(Record),
+	Record == max_size(Max),!,
+	Top== (AbsoluteHeight - BaseHeight - Width * 1.02),
+	get_mode_of_size_scaling(Mode),
+	scale_real(Mode,Top,Size,Max,Y).
+scale_size(_,_):-
+	break('Error in scale_size.').
+scale_size(_,0.0).
+-----------------------------------------------------------------------
+scale_value(Value,K):-
+	is_selected_keyword_scene,!,
+	calculate_coefficient(Value,K).
+scale_value(_,0.3).
+--
+calculate_coefficient(Value,K):-
+	counters ? find(max_value(Max)),
+	counters ? find(min_value(Min)),
+	get_mode_of_value_scaling(Mode),
+	V1== (Value - Min),
+	V2== (Max - Min),
+	V2 > 0,!,
+	scale_real(Mode,1.0,V1,V2,SV),
+	K== 0.05 + SV * 0.4.
+calculate_coefficient(_,0.5).
+-----------------------------------------------------------------------
+scale_real(_,Top,_,Max,Top):-
+	Max <= 0,!.
+scale_real(0,Top,Size,Max,Y):-!,
+	Y== Top * (Size / Max).
+scale_real(1,Top,Size,Max,Y):-!,
+	Y== Top * ?sqrt(Size / Max).
+scale_real(2,Top,Size,Max,Y):-!,
+	Y== Top * ?sqrt(?sqrt(Size / Max)).
+scale_real(_,Top,Size,Max,Y):-!,
+	Y== Top * ?sqrt(?sqrt(?sqrt(Size / Max))).
+]
+-----------------------------------------------------------------------
+class 'ItemCounter' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------

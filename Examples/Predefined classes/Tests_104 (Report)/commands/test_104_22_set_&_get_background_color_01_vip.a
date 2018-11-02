@@ -1,0 +1,32 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2014 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Report',
+			x= 'centered',
+			y= 'centered',
+			width= 50,
+			height= 15,
+			font_name= 'helvetica',
+			font_size= 12,
+			font_style= 'bold');
+--
+[
+goal:-!,
+	con ? writeln("Hi!"),
+	set_period(0.5,0.0),
+	activate.
+--
+tick:-!,
+	R1== ?random(256)/255,
+	G1== ?random(256)/255,
+	B1== ?random(256)/255,
+	con ? set_background_color(color3(R1,G1,B1)),
+	C2== con?get_background_color(),
+	con ? writeln("Color: ",C2).
+]
+-----------------------------------------------------------------------

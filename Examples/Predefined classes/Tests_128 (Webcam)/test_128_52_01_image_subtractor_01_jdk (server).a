@@ -1,0 +1,121 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute this example in the first environment and
+-- the client example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+-----------------------------------------------------------------------
+import .. from "morozov/Vision";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	subtractor	= ('ImageSubtractor',
+				extract_blobs= 'yes',
+				track_blobs= 'no',
+				minimal_training_interval= 0,
+				maximal_training_interval= -1,
+				use_grayscale_colors= 'no',
+				apply_gaussian_filtering_to_background= 'no',
+				-- background_gaussian_filter_radius= 1,
+				apply_rank_filtering_to_background= 'yes',
+				background_rank_filter_threshold= 4,
+				background_standard_deviation_factor= 1.5, -- 1.2,
+				horizontal_blob_border= 3,
+				vertical_blob_border= 3,
+				horizontal_extra_border_coefficient= -1.0,
+				vertical_extra_border_coefficient= -1.0,
+				minimal_blob_intersection_area= 1,
+				minimal_blob_size= 1000,
+				sampling_rate= 1000.0,
+				synthesized_image_transparency= 64,
+				make_rectangular_blobs_in_synthesized_image= 'no',
+				image_encoding_attributes= {
+					format:'JPEG',
+					compressionQuality:0.9});
+--
+	database	= ('MyDatabase',
+				name="MyDatabase3.db");
+	counter		= ('Counter');
+	panel		= ('Canvas2D');
+	buffer		= ('BufferedImage');
+	con		= ('Console');
+--
+[
+goal:-!,
+	con ? set_color('Orange'),
+	con ? write("CREATION OF THE DATABASE... "),
+	database ? insert(subtractor),
+	database ? save,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	panel ? show,
+	set_period(0.02),
+	activate.
+--
+tick:-
+	subtractor ? commit,
+	subtractor ? get_recent_frame_number(FrameNumber),
+	counter ? check_and_update(FrameNumber),!,
+	panel ? suspend_redrawing,
+	panel ? clear('no'),
+	subtractor ? get_synthesized_image(buffer),
+	panel ? draw_image(buffer,0,0,1,1),
+	-- subtractor ? get_recent_image(buffer),
+	-- subtractor ? get_background_image(buffer),
+	-- subtractor ? get_sigma_image(buffer),
+	subtractor ? get_foreground_image(buffer),
+	panel ? draw_image(buffer,0,0,1,1),
+	subtractor ? get_blobs(Blobs),
+	buffer ? get_size_in_pixels(IW,IH),
+	draw_blobs(IW,IH,Blobs),
+	panel ? draw_now.
+tick:-!.
+--
+draw_blobs(IW,IH,[Blob|Rest]):-!,
+	draw_blob(IW,IH,Blob),
+	draw_blobs(IW,IH,Rest).
+draw_blobs(_,_,_).
+--
+draw_blob(IW,IH,Blob):-
+	Blob == {identifier:Id,x:X0,y:Y0,width:W1,height:H1|_},
+	panel ? set_pen({color:'Yellow',lineWidth:3}),
+	panel ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	panel ? set_text_alignment('CENTER','CENTER'),
+	X2== (X0 - W1 / 2) / IW,
+	Y2== (Y0 - H1 / 2) / IH,
+	W2== W1 / IW,
+	H2== H1 / IH,
+	panel ? draw_rectangle(X2,Y2,W2,H2),
+	draw_blob_identifier(X0,Y0,IW,IH,Id),
+	fail.
+draw_blob(_,_,_).
+--
+draw_blob_identifier(X0,Y0,IW,IH,Id):-!,
+	Text== con?format("%d",Id),
+	panel ? set_font({size:18}),
+	panel ? set_text_alignment('CENTER','CENTER'),
+	panel ? draw_text(X0/IW,Y0/IH,Text).
+]
+-----------------------------------------------------------------------
+class 'Counter' (specialized 'Database'):
+[
+check_and_update(FrameNumber2):-
+	find(FrameNumber1),!,
+	FrameNumber1 < FrameNumber2,
+	retract_all(),
+	insert(FrameNumber2).
+check_and_update(FrameNumber2):-
+	insert(FrameNumber2).
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------

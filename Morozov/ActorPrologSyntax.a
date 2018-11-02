@@ -1,0 +1,72 @@
+--------------------------------------------------------------------
+-- (c) 2017 Alexei A. Morozov                                     --
+-- Actor Prolog self-compiling compiler                           --
+--------------------------------------------------------------------
+
+package "Morozov/ActorPrologSyntax":
+
+--------------------------------------------------------------------
+-- The 'ActorPrologScanner' class is specialized class 'Text'.    --
+--------------------------------------------------------------------
+
+class 'ActorPrologScanner' (specialized 'Text'):
+--
+constant:
+--
+keywords = [
+		"as",
+		"class",
+		"CLASSES",
+		"CLAUSES",
+		"constant",
+		"determ",
+		"DOMAINS",
+		"from",
+		"ground",
+		"imperative",
+		"IMPERATIVES",
+		"import",
+		"interface",
+		"internal",
+		"lazy",
+		"metainterface",
+		"mixed",
+		"MODEL",
+		"nondeterm",
+		"of",
+		"package",
+		"pragma",
+		"PREDICATES",
+		"private",
+		"project",
+		"protecting",
+		"reference",
+		"SOURCE",
+		"specialized",
+		"suspending",
+		"unrestricted",
+		"variable",
+		"visible"
+		];
+--
+keep_text_positions	= 'yes';
+--
+[
+SOURCE:
+	"morozov.built_in.ActorPrologScanner";
+
+CLAUSES:
+
+convert_to_tokens(Text) = Tokens:
+	[external "convertToTokens"].
+--
+set_keywords(NameList):
+	[external "setKeywords"].
+get_keywords() = NameList:
+	[external "getKeywords"].
+--
+set_keep_text_positions(YesNo):
+	[external "setKeepTextPositions"].
+get_keep_text_positions() = YesNo:
+	[external "getKeepTextPositions"].
+]

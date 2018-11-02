@@ -1,0 +1,54 @@
+---------------------------------------------------
+--                                               --
+--             Actor Prolog lessons              --
+--          (c) 2015 Alexei A. Morozov           --
+--                                               --
+-- The topic: Basics of the structured logic     --
+-- programming. Combination of basic ideas.      --
+--                                               --
+-- The task: generate all possible lists of a    --
+-- length K.                                     --
+--                                               --
+-- Basic ideas to be used:                       --
+-- 1) Output assembling a list.                  --
+-- 2) Increasing a counter.                      --
+-- 3) Extracting an arbitrary element from a     --
+--    list.                                      --
+-- 4) Backtracking.                              --
+--                                               --
+---------------------------------------------------
+
+DOMAINS:
+
+List	= S*.
+S	=	'A'; 'C'; 'G'; 'T';
+		'R'; 'Y'; 'K'; 'M'; 'S'; 'W';
+		'B'; 'D'; 'H'; 'V'; 'N'.
+N	= INTEGER.
+
+PREDICATES:
+
+nondeterm:
+
+list_generation(N,N,List,List)	- (i,i,i,o);
+element(S,List)			- (o,i);
+
+CLAUSES:
+
+goal:-
+	L1==['A','C','G','T'],
+	K== 5,
+	writeln("L1=",L1),
+	writeln("K=",K),
+	list_generation(0,K,L1,L2),
+		writeln("L2=",L2),
+		fail.
+
+list_generation(N,N,_,[]):-!.
+list_generation(I,K,L1,[Head|Rest]):-
+	element(Head,L1),
+	list_generation(I+1,K,L1,Rest).
+
+element(H,[H|_]).
+element(H,[_|Rest]):-
+	element(H,Rest).

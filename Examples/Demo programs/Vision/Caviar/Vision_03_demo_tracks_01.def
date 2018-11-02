@@ -1,0 +1,105 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	data_directory		: STRING;
+	target_directory	: STRING;
+	sampling_rate		: INTEGER;
+	circle_radius		: REAL;
+--
+internal:
+--
+	subtractor		: 'ImageSubtractor';
+	graphic_window		: 'Canvas2D';
+	prompt_window		: 'Report';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	state			: 'ProgramState';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+--
+draw_scene;
+--
+draw_tracks(PointX,PointY,TrackList)		- (i,i,i);
+draw_track(PointX,PointY,Track)			- (i,i,i);
+--
+draw_track_segments(
+	PointX,
+	PointY,
+	INTEGER,
+	TrackSegmentList)	- (i,i,i,i);
+draw_track_segment(
+	PointX,
+	PointY,
+	INTEGER,
+	TrackSegment)		- (i,i,i,i);
+--
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	TrackOfBlob)		- (i,i,i);
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	TrackOfBlob)		- (i,i,i,i,i);
+--
+draw_circle(PointX,PointY)	- (i,i);
+--
+draw_blob_identifier(
+		PointX,
+		PointY,
+		PointX,
+		PointY,
+		INTEGER)	- (i,i,i,i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)		- (o);
+get_current_frame(INTEGER)		- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)		- (i);
+set_current_frame(INTEGER)		- (i);
+]
+-----------------------------------------------------------------------

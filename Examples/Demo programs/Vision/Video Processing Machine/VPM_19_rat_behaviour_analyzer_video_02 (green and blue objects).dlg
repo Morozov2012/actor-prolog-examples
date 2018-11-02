@@ -1,0 +1,160 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+
+dialog_font("Arial",8,[])
+padding(1,0)
+draft('off')
+
+modeless dialog 'ControlDialog' (
+	"Rat Behaviour Analyzer",
+	default,default,default,
+	centered,centered,default)
+vbox(center)
+	grid
+	row
+		column(right)
+			"Target distance:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](1001,5,0)
+		end_of_column
+		column
+			"   "
+		end_of_column
+		column(right)
+			"Background distance:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](1002,5,0)
+		end_of_column
+		column
+			"   "
+		end_of_column
+		column(right)
+			"Target / Background:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](1003,5,0)
+		end_of_column
+		column
+			"   "
+		end_of_column
+		column(right)
+			"Total distance:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](1004,5,0)
+		end_of_column
+		column
+			"   "
+		end_of_column
+		column(right)
+			"Velocity:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](1005,5,0)
+		end_of_column
+	end_of_row
+	row
+		column(right)
+			"Target behaviour:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](2001,5,0)
+		end_of_column
+		column
+			"   "
+		end_of_column
+		column(right)
+			"Background behaviour:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](2002,5,0)
+		end_of_column
+		column
+			"   "
+		end_of_column
+		column(right)
+			"Target / Background:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](2003,5,0)
+		end_of_column
+		column
+			"   "
+		end_of_column
+		column(right)
+			"Sensitivity:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](2004,5,0)
+		end_of_column
+		column
+			"   "
+		end_of_column
+		column(right)
+			"Specificity:"
+		end_of_column
+		column(right)
+			editreal['ReadOnly'](2005,5,0)
+		end_of_column
+	end_of_row
+	end_of_grid
+	hbox(center)
+		-- custom(graphic_window,48,36,"Control2D")
+		-- custom['KeepProportions'](graphic_window,64,48,"Control2D")
+		custom['KeepProportions'](graphic_window,72,54,"Control2D")
+	end_of_hbox
+	grid
+	row
+		column(right)
+			"First Frame:"
+		end_of_column
+		column(right)
+			hscroll(3001,first_frame,21,[0,1000],0)
+		end_of_column
+		column(right)
+			editinteger(first_frame,5,0)
+		end_of_column
+		column
+			"  "
+		end_of_column
+		column(right)
+			"Last Frame:"
+		end_of_column
+		column(right)
+			hscroll(3002,last_frame,21,[0,1000],0)
+		end_of_column
+		column(right)
+			editinteger(last_frame,5,1000)
+		end_of_column
+		column
+			"  "
+		end_of_column
+		column(right)
+			checkbox(3003,"Repeat",'yes')
+		end_of_column
+	end_of_row
+	end_of_grid
+	hbox(justify)
+		scaling(2.3,1)
+		button("load","&Load")
+		button("rewind","Re&wind")
+		button("100_steps_back","<<<")
+		button("10_steps_back","<<")
+		button("1_step_back","<")
+		button("play","&Play")
+		button("1_step_forward",">")
+		button("10_steps_forward",">>")
+		button("100_steps_forward",">>>")
+		end_of_scaling
+	end_of_hbox
+	"(c) 2017 The data are coming from "
+	"the Institute of Higher Nervous Activity "
+	"and Neurophysiology of RAS"
+end_of_vbox
+end_of_dialog

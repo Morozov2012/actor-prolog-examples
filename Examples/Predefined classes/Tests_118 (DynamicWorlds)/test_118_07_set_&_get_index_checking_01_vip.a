@@ -1,0 +1,145 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+RefArrayIndex	= INTEGER.
+--
+ground:
+--
+MyDomain	= 'MyArray' of 'Report'.
+--
+-----------------------------------------------------------------------
+interface 'Tests':
+[
+PREDICATES:
+determ:
+test0;
+test1;
+test2(OnOff)	- (i);
+test3;
+]
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Console', 'Tests'):
+--
+internal:
+--
+my_array	: MyDomain;
+--
+catch		: 'Tests';
+--
+[
+PREDICATES:
+determ:
+alarm(ExceptionName,SYMBOL)		- (i,i);
+alarm(ExceptionName,SYMBOL,OnOff)	- (i,i,i);
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+my_array	= 'MyArray'[1 .. 5] of ('Report');
+--
+catch		= ('Trap',
+			world=self,
+			handler=self);
+--
+[
+goal:-
+	test0,
+	test1,
+	catch ? test3,
+	fail.
+goal:-
+	test2('off'),
+	test1,
+	catch ? test3,
+	fail.
+goal:-
+	test2('on'),
+	test1,
+	catch ? test3,
+	fail.
+goal:-!.
+--
+test0:-
+	set_color('RoyalBlue'),
+	writeln("Test 0."),
+	set_color('default'),
+	my_array ? get_index_checking(),!,
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+test0:-
+	set_color('Red'),
+	writeln("Failed!"),
+	set_color('default').
+--
+test1:-
+	set_color('RoyalBlue'),
+	writeln("Test 1."),
+	set_color('default'),
+	Mode== my_array?get_index_checking(),!,
+	write("Index checking: "),
+	set_color('Violet'),
+	writeln(Mode),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+test1:-
+	set_color('Red'),
+	writeln("Failed!"),
+	set_color('default').
+--
+test2(Mode):-
+	set_color('RoyalBlue'),
+	writeln("Test 2."),
+	set_color('default'),
+	my_array ? set_index_checking(Mode),
+	set_color('DkGreen'),
+	writeln("O.K."),
+	set_color('default').
+--
+test3:-
+	set_color('RoyalBlue'),
+	writeln("Test 3."),
+	set_color('default'),
+	write("I try to use an illegal array index: "),
+	_ == my_array[10],!,
+	set_color('Red'),
+	writeln("O.K."),
+	set_color('default').
+test3:-
+	set_color('DkGreen'),
+	writeln("Failure"),
+	set_color('default').
+--
+alarm(Name):-
+	set_color('Red'),
+	writeln("Alarm: ",Name),
+	set_color('default'),
+	fail.
+alarm(Exception,Name):-
+	set_color('Magenta'),
+	writeln("Alarm: ",Exception," ",Name),
+	set_color('default').
+alarm(Exception,Name,A1):-
+	set_color('Magenta'),
+	writeln("Alarm: ",Exception," ",Name," ",A1),
+	set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyArray' (specialized 'DynamicWorlds'):
+[
+DOMAINS:
+Target	= ('Report').
+PREDICATES:
+nondeterm:
+element(RefArrayIndex*) = Target	- (i)(o);
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,160 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'WorldArray' as 'WindowArray'
+	from "Arrays"('TargetClass':='TextPage');
+
+DOMAINS:
+
+reference:
+
+WindowCoordinate	= INTEGER; STRING.
+MessageString		= STRING.
+
+Matrix			= Row*.
+Row			= MessageString*.
+
+mixed:
+
+WindowCoordinates	= WindowCoordinate*.
+Colors			= Color*.
+
+-----------------------------------------------------------------------
+
+interface 'Main' (specialized 'Dialog'):
+
+variable:
+
+	i	: WindowCoordinate;
+	j	: WindowCoordinate;
+	value	: MessageString;
+
+variable:
+
+	link	: Matrix;
+
+internal:
+
+	output	: 'TextOutput';
+	tools	: 'MatrixOperations';
+
+[
+PREDICATES:
+
+nondeterm:
+
+goal;
+
+imperative:
+
+send_value(WindowCoordinate,WindowCoordinate,MessageString);
+]
+
+-----------------------------------------------------------------------
+
+interface 'TextOutput' (specialized 'Alpha'):
+
+variable:
+
+	link	: Matrix;
+
+constant:
+
+	w	: 'WindowArray' of 'TextPage';
+
+	x_list			: WindowCoordinates;
+	y_list			: WindowCoordinates;
+	text_colors		: Colors;
+	background_colors	: Colors;
+
+internal:
+
+	tools	: 'MatrixOperations';
+
+[
+PREDICATES:
+
+imperative:
+
+create_text_windows(
+	INTEGER,
+	INTEGER,
+	WindowCoordinates,
+	WindowCoordinates,
+	Colors,
+	Colors);
+]
+
+-----------------------------------------------------------------------
+
+interface 'TextPage' (specialized 'Report'):
+
+variable:
+
+	link	: Matrix;
+
+variable:
+
+	x			: WindowCoordinate;
+	y			: WindowCoordinate;
+	text_color		: Color;
+	background_color	: Color;
+	title			: MessageString;
+
+internal:
+
+	tools	: 'MatrixOperations';
+	memory	: 'TextPageStore';
+
+[
+PREDICATES:
+
+nondeterm:
+
+goal;
+
+imperative:
+
+show_window(WindowCoordinate,WindowCoordinate,Color,Color);
+retrieve_and_write_value(Matrix);
+
+nondeterm:
+
+write_value(MessageString);
+]
+
+-----------------------------------------------------------------------
+
+interface 'TextPageStore' (specialized 'Database'):
+[
+DOMAINS:
+
+mixed:
+
+Target		= coordinates(WindowCoordinate,WindowCoordinate).
+]
+
+-----------------------------------------------------------------------
+
+interface 'MatrixOperations' (specialized 'Alpha'):
+[
+PREDICATES:
+
+determ:
+
+matrix_element
+	(Matrix,WindowCoordinate,WindowCoordinate) = MessageString;
+row_element(Row,WindowCoordinate) = MessageString;
+
+determ:
+
+'>'(WindowCoordinate,WindowCoordinate);
+
+imperative:
+
+'-'(WindowCoordinate,WindowCoordinate) = WindowCoordinate;
+]
+
+-----------------------------------------------------------------------

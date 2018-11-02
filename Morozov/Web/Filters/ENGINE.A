@@ -1,0 +1,41 @@
+package "Morozov/Web/Filters/Engine":
+---------------------------------------------------------------
+--          The "FILTERS/EXAM" Actor Prolog package.         --
+--         (c) 2002-2011, IRE RAS, Alexei A. Morozov.        --
+---------------------------------------------------------------
+-- This is a design pattern for implementing filtering lists --
+-- of the Web resources.                                     --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+---------------------------------------------------------------
+PREDICATES:
+--
+determ:
+--
+switch_mode(DoFilterList)	- (i);
+--
+---------------------------------------------------------------
+class 'Filter_List' (specialized 'Dialog'):
+--
+variable:
+--
+	input_list;
+	output_list;
+	check;
+--
+	results		= check ?? filter(switch,input_list);
+--
+	switch;
+--
+[
+goal:-!,
+	switch_mode(switch).
+--
+switch_mode('no'):-!,
+	output_list== input_list.
+switch_mode('yes'):-!,
+	output_list== results.
+switch_mode(_):-!,
+	output_list== input_list.
+]
+---------------------------------------------------------------

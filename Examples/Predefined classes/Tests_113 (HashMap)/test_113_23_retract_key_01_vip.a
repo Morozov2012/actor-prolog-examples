@@ -1,0 +1,105 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+N		= INTEGER.
+R		= REAL.
+S		= SYMBOL.
+T		= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+test5;
+--
+check_key(N)		- (i);
+retrieve_value(N)	- (i);
+--
+-------------------------------------------------------------------------
+class 'MyHashMap' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+TargetKey	= N.
+TargetValue	= f(R,S,T).
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyHashMap');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test2,
+	test3,
+	test4,
+	test5.
+--
+test1:-
+	writeln("I will store data items."),
+	store ? put(1000,f(3.14,'symbol1',"Text1")),
+	store ? put(1000,f(7.00,'symbol1',"Text1")),
+	store ? put(1000,f(3.14,'symbol1',"Text1")),
+	store ? put(3000,f(3.14,'symbol1',"Text1")),
+	store ? put(1000,f(3.14,'symbol2',"Text1")),
+	store ? put(1000,f(3.14,'symbol1',"Text2")),
+	store ? put(5000,f(9.00,'symbol1',"Text3")),
+	writeln("Done.").
+--
+test2:-
+	writeln("I will retrieve data items:"),
+	store ? find(Item),
+	writeln("\t",Item),
+	fail.
+test2:-
+	writeln("Done.").
+--
+test3:-
+	writeln("I will retrieve data items:"),
+	retrieve_value(1000),
+	retrieve_value(3000),
+	retrieve_value(5000).
+--
+test4:-
+	writeln("I will check hash map:"),
+	check_key(1000),
+	check_key(3000),
+	check_key(5000).
+--
+test5:-
+	writeln("I will try to retract data item:"),
+	Key1== 3000,
+	writeln("\tKey: ",Key1),
+	store ? retract_key(Key1),!,
+	writeln("\tThe ",Key1," key was deleted.").
+test5:-
+	writeln("\tThis key does not exist in the map.").
+--
+check_key(Key):-
+	store ? contains_key(Key),!,
+	writeln("\tThe ",Key," key does exist.").
+check_key(Key):-
+	writeln("\tThe ",Key," key does NOT exist.").
+--
+retrieve_value(Key):-
+	Value== store?get(Key),!,
+	writeln("\t",Key," -> ",Value).
+retrieve_value(Key):-
+	writeln("\tThe ",Key," key does NOT exist.").
+]
+-----------------------------------------------------------------------

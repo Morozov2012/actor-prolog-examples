@@ -1,0 +1,70 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Webcam";
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+check_watcher;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	timer	= ('MyTimer',
+			webcam=self);
+	con	= ('Console');
+--
+[
+goal:-!,
+	check_watcher,
+	watch_webcam_state('yes'),
+	check_watcher,
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Opening webcam..."),
+	open,
+	check_watcher,
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Listening for events...").
+--
+check_watcher:-
+	watch_webcam_state(Mode),
+	con ? set_color('default'),
+	con ? writeln("Webcam state watcher is active: ",Mode).
+--
+webcam_open(WebcamName):-!,
+	con ? set_color('Violet'),
+	con ? writeln("This webcam is open: ",WebcamName).
+--
+webcam_image_obtained(WebcamName):-!,
+	con ? set_color('DkGreen'),
+	con ? writeln("This webcam has a new image: ",WebcamName).
+--
+webcam_closed(WebcamName):-!,
+	con ? set_color('Orange'),
+	con ? writeln("This webcam is closed: ",WebcamName).
+--
+webcam_disposed(WebcamName):-!,
+	con ? set_color('Red'),
+	con ? writeln("This webcam is disposed: ",WebcamName).
+]
+-----------------------------------------------------------------------
+class 'MyTimer' (specialized 'Timer'):
+--
+internal:
+--
+	webcam		: 'Webcam';
+--
+[
+goal:-!,
+	delay(10).
+--
+tick:-!,
+	webcam ? close.
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,190 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013-2017 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+	data_directory			: STRING;
+	target_directory		: STRING;
+	inverse_transformation_matrix	: TransformationMatrix;
+	sampling_rate			: REAL;
+--
+	stage_one		: 'ImagePreprocessor';
+	stage_two		: 'ImageAnalyzer';
+--
+internal:
+--
+	low_level_analyzer	: 'ImageSubtractor';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ImagePreprocessor' (specialized 'Timer'):
+--
+constant:
+--
+	data_directory		: STRING;
+	target_directory	: STRING;
+	sampling_rate		: REAL;
+--
+	low_level_analyzer	: 'ImageSubtractor';
+	stage_two		: 'ImageAnalyzer';
+--
+internal:
+--
+	subtractor		: 'SynchronizedImageSubtractor';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	state			: 'ProgramState';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ImageAnalyzer' (specialized 'Alpha'):
+--
+constant:
+--
+	sampling_rate		: REAL;
+--
+	low_level_analyzer	: 'ImageSubtractor';
+--
+	velocity_bound_1	: REAL;
+	velocity_bound_2	: REAL;
+	velocity_bound_3	: REAL;
+	velocity_bound_4	: REAL;
+--
+	circle_radius		: REAL;
+--
+internal:
+--
+	subtractor		: 'SynchronizedImageSubtractor';
+	graphic_window		: 'Canvas2D';
+	prompt_window		: 'Report';
+	text			: 'Text';
+	image			: 'BufferedImage';
+	timer			: 'Timer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+draw_scene;
+--
+draw_graphs(INTEGER,PointX,PointY,GraphList)	- (i,i,i,i);
+--
+draw_graph(
+	INTEGER,
+	PointX,
+	PointY,
+	ConnectedGraph,
+	ConnectedGraph)		- (i,i,i,i,i);
+--
+draw_edge(
+	INTEGER,
+	PointX,
+	PointY,
+	ConnectedGraphEdge,
+	ConnectedGraph)		- (i,i,i,i,i);
+--
+draw_origins(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	EdgeNumbers,
+	ConnectedGraph)		- (i,i,i,i,i,i);
+draw_origin(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	EdgeNumber,
+	ConnectedGraph)		- (i,i,i,i,i,i);
+draw_origin_arrow(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+--
+determ:
+--
+get_edge(
+	INTEGER,
+	ConnectedGraph,
+	ConnectedGraphEdge)	- (i,i,o);
+--
+imperative:
+--
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	TrackOfBlob)		- (i,i,i);
+draw_track_of_blobs(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	TrackOfBlob)		- (i,i,i,i,i);
+--
+draw_circle(PointX,PointY)	- (i,i);
+select_line_color(REAL,Color)	- (i,o);
+--
+draw_blob_identifier(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER)		- (i,i,i,i,i);
+--
+draw_legend;
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)		- (o);
+get_current_frame(INTEGER)		- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)		- (i);
+set_current_frame(INTEGER)		- (i);
+]
+-----------------------------------------------------------------------

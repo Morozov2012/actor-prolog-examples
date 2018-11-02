@@ -1,0 +1,53 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+
+DOMAINS:
+reference:
+RefArrayIndex	= INTEGER.
+Text		= STRING.
+ground:
+MyDomain	= ('MyArray').
+
+PREDICATES:
+imperative:
+p;
+
+class 'MyArray' (specialized 'BacktrackableArray'):
+[
+DOMAINS:
+reference:
+Target	= Text.
+PREDICATES:
+nondeterm:
+element(RefArrayIndex,
+	RefArrayIndex,
+	RefArrayIndex) = Target	- (o,i,o);
+]
+
+class 'MyWorld' (specialized 'Console'):
+--
+internal:
+--
+my_array	: MyDomain;
+--
+[
+goal:-!,
+	p.
+--
+p:-
+	Index2== -1,
+	R== my_array[Index1,Index2,Index3],
+	writeln("w[",Index1,",",Index2,",",Index3,"]= ",R),
+	fail.
+p.
+]
+
+class 'Main' (specialized 'Alpha'):
+--
+my_array : MyDomain	= 'MyArray'[7 .. 8, -1 .. 0, -3 .. -2];
+w			= ('MyWorld',my_array);
+--
+[
+]

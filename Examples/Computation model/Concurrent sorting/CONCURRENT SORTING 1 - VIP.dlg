@@ -1,0 +1,21 @@
+dialog 'UserInterface' ("Control Panel",default,default,default,centered,centered,default)
+	grid
+		row
+			column
+				"Input list:"
+			end_of_column
+			column
+				editname(input_list,27,"[5,8,2,7,9,2,6,5,9,4,7]")
+			end_of_column
+		end_of_row
+		row
+			column
+				"Sorted list:"
+			end_of_column
+			column
+				text(sorted_list,27,2,"")
+			end_of_column
+		end_of_row
+	end_of_grid
+	ok(close,"O.K.")
+end_of_dialog

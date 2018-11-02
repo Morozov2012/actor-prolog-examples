@@ -1,0 +1,232 @@
+package "Morozov/Web/Engines/Core":
+---------------------------------------------------------------
+--         The "ENGINES/CORE" Actor Prolog package.          --
+--       (c) 2002-2005, IRE RAS, Alexei A. Morozov.          --
+---------------------------------------------------------------
+-- This is a design pattern for implementing interfaces to   --
+-- the Web Search Engines.                                   --
+---------------------------------------------------------------
+import 'WebAddressRegistry'
+		from "Morozov/Web/Scanning/Counter";
+import 'ControlDialog'
+		from "Morozov/Web/Engines/Control";
+import 'EngineInput'
+		from "Morozov/Web/Engines/Control";
+---------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+determ:
+--
+check_number_of_page(PageNumber)		- (i);
+--
+imperative:
+--
+report_errors(TreeContent)			- (i);
+--
+determ:
+--
+search_useful_data_or_Fail(
+		TreeContent,
+		PageNumber,
+		PageNumber,
+		WebAddress)			- (i,i,o,o);
+--
+imperative:
+--
+save_address(WebAddress)			- (i);
+--
+reset;
+--
+---------------------------------------------------------------
+class 'SearchEngine' (specialized 'Alpha'):
+--
+constant:
+--
+	control		 = (('ControlDialog',
+				limit_number_of_pages,
+				max_page,
+				engine=self));
+--
+variable:
+--
+	limit_number_of_pages;
+	max_page;
+--
+internal:
+--
+	receiver	 = ('SpecialReceptor',
+				location,
+				maximal_waiting_time,
+				tags);
+--
+variable:
+--
+	location;
+	maximal_waiting_time = 20.0;
+	tags;
+--
+internal:
+--
+	registry	 = ('WebAddressRegistry');
+--
+constant:
+--
+	engine_output	 = #;
+	debug_output	 = #; -- ('Report');
+--
+internal:
+--
+	text		 = ('TextOperations');
+--
+[
+goal:-!.
+--
+show(_*):-!,
+	control <- show.
+--
+set_engine_mode(CountPages,MaxPage):-!,
+	control <- set_engine_mode(CountPages,MaxPage).
+---------------------------------------------------------------
+search(Words):-
+	/* Debug:
+	debug_output ? writeln(
+		"Flag: ",limit_number_of_pages,
+		" MaxPage: ",max_page),
+	*/
+	prepare_request_or_Fail(Words,URL),!,
+	registry ? retract_all(),
+	/* Debug
+	save_address("Reference1"),
+	save_address("Reference2"),
+	save_address("Reference3"),
+	save_address("Reference4"),
+	save_address("Reference5"),
+	*/
+	self << inspect_page(1,URL).
+search(Words):-
+	debug_output ? writeln(
+		"Illegal search pattern: ",Words),!.
+search(_).
+--
+replace_spaces(P,T,S1,S3):-
+	S2== text ? replace(?val("STRING",S1),P,T),!,
+	replace_spaces(P,T,S2,S3).
+replace_spaces(_,_,S,S):-!.
+--
+check_keywords(""):-!,
+	fail.
+check_keywords("+"):-!,
+	fail.
+check_keywords(_):-!.
+---------------------------------------------------------------
+inspect_page('no_page',_):-!.
+inspect_page(RequestedPage,URL1):-
+	check_number_of_page(RequestedPage),
+	debug_output ? writeln(
+		"I will inspect page ",RequestedPage," at ",URL1),
+	Tree== receiver ? get_trees(?val("STRING",URL1)),
+	report_errors(Tree),
+	-- search_useful_data_or_Fail(Tree,NextPage,URL2),!,
+	search_useful_data_or_Fail(
+		Tree,RequestedPage,NextPage,URL2),!,
+	self << inspect_page(NextPage,URL2).
+inspect_page(_,_).
+--
+check_number_of_page(CurrentPage):-
+	[limit_number_of_pages,max_page],
+	/*
+	debug_output ? writeln(limit_number_of_pages),
+	debug_output ? writeln(max_page),
+	*/
+	-- bound(CurrentPage), -- 2013.01.21 ?!
+	bound(max_page),
+	limit_number_of_pages == 'yes',
+	integer(CurrentPage),
+	CurrentPage > max_page,!,
+	debug_output ? writeln(
+		"The limit of page number was exceeded: ",
+		max_page),
+	fail.
+check_number_of_page(_):-!.
+--
+report_errors([]):-!.
+report_errors([_|_]):-!.
+report_errors(Tree):-
+	debug_output ? writeln(
+		"Unexpected answer: ",Tree),!.
+report_errors(_).
+--
+/* Debug
+search_useful_data_or_Fail(_,_,_,_):-
+	save_address("http://www.cplire.ru/Lab144/"),
+	save_address("http://techref.massmind.org/techref/language/prolog/index.htm"),
+	save_address("http://objectmix.com/prolog/211634-compiler-actor-prolog-available-testing.html"),
+	save_address("http://coding.derkeiler.com/Archive/Prolog/comp.lang.prolog/2007-05/msg00078.html"),
+	save_address("http://newsgroups.derkeiler.com/Archive/Comp/comp.lang.pascal.misc/2006-05/msg00000.html"),
+	save_address("http://www.dmi.unict.it/~barba/PROG-LANG/PROGRAMMI-TESTI/READING-MATERIAL/shortNotesOnErlang.html"),
+	save_address("Reference1"),
+	save_address("Reference2"),
+	save_address("Reference3"),
+	save_address("Reference4"),
+	save_address("Reference5"),
+	fail.
+*/
+search_useful_data_or_Fail(Tree,_,_,_):-
+	debug_output ? writeln("I will search references..."),
+	extract_reference_from_tree(Tree,Reference),
+	engine_output ? find_reference(Reference),
+	debug_output ? writeln("Address: ",Reference),
+	save_address(Reference),
+	fail.
+search_useful_data_or_Fail(Tree,RequestedPage,NextPage,PA):-
+	debug_output ? writeln(
+		"I will search the address of the next page..."),
+	NextPage== RequestedPage+1,
+	extract_address_of_next_page(Tree,NextPage,PA),!,
+	-- integer(PN),
+	-- NextNumber== text ? convert_to_integer(PN),
+	engine_output ? next_page(NextPage,PA),
+	debug_output ? writeln(
+		"The Address of the next page: ",PA).
+search_useful_data_or_Fail(_,_,_,_):-!,
+	debug_output ? writeln("This page was the last one!"),
+	fail.
+---------------------------------------------------------------
+refine_address(Address,Address):-
+	text ? search(?val("STRING",Address),"HTTP://"),!.
+refine_address(A1,A2):-
+	A2== text ? replace(
+		?val("STRING",A1),"HTTP:/","http://"),!.
+refine_address(Address,Address):-!.
+---------------------------------------------------------------
+save_address(URL):-
+	registry ? find(old(_,URL)),!.
+save_address(URL):-!,
+	registry ? append(old("",URL)).
+--
+reset:-
+	registry ? retract_all().
+--
+get_resource= URL :-
+	registry ? find(old(_,URL)).
+]
+---------------------------------------------------------------
+class 'SpecialReceptor' (specialized 'WebReceptor'):
+--
+revision_period	= 'none';
+attempt_period	= 'none';
+--
+[
+]
+---------------------------------------------------------------
+class 'TextOperations' (specialized 'Text'):
+[
+]
+---------------------------------------------------------------
+class 'TextWindow' (specialized 'Report'):
+[
+]
+---------------------------------------------------------------

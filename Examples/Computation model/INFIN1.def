@@ -1,0 +1,118 @@
+---------------------------------------------------
+-- An example of Actor Prolog program.           --
+-- (c) 2008, IRE RAS, Alexei A. Morozov.         --
+-- Creation of an arbitrary number of processes. --
+---------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+N		= INTEGER; STRING.
+--
+TargetData	= d(N,TargetValue);
+		  ('W');
+		  TargetData*.
+--
+TargetValue	= STRING.
+--
+RefX, RefY	= INTEGER.
+--
+---------------------------------------------------
+interface 'Main' (specialized 'Dialog'):
+--
+constant:
+--
+	list		: 'ListOfNodes';
+--
+variable:
+--
+	number_of_nodes	: N;
+	list_of_nodes	: TargetData;
+--
+	results		: TargetData;
+--
+constant:
+--
+	output		: 'Reporter';
+--
+[
+]
+---------------------------------------------------
+interface 'Reporter' (specialized 'Console'):
+--
+variable:
+--
+	results		: TargetData;
+--
+[
+]
+---------------------------------------------------
+interface 'ListOfNodes' (specialized 'Alpha'):
+--
+constant:
+--
+	world		: 'W';
+--
+variable:
+--
+	number_of_nodes	: N;
+	n1		: N;
+	list_of_nodes	: TargetData;
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_number_of_processes(N,N)	- (i,i);
+--
+imperative:
+--
+display;
+]
+---------------------------------------------------
+interface 'W' (specialized 'Dialog'):
+--
+constant:
+--
+	world		: 'W';
+--
+suspending:
+--
+	n1		: N;
+--
+variable:
+--
+	n2		: N;
+--
+	x		: RefX;
+	y		: RefY;
+--
+protecting:
+--
+	list_of_nodes	: TargetData;
+--
+variable:
+--
+	r2		: TargetData;
+	target_value	: TargetValue;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+check_number(
+	N,N,
+	TargetData,TargetData)	- (i,i,o,i);
+--
+set_coordinates(RefX,RefY)	- (i,i);
+--
+display;
+--
+nondeterm:
+--
+get_data= TargetData;
+]
+---------------------------------------------------

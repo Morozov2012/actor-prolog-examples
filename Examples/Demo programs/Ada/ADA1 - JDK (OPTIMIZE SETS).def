@@ -1,0 +1,304 @@
+------------------------------------------------------------------
+--              An example of Actor Prolog program.             --
+--          (c) 1990-2011, IRE RAS, Alexei A. Morozov.          --
+------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+Values		= Value*.
+--
+Value		= /* Computed Value */
+		  SYMBOL; STRING; INTEGER;
+		  name(N);
+		  s(Value);
+		  half(Value);
+		  {	value:Value,
+		  	even:IsEven,
+		  	positive:IsPositive	};
+		  '*'(Value,Value);
+		  '+'(Value,Value);
+		  program(Values);
+		  declare(Values);
+		  input_list(Values);
+		  guard(Value,Value);
+		  block(Values);
+		  do(Value,Values);
+		  'if'(Values);
+		  'is'(Value,Value);
+		  neq(Value,Value);
+		  odd(Value);
+		  even(Value);
+		  output(Value).
+--
+N		= INTEGER.
+IsEven		= 'yes'; 'no'; 'all'.
+IsPositive	= 'yes'; 'no'; 'all'; 'zero_valued'.
+--
+mixed:
+--
+Function	= /* Function */
+		  SYMBOL{ index:Value,
+			  argument_2:Value,
+			  result:Value,
+			  in_loop:LoopAttributes,
+			  inner:InternalData,
+			  vn:VariableNumbers}.
+--
+LoopAttributes	= b(Value,Value).
+InternalData	= p(Value,Value).
+--
+reference:
+--
+VariableNumbers	= vn(N,N).
+--
+ground:
+--
+Tabulators	= INTEGER.
+--
+------------------------------------------------------------------
+--		The 'TRANSLATOR' class				--
+------------------------------------------------------------------
+interface 'TRANSLATOR' (specialized 'RULES'):
+--
+con		: 'Console';
+help_1		: 'Report';
+function	: 'TARGET';
+report		: 'LANGUAGE';
+format_output	: 'FORMAT';
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+synthesis(Value,Value)				- (o,o);
+show_help_windows(Value);
+--
+create_list_of_variables(Value,Values,Values)	- (i,i,o);
+is_member(Value,Values);
+]
+------------------------------------------------------------------
+--		The 'TEST' class				--
+------------------------------------------------------------------
+interface 'TEST' (specialized 'TARGET'):
+--
+value_A		: Value;
+value_B		: Value;
+value_C		: Value;
+value_D		: Value;
+test_value	: Value;
+--
+[
+]
+------------------------------------------------------------------
+--		Some dummy classes for definition		--
+--		of the target function ('*', '+', 'DATA')	--
+------------------------------------------------------------------
+interface '*' (specialized 'F'):
+[
+]
+------------------------------------------------------------------
+interface '+' (specialized 'F'):
+[
+]
+------------------------------------------------------------------
+interface 'F' (specialized 'TARGET'):
+--
+input1	: 'TARGET';
+input2	: 'TARGET';
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+f(Value,Value) = Value;
+]
+------------------------------------------------------------------
+interface 'DATA' (specialized 'TARGET'):
+--
+name	: Value;
+window	: 'Report';
+--
+[
+]
+------------------------------------------------------------------
+interface 'TARGET' (specialized 'Alpha'):
+[
+PREDICATES:
+--
+nondeterm:
+--
+value() = Value;
+--
+determ:
+--
+is_even(Value,IsEven)		- (i,o);
+is_positive(Value,IsPositive)	- (i,o);
+--
+even(Value*);
+'>'(Value,Value);
+--
+imperative:
+--
+'+'(Value,Value) = Value;
+'*'(Value,Value) = Value;
+]
+------------------------------------------------------------------
+--		Definition of the '*' operation			--
+------------------------------------------------------------------
+interface 'RULES' (specialized 'SECOND_ORDER_RULES'):
+[
+PREDICATES:
+--
+nondeterm:
+--
+is_zero(Value);
+--
+determ:
+--
+get_value(Value)= Value;
+]
+------------------------------------------------------------------
+--		Second order rules				--
+------------------------------------------------------------------
+interface 'SECOND_ORDER_RULES' (specialized 'Alpha'):
+--
+w	: 'Report';
+con	: 'Console';
+--
+[
+PREDICATES:
+--
+nondeterm:
+--
+compute(Value,N,N) = Value	- (i,i,o);
+--
+internal_block(
+	Value,
+	Value,
+	Value,
+	Value,
+	Value) = Value;
+--
+loop_result(
+	Value,
+	Value,
+	Value,
+	Value,
+	Value,
+	Value,
+	Value,
+	Value) = Value;
+--
+declare_do_od(Value,Value,Value) = Value;
+--
+do_od_block(
+	Value,
+	Value,
+	Value,
+	Value,
+	Value,
+	Value) = Value;
+--
+{Function} = Value;
+--
+nondeterm:
+--
+half(Value) = Value;
+plus(Value,Value) = Value;
+--
+nondeterm:
+--
+not(IsEven,IsEven)		- (i,o);
+--
+positive(Value);
+is_even(Value);
+is_odd(Value);
+is_less(Value,Value);
+synonym1(Value) = Value;
+analog(Value,N,N) = Value	- (i,i,o);
+neq(Value,Value);
+--
+imperative:
+--
+newname(N,N) = Value		- (i,o);
+--
+imperative:
+--
+'+'(N,N) = N;
+]
+------------------------------------------------------------------
+--		Syntax of target language			--
+------------------------------------------------------------------
+interface 'LANGUAGE' (specialized 'Report'):
+--
+help_2	: 'Report';
+env	: 'Timer';
+con	: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+show_help_2;
+--
+target_program(Tabulators,Value,Value);
+tab(Tabulators);
+--
+determ:
+--
+'<'(Value,Value);
+'>='(Value,Value);
+]
+------------------------------------------------------------------
+--		Syntax of the Ada language			--
+------------------------------------------------------------------
+interface 'ADA' (specialized 'LANGUAGE'):
+--
+help_2		: 'Text';
+comment		: STRING;
+format_output	: 'FORMAT';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+write_heading(Tabulators,Value);
+write_end_of_program(Tabulators);
+variable_name(Value);
+declarations(Values);
+main_block(Tabulators,Value,Values);
+block_operator(Tabulators,Value,Values);
+operators(Tabulators,Value,Values);
+ada_operator(Tabulators,Value,Value);
+input_list(Tabulators,Values);
+input_value(Tabulators,Value);
+--
+determ:
+--
+is_arithmetic_expression(Value);
+--
+imperative:
+--
+arithmetic_expression(Value);
+logic_expression(Value);
+if_operator(Tabulators,Value,Values);
+]
+------------------------------------------------------------------
+interface 'FORMAT' (specialized 'Alpha'):
+--
+device	: 'Text';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+output(Value);
+]
+------------------------------------------------------------------

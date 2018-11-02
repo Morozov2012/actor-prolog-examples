@@ -1,0 +1,50 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+timer1	= ('MainTimer');
+timer2	= ('AuxiliaryTimer',
+		main_timer=timer1);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'MainTimer' (specialized 'Timer'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	set_period(3),
+	activate.
+--
+tick:-!,
+	Time== ?time(),
+	con ? writeln("Main Timer :: Tick :: Time: ",Time).
+]
+-----------------------------------------------------------------------
+class 'AuxiliaryTimer' (specialized 'Timer'):
+--
+internal:
+--
+main_timer;
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	delay(10).
+--
+tick:-!,
+	Time== ?time(),
+	con ? writeln("Auxiliary Timer :: Tick :: Time: ",Time),
+	main_timer ? set_period(0.5).
+]
+-----------------------------------------------------------------------
+

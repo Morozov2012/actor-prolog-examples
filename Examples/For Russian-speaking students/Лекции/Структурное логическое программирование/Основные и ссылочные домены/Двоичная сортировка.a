@@ -1,0 +1,93 @@
+-------------------------------------------
+--                                       --
+-- ѕример использовани€ ссылочных        --
+-- доменов (типов данных).               --
+--                                       --
+-- ƒвоична€ сортировка (сортировка       --
+-- списка с помощью двоичного дерева     --
+-- с удалением повторных элементов).     --
+--                                       --
+-- Ќовый "кирпичик":                     --
+-- постепенное доопределение составного  --
+-- терма (терм принадлежит ссылочному    --
+-- типу).                                --
+--                                       --
+-- »спользованы "кирпичики":             --
+-- 1) разборка списка;                   --
+-- 2) входна€ сборка списка;             --
+-- 3) выходной аргумент.                 --
+--                                       --
+-- ¬спомогательные средства (без них     --
+-- можно было бы обойтись):              --
+-- 1) отсечение.                         --
+-- 2) классы.                            --
+--                                       --
+-------------------------------------------
+
+class 'Main' (specialized 'DemoConsole'):
+[
+
+DOMAINS:
+
+reference:
+
+BTree	= b(N,BTree,BTree); 'leaf'.
+N	= INTEGER.
+
+mixed:
+
+List	= N*.
+
+PREDICATES:
+
+imperative:
+
+sort_list(List,List)		- (i,o);
+create_tree(BTree)		- (o);
+list_to_tree(List,BTree)	- (i,i);
+insert_element(N,BTree)		- (i,i);
+tree_to_list(BTree,List,List)	- (i,i,o);
+
+determ:
+
+'<'(N,N)			- (i,i);
+'>'(N,N)			- (i,i);
+
+CLAUSES:
+
+goal:-
+	L1== [1,5,1,3,2,4,5,2],
+	writeln("L1 = ",L1),
+	sort_list(L1,L2),
+	writeln("L2 = ",L2).
+
+sort_list(L1,L2):-
+	create_tree(Tree),
+	list_to_tree(L1,Tree),
+	tree_to_list(Tree,[],L2).
+
+create_tree(_).
+
+list_to_tree([],_).
+list_to_tree([H|Rest],Tree):-
+	insert_element(H,Tree),
+	writeln(Tree),
+	list_to_tree(Rest,Tree).
+
+insert_element(N,b(N,_,_)):-!.
+insert_element(N1,b(N2,Left,_)):-
+	N1 < N2,!,
+	insert_element(N1,Left).
+insert_element(N1,b(N2,_,Right)):-
+	N1 > N2,!,
+	insert_element(N1,Right).
+insert_element(_,_):-
+	writeln("Error.").
+
+tree_to_list('leaf',List,List):-!.
+tree_to_list(b(N,Left,Right),L1,L3):-!,
+	tree_to_list(Left,L1,L2),
+	tree_to_list(Right,[N|L2],L3).
+tree_to_list(_,_,[]):-
+	writeln("Error.").
+]

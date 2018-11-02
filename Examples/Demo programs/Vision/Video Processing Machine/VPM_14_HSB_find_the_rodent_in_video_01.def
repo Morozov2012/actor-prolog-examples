@@ -1,0 +1,192 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+Hue		= INTEGER; STRING.
+Saturation	= INTEGER; STRING.
+Brightness	= INTEGER; STRING.
+--
+IsMatureTrack	= YesNo.
+IsLastSegment	= 'no'; 'yes'.
+--
+-----------------------------------------------------------------------
+interface 'DialogHSB' (specialized 'Dialog'):
+--
+constant:
+--
+	data_directory		: STRING;
+	file_name		: STRING;
+	frame_rate		: REAL;
+--
+internal:
+--
+	video			: 'VideoReader';
+	vpm			: 'VideoProcessingMachine';
+	timer			: 'Timer';
+	graphic_window		: 'Canvas2D';
+	text			: 'Text';
+	image1			: 'BufferedImage';
+	image2			: 'BufferedImage';
+	state			: 'ProgramState';
+	con			: 'Console';
+--
+variable:
+--
+	minimal_hue		: Hue;
+	maximal_hue		: Hue;
+--
+	minimal_saturation	: Saturation;
+	maximal_saturation	: Saturation;
+--
+	minimal_brightness	: Brightness;
+	maximal_brightness	: Brightness;
+--
+constant:
+--
+	circle_radius		: REAL;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+divide_list(INTEGER,PointList,PointList)	- (i,i,o);
+--
+frame_obtained;
+data_transfer_completion;
+data_transfer_error(ExceptionName)		- (i);
+--
+draw_scene;
+--
+draw_tracks(TrackList,PointX,PointY)		- (i,i,i);
+draw_track(Track,PointX,PointY)			- (i,i,i);
+select_color(INTEGER,Color)			- (i,o);
+--
+draw_first_blob_rectangle(
+	TrackSegmentList,
+	IsMatureTrack,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i);
+draw_track_segments(
+	TrackSegmentList,
+	TrackSegment,
+	IsMatureTrack,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+draw_track_segment(
+	TrackSegment,
+	TrackSegment,
+	IsLastSegment,
+	IsMatureTrack,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i);
+--
+draw_track_of_blob(
+	TrackOfBlob,
+	BlobCoordinates,
+	IsLastSegment,
+	IsMatureTrack,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i,i,i);
+draw_blob_rectangle(
+	BlobCoordinates,
+	IsMatureTrack,
+	Color,
+	INTEGER,
+	PointX,
+	PointY)			- (i,i,i,i,i,i);
+select_dash_array(
+	IsMatureTrack,
+	PenAttributes)		- (i,o);
+draw_blob_link(
+	BlobCoordinates,
+	BlobCoordinates,
+	Color,
+	PointX,
+	PointY)			- (i,i,i,i,i);
+--
+draw_segment_link(
+	TrackSegment,
+	TrackSegment,
+	PointX,
+	PointY)			- (i,i,i,i);
+--
+draw_circle(PointX,PointY)	- (i,i);
+--
+draw_legend;
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX			- (i,i);
+'+'(PointY,PointY) = PointY			- (i,i);
+'-'(PointX,PointX) = PointX			- (i,i);
+'-'(PointY,PointY) = PointY			- (i,i);
+'/'(PointX,PointX) = PointX			- (i,i);
+'/'(PointY,PointY) = PointY			- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'VideoReader' (specialized 'FFmpeg'):
+--
+internal:
+--
+target_world;
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		: 'Timer';
+--
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER);
+		  frame_counter(INTEGER);
+		  stop_watch_time(INTEGER);
+		  global_counter(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)			- (o);
+get_current_frame(INTEGER)			- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)			- (i);
+set_current_frame(INTEGER)			- (i);
+--
+reset_stopwatch;
+get_stopwatch_time(INTEGER)			- (o);
+--
+reset_frame_counter;
+increase_frame_counter;
+get_frame_counter(INTEGER)			- (o);
+--
+increase_global_counter;
+get_global_counter(INTEGER)			- (o);
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,167 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Warning: the VIP version does not support the activate and
+-- the update predicates of the Database and the DataStore classes.
+-- Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DataStore'):
+--
+constant:
+--
+	name		= "SharedDataStore.dat";
+	access_mode	= 'modifying';
+	sharing_mode	= 'shared_access';
+--
+internal:
+--
+	updater	= ('DataStoreUpdater',
+			store=self);
+--
+	con1	= ('Report',
+			title="",
+			x=0,
+			y=17);
+	con2	= ('Report',
+			title="Inspector",
+			x=40,
+			y=0,
+			width=40,
+			height=17);
+--
+[
+goal:-!,
+	-- store ? delete,
+	con1 ? set_color('Orange'),
+	con1 ? write("OPENING DATA STORE... "),
+	open,
+	con1 ? writeln("DONE."),
+	con1 ? set_color('default'),
+	activate.
+--
+update:-!,
+	con2 ? set_color('Magenta'),
+	con2 ? writeln("DATASTORE IS UPDATED!"),
+	con2 ? set_color('default'),
+	report_whether_data_store_is_updated,
+	test_datastore.
+--
+report_whether_data_store_is_updated:-
+	is_updated,!,
+	con2 ? set_color('White','Magenta'),
+	con2 ? writeln("The data store is updated!"),
+	con2 ? set_color('default','default').
+report_whether_data_store_is_updated:-
+	con2 ? set_color('White','Red'),
+	con2 ? writeln("The data store is NOT updated!"),
+	con2 ? set_color('default','default').
+--
+test_datastore:-
+	con2 ? set_color('RoyalBlue'),
+	con2 ? writeln("Test data store inspection."),
+	con2 ? set_color('default'),
+	begin_transaction('reading'),!,
+	inspect_datastore,
+	end_transaction,
+	con2 ? set_color('DkGreen'),
+	con2 ? writeln("O.K."),
+	con2 ? set_color('default').
+test_datastore:-
+	con2 ? set_color('Red'),
+	con2 ? writeln("\tTransaction failed."),
+	con2 ? set_color('default').
+--
+inspect_datastore:-
+	get_entry(Name,Type),
+		con2 ? writeln("\t",Name," : ",Type),
+		fail.
+inspect_datastore.
+]
+-----------------------------------------------------------------------
+class 'DataStoreUpdater' (specialized 'Timer'):
+--
+internal:
+--
+	store;
+--
+	writer	= ('MyDatabase',
+			store,
+			con);
+--
+	con	= ('Report',
+			title="Updater",
+			x=0,
+			y=0,
+			width=40,
+			height=17);
+--
+[
+goal:-!,
+	set_period(1,0),
+	activate.
+--
+tick:-!,
+	writer ? update_database.
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	store;
+	con;
+--
+[
+update_database:-
+	con ? set_color('Black'),
+	N== ?random(9000000),
+	TableName== con?format("Table_%07d",N),
+	con ? writeln("Update table: ",TableName),
+	set_place(shared(store,TableName)),
+	con ? writeln("Test database update."),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	modify_database,
+	end_transaction.
+update_database:-
+	con ? set_color('White','Violet'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default','default').
+--
+modify_database:-
+	check_database('Black'),
+	fail.
+modify_database:-
+	Delta== ?random(101) - 50.0,
+	modify_database(Delta),
+	modify_database(-(Delta)).
+--
+modify_database(Delta):-
+	T1== ?match(_),
+	T1 == my_data(V1),
+	retract(T1),!,
+	insert(my_data(V1 + Delta)).
+modify_database(Delta):-
+	insert(my_data(Delta)).
+--
+check_database(Color):-
+	T1== ?match(_),
+	T1 == my_data(V1),!,
+	report_checksum(V1,Color).
+check_database(_).
+--
+report_checksum(V1,_):-
+	V1 <> 0.0,
+	con ? set_color('White','Red'),
+	con ? writeln("Illegal check sum value!"),
+	con ? set_color('default','default'),
+	fail.
+report_checksum(V1,Color):-
+	con ? set_color(Color,'default'),
+	con ? writeln("Check sum: ",V1),
+	con ? set_color('default','default').
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,9 @@
+dialog 'Check_Resources' (
+	"Parameters of Check",'White','Blue',
+	default,centered,centered,default)
+vbox(center)
+	"Maximal Length of File:"
+	editinteger(limit_of_length,8,10000)
+	ok(close,"&O.K.")
+end_of_vbox
+end_of_dialog

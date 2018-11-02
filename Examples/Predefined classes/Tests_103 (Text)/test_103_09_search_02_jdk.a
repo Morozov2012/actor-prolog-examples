@@ -1,0 +1,148 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+test7;
+test8;
+
+class 'Main' (specialized 'Text'):
+--
+case_sensitivity	= 'off';
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	set_string("TextPatterns"),
+	test0,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6,
+	test7,
+	test8.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0"),
+	con ? set_color('default'),
+	?search("TextPatterns","Pattern"),
+	?search("Pattern"),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tO.K."),
+	con ? set_color('default'),
+	fail.
+test0.
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1"),
+	con ? set_color('default'),
+	Text== "ABCD{efGHi}JK{efGHi}lmnO{EFghI}PQRST",
+	X1== ?search(Text,"efGHi"),
+	con ? set_color('DkGreen'),
+	con ? writeln("\t",X1),
+	con ? set_color('default'),
+	fail.
+test1.
+--
+test2:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2"),
+	con ? set_color('default'),
+	Text== "ABCD{efGHi}JK{efGHi}lmnO{EFghI}PQRST",
+	?search(Text,"efGHi"),
+	con ? set_color('DkGreen'),
+	con ? writeln("\t","O.K."),
+	con ? set_color('default'),
+	fail.
+test2.
+--
+test3:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 3"),
+	con ? set_color('default'),
+	X1== ?search("ABC",""),
+	con ? set_color('DkGreen'),
+	con ? writeln("\t",X1),
+	con ? set_color('default'),
+	fail.
+test3.
+--
+test4:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 4"),
+	con ? set_color('default'),
+	X1== ?search("",""),
+	con ? set_color('DkGreen'),
+	con ? writeln("\t",X1),
+	con ? set_color('default'),
+	fail.
+test4.
+--
+test5:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 5"),
+	con ? set_color('default'),
+	Text== "ABCD{efGHi}JK{efGHi}lmnO{EFghI}PQRST",
+	set_string(Text),
+	X1== ?search("efGHi"),
+	con ? set_color('DkGreen'),
+	con ? writeln("\t",X1),
+	con ? set_color('default'),
+	fail.
+test5.
+--
+test6:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 6"),
+	con ? set_color('default'),
+	Text== "ABCD{efGHi}JK{efGHi}lmnO{EFghI}PQRST",
+	set_string(Text),
+	?search("efGHi"),
+	con ? set_color('DkGreen'),
+	con ? writeln("\t","O.K."),
+	con ? set_color('default'),
+	fail.
+test6.
+--
+test7:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 7"),
+	con ? set_color('default'),
+	set_string("ABC"),
+	X1== ?search(""),
+	con ? set_color('DkGreen'),
+	con ? writeln("\t",X1),
+	con ? set_color('default'),
+	fail.
+test7.
+--
+test8:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 8"),
+	con ? set_color('default'),
+	set_string(""),
+	X1== ?search(""),
+	con ? set_color('DkGreen'),
+	con ? writeln("\t",X1),
+	con ? set_color('default'),
+	fail.
+test8.
+]

@@ -1,0 +1,37 @@
+package "MOROZOV/WEB/DATA/MY_DATA":
+---------------------------------------------------------------
+--            The "MY_DATA" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package is dummy one. It contains some addresses of  --
+-- the HTML files on my local disk.                          --
+---------------------------------------------------------------
+import "Morozov/Web/Data/Address";
+---------------------------------------------------------------
+interface '_My_Data':
+--
+variable:
+--
+	value_o1		: WebAddressList;
+--
+	list_of_resources	: WebAddressList;
+--
+internal:
+--
+	con			: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+show(_*);
+--
+nondeterm:
+--
+get_address= WebAddress;
+--
+{WebResourceAttributes};
+--
+]
+---------------------------------------------------------------

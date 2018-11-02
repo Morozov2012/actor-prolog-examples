@@ -1,0 +1,13 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+[
+goal:-
+	Color1== ?input_color('default'),
+	writeln(Color1),
+	Color2== ?input_color(Color1),!,
+	writeln(Color2).
+]
+-----------------------------------------------------------------------

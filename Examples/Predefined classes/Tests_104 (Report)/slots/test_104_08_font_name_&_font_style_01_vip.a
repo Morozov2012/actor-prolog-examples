@@ -1,0 +1,162 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w1	= ('Row');
+--
+[
+goal.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Row':
+--
+constant:
+--
+w1	= ('Column',
+		x= 0,
+		font_style='default');
+--
+w2	= ('Column',
+		x= 1,
+		font_style='bold');
+--
+w3	= ('Column',
+		x= 2,
+		font_style='italic');
+--
+w4	= ('Column',
+		x= 3,
+		font_style='underlined');
+--
+w5	= ('Column',
+		x= 4,
+		font_style=['bold','italic']);
+--
+w6	= ('Column',
+		x= 5,
+		font_style=['bold','underlined']);
+--
+w7	= ('Column',
+		x= 6,
+		font_style=['italic','underlined']);
+--
+w8	= ('Column',
+		x= 7,
+		font_style=['bold','italic','underlined']);
+--
+w9	= ('Column',
+		x= 8,
+		font_style=[]);
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'Column':
+--
+constant:
+--
+	x	: X;
+--
+	font_style	: FontStyle;
+--
+w1	= ('MyWindow',
+		x,
+		y= 0,
+		width=1,
+		height=1,
+		text_color= 'default',
+		space_color= 'default',
+		font_name= 'system',
+		font_size= 18,
+		font_style,
+		background_color= 'White');
+--
+w2	= ('MyWindow',
+		x,
+		y= 1,
+		width=1,
+		height=1,
+		text_color= 'default',
+		space_color= 'default',
+		font_name= 'fixed',
+		font_size= 18,
+		font_style,
+		background_color= 'White');
+--
+w3	= ('MyWindow',
+		x,
+		y= 2,
+		width=1,
+		height=1,
+		text_color= 'default',
+		space_color= 'default',
+		font_name= 'times',
+		font_size= 18,
+		font_style,
+		background_color= 'White');
+--
+w4	= ('MyWindow',
+		x,
+		y= 3,
+		width=1,
+		height=1,
+		text_color= 'default',
+		space_color= 'default',
+		font_name= 'helvetica',
+		font_size= 18,
+		font_style,
+		background_color= 'White');
+--
+w5	= ('MyWindow',
+		x,
+		y= 4,
+		width=1,
+		height=1,
+		text_color= 'default',
+		space_color= 'default',
+		font_name= 'default',
+		font_size= 18,
+		font_style,
+		background_color= 'White');
+--
+w6	= ('MyWindow',
+		x,
+		y= 5,
+		width=1,
+		height=1,
+		text_color= 'default',
+		space_color= 'default',
+		font_name= "Arial",
+		font_size= 18,
+		font_style,
+		background_color= 'White');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	font_name;
+	font_style;
+--
+[
+goal:-!,
+	writeln(font_name),
+	writeln(font_style).
+]
+-----------------------------------------------------------------------

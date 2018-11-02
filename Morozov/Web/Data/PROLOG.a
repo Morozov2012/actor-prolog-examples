@@ -1,0 +1,318 @@
+package "Morozov/Web/Data/Prolog":
+---------------------------------------------------------------
+--            The "PROLOG" Actor Prolog package.             --
+--        (c) 2002-2011, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package contains the addresses of some Web resources --
+-- related to the logic programming and Prolog.              --
+---------------------------------------------------------------
+class 'LogicProgrammingSites' (specialized 'Alpha'):
+[
+{name:"Abreu",address:"http://www.di.uevora.pt/~spa/"}.
+--
+{name:"ACE",address:"http://www.cs.kuleuven.ac.be/~dtai/ACE/"}.
+--
+-- {name:"HTML2",address:"file:///d:\\Morozov\\HTML-2\\index.html"}.
+-- {name:"HTML2",address:"D:\\Morozov\\HTML-2\\index.html"}.
+{name:"Actor Prolog",address:"http://www.cplire.ru/Lab144/index.html"}.
+--
+{name:"AILog2",address:"http://artint.info/code/ailog/ailog2.html"}.
+--
+{name:"Alain Colmerauer",address:"http://alain.colmerauer.free.fr/"}.
+--
+-- {name:"ALF",address:"ftp://ftp.mpi-sb.mpg.de/pub/guide/staff/michael/systems/ALF.html"}.
+{name:"ALF",address:"http://www.informatik.uni-kiel.de/~mh/systems/ALF.html"}.
+--
+-- {name:"ALP",address:"http://www.cwi.nl/projects/alp/index.html"}.
+--
+-- {name:"ALS Prolog",address:"http://www.als.com/"}.
+--
+{name:"Amzi Prolog",address:"http://www.amzi.com/"}.
+--
+{name:"B-Prolog",address:"http://www.probp.com/"}.
+--
+{name:"BinProlog",address:"http://www.binnetcorp.com/BinProlog/"}.
+--
+-- {name:"Bowen",address:"http://www.afm.sbu.ac.uk/logic-prog/"}.
+--
+-- {name:"Brain Aid Prolog",address:"http://www.comnets.rwth-aachen.de/~ost/private.html"}.
+{name:"Brain Aid Prolog",address:"http://www.fraber.de/bap/"}.
+--
+{name:"Bry",address:"http://www.pms.informatik.uni-muenchen.de/mitarbeiter/bry/"}.
+--
+{name:"Carlsson",address:"http://www.sics.se/~matsc/"}.
+--
+{name:"Carro",address:"http://www.clip.dia.fi.upm.es/~boris/"}.
+--
+{name:"Cetus",address:"http://www.cetus-links.org/oo_prolog.html",prefix:"oo_prolog"}.
+--
+{name:"Ciao Prolog",address:"http://www.clip.dia.fi.upm.es/Software/Ciao/"}.
+--
+-- {name:"CIspace",address:"http://www.cs.ubc.ca/labs/lci/CIspace/version2/deduction.html"}.
+-- {name:"CIspace",address:"http://www.cs.ubc.ca/labs/lci/CIspace/version2/project/CIspace/tree/treeHelp.html"}.
+{name:"CIspace",address:"http://150.214.140.135/~cgdiaz/CIspace/"}.
+--
+-- {name:"CKI Prolog",address:"http://www.students.cs.uu.nl/people/smotterl/prolog/index.htm",declared_date:date(2001,"SEP",5)}.
+--
+{name:"Clark",address:"http://www.doc.ic.ac.uk/~klc/"}.
+--
+{name:"Cohen",address:"http://www.cs.brandeis.edu/~jc/"}.
+--
+-- {name:"Colmerauer",address:"http://www.lim.univ-mrs.fr/~colmer/"}.
+{name:"Colmerauer",address:"http://alain.colmerauer.free.fr/"}.
+--
+-- {name:"Costantini",address:"http://costantini.dm.univaq.it/"}.
+--
+-- {name:"Curry",address:"http://www.informatik.uni-kiel.de/~mh/curry/"}.
+{name:"Curry",address:"http://www-ps.informatik.uni-kiel.de/currywiki/"}.
+--
+{name:"Dahl",address:"http://www.cs.sfu.ca/people/Faculty/Dahl/"}.
+--
+{name:"Davison",address:"http://fivedots.coe.psu.ac.th/%7Ead/"}.
+--
+{name:"Delzanno",address:"http://www.disi.unige.it/person/DelzannoG/"}.
+--
+{name:"Demoen",address:"http://www.cs.kuleuven.ac.be/~bmd/"}.
+--
+-- {name:"DGKS Prolog",address:"http://www.geocities.com/SiliconValley/Campus/7816/"}.
+--
+{name:"Dix",address:"http://www.cs.man.ac.uk/~jdix/"}.
+--
+{name:"Ducasse",address:"http://www.irisa.fr/lande/ducasse/"}.
+--
+{name:"Dutra",address:"http://www.cos.ufrj.br/~ines/"}.
+--
+-- {name:"ECLIPSE",address:"http://www.icparc.ic.ac.uk/eclipse/"}.
+{name:"ECLIPSE",address:"http://87.230.22.228/"}.
+--
+{name:"Elf",address:"http://www-2.cs.cmu.edu/afs/cs/user/fp/www/elf.html",prefix:"elf",declared_date:date(1999,"AUG",3)}.
+--
+{name:"Eliens",address:"http://www.cs.vu.nl/~eliens/research/logic/index.html"}.
+--
+-- {name:"Epilog",address:"http://logic.stanford.edu/software/epilog/"}.
+{name:"Epilog",address:"http://www.cs.rochester.edu/research/epilog/"}.
+--
+{name:"EZY Prolog",address:"http://www.ezy-software.com/ezyprolog/EZY_Prolog_-_born_to_be_easy.htm"}.
+--
+{name:"Ferreia",address:"http://www.dcc.fc.up.pt/~michel/"}.
+--
+-- {name:"GNU Prolog",address:"http://www.gnu.org/software/prolog/"}.
+{name:"GNU Prolog",address:"http://www.gnu.org/software/gprolog/gprolog.html"}.
+--
+-- {name:"Goedel",address:"http://www.cs.bris.ac.uk/~bowers/goedel.html"}.
+{name:"Goedel",address:"http://www.scs.leeds.ac.uk/hill/GOEDEL/expgoedel.html"}.
+--
+{name:"Guo",address:"http://faculty.ist.unomaha.edu/hguo/"}.
+--
+-- {name:"Gupta",address:""http://www.CS.NMSU.Edu/~gupta/""}.
+{name:"Gupta",address:"http://www.cs.utdallas.edu/~gupta/"}.
+--
+{name:"Hermenegildo",address:"http://www.clip.dia.fi.upm.es/~herme"}.
+--
+{name:"Huang",address:"http://wasp.cs.vu.nl/~huang/"}.
+--
+{name:"Huntbach",address:"http://www.dcs.qmul.ac.uk/~mmh/"}.
+--
+-- {name:"IF/Prolog",address:"http://www.ifcomputer.de/IFProlog/"}.
+{name:"IF/Prolog",address:"http://www.ifcomputer.de/Products/Prolog/home_en.html"}.
+--
+-- {name:"JavaLog",address:"http://www.exa.unicen.edu.ar/~azunino/"}.
+-- {name:"JavaLog",address:"http://www.exa.unicen.edu.ar/~azunino/index.php"}.
+--
+-- {name:"JIPL",address:"http://prolog.isac.co.jp/doc/en/index.html"}.
+-- {name:"JIPL",address:"http://www.kprolog.com/jipl/jipl_e.html"}.
+-- {name:"JIPL",address:"http://prolog.isac.co.jp/doc/en/jipl.html"}.
+--
+-- {name:"JIProlog",address:"http://www.ugosweb.com/jiprolog/Presentation.html"}.
+-- {name:"JIProlog",address:"http://www.ugosweb.com/jiprolog/index.asp"}.
+{name:"JIProlog",address:"http://www.ugosweb.com/jiprolog/"}.
+--
+{name:"JLog",address:"http://jlogic.sourceforge.net/"}.
+--
+-- {name:"Joohyung Lee",address:"http://www.cs.utexas.edu/users/appsmurf/"}.
+--
+{name:"jProlog",address:"http://www.cs.kuleuven.ac.be/~bmd/PrologInJava/"}.
+--
+-- {name:"K-Prolog",address:"http://Prolog.isac.co.jp/index_e.html"}.
+-- {name:"K-Prolog",address:"http://prolog.isac.co.jp/doc/en/index.html"}.
+{name:"K-Prolog",address:"http://www.kprolog.com/index_e.html"}.
+--
+-- {name:"Kiev",address:"http://www.forestro.com/kiev/"}.
+{name:"Kiev",address:"http://classic-web.archive.org/web/20050526084718/kiev.forestro.com/"}.
+--
+-- {name:"KLIC",address:"http://www.klic.org/software/klic/index.en.html",declared_date:date(1999,"MAR",31)}.
+{name:"KLIC",address:"http://en.wikipedia.org/wiki/KL1",declared_date:date(1999,"MAR",31),prefix:"http://en.wikipedia.org/wiki/KL1"}.
+--
+{name:"KLIJava",address:"http://www.ueda.info.waseda.ac.jp/~satoshi/klijava/klijava-e.html"}.
+--
+-- {name:"Kowalski",address:"http://www-lp.doc.ic.ac.uk/UserPages/staff/rak/rak.html"}.
+-- {name:"Kowalski",address:"http://www-lp.doc.ic.ac.uk/~rak/rak.html"}.
+{name:"Kowalski",address:"http://www.doc.ic.ac.uk/~rak/"}.
+--
+-- {name:"Krishna Rao",address:"http://www.it.jcu.edu.au/~krishna/"}.
+{name:"Krishna Rao",address:"http://faculty.kfupm.edu.sa/ics/mkrishna/index.html"}.
+--
+-- {name:"lambda Prolog",address:"http://www.cse.psu.edu/~dale/lProlog/"}.
+-- Last updated: 216 August 2006
+{name:"lambda Prolog",address:"http://www.lix.polytechnique.fr/Labo/Dale.Miller/lProlog/"}.
+--
+-- Timothy A. Budd
+-- {name:"Leda",address:"ftp://ftp.cs.orst.edu/pub/budd/leda/ReadMe.html"}.
+-- {name:"Leda",address:"http://web.engr.oregonstate.edu/~budd/leda.html"}.
+{name:"Leda",address:"http://web.engr.oregonstate.edu/~budd/"}.
+--
+{name:"Leite",address:"http://centria.di.fct.unl.pt/~jleite/"}.
+--
+{name:"Leuschel",address:"http://users.ecs.soton.ac.uk/mal/"}.
+--
+-- Last Web update on Mon Feb 13 10:34:36 1995
+{name:"LIFE",address:"http://www-cgi.cs.cmu.edu/afs/cs/project/ai-repository/ai/lang/prolog/impl/fp_lp/life/0.html",declared_date:date(1995,"FEB",13)}.
+--
+{name:"LLP",address:"http://bach.cs.kobe-u.ac.jp/llp/"}.
+--
+-- {name:"Logtalk",address:"http://www.ci.uc.pt/logtalk/logtalk.html"}.
+{name:"Logtalk",address:"http://www.logtalk.org/"}.
+--
+-- {name:"Loke",address:"http://goanna.cs.rmit.edu.au/~swloke/"}.
+{name:"Loke",address:"http://olabini.com/blog/tag/ioke/"}.
+--
+-- {name:"Lolli",address:"http://www.cs.hmc.edu/~hodas/research/lolli/"}.
+{name:"Lolli",address:"http://www.lix.polytechnique.fr/Labo/Dale.Miller/lolli/"}.
+--
+-- {name:"LPA Prolog",address:"http://www.lpa.co.uk/ind_top.htm"}.
+{name:"LPA Prolog",address:"http://www.lpa.co.uk/"}.
+--
+{name:"Lygon",address:"http://www.cs.rmit.edu.au/lygon/"}.
+--
+{name:"Mark Miller",address:"http://www.caplet.com/index.html"}.
+--
+{name:"MCMCMS",address:"http://scibsfs.bch.ed.ac.uk/~nicos/sware/dlp/mcmcms/"}.
+--
+{name:"Mercury",address:"http://www.cs.mu.oz.au/research/mercury/",disabled_prefix:["mailing-lists"]}.
+--
+{name:"MINERVA",address:"http://www.ifcomputer.com/MINERVA/"}.
+--
+-- {name:"Mozart",address:"http://www.mozart-oz.org/",disabled_prefix:["lists","mogul/pkg/1.3.0/source/","cgi-bin/oz-bugs","download/debian/"]}.
+{name:"Mozart",address:"http://www.mozart-oz.org/",disabled_prefix:["lists","cgi-bin/oz-bugs"]}.
+--
+-- {name:"Najork",address:"http://www.research.compaq.com/SRC/personal/najork/index.html"}.
+-- {name:"Najork",address:"http://research.microsoft.com/~najork/"}.
+--
+{name:"Natarajan",address:"http://www.tcs.tifr.res.in/~raja/"}.
+--
+-- {name:"Nano-Prolog",address:"http://hk.geocities.com/bear2388/prolog.htm"}.
+{name:"Nano-Prolog",address:"http://geocities.ws/bear2388/prolog.html"}.
+--
+-- {name:"Net Prolog",address:"http://netprolog.pdc.dk/"}.
+--
+{name:"Nilsson",address:"http://ulfni.dyndns.org/ulfni/"}.
+--
+-- http://www.cs.mu.oz.au/~lee/src/nuprolog/
+-- {name:"NU-Prolog",address:"http://www.cs.mu.oz.au/~lee/src/nuprolog/"}.
+{name:"NU-Prolog",address:"http://www.cs.mu.oz.au/~lee/"}.
+--
+{name:"Palamidessi",address:"http://www.lix.polytechnique.fr/~catuscia/"}.
+--
+{name:"Pepl",address:"http://scibsfs.bch.ed.ac.uk/~nicos/sware/slps/pe/"}.
+--
+-- {name:"Petukhin",address:"http://www.isu.ru/%7Eslava/"}.
+{name:"Petukhin",address:"http://math.isu.ru/ru/chairs/it/petukhin.htm"}.
+--
+-- http://www.cs.cmu.edu/afs/cs/user/fp/www/
+{name:"Pfenning",address:"http://www.cs.cmu.edu/afs/cs/user/fp/www/"}.
+--
+{name:"PiLLoW",address:"http://www.clip.dia.fi.upm.es/miscdocs/pillow/pillow.html"}.
+--
+{name:"Pontelli",address:"http://www.cs.nmsu.edu/~epontell/index.html"}.
+--
+{name:"PRISM",address:"http://sato-www.cs.titech.ac.jp/prism/"}.
+--
+-- {name:"PRObjLOG",address:"http://www.mpi-sb.mpg.de/~delzanno/PRObjLOG/prob.html",declared_date:date(1997,"AUG",12)}.
+--
+{name:"ProbLog",address:"http://dtai.cs.kuleuven.be/problog/"}.
+--
+{name:"Progol",address:"http://www.cs.york.ac.uk/mlg/"}.
+--
+{name:"PROL",address:"http://igormaznitsa.com/projects/prol/index.html"}.
+--
+-- {name:"PrologCafe",address:"http://kaminari.scitec.kobe-u.ac.jp/PrologCafe/"}.
+{name:"PrologCafe",address:"http://kaminari.scitec.kobe-u.ac.jp/PrologCafe/"}.
+--
+-- {name:"PROLOG+CG",address:"http://www.insea.ac.ma/CGTools/PROLOG+CG.htm"}.
+{name:"PROLOG+CG",address:"http://prologpluscg.sourceforge.net/"}.
+--
+{name:"Quintus Prolog",address:"http://www.sics.se/isl/quintus/"}.
+--
+{name:"RELFUN",address:"http://www.dfki.uni-kl.de/~vega/relfun.html"}.
+--
+{name:"Rocha",address:"http://www.ncc.up.pt/~ricroc/"}.
+--
+-- Konstantinos (Kostis) Sagonas
+-- {name:"Sagonas",address:"http://www.csd.uu.se/~kostis/"}.
+{name:"Sagonas",address:"http://user.it.uu.se/~kostis/"}.
+--
+{name:"Satoh",address:"http://research.nii.ac.jp/~ksatoh/"}.
+--
+-- {name:"Schrijvers",address:"http://www.cs.kuleuven.be/~toms/"}.
+{name:"Schrijvers",address:"http://users.ugent.be/~tschrijv/"}.
+--
+-- Dr. Uta Schwertel
+-- {name:"Schwertel",address:"http://www.ifi.unizh.ch/~uschwert/"}.
+{name:"Schwertel",address:"http://www.ifi.unizh.ch/rerg/people/schwertel/"}.
+--
+{name:"Shyamasundar",address:"http://www.tcs.tifr.res.in/~shyam/"}.
+--
+-- {name:"Sicstus Prolog",address:"http://www.sics.se/ps/sicstus.html"}.
+-- {name:"Sicstus Prolog",address:"http://www.sics.se/isl/sicstuswww/site/index.html"}.
+{name:"Sicstus Prolog",address:"http://www.sics.se/ps/sicstus.html"}.
+--
+{name:"Strawberry Prolog",address:"http://www.dobrev.com/"}.
+--
+-- {name:"Stuber",address:"http://www.loria.fr/~stuber/index.html"}.
+{name:"Stuber",address:"http://www.mpi-sb.mpg.de/~juergen/"}.
+--
+{name:"Stuckey",address:"http://www.cs.mu.oz.au/~pjs/"}.
+--
+{name:"SWI_Prolog",address:"http://www.swi-prolog.org/"}.
+--
+-- {name:"Tarau",address:"http://www.cs.unt.edu/%7Etarau/research/researchPapers.html"}.
+-- {name:"Tarau",address:"http://www.cs.unt.edu/%7Etarau/"}.
+{name:"Tarau",address:"http://www.cs.unt.edu/~tarau/"}.
+--
+{name:"TechRef",address:"http://techref.massmind.org/techref/language/prolog/index.htm",declared_date:date(2002,"JAN",28)}.
+--
+{name:"Toy",address:"http://www.fdi.ucm.es/profesor/fernan/TOY/"}.
+--
+-- {name:"Trinc-Prolog",address:"http://www.trinc-prolog.com/"}.
+--
+--- http://www.alice.unibo.it/tuProlog/
+-- {name:"tuProlog",address:"http://lia.deis.unibo.it/research/tuprolog/"}.
+-- {name:"tuProlog",address:"http://www.alice.unibo.it/tuProlog/"}.
+{name:"tuProlog",address:"http://www.alice.unibo.it/xwiki/bin/view/Tuprolog/"}.
+--
+{name:"Ueda",address:"http://www.ueda.info.waseda.ac.jp/~ueda/"}.
+--
+{name:"Visual Prolog",address:"http://www.visual-prolog.com"}.
+--
+-- {name:"VPStudio",address:"http://www.rastertech.com.au/vpstudio/"}.
+-- {name:"VPStudio",address:"http://members.ozemail.com.au/~vip2000/"}.
+{name:"VPStudio",address:"http://users.tpg.com.au/adsluwfl/vpstudio/index.htm"}.
+--
+-- {name:"W-Prolog",address:"http://goanna.cs.rmit.edu.au/~winikoff/wp/"}.
+{name:"W-Prolog",address:"http://waitaki.otago.ac.nz/~michael/wp/"}.
+--
+{name:"Warren",address:"http://www.cs.sunysb.edu/~warren/"}.
+--
+{name:"Wikipedia",address:"http://en.wikipedia.org/wiki/Prolog",prefix:"http://en.wikipedia.org/wiki/Prolog"}.
+--
+{name:"XSB Prolog",address:"http://www.cs.sunysb.edu/~sbprolog/xsb-page.html"}.
+--
+-- {name:"XVisor",address:"http://xvisor.dirinfo.net/index.html"}.
+--
+-- {name:"YahOO",address:"http://www.mpi-sb.mpg.de/~delzanno/yahoo.html",declared_date:date(1999,"OCT",31)}.
+--
+{name:"YAP",address:"http://www.ncc.up.pt/~vsc/Yap/"}.
+--
+{name:"Zhou",address:"http://www.sci.brooklyn.cuny.edu/~zhou/"}.
+]
+---------------------------------------------------------------

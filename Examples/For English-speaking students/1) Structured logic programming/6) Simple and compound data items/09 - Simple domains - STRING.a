@@ -1,0 +1,40 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- STRING.                               --
+--                                       --
+-- Questions: What are strings? When the --
+-- strings are more appropriate than the --
+-- symbols? How can the compiler         --
+-- distinguish a string from a symbol?   --
+-- How can one define the tabulation and --
+-- the newline characters in a string?   --
+-- How can one define an ASCII code in a --
+-- string? How can one define a string   --
+-- that includes several segments?       --
+--                                       --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	T1== "Hello World!",
+	writeln(T1),
+	--
+	T2== "Hello\tWorld!",
+	writeln(T2),
+	--
+	T3== "Hello\nWorld",
+	writeln(T3),
+	--
+	T4== "Hello \16#57#orld",
+	writeln(T4),
+	--
+	T5==	"Hello"
+		" "
+		"World",
+	writeln(T5).

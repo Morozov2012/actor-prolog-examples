@@ -1,0 +1,152 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+	p1	= (('Receiver'));
+--
+internal:
+--
+	timer1	= ('MainTimer',
+			receiver=p1,
+			con);
+	timer2	= ('StopTimer',
+			receiver=p1,
+			con);
+	timer3	= ('StartTimer',
+			receiver=p1,
+			con);
+--
+	con	= ('Report',
+			y= 0,
+			height= 12);
+--
+[
+]
+-----------------------------------------------------------------------
+class 'MainTimer' (specialized 'Timer'):
+--
+	receiver;
+--
+internal:
+--
+	env	= ('Timer');
+	con;
+--
+[
+goal:-!,
+	set_period(1,0),
+	activate.
+--
+tick:-!,
+	Time== env?time(),
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"Sender: ",
+		"I will send information message1 at ",Time),
+	con ? set_color('default'),
+	receiver << message1("From the Main timer").
+]
+-----------------------------------------------------------------------
+class 'StartTimer' (specialized 'Timer'):
+--
+	receiver;
+--
+internal:
+--
+	env	= ('Timer');
+	con;
+--
+[
+goal:-!,
+	delay(3).
+--
+tick:-!,
+	Time== env?time(),
+	con ? set_color('Fuchsia'),
+	con ? writeln(
+		"Sender: ",
+		"I will send switching message2 at ",Time),
+	con ? set_color('default'),
+	receiver <- message2("From the Second timer").
+]
+-----------------------------------------------------------------------
+class 'StopTimer' (specialized 'Timer'):
+--
+	receiver;
+--
+internal:
+--
+	env	= ('Timer');
+	con;
+--
+[
+goal:-!,
+	delay(7).
+--
+tick:-!,
+	Time== env?time(),
+	con ? set_color('Orange'),
+	con ? writeln(
+		"Sender: ",
+		"I will send switching message3 at ",Time),
+	con ? set_color('default'),
+	receiver <- message3("From the Third timer").
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Alpha'):
+--
+internal:
+--
+	env	= ('Timer');
+	con	= ('Report',
+			y= 12,
+			height= 13);	
+--
+[
+PREDICATES:
+--
+determ:
+--
+message1(STRING)		- (i);
+message2(STRING)		- (i);
+--
+imperative:
+--
+message3(STRING)		- (i);
+--
+CLAUSES:
+--
+goal:-!.
+--
+message1(Text):-
+	Time== env?time(),
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"Receiver: ",
+		"I have received message1: \"",
+		Text,"\" at ",Time),
+	con ? set_color('default'),
+	fail.
+--
+message2(Text):-
+	Time== env?time(),
+	con ? set_color('Fuchsia'),
+	con ? writeln(
+		"Receiver: ",
+		"I have received message2: \"",
+		Text,"\" at ",Time),
+	con ? set_color('default'),
+	fail.
+--
+message3(Text):-
+	Time== env?time(),
+	con ? set_color('Orange'),
+	con ? writeln(
+		"Receiver: ",
+		"I have received message3: \"",
+		Text,"\" at ",Time),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

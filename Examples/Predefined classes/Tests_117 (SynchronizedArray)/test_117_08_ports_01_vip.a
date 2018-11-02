@@ -1,0 +1,103 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+class 'Main' (specialized 'Alpha'):
+
+internal:
+
+	link	= ('Link');
+
+constant:
+
+	p1	= (('Control',
+			link,
+			x= 5,
+			y= 5));
+	p2	= (('Control',
+			link,
+			x= 45,
+			y= 5));
+	p3	= (('Control',
+			link,
+			x= 5,
+			y= 14));
+	p4	= (('Control',
+			link,
+			x= 45,
+			y= 14));
+[
+goal:-!,
+	p1 <- show,
+	p2 <- show,
+	p3 <- show,
+	p4 <- show.
+]
+
+-----------------------------------------------------------------------
+
+class 'Control' (specialized 'Dialog'):
+
+constant:
+
+	link;
+
+internal:
+
+	proxy	= ('Link',
+			content= link);
+
+constant:
+
+	con	= ('Console');
+
+[
+goal:-!,
+	initiate_value(proxy[10]),
+	put(1002,proxy[10]),!,
+	check_port.
+--
+initiate_value(""):-!.
+initiate_value(_).
+--
+action("text"):-
+	Text== ?cast("MessageString",
+		con?input_string("Please enter the text","")),
+	proxy[10]== Text,!,
+	check_port.
+action("plain"):-!,
+	proxy ? define_plain_port(10),
+	check_port.
+action("protecting"):-!,
+	proxy ? define_protecting_port(10),
+	check_port.
+action("suspending"):-!,
+	proxy ? define_suspending_port(10),
+	check_port.
+--
+check_port:-
+	proxy ? is_plain_port(10),!,
+	put(1001,"PLAIN").
+check_port:-
+	proxy ? is_protecting_port(10),!,
+	put(1001,"PROTECTING").
+check_port:-
+	proxy ? is_suspending_port(10),!,
+	put(1001,"SUSPENDING").
+check_port.
+]
+
+-----------------------------------------------------------------------
+
+class 'Link' (specialized 'SynchronizedArray'):
+--
+indices_range		= [[1,100]];
+index_checking		= 'off';
+--
+implement_protecting_ports	= 'no';
+implement_suspending_ports	= 'no';
+[
+]
+
+-----------------------------------------------------------------------

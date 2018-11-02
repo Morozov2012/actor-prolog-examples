@@ -1,0 +1,58 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+N	= INTEGER.
+R	= REAL.
+S	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+--
+-----------------------------------------------------------------------
+class 'MyHashMap' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+TargetKey	= STRING.
+TargetValue	= f(N,R,S).
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+store	= ('MyHashMap');
+--
+[
+goal:-!,
+	test1,
+	test2.
+--
+test1:-
+	writeln("I will store data items."),
+	store ? insert(map("A",f(1000,3.14,"Text1"))),
+	store ? insert(map("B",f(1000,7.00,"Text1"))),
+	store ? insert(map("A",f(1000,3.14,"Text2"))),
+	store ? insert(map("C",f(3000,3.14,"Text3"))),
+	store ? insert(map("A",f(1000,3.14,"Text3"))),
+	store ? insert(map("D",f(1000,3.14,"Text2"))),
+	store ? insert(map("E",f(5000,9.00,"Text3"))),
+	writeln("Done.").
+--
+test2:-
+	writeln("I will retrieve data items:"),
+	store ? find(Item),
+	writeln(Item),
+	fail.
+test2:-
+	writeln("Done.").
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,541 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2013 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Java2D":
+
+--------------------------------------------------------------------
+-- The 'Canvas2D' class is specialized class 'DataAbstraction'.   --
+--------------------------------------------------------------------
+
+class 'Canvas2D' (specialized 'DataAbstraction'):
+
+scaling_factor		= 'INDEPENDENT';
+--
+enable_scene_antialiasing	= 'no';
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+image_encoding_attributes	= {};
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+maximal_waiting_time		= 'default';
+--
+-- The implementation of the 'MenuListener' interface:
+--
+menu				= [];
+--
+-- The implementation of the 'DimensionedFrame' interface:
+--
+width				= 'default';
+height				= 'default';
+--
+-- The implementation of the 'DimensionlessFrame' interface:
+--
+title				= "";
+x				= 'default';
+y				= 'default';
+background_color		= 'default';
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+backslash_always_is_separator			= 'yes';
+accept_only_uniform_resource_identifiers	= 'no';
+
+[
+SOURCE:
+	"morozov.built_in.Canvas2D";
+
+MODEL:
+
+?action(MenuActionName).
+?mouse_clicked(MouseEvent).
+?mouse_entered(MouseEvent).
+?mouse_exited(MouseEvent).
+?mouse_pressed(MouseEvent).
+?mouse_released(MouseEvent).
+?mouse_dragged(MouseEvent).
+?mouse_moved(MouseEvent).
+?initialize().
+?start().
+?stop().
+
+CLAUSES:
+
+enable_mouse_events(MouseEventType*):
+	[external "enableMouseEvents"].
+disable_mouse_events(MouseEventType*):
+	[external "disableMouseEvents"].
+--
+set_mesh(Columns,Rows):
+	[external "setMesh"].
+--
+set_transform(Transform2D):
+	[external "setTransform"].
+translate(X,Y):
+	[external "translate"].
+--
+draw_line(X1,Y1,X2,Y2):
+	[external "drawLine"].
+draw_polygon(PointList):
+	[external "drawPolygon"].
+--
+draw_point(X,Y):
+	[external "drawPoint"].
+draw_rectangle(X1,Y1,Width,Height):
+	[external "drawRectangle"].
+draw_round_rectangle(X1,Y1,Width,Height,ArcWidth,ArcHeight):
+	[external "drawRoundRectangle"].
+draw_ellipse(X1,Y1,Width,Height):
+	[external "drawEllipse"].
+draw_arc(X1,Y1,Width,Height,StartingAngle,AngularExtent):
+	[external "drawArc"].
+draw_arc(	X1,Y1,Width,Height,
+		StartingAngle,AngularExtent,
+		ClosureType):
+	[external "drawArc"].
+draw_quad_curve(X1,Y1,CtrlX1,CtrlY1,X2,Y2):
+	[external "drawQuadCurve"].
+draw_cubic_curve(X1,Y1,CtrlX1,CtrlY1,CtrlX2,CtrlY2,X2,Y2):
+	[external "drawCubicCurve"].
+--
+draw_text(X,Y,Text):
+	[external "drawText"].
+--
+draw_image(ImageToBeDrawn):
+	[external "drawImage"].
+draw_image(ImageToBeDrawn,BackgroundColor):
+	[external "drawImage"].
+draw_image(ImageToBeDrawn,X,Y):
+	[external "drawImage"].
+draw_image(ImageToBeDrawn,X,Y,Color):
+	[external "drawImage"].
+draw_image(ImageToBeDrawn,X,Y,Width,Height):
+	[external "drawImage"].
+draw_image(ImageToBeDrawn,X,Y,Width,Height,BackgroundColor):
+	[external "drawImage"].
+draw_image(	ImageToBeDrawn,
+		DestX1,DestY1,DestX2,DestY2,
+		SourceX1,SourceY1,SourceX2,SourceY2):
+	[external "drawImage"].
+draw_image(	ImageToBeDrawn,
+		DestX1,DestY1,DestX2,DestY2,
+		SourceX1,SourceY1,SourceX2,SourceY2,
+		BackgroundColor):
+	[external "drawImage"].
+--
+set_pen(PenAttributes):
+	[external "setPen"].
+set_brush(BrushAttributes):
+	[external "setBrush"].
+set_font(FontAttributes):
+	[external "setFont"].
+set_text_alignment(
+	HorizontalAlignment,
+	VerticalAlignment):
+	[external "setTextAlignment"].
+--
+set_paint_mode:
+	[external "setPaintMode"].
+set_compositing_rule(AlphaCompositingRule):
+	[external "setCompositingRule"].
+set_compositing_rule(AlphaCompositingRule,AlphaValue):
+	[external "setCompositingRule"].
+set_XOR_mode(Color):
+	[external "set_XOR_Mode"].
+--
+set_rendering_mode(RenderingHints):
+	[external "setRenderingMode"].
+--
+mark_drawing() = DrawingMarker:
+	[external "markDrawing"].
+retract_drawing(DrawingMarker):
+	[external "retractDrawing"].
+undo_drawing:
+	[external "undoDrawing"].
+redo_drawing:
+	[external "redoDrawing"].
+--
+suspend_redrawing:
+	[external "suspendRedrawing"].
+draw_now:
+	[external "drawNow"].
+--
+get_image(BufferedImage):
+	[external "getImage"].
+get_image(BufferedImage,X,Y,Width,Height):
+	[external "getImage"].
+--
+save(FileName):
+	[external "save"].
+save(FileName,ImageAttributes):
+	[external "save"].
+--
+set_scaling_factor(ScalingFactor2D):
+	[external "setScalingFactor"].
+get_scaling_factor() = ScalingFactor2D:
+	[external "getScalingFactor"].
+set_enable_scene_antialiasing(YesNo):
+	[external "setEnableSceneAntialiasing"].
+get_enable_scene_antialiasing() = YesNo:
+	[external "getEnableSceneAntialiasing"].
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+set_image_encoding_attributes(ImageAttributes):
+	[external "setImageEncodingAttributes"].
+get_image_encoding_attributes() = ImageAttributes:
+	[external "getImageEncodingAttributes"].
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+set_maximal_waiting_time(WaitingInterval):
+	[external "setMaximalWaitingTime"].
+get_maximal_waiting_time() = WaitingInterval:
+	[external "getMaximalWaitingTime"].
+--
+-- The implementation of the 'CustomControl' interface:
+--
+refine_width(WidthToHeightRatio):
+	[external "refineWidth"].
+refine_height(WidthToHeightRatio):
+	[external "refineHeight"].
+--
+-- The implementation of the 'MenuListener' interface:
+--
+set_menu(MenuDefinition):
+	[external "setMenu"].
+get_menu() = MenuDefinition:
+	[external "getMenu"].
+--
+-- The implementation of the 'DimensionedFrame' interface:
+--
+clear:
+	[external "clear"].
+clear(YesNo/* Repaint the image */):
+	[external "clear"].
+set_width(Width):
+	[external "setWidth"].
+get_width() = Width:
+	[external "getWidth"].
+set_height(Height):
+	[external "setHeight"].
+get_height() = Height:
+	[external "getHeight"].
+set_default_size(Width,Height):
+	[external "setDefaultSize"].
+get_default_size(Width,Height):
+	[external "getDefaultSize"].
+set_actual_size(Width,Height):
+	[external "setActualSize"].
+get_actual_size(Width,Height):
+	[external "getActualSize"].
+get_size_in_pixels(Width,Height):
+	[external "getSizeInPixels"].
+set_default_bounds(X,Y,Width,Height):
+	[external "setDefaultBounds"].
+get_default_bounds(X,Y,Width,Height):
+	[external "getDefaultBounds"].
+set_actual_bounds(X,Y,Width,Height):
+	[external "setActualBounds"].
+get_actual_bounds(X,Y,Width,Height):
+	[external "getActualBounds"].
+get_bounds_in_pixels(X,Y,Width,Height):
+	[external "getBoundsInPixels"].
+--
+-- The implementation of the 'DimensionlessFrame' interface:
+--
+set_title(Title):
+	[external "setTitle"].
+get_title() = FrameTitle:
+	[external "getTitle"].
+set_x(X):
+	[external "setX"].
+get_x() = X:
+	[external "getX"].
+set_y(Y):
+	[external "setY"].
+get_y() = Y:
+	[external "getY"].
+set_default_position(X,Y):
+	[external "setDefaultPosition"].
+get_default_position(X,Y):
+	[external "getDefaultPosition"].
+set_actual_position(X,Y):
+	[external "setActualPosition"].
+get_actual_position(X,Y):
+	[external "getActualPosition"].
+get_position_in_pixels(X,Y):
+	[external "getPositionInPixels"].
+set_background_color(Color):
+	[external "setBackgroundColor"].
+get_background_color() = Color:
+	[external "getBackgroundColor"].
+--
+-- The implementation of the 'DisplayableFrame' interface:
+--
+show:
+	[external "show"].
+show(DummyArguments*):
+	[external "show"].
+redraw:
+	[external "redraw"].
+hide:
+	[external "hide"].
+maximize:
+	[external "maximize"].
+minimize:
+	[external "minimize"].
+restore:
+	[external "restore"].
+is_visible:
+	[external "isVisible"].
+is_hidden:
+	[external "isHidden"].
+is_maximized:
+	[external "isMaximized"].
+is_minimized:
+	[external "isMinimized"].
+is_restored:
+	[external "isRestored"].
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+set_backslash_always_is_separator(YesNo):
+	[external "setBackslashAlwaysIsSeparator"].
+get_backslash_always_is_separator() = YesNo:
+	[external "getBackslashAlwaysIsSeparator"].
+set_accept_only_uniform_resource_identifiers(YesNo):
+	[external "setAcceptOnlyUniformResourceIdentifiers"].
+get_accept_only_uniform_resource_identifiers() = YesNo:
+	[external "getAcceptOnlyUniformResourceIdentifiers"].
+--
+-- The default implementation of programmer-defined clauses:
+--
+action(MenuActionName):
+	[external "action"].
+--
+mouse_clicked(MouseEvent):
+	[external "mouseClicked"].
+mouse_entered(MouseEvent):
+	[external "mouseEntered"].
+mouse_exited(MouseEvent):
+	[external "mouseExited"].
+mouse_pressed(MouseEvent):
+	[external "mousePressed"].
+mouse_released(MouseEvent):
+	[external "mouseReleased"].
+mouse_dragged(MouseEvent):
+	[external "mouseDragged"].
+mouse_moved(MouseEvent):
+	[external "mouseMoved"].
+--
+initialize:
+	[external "initialize"].
+start:
+	[external "start"].
+stop:
+	[external "stop"].
+]
+
+--------------------------------------------------------------------
+-- The 'BufferedImage' class is                                   --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+class 'BufferedImage' (specialized 'DataAbstraction'):
+
+width				= 'default';
+height				= 'default';
+--
+image_type			= 'default';
+image_transparency		= 'default';
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+image_encoding_attributes	= {};
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+maximal_waiting_time		= 'default';
+--
+-- The implementation of the 'OperatingSystemResource' interface:
+--
+name				= "a-prolog.png";
+extension			= ".png";
+--
+-- The implementation of the 'AccessibleDataResource' interface:
+--
+character_set			= 'none';
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+backslash_always_is_separator			= 'yes';
+accept_only_uniform_resource_identifiers	= 'no';
+
+[
+SOURCE:
+	"morozov.built_in.BufferedImage";
+
+CLAUSES:
+
+create:
+	[external "create"].
+create(Width,Height):
+	[external "create"].
+create(Width,Height,ImageType):
+	[external "create"].
+--
+set_pixel(X,Y,Red,Green,Blue):
+	[external "setPixel"].
+set_pixel(X,Y,Color):
+	[external "setPixel"].
+--
+get_pixel(X,Y,Red,Green,Blue):
+	[external "getPixel"].
+get_pixel(X,Y,Color):
+	[external "getPixel"].
+--
+save:
+	[external "save"].
+save(FileName):
+	[external "save"].
+save(FileName,ImageAttributes):
+	[external "save"].
+--
+load:
+	[external "load"].
+load(FileName):
+	[external "load"].
+load(FileName):
+	[external "load"].
+load(FileName,XSubsampling,YSubsampling,XOffset,YOffset):
+	[external "load"].
+--
+set_binary(Binary):
+	[external "setBinary"].
+get_binary() = Binary:
+	[external "getBinary"].
+--
+set_width(Width):
+	[external "setWidth"].
+get_width() = Width:
+	[external "getWidth"].
+set_height(Height):
+	[external "setHeight"].
+get_height() = Height:
+	[external "getHeight"].
+--
+set_default_size(Width,Height):
+	[external "setDefaultSize"].
+get_default_size(Width,Height):
+	[external "getDefaultSize"].
+set_actual_size(Width,Height):
+	[external "setActualSize"].
+get_actual_size(Width,Height):
+	[external "getActualSize"].
+get_size_in_pixels(Width,Height):
+	[external "getSizeInPixels"].
+--
+set_image_type(BufferedImageType):
+	[external "setImageType"].
+get_image_type() = BufferedImageType:
+	[external "getImageType"].
+set_image_transparency(ImageTransparency):
+	[external "setImageTransparency"].
+get_image_transparency() = ImageTransparency:
+	[external "getImageTransparency"].
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+set_image_encoding_attributes(ImageAttributes):
+	[external "setImageEncodingAttributes"].
+get_image_encoding_attributes() = ImageAttributes:
+	[external "getImageEncodingAttributes"].
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+set_maximal_waiting_time(WaitingInterval):
+	[external "setMaximalWaitingTime"].
+get_maximal_waiting_time() = WaitingInterval:
+	[external "getMaximalWaitingTime"].
+--
+-- The implementation of the 'OperatingSystemResource' interface:
+--
+delete:
+	[external "delete"].
+delete(FileName):
+	[external "delete"].
+rename(NewName):
+	[external "rename"].
+rename(OldName,NewName):
+	[external "rename"].
+copy(Destination):
+	[external "copy"].
+copy(Origin,Destination):
+	[external "copy"].
+is_standard_file:
+	[external "isStandardFile"].
+is_standard_file(FileName):
+	[external "isStandardFile"].
+set_current_directory(Path):
+	[external "setCurrentDirectory"].
+get_current_directory() = Path:
+	[external "getCurrentDirectory"].
+extract_path(Path,FileName):
+	[external "extractPath"].
+extract_path(OldFileName,Path,NewFileName):
+	[external "extractPath"].
+extract_extension(Name,Extension):
+	[external "extractExtension"].
+extract_extension(FileName,Name,Extension):
+	[external "extractExtension"].
+replace_extension(Extension) = NewFileName:
+	[external "replaceExtension"].
+replace_extension(OldFileName,Extension) = NewFileName:
+	[external "replaceExtension"].
+set_name(Name):
+	[external "setName"].
+get_name() = Name:
+	[external "getName"].
+set_extension(Extension):
+	[external "setExtension"].
+get_extension() = Extension:
+	[external "getExtension"].
+--
+-- The implementation of the 'AccessibleDataResource' interface:
+--
+does_exist:
+	[external "doesExist"].
+does_exist(FileName):
+	[external "doesExist"].
+is_local_resource:
+	[external "isLocalResource"].
+is_local_resource(FileName):
+	[external "isLocalResource"].
+get_full_name = FullName:
+	[external "getFullName"].
+get_full_name(ShortName) = FullName:
+	[external "getFullName"].
+get_URL = FileName:
+	[external "getURL"].
+get_URL(ShortName) = FullName:
+	[external "getURL"].
+set_character_set(CharacterSet):
+	[external "setCharacterSet"].
+get_character_set() = CharacterSet:
+	[external "getCharacterSet"].
+--
+-- The implementation of the 'NamedDataResource' interface:
+--
+set_backslash_always_is_separator(YesNo):
+	[external "setBackslashAlwaysIsSeparator"].
+get_backslash_always_is_separator() = YesNo:
+	[external "getBackslashAlwaysIsSeparator"].
+set_accept_only_uniform_resource_identifiers(YesNo):
+	[external "setAcceptOnlyUniformResourceIdentifiers"].
+get_accept_only_uniform_resource_identifiers() = YesNo:
+	[external "getAcceptOnlyUniformResourceIdentifiers"].
+]

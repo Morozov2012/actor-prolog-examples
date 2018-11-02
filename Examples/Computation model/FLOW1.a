@@ -1,0 +1,56 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, Alexei A. Morozov, IRE RAS. --
+-- Transmission of flow message.         --
+-------------------------------------------
+project: (('Flow1'))
+-------------------------------------------
+class 'Flow1':
+--
+p1	= (('Receiver',
+		input=V));
+p2	= (('Sender',
+		protecting:
+			output=V));
+--
+[
+goal.
+alarm(_).
+]
+-------------------------------------------
+class 'Receiver':
+--
+variable:
+--
+	input;
+--
+constant:
+--
+	con	= ('Report');
+--
+[
+goal:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"I have received ",
+		"a message:"),
+	con ? set_color('Violet'),
+	con ? writeln(input),
+	con ? set_color('default').
+--
+alarm(_).
+]
+-------------------------------------------
+class 'Sender':
+--
+variable:
+--
+	output;
+--
+[
+goal:-
+	output== "Message".
+--
+alarm(_).
+]
+-------------------------------------------

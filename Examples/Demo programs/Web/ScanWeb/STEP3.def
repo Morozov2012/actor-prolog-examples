@@ -1,0 +1,25 @@
+-------------------------------------------------------------------
+--              An example of Actor Prolog program.              --
+--          (c) 2002-2011, IRE RAS, Alexei A. Morozov.           --
+-------------------------------------------------------------------
+-- This is an auxiliary utility that processes data collected    --
+-- by the ScanWeb program. Execute it after the Step2 program.   --
+-------------------------------------------------------------------
+import 'Jewel_Report' from "Morozov/VRML/Report";
+-------------------------------------------------------------------
+interface 'Main':
+--
+input		: 'WebReceptor';
+--
+file_operations	: 'File';
+text_operations	: 'Text';
+--
+output		: 'Jewel_Report';
+--
+bat_file	: 'File';
+--
+con		: 'Console';
+--
+[
+]
+-------------------------------------------------------------------

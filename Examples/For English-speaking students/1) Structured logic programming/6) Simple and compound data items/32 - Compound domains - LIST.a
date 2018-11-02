@@ -1,0 +1,37 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Compound domains.  --
+-- Lists.                                --
+--                                       --
+-- Questions: What are lists? How can    --
+-- one declare a list argument of a      --
+-- predicate? How can one create a new   --
+-- domain that is a kind of a list       --
+-- structure? What is the meaning of the --
+-- asterisk symbol in the declaration of --
+-- a list domain? What is the domain of  --
+-- the T tail of the [H|T] list if the H --
+-- head belongs to the D domain?         --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+Students	= Student*.
+Student		= STRING.
+
+PREDICATES:
+
+p(Students)	- (i);
+
+CLAUSES:
+
+goal:-
+	p(["Ivan","Peter","Tom"]).
+
+p(X):-
+	writeln(X).

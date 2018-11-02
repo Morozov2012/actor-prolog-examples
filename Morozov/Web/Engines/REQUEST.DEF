@@ -1,0 +1,38 @@
+package "Morozov/Web/Engines/Request":
+---------------------------------------------------------------
+--            The "REQUEST" Actor Prolog package.            --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This dialog box is intended for input of the keywords for --
+-- Web search engine and start the search.                   --
+---------------------------------------------------------------
+import 'SearchEngine' from "Morozov/Web/Engines/Core";
+import 'EngineInput' from "Morozov/Web/Engines/Control";
+---------------------------------------------------------------
+interface 'Request' (specialized 'Dialog'):
+--
+variable:
+--
+	keywords	: SearchPattern;
+--
+internal:
+--
+	engine		: 'EngineInput';
+--
+variable:
+--
+	pattern		: SearchPattern;
+--
+internal:
+--
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_keywords(SearchPattern)	- (i);
+--
+]
+------------------------------------------------------------------------

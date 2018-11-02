@@ -1,0 +1,100 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+dialog1	= (('DemoPanel'));
+--
+[
+goal:-!,
+	dialog1 <- show.
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+--
+internal:
+--
+con		= ('Console');
+--
+[
+action("enable"):-!,
+	enable(7000),
+	enable(1010),
+	enable(1020),
+	enable(1030),
+	enable(1040),
+	enable(1050),
+	enable(1060),
+	enable(2010),
+	enable(3010),
+	enable(3020),
+	enable(4011),
+	enable(4021),
+	enable(4032),
+	enable(5011),
+	enable(5022),
+	enable(7010),
+	enable("action"),
+	enable('close'),
+	check_all_controls.
+action("disable"):-!,
+	disable(7000),
+	disable(1010),
+	disable(1020),
+	disable(1030),
+	disable(1040),
+	disable(1050),
+	disable(1060),
+	disable(2010),
+	disable(3010),
+	disable(3020),
+	disable(4011),
+	disable(4021),
+	disable(4032),
+	disable(5011),
+	disable(5022),
+	disable(7010),
+	disable("action"),
+	disable('close'),
+	check_all_controls.
+action(Name):-!,
+	con ? note(Name).
+--
+check_all_controls:-
+	con ? clear,
+	check_control(7000),
+	check_control(1010),
+	check_control(1020),
+	check_control(1030),
+	check_control(1040),
+	check_control(1050),
+	check_control(1060),
+	check_control(2010),
+	check_control(3010),
+	check_control(3020),
+	check_control(4011),
+	check_control(4021),
+	check_control(4032),
+	check_control(5011),
+	check_control(5022),
+	check_control(7010),
+	check_control("action"),
+	check_control('close').
+--
+check_control(Identifier):-
+	is_enabled(Identifier),!,
+	con ? set_color('DkGreen'),
+	con ? writeln(Identifier," - is enabled"),
+	con ? set_color('default').
+check_control(Identifier):-
+	is_disabled(Identifier),!,
+	con ? set_color('Red'),
+	con ? writeln(Identifier," - is disabled"),
+	con ? set_color('default').
+check_control(Identifier):-
+	con ? set_color('Orange'),
+	con ? writeln(Identifier," - has undefined state"),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

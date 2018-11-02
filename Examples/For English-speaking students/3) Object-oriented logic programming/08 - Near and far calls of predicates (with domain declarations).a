@@ -1,0 +1,55 @@
+-----------------------------------------------------
+--                                                 --
+--              Actor Prolog lessons               --
+--           (c) 2015 Alexei A. Morozov            --
+--                                                 --
+-- The topic: Object-oriented logic programming.   --
+-- Near and far calls of predicates.               --
+--                                                 --
+-- Questions: What are classes and class instances --
+-- (the worlds)? What are near and far calls of    --
+-- predicates?                                     --
+--                                                 --
+-----------------------------------------------------
+
+class 'Main' (specialized 'DemoConsole'):
+
+w1	= ('A1');
+
+w2	= ('A1',
+		n= 500);
+
+[
+
+goal:-
+	writeln("Hello from the Main class."),
+	w1 ? p("Message to the W1 world."),
+	w2 ? p("Message to the W2 world.").
+
+]
+
+-----------------------------------------------------
+
+class 'A1' (specialized 'DemoConsole'):
+
+n	= 100;
+
+[
+
+PREDICATES:
+
+imperative:
+
+p(STRING)		- (i);
+
+CLAUSES:
+
+goal:-
+	writeln(n).
+
+p(Text):-
+	writeln(Text).
+
+]
+
+-----------------------------------------------------

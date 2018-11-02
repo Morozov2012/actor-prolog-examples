@@ -1,0 +1,44 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, Alexei A. Morozov, IRE RAS. --
+-- A resident.                           --
+-------------------------------------------
+project: (('R1'))
+-------------------------------------------
+class 'R1':
+--
+p1	= (('Target'));
+p2	= (('Observer',
+		data= p1 ?? f(1,2,3,4)
+		));
+--
+[
+goal.
+--
+alarm(_).
+]
+-------------------------------------------
+class 'Target' (specialized 'Alpha'):
+[
+goal:-!.
+--
+f(_,_,C,D)= C + D.
+f(A,B,C,D)= A + B + C + D.
+f(A,B,_,_)= A + B.
+]
+-------------------------------------------
+class 'Observer' (specialized 'Report'):
+--
+variable:
+--
+	data;
+--
+[
+goal:-!,
+	set_color('RoyalBlue'),
+	writeln("I have received data:"),
+	set_color('Violet'),
+	writeln(data),
+	set_color('default').
+]
+-------------------------------------------

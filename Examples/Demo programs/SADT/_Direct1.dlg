@@ -1,0 +1,20 @@
+mesh(80,25)
+--
+window_font("Arial",14)
+diagram_font("Arial",17)
+dialog_font("Arial",14)
+--
+dialog '_Sender' (
+     "Sender control panel",'Blue',default,default,
+     centered,centered,default)
+vbox(center)
+     hbox
+          "&Message "
+          edittext(text,10,1,"Hello")
+     end_of_hbox
+     hbox(center)
+          button("send","&Send message")
+          button(close,"&Close dialog")
+     end_of_hbox
+end_of_vbox
+end_of_dialog

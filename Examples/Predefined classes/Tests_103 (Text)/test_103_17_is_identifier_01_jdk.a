@@ -1,0 +1,236 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test11;
+test12;
+test13;
+test14;
+test15;
+test16;
+test17;
+test21;
+test22;
+test23;
+test24;
+test25;
+test26;
+test27;
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test11,
+	test12,
+	test13,
+	test14,
+	test15,
+	test16,
+	test17,
+	test21,
+	test22,
+	test23,
+	test24,
+	test25,
+	test26,
+	test27.
+--
+test11:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.1"),
+	Text== "name",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	?is_identifier(Text),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test11:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test12:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.2"),
+	Text== "àáâãäå¸æçèéêëìíîïðñòóôõö÷øùúûüýþÿ",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	?is_identifier(Text),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test12:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test13:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.3"),
+	Text== "ÀÁÂÃÄÅ¨ÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	?is_identifier(Text),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test13:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test14:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.4"),
+	Text== "_èìÿ_123",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	?is_identifier(Text),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test14:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test15:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.5"),
+	Text== "___èìÿ_123__ôàìèëèÿ",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	?is_identifier(Text),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test15:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test16:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.6"),
+	Text== "123___èìÿ_",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	?is_identifier(Text),!,
+	con ? set_color('Red'),
+	con ? writeln("\tYes").
+test16:-
+	con ? set_color('DkGreen'),
+	con ? writeln("\tNo").
+--
+test17:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.7"),
+	Text== "èìÿ@äîìåí",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	?is_identifier(Text),!,
+	con ? set_color('Red'),
+	con ? writeln("\tYes").
+test17:-
+	con ? set_color('DkGreen'),
+	con ? writeln("\tNo").
+--
+test21:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.1"),
+	Text== "name",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	?is_identifier(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test21:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test22:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.2"),
+	Text== "àáâãäå¸æçèéêëìíîïðñòóôõö÷øùúûüýþÿ",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	?is_identifier(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test22:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test23:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.3"),
+	Text== "ÀÁÂÃÄÅ¨ÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	?is_identifier(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test23:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test24:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.4"),
+	Text== "_èìÿ_123",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	?is_identifier(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test24:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test25:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.5"),
+	Text== "___èìÿ_123__ôàìèëèÿ",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	?is_identifier(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("\tYes").
+test25:-
+	con ? set_color('Red'),
+	con ? writeln("\tNo").
+--
+test26:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.6"),
+	Text== "123___èìÿ_",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	?is_identifier(),!,
+	con ? set_color('Red'),
+	con ? writeln("\tYes").
+test26:-
+	con ? set_color('DkGreen'),
+	con ? writeln("\tNo").
+--
+test27:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.7"),
+	Text== "èìÿ@äîìåí",
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	?is_identifier(),!,
+	con ? set_color('Red'),
+	con ? writeln("\tYes").
+test27:-
+	con ? set_color('DkGreen'),
+	con ? writeln("\tNo").
+]

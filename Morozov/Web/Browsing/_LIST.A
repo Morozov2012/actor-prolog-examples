@@ -1,0 +1,88 @@
+package "Morozov/Web/Browsing/_List"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--             The "LIST" Actor Prolog package.              --
+--        (c) 2002-2005, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package implements a dialog box for examination of   --
+-- a list of Web resources. One can call an external Web     --
+-- browser to examine the content of given resources.        --
+---------------------------------------------------------------
+import 'List' from "Morozov/Web/Browsing/List";
+import 'Selector' from "Morozov/Web/Browsing/List";
+import 'Edit' from "Morozov/Web/Browsing/List";
+import '_EngineControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+---------------------------------------------------------------
+class '_Browse_List' (specialized '_Block'):
+--
+variable:
+--
+	value_i1;
+--
+internal:
+--
+	world	= ('List',
+			list_of_resources=value_i1);
+--
+[
+goal:-!.
+--
+show(_*):-!,
+	world ? show().
+--
+open(_*):-!.
+start(_*):-!.
+search(_*):-!.
+--
+]
+---------------------------------------------------------------
+class '_Selector' (specialized '_Block'):
+--
+variable:
+--
+	value_i1;
+	value_o1;
+--
+internal:
+--
+	entry_o1;
+--
+	world	= ('Selector',
+			list_of_resources=value_i1,
+			item=value_o1,
+			handler=entry_o1);
+--
+[
+goal:-!.
+--
+show(_*):-!,
+	world ? show.
+]
+---------------------------------------------------------------
+class '_Edit' (specialized '_Block'):
+--
+variable:
+--
+	value_i1;
+	value_o1;
+--
+internal:
+--
+	entry_o1;
+--
+	world	= ('Edit',
+			list_of_resources=value_i1,
+			item=value_o1,
+			handler=entry_o1);
+--
+[
+goal:-!.
+--
+show(_*):-!,
+	world ? show().
+open(_*):-!.
+start(_*):-!.
+--
+]
+---------------------------------------------------------------

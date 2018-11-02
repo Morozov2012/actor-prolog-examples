@@ -1,0 +1,80 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1 = STRING;
+test2(STRING)		- (i);
+
+class 'Main':
+--
+internal:
+--
+	test1	= ('Test',
+			name= "test.asc");
+--
+	con	= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'File'):
+--
+constant:
+--
+	name	: FileName;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("=== File: ",name," ==="),
+	test0,
+	CD== ?test1,
+	test2("c:\\"),
+	test1,
+	test2("Program Files"),
+	test1,
+	test2("."),
+	test1,
+	test2("Far"),
+	test1,
+	test2(".."),
+	test1,
+	test2(".."),
+	test1,
+	test2(".."),
+	test1,
+	test2(CD),
+	test1.
+--
+test0:-
+	con ? writeln("Test 0"),
+	?get_current_directory(),
+	con ? writeln("\tDone.").
+--
+test1 = Path:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tI will determine the current directory."),
+	?get_current_directory(),
+	Path== ?get_current_directory(),
+	con ? writeln("\tPath: ",Path).
+--
+test2(Path):-
+	con ? writeln("Test 2"),
+	con ? writeln("\tPath: ",Path),
+	con ? writeln("\tI will try to change the current directory."),
+	?set_current_directory(Path),
+	con ? writeln("\tDone!").
+]

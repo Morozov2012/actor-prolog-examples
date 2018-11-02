@@ -1,0 +1,138 @@
+--------------------------------------------------------------------
+-- Predefined Classes of Actor Prolog                             --
+-- (c) 2015 IRE RAS Alexei A. Morozov                             --
+--------------------------------------------------------------------
+
+package "Morozov/Webcam":
+
+pragma: INCLUDE_WEBCAM_LIBRARIES = ON;
+
+import 'BufferedImage' from "Morozov/Java2D";
+
+--------------------------------------------------------------------
+-- The 'Webcam' class is specialized class 'DataAbstraction'.     --
+--------------------------------------------------------------------
+
+class 'Webcam' (specialized 'DataAbstraction'):
+--
+default_name				= 'default';
+--
+width					= 'default';
+height					= 'default';
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+image_encoding_attributes		= {};
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+maximal_waiting_time			= 'default';
+--
+[
+SOURCE:
+	"morozov.built_in.Webcam";
+
+MODEL:
+
+?webcam_added(WebcamName).
+?webcam_removed(WebcamName).
+--
+?webcam_open(WebcamName).
+?webcam_image_obtained(WebcamName).
+?webcam_closed(WebcamName).
+?webcam_disposed(WebcamName).
+
+CLAUSES:
+
+open() = YesNo:
+	[external "open"].
+open(WebcamName) = YesNo:
+	[external "open"].
+open(WebcamName,Seconds) = YesNo:
+	[external "open"].
+--
+close:
+	[external "close"].
+--
+is_open:
+	[external "isOpen"].
+contains_new_image:
+	[external "containsNewImage"].
+--
+get_actual_name() = WebcamName:
+	[external "getActualName"].
+get_image(BufferedImage):
+	[external "getImage"].
+get_FPS() = FramesPerSecond:
+	[external "getFPS"].
+--
+get_webcam_list() = WebcamNameList:
+	[external "getWebcamList"].
+get_webcam_list(Seconds) = WebcamNameList:
+	[external "getWebcamList"].
+--
+watch_webcam_list(YesNo):
+	[external "watchWebcamList"].
+--
+watch_webcam_state(YesNo):
+	[external "watchWebcamState"].
+--
+get_view_sizes() = ViewSizeList:
+	[external "getViewSizes"].
+--
+set_width(Width):
+	[external "setWidth"].
+get_width() = Width:
+	[external "getWidth"].
+set_height(Height):
+	[external "setHeight"].
+get_height() = Height:
+	[external "getHeight"].
+--
+set_default_resolution(Resolution):
+	[external "setDefaultResolution"].
+set_default_resolution(Width,Height):
+	[external "setDefaultResolution"].
+get_default_resolution(Width,Height):
+	[external "getDefaultResolution"].
+--
+set_actual_resolution(Resolution):
+	[external "setDefaultResolution"].
+set_actual_resolution(Width,Height):
+	[external "setActualResolution"].
+get_actual_resolution(WidthInPixels,HeightInPixels):
+	[external "getActualResolution"].
+--
+set_default_name(WebcamName):
+	[external "setDefaultName"].
+get_default_name() = WebcamName:
+	[external "getDefaultName"].
+--
+webcam_added(WebcamName):
+	[external "webcamAdded"].
+webcam_removed(WebcamName):
+	[external "webcamRemoved"].
+--
+webcam_open(WebcamName):
+	[external "webcamOpen"].
+webcam_image_obtained(WebcamName):
+	[external "webcamImageObtained"].
+webcam_closed(WebcamName):
+	[external "webcamClosed"].
+webcam_disposed(WebcamName):
+	[external "webcamDisposed"].
+--
+-- The implementation of the 'WritableImageProducer' interface:
+--
+set_image_encoding_attributes(ImageAttributes):
+	[external "setImageEncodingAttributes"].
+get_image_encoding_attributes() = ImageAttributes:
+	[external "getImageEncodingAttributes"].
+--
+-- The implementation of the 'DataResourceConsumer' interface:
+--
+set_maximal_waiting_time(TimeInterval):
+	[external "setMaximalWaitingTime"].
+get_maximal_waiting_time() = TimeInterval:
+	[external "getMaximalWaitingTime"].
+]

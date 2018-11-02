@@ -1,0 +1,51 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',18)
+
+dialog 'MyDialog'("Toggle Button Demo",default,default,default,centered,centered,default)
+vbox(center)
+	groupbox("Toggle Buttons")
+		togglebutton(output_slot_1,"Toggle Button &1",'yes')
+		togglebutton(output_slot_2,"Toggle Button &2",'no')
+	end_of_groupbox
+	grid
+		row
+			column
+				button("action11","Put 'yes'")
+			end_of_column
+			column
+				button("action12","Put 'no'")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action21","Put \"yEs\"")
+			end_of_column
+			column
+				button("action22","Put \"nO\"")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action31","Put 'unknown'")
+			end_of_column
+			column
+				button("action32","Put 'X'")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action41","Put #")
+			end_of_column
+			column
+				button("action42","Put _")
+			end_of_column
+		end_of_row
+		row
+			column
+				button("action5","Get value")
+			end_of_column
+		end_of_row
+	end_of_grid
+end_of_vbox
+end_of_dialog

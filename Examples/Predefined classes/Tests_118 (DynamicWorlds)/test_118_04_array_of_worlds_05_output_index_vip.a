@@ -1,0 +1,34 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+
+import 'WorldArray' as 'WindowArray'
+	from "Arrays"('TargetClass':='Console');
+
+PREDICATES:
+imperative:
+-- determ:
+p;
+
+class 'MyWorld' (specialized 'Console'):
+--
+internal:
+--
+w	: 'WindowArray' of 'Console';
+--
+[
+goal:-!,
+	p.
+--
+p:-
+	w[Index] ? writeln("Index= ",Index),
+	fail.
+p.
+]
+
+class 'Main' (specialized 'Alpha'):
+w	= 'WindowArray'[1 .. 5] of ('Console');
+s	= ('MyWorld',w);
+[
+]

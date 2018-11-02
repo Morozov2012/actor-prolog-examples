@@ -1,0 +1,40 @@
+package "Morozov/Web/Filters/_Engine"
+	('_Empty_Protocol','_Block','_Model'):
+---------------------------------------------------------------
+--        The "WEB/FILTERS/EXAM" Actor Prolog package.       --
+--         (c) 2002-2011, IRE RAS, Alexei A. Morozov.        --
+---------------------------------------------------------------
+-- This is a design pattern for implementing filtering lists --
+-- of the Web resources.                                     --
+---------------------------------------------------------------
+-- import 'WebAddressFilter' from "Morozov/Web/Data/Address";
+import 'Filter_List' from "Morozov/Web/Filters/Engine";
+import "Morozov/Web/Filters/Exam";
+import '_AnalyserControl'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+import '_EngineInput'
+	from "Morozov/Web/Links/_Comm" ('_Empty_Protocol');
+---------------------------------------------------------------
+interface '_Filter_List'
+(specialized '_Block', '_AnalyserControl', '_EngineInput'):
+--
+variable:
+--
+	value_i1	: WebAddressList;
+	value_o1	: WebAddressList;
+	value_m1	: WebAddressList;
+--
+internal:
+--
+	world		: 'Filter_List';
+--
+[
+PREDICATES:
+--
+visible:
+--
+imperative:
+--
+show(_*);
+]
+---------------------------------------------------------------

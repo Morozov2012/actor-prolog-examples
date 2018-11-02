@@ -1,0 +1,46 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'FFmpeg'):
+--
+internal:
+--
+	vpm			: 'VideoProcessingMachine';
+	dialog			: 'DemoPanel';
+	graphic_window		: 'Canvas2D';
+	image1			: 'BufferedImage';
+	image2			: 'BufferedImage';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+store_VPM_program;
+--
+draw_scene;
+--
+draw_blob_list(BlobList,INTEGER,INTEGER)	- (i,i,i);
+draw_blob(Blob,INTEGER,INTEGER)			- (i,i,i);
+--
+determ:
+--
+select_blob_color(BlobType,Color)		- (i,o);
+]
+-----------------------------------------------------------------------
+interface 'DemoPanel' (specialized 'Dialog'):
+internal:
+	graphic_window		: 'Canvas2D';
+[
+]
+-----------------------------------------------------------------------

@@ -1,0 +1,29 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	dialog	= ('DemoPanel',
+			x= 'centered',
+			y= 'centered');
+--
+[
+goal:-!,
+	dialog ? show,
+	set_period(0.5,0.0),
+	activate.
+--
+tick:-!,
+	R1== ?random(256)/255,
+	G1== ?random(256)/255,
+	B1== ?random(256)/255,
+	dialog ? set_background_color(color3(R1,G1,B1)).
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+[
+]
+-----------------------------------------------------------------------

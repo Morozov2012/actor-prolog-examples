@@ -1,0 +1,70 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Astrohn";
+import .. from "morozov/ColorMap";
+--
+-----------------------------------------------------------------------
+interface 'VideoPlayer' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer			: 'TerahertzVideoManager';
+	main_window		: 'Canvas2D';
+	legend_window		: 'Canvas2D';
+	con			: 'Console';
+	text_operations		: 'Text';
+	color_maps		: 'ColorMap';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+play_video;
+--
+determ:
+--
+check_file_name;
+--
+imperative:
+--
+update_color_map;
+--
+imperative:
+--
+set_read_buffer_size(INTEGER)			- (i);
+park_scroll_control;
+--
+]
+-----------------------------------------------------------------------
+interface 'TerahertzVideoManager' (specialized 'Astrohn'):
+--
+internal:
+--
+	player			: 'VideoPlayer';
+	main_window		: 'Canvas2D';
+	legend_window		: 'Canvas2D';
+	image			: 'BufferedImage';
+	con			: 'Console';
+	text			: 'Text';
+	timer			: 'Timer';
+--
+[
+PREDICATES:
+--
+determ:
+--
+get_image(
+	STRING,INTEGER,INTEGER,
+	INTEGER,INTEGER,REAL,FontSize)		- (i,o,o,o,o,o,o);
+--
+imperative:
+--
+resize_main_window(INTEGER,INTEGER)		- (i,i);
+report_time(INTEGER,INTEGER,REAL,FontSize)	- (i,i,i,i);
+]
+-----------------------------------------------------------------------

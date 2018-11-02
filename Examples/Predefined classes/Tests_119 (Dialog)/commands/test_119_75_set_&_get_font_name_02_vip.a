@@ -1,0 +1,42 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+select_name_of_font(INTEGER,FontName)		- (i,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	dialog	= ('DemoPanel',
+			x= 'centered',
+			y= 'centered');
+--
+[
+goal:-!,
+	dialog ? show,
+	set_period(0.5,0.0),
+	activate.
+--
+tick:-!,
+	N== ?random(5),
+	select_name_of_font(N,Name),
+	dialog ? set_font_name(Name).
+--
+select_name_of_font(0,'default'):-!.
+select_name_of_font(1,'fixed'):-!.
+select_name_of_font(2,'times'):-!.
+select_name_of_font(3,'helvetica'):-!.
+select_name_of_font(_,'system').
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+[
+]
+-----------------------------------------------------------------------

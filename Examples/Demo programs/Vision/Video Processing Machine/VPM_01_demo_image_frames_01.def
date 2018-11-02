@@ -1,0 +1,79 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+pragma: INTERMEDIATE_SOURCE_CODE = JDK;
+pragma: USE_COMPILER_INSTEAD_OF_PROVER = ON;
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Timer'):
+--
+constant:
+--
+	data_directory		: STRING;
+	file_name_format	: STRING;
+	frame_rate		: REAL;
+--
+internal:
+--
+	vpm			: 'VideoProcessingMachine';
+	graphic_window		: 'Canvas2D';
+	prompt_window		: 'Report';
+	text			: 'Text';
+	image1			: 'BufferedImage';
+	image2			: 'BufferedImage';
+	state			: 'ProgramState';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+--
+draw_scene;
+draw_legend;
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+--
+internal:
+--
+timer		: 'Timer';
+--
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER);
+		  frame_counter(INTEGER);
+		  stop_watch_time(INTEGER);
+		  global_counter(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)		- (o);
+get_current_frame(INTEGER)		- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)		- (i);
+set_current_frame(INTEGER)		- (i);
+--
+reset_stopwatch;
+get_stopwatch_time(INTEGER)		- (o);
+--
+reset_frame_counter;
+increase_frame_counter;
+get_frame_counter(INTEGER)		- (o);
+--
+increase_global_counter;
+get_global_counter(INTEGER)		- (o);
+]
+-----------------------------------------------------------------------

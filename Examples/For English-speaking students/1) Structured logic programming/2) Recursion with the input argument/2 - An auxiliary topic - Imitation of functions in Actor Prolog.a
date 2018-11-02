@@ -1,0 +1,36 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- An auxiliary topic: The syntax.       --
+-- Imitation of functions in the Actor   --
+-- Prolog language.                      --
+--                                       --
+-- Questions: How can one declare a      --
+-- function in Actor Prolog? How can one --
+-- call the function in Actor Prolog?    --
+-- How the compiler distinguishes among  --
+-- function calls and structures? How    --
+-- can one implement the function in     --
+-- Actor Prolog? How the compiler        --
+-- converts functions to predicates      --
+-- during the syntax analysis of the     --
+-- program?                              --
+--                                       --
+-------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+percentage(REAL,INTEGER) = REAL	- (i,i);
+
+CLAUSES:
+
+goal:-
+	V== ?percentage(3.14,25),
+	writeln("25% of 3.14 equals ",V).
+
+percentage(X,P) = Y :-
+	Y== X * P / 100.

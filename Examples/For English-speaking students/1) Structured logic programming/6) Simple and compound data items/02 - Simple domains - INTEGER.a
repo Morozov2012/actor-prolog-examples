@@ -1,0 +1,38 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Simple domains.    --
+-- INTEGER.                              --
+--                                       --
+-- Questions: What are integer numbers?  --
+-- When the integer numbers are more     --
+-- appropriate than the float (real)     --
+-- numbers? How can one declare an       --
+-- integer argument of a predicate? How  --
+-- can one create a new domain that is   --
+-- a kind of integer numbers?            --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+NumberOfStudents	= INTEGER.
+
+PREDICATES:
+
+p(INTEGER)		- (i);
+q(NumberOfStudents)	- (i);
+
+CLAUSES:
+
+goal:-
+	p(100),
+	q(30).
+
+p(N):-
+	writeln(N).
+q(K):-
+	writeln(K).

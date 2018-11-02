@@ -1,0 +1,42 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+[
+goal:-!,
+	test1,
+	test2.
+--
+test1:-
+	writeln("Test 1:"),
+	Name1== ?input_directory_name(""),
+	writeln("\t",Name1),
+	Name2== ?input_directory_name(Name1),!,
+	writeln("\t",Name2).
+test1:-
+	writeln("\tThe input was canceled by the user.").
+--
+test2:-
+	writeln("Test 2:"),
+	Name1== ?input_directory_name(
+		"Please select a directory",
+		""),
+	writeln("\t",Name1),
+	Name2== ?input_directory_name(
+		"Please select a directory",
+		Name1),!,
+	writeln("\t",Name2).
+test2:-
+	writeln("\tThe input was canceled by the user.").
+]
+-----------------------------------------------------------------------

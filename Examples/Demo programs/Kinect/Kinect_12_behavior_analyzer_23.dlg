@@ -1,0 +1,129 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+draft('off')
+
+dialog 'VideoPlayer' (
+	"2.5D Video Player",
+	default,default,default,centered,centered,default)
+vbox(justify)
+	hbox(justify)
+		custom(000,15,65,"Control2D")
+		custom['KeepProportions'](main_window,70,65,"Control2D")
+		custom(legend_window,15,65,"Control2D")
+	end_of_hbox
+	hbox(justify)
+		listbutton(0,1010,15,7,
+			[
+			"Depth Maps",
+			"Colored Depth Maps",
+			"Infrared",
+			"Long Exposure Infrared",
+			"Mapped Color",
+			"Point Clouds",
+			"Color",
+			"Device Tuning",
+			"None"
+			],
+			"Colored Depth Maps"
+			)
+		listbutton(0,1020,16,7,
+			[
+			"Tincture People",
+			"Paint People",
+			"Extract People",
+			"Adaptively Extract People",
+			"Project People",
+			"None"
+			],
+			"Tincture People"
+			)
+		listbutton(0,1030,16,7,
+			[
+			"Total Rectangles",
+			"Skeleton Rectangles",
+			"Total Parallelepipeds",
+			"Skeleton Parallelepipeds",
+			"None"
+			],
+			"None"
+			)
+		listbutton(0,1040,12,7,
+			[
+			"Detect Skeletons",
+			"Track Skeletons",
+			"None"
+			],
+			"Track Skeletons"
+			)
+		listbutton(0,1050,10,7,
+			[
+			"Aqua",
+			"Autumn",
+			"Blackhot",
+			"Blaze",
+			"BlueRed",
+			"Bone",
+			"Bright Rainbow",
+			"Cool",
+			"Copper",
+			"Gray",
+			"Green",
+			"Hot",
+			"HSV",
+			"Iron",
+			"Jet",
+			"LightJet",
+			"Medical",
+			"Ocean",
+			"Parula",
+			"Pink",
+			"Prism",
+			"Purple",
+			"Red",
+			"Reptiloid",
+			"Soft Rainbow",
+			"Spring",
+			"Summer",
+			"Winter",
+			"Optical",
+			"None"
+			],
+			"Ocean"
+			)
+		listbutton(0,1060,7,7,
+			[
+			"Rainbow",
+			"Red",
+			"Orange",
+			"Yellow",
+			"Green",
+			"Cyan",
+			"Blue",
+			"Magenta"
+			],
+			"Green"
+			)
+	end_of_hbox
+	hbox(justify)
+	scaling(2.8,1.0)
+		button("Select","&Select")
+		ok("Play","&Play")
+		button("Pause","P&ause")
+		button("Stop","S&top")
+		ok("Export","&Export")
+		button(close,"&Quit")
+	end_of_scaling
+	end_of_hbox
+	padding(0,0)
+		statictext(
+			"The project is supported by the Russian "
+			"Foundation for Basic Research, "
+			"grant 16-29-09626-ofi_m.")
+	end_of_padding
+end_of_vbox
+end_of_dialog

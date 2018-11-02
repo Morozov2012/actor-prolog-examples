@@ -1,0 +1,83 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+A1	= f(INTEGER,A2,REAL); g(A2).
+A2	= {name:SYMBOL,text:STRING,list:A3}.
+A3	= A4*.
+A4	= {a:INTEGER,b:REAL,c:SYMBOL,d:STRING}.
+--
+IMPERATIVES:
+--
+test1;
+test2;
+test3;
+test4;
+--
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+name	= "Test.db";
+[
+DOMAINS:
+Target	= A1.
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+constant:
+--
+	database_name	= "MyTest.db";
+--
+internal:
+--
+	store	= ('MyDatabase',
+			name= database_name);
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test2.
+--
+test1:-
+	writeln("Test 1:"),
+	writeln("\tI will store data items."),
+	store ? append(
+		f(1,{name:'n1',list:[{a:1,b:11.0,c:'symb1'}]},3.0)),
+	store ? append(
+		f(-10,{list:[{a:3,b:3.14,c:'symb2'}],name:'n2'},9.0)),
+	store ? append(
+		f(17,{name:'n3',list:[{a:5,b:1.0,c:'symb3'}]},11.0)),
+	writeln("\tDone.").
+--
+test2:-
+	writeln("Test 2:"),
+	writeln("\tI will search data items:"),
+	store ? find(Item),
+	writeln("\t\t",Item),
+	fail.
+test2:-
+	writeln("\tDone.").
+--
+test3:-
+	writeln("Test 3:"),
+	writeln("\tI will save data to the ",
+		database_name," file."),
+	store ? save(database_name),
+	writeln("\tDone.").
+--
+test4:-
+	writeln("Test 4:"),
+	writeln("\tI consult data from the ",
+		database_name," file."),
+	store ? load(database_name),
+	writeln("\tDone.").
+]
+-----------------------------------------------------------------------

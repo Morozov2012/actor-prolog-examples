@@ -1,0 +1,6 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013-2017 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+
+resource("data/Fight_RunAway1_jpg/JPEGS/*.jpg")

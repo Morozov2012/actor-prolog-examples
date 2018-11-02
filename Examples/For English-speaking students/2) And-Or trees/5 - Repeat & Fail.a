@@ -1,0 +1,100 @@
+-----------------------------------------------------
+--                                                 --
+--              Actor Prolog lessons               --
+--           (c) 2015 Alexei A. Morozov            --
+--                                                 --
+-- The topic: And-Or trees. Repeat and fail.       --
+--                                                 --
+-----------------------------------------------------
+
+PREDICATES:
+
+nondeterm:
+
+repeat;
+
+CLAUSES:
+
+repeat.
+repeat:-
+	repeat.
+
+goal:-
+	repeat,
+	writeln("Hello!"),
+	fail.
+
+/*
+This program corresponds to infinity
+number of And trees (proof trees).
+
+Here is the first And tree:
+
+               the goal statement
+                  /     |     \
+                 /      |      \
+             repeat  writeln   fail
+
+Here is the second And tree:
+
+               the goal statement
+                  /     |     \
+                 /      |      \
+             repeat  writeln   fail
+                |
+             repeat
+
+Here is the third And tree:
+
+               the goal statement
+                  /     |     \
+                 /      |      \
+             repeat  writeln  fail
+                |
+             repeat
+                |
+             repeat
+
+Etc.
+
+(Arguments of sub-goals are not
+showed for the sake of simplicity.)
+
+Here is the Or tree (the search tree) of
+the program:
+
+                Sub-goals: repeat, writeln("Hello!"), fail.
+                (the goal statement of the program)
+                          /     \
+                 repeat. /       \  repeat:-
+                        /         \      repeat.
+                       /           \
+                      /             \
+                     /               \
+                    /                 \
+                   /                   \
+                  /                     \
+                 /                       \
+                /                         \
+               /                           \
+Sub-goals:                               Sub-goals:
+writeln("Hello!"),                       repeat,
+fail.                                    writeln("Hello!"),
+|                                        fail.
+| Output the text                            /        \
+|                                   repeat. /          \ repeat:-
+Sub-goals:                                 /            \     repeat.
+fail.                                     /              \
+|                                    Sub-goals:           Etc.
+This branch of the Or tree           writeln("Hello!"),   ...
+of the program is terminated         fail.
+with a failure.                      |
+                                     | Output the text
+                                     |
+                                     Sub-goals:
+                                     fail.
+                                     |
+                                     This branch of the Or tree
+                                     of the program is terminated
+                                     with a failure.
+*/

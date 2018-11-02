@@ -1,0 +1,29 @@
+
+DOMAINS:
+
+reference:
+
+M	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+p;
+
+class 'Main' (specialized 'DemoConsole'):
+
+variable:
+
+a	: M;
+
+[
+
+goal:-
+	a == 100,
+	p.
+
+p:-
+	writeln(a).
+
+]

@@ -1,0 +1,513 @@
+-------------------------------------------------------------------
+--              An example of Actor Prolog program.              --
+--          (c) 2002-2011, IRE RAS, Alexei A. Morozov.           --
+-------------------------------------------------------------------
+-- This is an auxiliary utility that processes data collected    --
+-- by the ScanWeb program. Execute it after the ScanWeb program. --
+-------------------------------------------------------------------
+import 'ColorDatabase'	from "Morozov/VRML/Colors";
+import 'AddressTable'	from "Morozov/Web/Scanning/Tables";
+import 'ShortName'	from "Morozov/VRML/Names";
+import "Morozov/VRML/Items";
+-------------------------------------------------------------------
+project: (('Step2'))
+-------------------------------------------------------------------
+class 'Step2' (specialized 'Console'):
+--
+constant:
+--
+	size_file	= "Tables\\All.tab";
+--
+	pages_file	= "Tables\\Pages.tab";
+	links_file	= "Tables\\Links.tab";
+	pictures_file	= "Tables\\Pictures.tab";
+	binaries_file	= "Tables\\Binaries.tab";
+	errors_file	= "Tables\\Errors.tab";
+--
+	keywords_file	= "Tables\\Keywords.tab";
+--
+internal:
+--
+	colors		= ('ColorDatabase',
+				name="Colors.db");
+--
+	input		= ('WebSitesDatabase',
+				name="Results.db");
+	attributes	= ('AddressTable');
+	output		= ('File');
+--
+	store		= ('KeywordStore',attributes);
+	names		= ('ShortName');
+--
+[
+goal:-
+	spy_point('no_trace'),
+	write("Loading the data ... "),
+	input ? load,
+	input ? sort_by('name'),
+	writeln("O.K."),
+	fail.
+goal:-
+	colors ? does_exist,
+	write("Loading color table ... "),
+	colors ? load,
+	writeln("O.K."),
+	fail.
+goal:-
+	input ? find(Item),
+	Item == {
+		name:Name,
+		address:Address,
+		updated:Date,
+		items:Items,
+		size:Size,
+		hyper_links:H,
+		other_links:O|_},
+	report_strange_date(Name,Address,Date),
+	report_strange_number_of_pages(Name,Address,Items,H,O),
+	report_strange_size(Name,Address,Size),
+	fail.
+goal:-
+	attributes ? find(Item),
+	Item == {
+		name:Name,
+		address:Address|_},
+	report_missing_item(Name,Address),
+	fail.
+goal:-
+	spy_point('no_trace'),
+	write("Creation of the \"",size_file,"\" file..."),
+	output ? open(size_file,'writing'),
+	copy_data(compare('size','letters'),0.0),
+	output ? close,
+	writeln("O.K."),
+	fail.
+goal:-
+	spy_point('no_trace'),
+	write("Creation of the \"",pages_file,"\" file..."),
+	output ? open(pages_file,'writing'),
+	copy_data(compare('size','pages'),0.0),
+	output ? close,
+	writeln("O.K."),
+	fail.
+goal:-
+	spy_point('no_trace'),
+	write("Creation of the \"",links_file,"\" file..."),
+	output ? open(links_file,'writing'),
+	copy_data(compare('richness','hyper_links'),0.0),
+	output ? close,
+	writeln("O.K."),
+	fail.
+goal:-
+	spy_point('no_trace'),
+	write("Creation of the \"",pictures_file,"\" file..."),
+	output ? open(pictures_file,'writing'),
+	copy_data(compare('richness','pictures'),0.0),
+	output ? close,
+	writeln("O.K."),
+	fail.
+goal:-
+	spy_point('no_trace'),
+	write("Creation of the \"",binaries_file,"\" file..."),
+	output ? open(binaries_file,'writing'),
+	copy_data(compare('richness','other_links'),0.0),
+	output ? close,
+	writeln("O.K."),
+	fail.
+goal:-
+	spy_point('no_trace'),
+	write("Creation of the \"",errors_file,"\" file..."),
+	output ? open(errors_file,'writing'),
+	copy_data(compare('inexactitude','errors'),0.0),
+	output ? close,
+	writeln("O.K."),
+	fail.
+goal:-
+	spy_point('trace'),
+	input ? find(Record),
+	Record == {list_of_keywords:Names|_},
+	write("Creation of separate keyword files ...\n"),
+	create_keyword_files(1,Names),
+	writeln("O.K."),
+	fail.
+goal:-
+	input ? find(Record),
+	Record == {name:_|_},
+	input ? retract_all(Record),
+	fail.
+goal:-
+	store ? get_virtual_item(Item),
+	input ? append(Item),
+	fail.
+goal:-
+	write("Creation of keywords file ... "),
+	input ? sort_by('name'),
+	output ? open(keywords_file,'writing'),
+	copy_data('all_keywords',0.0),
+	output ? close,
+	writeln("O.K."),
+	fail.
+goal:-
+	write("Creation of color table ... "),
+	colors ? save,
+	writeln("O.K."),
+	fail.
+goal:-!,
+	input ? save("MAIN.LOG"),
+	writeln("Good luck!").
+--
+report_strange_date(Name,Address,#):-
+	attributes ? find({name:Name,declared_date:_|_}),!,
+	set_color('Black','Yellow'),
+	writeln("Unknown date of ",Name," (",Address,")!"),
+	set_color('Black','White').
+report_strange_date(Name,Address,#):-!,
+	set_color('Black','Magenta'),
+	writeln("Unknown date of ",Name," (",Address,")!"),
+	set_color('Black','White').
+report_strange_date(_,_,_).
+--
+report_strange_number_of_pages(Name,Address,Items,H,_/*O*/):-
+	Items <= 1,
+	H < 5,!,
+	set_color('White','Red'),
+	writeln("Check the address of ",Name," (",Address,")!"),
+	set_color('Black','White').
+report_strange_number_of_pages(_,_,_,_,_).
+--
+report_strange_size(Name,Address,Size):-
+	Size < 500,!,
+	set_color('White','Brown'),
+	writeln("Check the address of ",Name," (",Address,")!"),
+	set_color('Black','White').
+report_strange_size(_,_,_).
+--
+report_missing_item(Name,_):-
+	input ? find(Item),
+	Item == {name:Name|_},!.
+report_missing_item(Name,Address):-
+	set_color('Black','Green'),
+	writeln("The item ",Name," (",Address,") isn't analysed!"),
+	set_color('Black','White').
+--
+create_keyword_files(N,[Name|Rest]):-!,
+	create_keyword_file(N,Name),
+	create_keyword_files(N+1,Rest).
+create_keyword_files(_,_).
+--
+create_keyword_file(N,Name):-
+	names ? make_short_name(6,?cast("STRING",Name),FN),
+	FrontName== "K_"+FN,
+	FullName== "Tables\\"+FrontName+".TAB",
+	writeln(FullName),
+	names ? replace_spaces(1,?cast("STRING",Name),Alias),
+	store ? append(file_name(N,Name,Alias,FullName)),
+	output ? open(?cast("FileName",FullName),'writing'),
+	determine_hue_of_keyword(N,Hue),
+	-- Hue== ?random_color,
+	store ? remember_hue(N,Hue),
+	copy_data(number(N),Hue),
+	output ? close.
+--
+copy_data(number(N),Hue):-
+	input ? find(Record),
+	Record == {list_of_keywords:Names|_},
+	element(N,Names,Keyword),
+	output ? write(
+		"selected_keyword(\"",Keyword,"\",",Hue,")\n"),
+	fail.
+copy_data('all_keywords',_):-
+	output ? write("'all_keywords'\n"),
+	fail.
+copy_data(Type,_):-
+	Type == compare(_,_),
+	output ? write(Type,"\n"),
+	fail.
+copy_data(_,_):-
+	input ? find(Record),
+	Record == {list_of_keywords:Names|_},
+	output ? write("list_of_keywords(["),
+	write_list(Names),
+	output ? write("])"),
+	fail.
+copy_data(N,Hue1):-
+	input ? find(Item),
+	Item == {
+		name:Name,
+		address:Address,
+		updated:Date,
+		items:Items,
+		size:Size,
+		hyper_links:Hyper,
+		pictures:Pictures,
+		other_links:Others,
+		error_links:Errors,
+		keywords:Dictionary|Rest},
+	--
+	check_dictionary_if_need(N,Rest,Dictionary,Index),
+	--
+	store ? increase_counter(N,Item),
+	output ? nl,
+	output ? write("item(\"",
+		Name,"\",",
+		"\"",Address,"\","),
+	write_date(Name,Date),
+	output ? write(
+		",",
+		Items,",",
+		Size,",",
+		Hyper,",",
+		Pictures,",",
+		Others,",",
+		Errors,",["),
+	write_list(Dictionary),
+	output ? write("],",Index,","),
+	determine_hue_of_site(N,Name,Rest,Hue1,Hue2),
+	output ? write(Hue2,")"),
+	--
+	fail.
+copy_data(_,_):-
+	output ? nl.
+--
+element(1,[Keyword|_],Keyword):-!.
+element(N,[_|Rest],Keyword):-!,
+	element(N-1,Rest,Keyword).
+--
+check_dictionary_if_need(number(N),_,Dictionary,Index):-
+	N > 0,!,
+	check_dictionary(N,Dictionary,Index).
+check_dictionary_if_need(
+		_,{scene_attributes:number(N)|_},
+		Dictionary,Index):-!,
+	check_dictionary(N,Dictionary,Index).
+check_dictionary_if_need(_,_,_,0).
+--
+check_dictionary(1,[Index|_],Index):-!,
+	Index > 0.
+check_dictionary(N,[_|Rest],Index):-!,
+	check_dictionary(N-1,Rest,Index).
+--
+write_list([Name]):-!,
+	write_item(Name).
+write_list([Name|Rest]):-!,
+	write_item(Name),
+	output ? write(","),
+	write_list(Rest).
+write_list(_).
+--
+write_item(Name):-
+	string(Name),!,
+	output ? write("\"",Name,"\"").
+write_item(Name):-
+	output ? write(Name).
+--
+write_date(Name,#):-
+	attributes ? find(Record),
+	Record == {name:Name,declared_date:Date|_},!,
+	write_date(Date).
+write_date(_,Date):-
+	write_date(Date).
+--
+write_date(#):-!,
+	output ? write("'no_date'").
+write_date(Date):-
+	/* 2010.12.17
+	output ? write(Date+0).
+	*/
+	output ? write(Date).
+--
+determine_hue_of_keyword(N,Hue):-
+	store ? find(FileName),
+	FileName == file_name(N,Name,_,_),!,
+	find_or_update_hue_of_keyword(Name,Hue).
+determine_hue_of_keyword(N,0.0):-
+	F== ?format("Cannot find the file of keyword %d",N),
+	writeln(F),
+	warning(F).
+--
+find_or_update_hue_of_keyword(Name,Hue):-
+	colors ? find(KeywordColor),
+	KeywordColor == keyword_color(Name,Hue),!.
+find_or_update_hue_of_keyword(Name,Hue):-
+	Hue== ?random_color,
+	update_keyword_color(Name,Hue).
+--
+determine_hue_of_site(compare(_,_),Name,_,_,Hue):-
+	colors ? find(PersonalColor),
+	PersonalColor == personal_color(Name,Hue),!.
+determine_hue_of_site(compare(_,_),Name,_,_,Hue):-!,
+	Hue== ?random_color,
+	update_personal_color(Name,Hue).
+determine_hue_of_site(
+		'all_keywords',_,
+		{scene_attributes:number(N)|_},_,Hue):-!,
+	store ? get_hue(N,Hue).
+determine_hue_of_site(_,_,_,Hue,Hue).
+--
+random_color= ?random(36000) / 100.0.
+--
+update_keyword_color(Name,_):-
+	colors ? find(KeywordColor),
+	KeywordColor == keyword_color(Name,_),!.
+update_keyword_color(Name,Hue):-
+	colors ? append(keyword_color(Name,Hue)).
+--
+update_personal_color(Name,_):-
+	colors ? find(PersonalColor),
+	PersonalColor == personal_color(Name,_),!.
+update_personal_color(Name,Hue):-
+	colors ? append(personal_color(Name,Hue)).
+]
+-------------------------------------------------------------------
+class 'KeywordStore' (specialized 'Database'):
+--
+attributes;
+--
+names		= ('Text');
+--
+con		= ('Console');
+file_operations	= ('File');
+--
+[
+increase_counter(number(N),Item):-!,
+	increase_counter(N),
+	analyse_item(N,Item).
+increase_counter(_,_).
+--
+increase_counter(Index):-
+	retract(number_of_items(Index,C)),!,
+	insert(number_of_items(Index,C+1)).
+increase_counter(Index):-
+	insert(number_of_items(Index,1)).
+--
+analyse_item(I,Item):-
+	Item == {
+		name:Name,
+		updated:Date1,
+		size:Size,
+		hyper_links:Hyper,
+		pictures:Pictures,
+		other_links:Others,
+		error_links:Errors,
+		keywords:Dictionary|_},!,
+	use_declared_date_if_need(Name,Date1,Date2),
+	Index== number(I),
+	refine_date(Index,Date2),
+	increase_sum(Index,'size',?cast("N",Size)),
+	increase_sum(Index,'hyper_links',Hyper),
+	increase_sum(Index,'pictures',Pictures),
+	increase_sum(Index,'other_links',Others),
+	increase_sum(Index,'errors',Errors),
+	update_list(?cast("Keyword",Name),Index,Dictionary).
+analyse_item(_,_):-
+	con ? warning("I cannot analyse the item!").
+--
+use_declared_date_if_need(Name,#,Date):-
+	attributes ? find({name:Name,declared_date:Date|_}),!.
+use_declared_date_if_need(_,Date,Date).
+--
+refine_date(Index,Date2):-
+	find(recent_update(Index,Date1)),!,
+	refine_date(Index,Date1,Date2).
+refine_date(Index,Date2):-
+	insert(recent_update(Index,Date2)).
+--
+refine_date(_,Date1,Date2):-
+	greater_date(Date1,Date2),!.
+refine_date(Index,_,Date2):-
+	retract(recent_update(Index,_)),!,
+	insert(recent_update(Index,Date2)).
+refine_date(_,_,_):-
+	con ? warning("I cannot change recent date of item!").
+--
+greater_date(_,#):-!.
+greater_date(#,_):-!,
+	fail.
+greater_date(Date1,Date2):-
+	Date1 >= Date2.
+--
+increase_sum(Index,Name,Delta):-
+	retract(total_sum(Index,Name,N)),!,
+	insert(total_sum(Index,Name,N+Delta)).
+increase_sum(Index,Name,Delta):-
+	insert(total_sum(Index,Name,Delta/*1.0*/)).
+--
+update_list(Name,Index,Delta):-
+	retract(keyword_list(Index,List)),!,
+	check_length(Name,Delta,List),
+	insert(keyword_list(Index,Delta+List)).
+update_list(_,Index,Delta):-
+	insert(keyword_list(Index,Delta)).
+--
+check_length(Name,Delta,List):-
+	Length1== ?length(Delta),
+	Length2== ?length(List),
+	Length1 <> Length2,
+	Message== con ? format(
+		"Keyword list of \"%s\" has strange length %d",
+		Name,
+		Length1),
+	con ? writeln(Message),
+	con ? warning(Message),
+	break.
+check_length(_,_,_).
+--
+length([])= 0 :-!.
+length([_|Rest])= ?length(Rest) + 1 :-!.
+length(_)= 0.
+--
+/*
+'+'([N1|Rest1],[N2|Rest2])= [N1+N2|Rest1+Rest2] :-!.
+'+'([],[])= [].
+*/
+--
+get_virtual_item(Item):-
+	find(Record),
+	Record == number_of_items(I,Number),
+	find(file_name(I,_,Alias,FileName)),
+	file_operations ? extract_path(
+		?cast("STRING",FileName),_,ShortName),
+	VRML_File_Name==
+		file_operations
+		? replace_extension(ShortName,".wrl"),
+	Index== number(I),
+	find(recent_update(Index,Date)),
+	find(total_sum(Index,'size',Size)),
+	find(total_sum(Index,'hyper_links',Hyper)),
+	find(total_sum(Index,'pictures',Pictures)),
+	find(total_sum(Index,'other_links',Others)),
+	find(total_sum(Index,'errors',Errors)),
+	find(keyword_list(Index,Dictionary)),
+	Item == {
+		scene_attributes:Index,
+		name: names?upper(?cast("STRING",Alias)),
+		address: names?lower(VRML_File_Name),
+		updated:Date,
+		items:Number,
+		size:?cast("Size",Size),
+		hyper_links:Hyper,
+		pictures:Pictures,
+		other_links:Others,
+		error_links:Errors,
+		keywords:Dictionary}.
+--
+remember_hue(N,Hue):-
+	find(hue(N,Hue)),!.
+remember_hue(N,_):-
+	find(Record),
+	Record == hue(N,_),
+	retract_all(Record),
+	fail.
+remember_hue(N,Hue):-
+	append(hue(N,Hue)).
+--
+get_hue(N,Hue):-
+	find(Record),
+	Record == hue(N,Hue),!.
+get_hue(_,0.0).
+]
+-------------------------------------------------------------------
+class 'WebSitesDatabase' (specialized 'Database'):
+[
+]
+-------------------------------------------------------------------

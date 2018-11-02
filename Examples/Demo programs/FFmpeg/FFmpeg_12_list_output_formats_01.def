@@ -1,0 +1,61 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'FFmpeg'):
+--
+internal:
+--
+	con	: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+write_format_list(FFmpegOutputFormats)		- (i);
+write_format(FFmpegOutputFormat)		- (i);
+--
+write_format_name(FFmpegOutputFormat)		- (i);
+write_format_long_name(FFmpegOutputFormat)	- (i);
+write_format_mime_type(FFmpegOutputFormat)	- (i);
+write_format_extensions(FFmpegOutputFormat)	- (i);
+write_audio_codec(FFmpegOutputFormat)		- (i);
+write_video_codec(FFmpegOutputFormat)		- (i);
+write_subtitle_codec(FFmpegOutputFormat)	- (i);
+--
+write_format_flags(FFmpegOutputFormat)		- (i);
+write_format_flag_list(FFmpegFormatFlags)	- (i);
+--
+write_format_tags(FFmpegOutputFormat)		- (i);
+write_format_tag_list(FFmpegFormatTags)		- (i);
+write_format_tag(FFmpegFormatTag)		- (i);
+--
+write_codec(FFmpegCodec)			- (i);
+--
+write_codec_name(FFmpegCodec)			- (i);
+write_codec_long_name(FFmpegCodec)		- (i);
+write_codec_type(FFmpegCodec)			- (i);
+write_codec_id(FFmpegCodec)			- (i);
+--
+write_codec_pix_fmts(FFmpegCodec)		- (i);
+write_codec_pixel_format_list
+	(FFmpegPixelFormats)			- (i);
+--
+write_codec_supported_samplerates(FFmpegCodec)	- (i);
+write_codec_supported_samplerates_list(I_List)	- (i);
+--
+write_codec_sample_fmts(FFmpegCodec)		- (i);
+write_codec_sample_format_list
+	(FFmpegAudioSampleFormats)		- (i);
+--
+write_codec_channel_layouts(FFmpegCodec)	- (i);
+write_codec_channel_layout_list
+	(FFmpegChannelLayouts)			- (i);
+]
+-----------------------------------------------------------------------

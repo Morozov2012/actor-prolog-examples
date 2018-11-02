@@ -1,0 +1,88 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+N	= INTEGER.
+--
+-----------------------------------------------------------------------
+interface 'MyPredicates':
+[
+PREDICATES:
+nondeterm:
+test1;
+test2;
+nondeterm:
+p1(N);
+p2(N);
+p3(N);
+]
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'MyPredicates', 'Console'):
+catch	: 'MyPredicates';
+[
+PREDICATES:
+determ:
+alarm(ExceptionName,SYMBOL)		- (i,i);
+alarm(ExceptionName,SYMBOL,N)		- (i,i,i);
+]
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+--
+catch	= ('Trap',
+		world=self,
+		handler=self);
+--
+[
+CLAUSES:
+--
+goal:-
+	catch ? test1,!.
+--
+test1:-
+	writeln("Main:: I will call p1/1."),
+	catch ? p1(1),
+	writeln("Main:: I will call p2/1."),
+	catch ? p2(2),
+	writeln("Main:: I will call p3/1."),
+	catch ? p3(3),
+	writeln("Success"),
+	fail.
+test1:-
+	writeln("No more solutions.").
+--
+p1(N):-
+	writeln("\tMain:: p1(",N,")"),
+	catch ? test2.
+p1(_).
+--
+p2(N):-
+	writeln("\tMain:: p2(",N,")"),
+	catch ? test2.
+p2(_).
+--
+p3(N):-
+	writeln("\tMain:: p3(",N,")"),
+	catch ? test2.
+p3(_):-
+	break('SpecialException1').
+--
+test2:-
+	writeln("\tTest 2: clause 1.").
+test2:-
+	writeln("\tTest 2: clause 2.").
+--
+alarm(Name):-
+	writeln("Alarm: ",Name),
+	fail.
+alarm(Exception,Name):-
+	writeln("Alarm: ",Exception,", Name: ",Name).
+alarm(Exception,Name,N):-
+	writeln("Alarm: ",Exception,", Name: ",Name,", N=",N),
+	break('SpecialException2').
+]
+-----------------------------------------------------------------------

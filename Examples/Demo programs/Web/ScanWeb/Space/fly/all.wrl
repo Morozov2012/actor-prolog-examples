@@ -1,0 +1,4098 @@
+#VRML V2.0 utf8
+WorldInfo{
+  title "Actor Prolog. An Example of Web Agent Report."
+  info ["(c) 2016 IRE RAS Alexei A. Morozov"]
+}
+NavigationInfo{
+  type "NONE"
+  headlight TRUE
+}
+Background{
+  backUrl ["../space4.gif"]
+  bottomUrl ["../space4.gif"]
+  frontUrl ["../space4.gif"]
+  leftUrl ["../space4.gif"]
+  rightUrl ["../space4.gif"]
+  topUrl ["../space4.gif"]
+}
+DEF PS1 ProximitySensor{
+  size 100 100 100
+}
+DEF Dashboard Transform{
+  children[
+    Transform{
+      translation -0.10 -0.075 -0.20
+      children[
+        Transform{
+          translation 0.01 0.01 0.04
+          children[
+            DEF SELECT Switch{
+              whichChoice 0
+              choice[
+                Transform{
+                  translation 0.02 0.0085 0
+                  children[
+                    Shape{
+                      appearance Appearance{
+                        material Material{
+                          emissiveColor 1 0 0
+                          diffuseColor 1 0 0
+                          specularColor 1 0 0
+                          transparency 0.5
+                        }
+                      }
+                      geometry Box{
+                        size 0.032 0.0159 0.0001
+                      }
+                    }
+                  ]
+                }
+                Group{
+                  children[
+                    Shape{
+                      appearance Appearance{
+                        material Material{
+                          transparency 1
+                        }
+                      }
+                      geometry IndexedFaceSet{
+                        coord Coordinate{
+                          point[
+                            0 0 0,
+                            0.04 0 0,
+                            0.04 0.017 0,
+                            0 0.018 0,
+                            0.09 0.065 0.161
+                          ]
+                        }
+                        coordIndex[
+                          0 1 2 3 -1
+                          1 4 0 -1
+                          2 4 1 -1
+                          3 4 2 -1
+                          4 3 0 -1
+                        ]
+                      }
+                    }
+                    Transform{
+                      translation 0.02 0.0085 0
+                      children[
+                        Shape{
+                          appearance Appearance{
+                            material Material{
+                              emissiveColor 0 1 0
+                              diffuseColor 0 1 0
+                              specularColor 0 1 0
+                              transparency 0.5
+                            }
+                          }
+                          geometry Box{
+                            size 0.032 0.0159 0.0001
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        Shape{
+          geometry Text{
+            string ["Fly !"]
+            fontStyle FontStyle{
+              family "SERIF"
+              style "BOLD"
+              size 0.015
+            }
+          }
+        }
+        DEF TS1 TouchSensor{
+        }
+      ]
+    }
+  ]
+}
+DEF TOGGLE Script{
+  eventIn SFBool isOver
+  eventOut SFInt32 whichChoice
+  url "javascript:
+    function isOver(value,time){
+      if(value==true) whichChoice= 1;
+      else whichChoice= 0;
+    }"
+  }
+ROUTE TS1.isOver TO TOGGLE.isOver
+ROUTE TOGGLE.whichChoice TO SELECT.whichChoice
+ROUTE PS1.orientation_changed TO Dashboard.set_rotation
+ROUTE PS1.position_changed TO Dashboard.set_translation
+DEF SENSOR1 SphereSensor{
+}
+DEF TRAN1 Transform{
+  children [
+    Shape{
+      geometry IndexedLineSet{
+        coord Coordinate{
+          point [
+            -2.5 -1.7 -2.5,
+            2.5 -1.7 -2.5,
+            -2.5 1.7 -2.5,
+            -2.5 -1.7 2.5,
+            2.5 1.7 -2.5,
+            2.5 -1.7 2.5,
+            -2.5 1.7 2.5
+          ]
+        }
+        coordIndex [
+          0 1 -1 0 2 -1 0 3 -1
+          2 6 -1 3 6 -1 2 4 -1
+          1 4 -1 3 5 -1 1 5 -1
+        ]
+      }
+      appearance Appearance{
+        material Material{
+          emissiveColor 1 1 1
+        }
+      }
+    }
+    Transform{
+      translation -2.5 1.7 -2.5
+      children[
+        Shape{
+          geometry Text{
+            string ["Size"]
+            fontStyle FontStyle{
+              family "SANS"
+              size 0.5
+            }
+          }
+        }
+      ]
+    }
+    Transform{
+      translation 2.5 -1.7 -2.5
+      children[
+        Shape{
+          geometry Text{
+            string ["Date"]
+            fontStyle FontStyle{
+              family "SANS"
+              size 0.5
+            }
+          }
+        }
+      ]
+    }
+    Shape{
+      geometry IndexedFaceSet{
+        coord Coordinate{
+          point [
+            -2.5 -1.7 -2.5,
+            2.5 -1.7 -2.5,
+            -2.5 1.7 -2.5,
+            -2.5 -1.7 2.5,
+            2.5 1.7 -2.5,
+            2.5 -1.7 2.5,
+            -2.5 1.7 2.5
+            2.5 1.7 2.5
+          ]
+        }
+        coordIndex [
+          0 1 4 2 -1
+          0 2 6 3 -1
+          0 3 5 1 -1
+        ]
+      }
+      appearance Appearance{
+        material Material{
+          diffuseColor 0 0 0
+          emissiveColor 0 0 0
+          transparency 1
+        }
+      }
+    }
+    Transform{
+      translation -2.37 -1.7 -2.37
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.05 0.6 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.87 -0.06,
+                    0.06 0.87 -0.13,
+                    -0.06 0.87 -0.13,
+                    -0.13 0.87 -0.06,
+                    -0.13 0.87 0.06,
+                    -0.06 0.87 0.13,
+                    0.06 0.87 0.13,
+                    0.13 0.87 0.06,
+                    0 1.0 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.12 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["ACE"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "ACE [recent update 1-Jan-1970; 21685 bytes; 21 links to ouside]"
+          url [
+            "../i_ace.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.31 -1.7 -2.25
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.49 0.0 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.31 -0.06,
+                    0.06 1.31 -0.13,
+                    -0.06 1.31 -0.13,
+                    -0.13 1.31 -0.06,
+                    -0.13 1.31 0.06,
+                    -0.06 1.31 0.13,
+                    0.06 1.31 0.13,
+                    0.13 1.31 0.06,
+                    0 1.44 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.56 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["AILog2"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "AILog2 [recent update 1-Feb-2012; 109350 bytes; 27 links to ouside]"
+          url [
+            "../i_ailog2.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 0.64 -1.7 -2.12
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.6 0.06
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.73 -0.06,
+                    0.06 0.73 -0.13,
+                    -0.06 0.73 -0.13,
+                    -0.13 0.73 -0.06,
+                    -0.13 0.73 0.06,
+                    -0.06 0.73 0.13,
+                    0.06 0.73 0.13,
+                    0.13 0.73 0.06,
+                    0 0.86 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.98 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["ALF"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "ALF [recent update 12-Sep-2007; 10384 bytes; 9 links to ouside]"
+          url [
+            "../i_alf.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.37 -1.7 -1.99
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.06 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.03 -0.06,
+                    0.06 1.03 -0.13,
+                    -0.06 1.03 -0.13,
+                    -0.13 1.03 -0.06,
+                    -0.13 1.03 0.06,
+                    -0.06 1.03 0.13,
+                    0.06 1.03 0.13,
+                    0.13 1.03 0.06,
+                    0 1.16 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.28 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Abreu"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Abreu [recent update ?; 41809 bytes; 27 links to ouside]"
+          url [
+            "../i_abreu.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 0.65 -1.7 -1.86
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.41 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 2.18 -0.06,
+                    0.06 2.18 -0.13,
+                    -0.06 2.18 -0.13,
+                    -0.13 2.18 -0.06,
+                    -0.13 2.18 0.06,
+                    -0.06 2.18 0.13,
+                    0.06 2.18 0.13,
+                    0.13 2.18 0.06,
+                    0 2.31 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 2.43 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Actor Prolog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Actor Prolog [recent update 24-Sep-2007; 848699 bytes; 32 links to ouside]"
+          url [
+            "../i_actrpr.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.0 -1.7 -1.73
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.36 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.78 -0.06,
+                    0.06 1.78 -0.13,
+                    -0.06 1.78 -0.13,
+                    -0.13 1.78 -0.06,
+                    -0.13 1.78 0.06,
+                    -0.06 1.78 0.13,
+                    0.06 1.78 0.13,
+                    0.13 1.78 0.06,
+                    0 1.91 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 2.03 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Amzi Prolog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Amzi Prolog [recent update 16-May-2011; 375738 bytes; 21 links to ouside]"
+          url [
+            "../i_amzprl.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.37 -1.7 -1.61
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.29 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 3.15 -0.06,
+                    0.06 3.15 -0.13,
+                    -0.06 3.15 -0.13,
+                    -0.13 3.15 -0.06,
+                    -0.13 3.15 0.06,
+                    -0.06 3.15 0.13,
+                    0.06 3.15 0.13,
+                    0.13 3.15 0.06,
+                    0 3.28 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 3.4 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["B-Prolog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "B-Prolog [recent update 20-Mar-2012; 3646723 bytes; 25 links to ouside]"
+          url [
+            "../i_bprlg.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 0.44 -1.7 -1.48
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.37 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.98 -0.06,
+                    0.06 0.98 -0.13,
+                    -0.06 0.98 -0.13,
+                    -0.13 0.98 -0.06,
+                    -0.13 0.98 0.06,
+                    -0.06 0.98 0.13,
+                    0.06 0.98 0.13,
+                    0.13 0.98 0.06,
+                    0 1.11 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.23 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["BinProlog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "BinProlog [recent update 22-Jan-2007; 34067 bytes; 11 links to ouside]"
+          url [
+            "../i_bnprlg.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -0.01 -1.7 -1.35
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.33 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 2.07 -0.06,
+                    0.06 2.07 -0.13,
+                    -0.06 2.07 -0.13,
+                    -0.13 2.07 -0.06,
+                    -0.13 2.07 0.06,
+                    -0.06 2.07 0.13,
+                    0.06 2.07 0.13,
+                    0.13 2.07 0.06,
+                    0 2.2 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 2.32 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Brain Aid Prolog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Brain Aid Prolog [recent update 22-Jun-2005; 690504 bytes; 39 links to ouside]"
+          url [
+            "../i_brndpr.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.35 -1.7 -1.22
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.41 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.94 -0.06,
+                    0.06 0.94 -0.13,
+                    -0.06 0.94 -0.13,
+                    -0.13 0.94 -0.06,
+                    -0.13 0.94 0.06,
+                    -0.06 0.94 0.13,
+                    0.06 0.94 0.13,
+                    0.13 0.94 0.06,
+                    0 1.07 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.19 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Bry"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Bry [recent update 1-Mar-2012; 28541 bytes; 76 links to ouside]"
+          url [
+            "../i_bry.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.15 -1.7 -1.09
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.55 0.0 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.35 -0.06,
+                    0.06 1.35 -0.13,
+                    -0.06 1.35 -0.13,
+                    -0.13 1.35 -0.06,
+                    -0.13 1.35 0.06,
+                    -0.06 1.35 0.13,
+                    0.06 1.35 0.13,
+                    0.13 1.35 0.06,
+                    0 1.48 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.6 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["CIspace"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "CIspace [recent update 22-Sep-2011; 122512 bytes; 10 links to ouside]"
+          url [
+            "../i_cspc.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -2.37 -1.7 -0.96
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.11 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.65 -0.06,
+                    0.06 0.65 -0.13,
+                    -0.06 0.65 -0.13,
+                    -0.13 0.65 -0.06,
+                    -0.13 0.65 0.06,
+                    -0.06 0.65 0.13,
+                    0.06 0.65 0.13,
+                    0.13 0.65 0.06,
+                    0 0.78 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.9 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Carlsson"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Carlsson [recent update 1-Jan-1970; 6470 bytes; 12 links to ouside]"
+          url [
+            "../i_crlsn.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.15 -1.7 -0.84
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.05 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.44 -0.06,
+                    0.06 1.44 -0.13,
+                    -0.06 1.44 -0.13,
+                    -0.13 1.44 -0.06,
+                    -0.13 1.44 0.06,
+                    -0.06 1.44 0.13,
+                    0.06 1.44 0.13,
+                    0.13 1.44 0.06,
+                    0 1.57 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.69 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Carro"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Carro [recent update 20-Sep-2011; 158083 bytes; 383 links to ouside]"
+          url [
+            "../i_carro.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.37 -1.7 -0.71
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.0 0.39
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.7 -0.06,
+                    0.06 1.7 -0.13,
+                    -0.06 1.7 -0.13,
+                    -0.13 1.7 -0.06,
+                    -0.13 1.7 0.06,
+                    -0.06 1.7 0.13,
+                    0.06 1.7 0.13,
+                    0.13 1.7 0.06,
+                    0 1.83 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.95 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Ciao Prolog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Ciao Prolog [recent update 21-Mar-2012; 308339 bytes; 14 links to ouside]"
+          url [
+            "../i_cprlg.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 1.71 -1.7 -0.58
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.0 0.09
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.19 -0.06,
+                    0.06 1.19 -0.13,
+                    -0.06 1.19 -0.13,
+                    -0.13 1.19 -0.06,
+                    -0.13 1.19 0.06,
+                    -0.06 1.19 0.13,
+                    0.06 1.19 0.13,
+                    0.13 1.19 0.06,
+                    0 1.32 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.44 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Clark"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Clark [recent update 27-Aug-2010; 75875 bytes; 7 links to ouside]"
+          url [
+            "../i_clark.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 0.38 -1.7 -0.45
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.13 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.78 -0.06,
+                    0.06 1.78 -0.13,
+                    -0.06 1.78 -0.13,
+                    -0.13 1.78 -0.06,
+                    -0.13 1.78 0.06,
+                    -0.06 1.78 0.13,
+                    0.06 1.78 0.13,
+                    0.13 1.78 0.06,
+                    0 1.91 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 2.03 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Cohen"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Cohen [recent update 1-Nov-2006; 370703 bytes; 25 links to ouside]"
+          url [
+            "../i_cohen.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -2.37 -1.7 -0.32
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.15 0.6 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.84 -0.06,
+                    0.06 0.84 -0.13,
+                    -0.06 0.84 -0.13,
+                    -0.13 0.84 -0.06,
+                    -0.13 0.84 0.06,
+                    -0.06 0.84 0.13,
+                    0.06 0.84 0.13,
+                    0.13 0.84 0.06,
+                    0 0.97 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.09 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Colmerauer"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Colmerauer [recent update 1-Jan-1970; 18612 bytes; 1 links to ouside]"
+          url [
+            "../i_clmr.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.37 -1.7 -0.19
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.06 0.6 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.8 -0.06,
+                    0.06 1.8 -0.13,
+                    -0.06 1.8 -0.13,
+                    -0.13 1.8 -0.06,
+                    -0.13 1.8 0.06,
+                    -0.06 1.8 0.13,
+                    0.06 1.8 0.13,
+                    0.13 1.8 0.06,
+                    0 1.93 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 2.05 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Curry"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Curry [recent update 21-Mar-2012; 392467 bytes; 112 links to ouside]"
+          url [
+            "../i_curry.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -2.37 -1.7 -0.07
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.6 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.67 -0.06,
+                    0.06 1.67 -0.13,
+                    -0.06 1.67 -0.13,
+                    -0.13 1.67 -0.06,
+                    -0.13 1.67 0.06,
+                    -0.06 1.67 0.13,
+                    0.06 1.67 0.13,
+                    0.13 1.67 0.06,
+                    0 1.8 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.92 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Dahl"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Dahl [recent update 1-Jan-1970; 293063 bytes; 46 links to ouside]"
+          url [
+            "../i_dahl.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -2.37 -1.7 0.06
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.0 0.42
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 1.45 -0.06,
+                    0.06 1.45 -0.13,
+                    -0.06 1.45 -0.13,
+                    -0.13 1.45 -0.06,
+                    -0.13 1.45 0.06,
+                    -0.06 1.45 0.13,
+                    0.06 1.45 0.13,
+                    0.13 1.45 0.06,
+                    0 1.58 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.7 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Davison"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Davison [recent update 1-Jan-1970; 164077 bytes; 136 links to ouside]"
+          url [
+            "../i_dvsn.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -2.37 -1.7 0.19
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.6 0.58
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.96 -0.06,
+                    0.06 0.96 -0.13,
+                    -0.06 0.96 -0.13,
+                    -0.13 0.96 -0.06,
+                    -0.13 0.96 0.06,
+                    -0.06 0.96 0.13,
+                    0.06 0.96 0.13,
+                    0.13 0.96 0.06,
+                    0 1.09 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.21 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Delzanno"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Delzanno [recent update 1-Jan-1970; 31212 bytes; 12 links to ouside]"
+          url [
+            "../i_dlzn.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.3 -1.7 0.32
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.6 0.43
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.72 -0.06,
+                    0.06 0.72 -0.13,
+                    -0.06 0.72 -0.13,
+                    -0.13 0.72 -0.06,
+                    -0.13 0.72 0.06,
+                    -0.06 0.72 0.13,
+                    0.06 0.72 0.13,
+                    0.13 0.72 0.06,
+                    0 0.85 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.97 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Demoen"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Demoen [recent update 23-Jan-2012; 10089 bytes; 64 links to ouside]"
+          url [
+            "../i_demoen.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -0.4 -1.7 0.45
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.01 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.78 -0.06,
+                    0.06 0.78 -0.13,
+                    -0.06 0.78 -0.13,
+                    -0.13 0.78 -0.06,
+                    -0.13 0.78 0.06,
+                    -0.06 0.78 0.13,
+                    0.06 0.78 0.13,
+                    0.13 0.78 0.06,
+                    0 0.91 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.03 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Dix"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Dix [recent update 5-Dec-2003; 13954 bytes; 19 links to ouside]"
+          url [
+            "../i_dix.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 0.05 -1.7 0.58
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.0 0.48
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.93 -0.06,
+                    0.06 0.93 -0.13,
+                    -0.06 0.93 -0.13,
+                    -0.13 0.93 -0.06,
+                    -0.13 0.93 0.06,
+                    -0.06 0.93 0.13,
+                    0.06 0.93 0.13,
+                    0.13 0.93 0.06,
+                    0 1.06 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.18 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Ducasse"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Ducasse [recent update 6-Sep-2005; 28464 bytes; 85 links to ouside]"
+          url [
+            "../i_dcs.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 0.07 -1.7 0.7
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.11 0.0 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.52 -0.06,
+                    0.06 0.52 -0.13,
+                    -0.06 0.52 -0.13,
+                    -0.13 0.52 -0.06,
+                    -0.13 0.52 0.06,
+                    -0.06 0.52 0.13,
+                    0.06 0.52 0.13,
+                    0.13 0.52 0.06,
+                    0 0.65 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.77 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Dutra"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Dutra [recent update 13-Oct-2005; 2631 bytes; 6 links to ouside]"
+          url [
+            "../i_dutra.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 1.35 -1.7 0.83
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.14 0.6 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.82 -0.06,
+                    0.06 0.82 -0.13,
+                    -0.06 0.82 -0.13,
+                    -0.13 0.82 -0.06,
+                    -0.13 0.82 0.06,
+                    -0.06 0.82 0.13,
+                    0.06 0.82 0.13,
+                    0.13 0.82 0.06,
+                    0 0.95 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.07 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["EZY Prolog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "EZY Prolog [recent update 23-Sep-2009; 17234 bytes; 2 links to ouside]"
+          url [
+            "../i_ezprlg.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -2.37 -1.7 0.96
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.07 0.6 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.55 -0.06,
+                    0.06 0.55 -0.13,
+                    -0.06 0.55 -0.13,
+                    -0.13 0.55 -0.06,
+                    -0.13 0.55 0.06,
+                    -0.06 0.55 0.13,
+                    0.06 0.55 0.13,
+                    0.13 0.55 0.06,
+                    0 0.68 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.8 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Elf"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Elf [recent update 1-Jan-1970; 3363 bytes; 6 links to ouside]"
+          url [
+            "../i_elf.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 0.71 -1.7 1.09
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.08 0.6 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.63 -0.06,
+                    0.06 0.63 -0.13,
+                    -0.06 0.63 -0.13,
+                    -0.13 0.63 -0.06,
+                    -0.13 0.63 0.06,
+                    -0.06 0.63 0.13,
+                    0.06 0.63 0.13,
+                    0.13 0.63 0.06,
+                    0 0.76 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.88 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Eliens"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Eliens [recent update 28-Nov-2007; 5689 bytes; 8 links to ouside]"
+          url [
+            "../i_eliens.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -2.37 -1.7 1.22
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.49 0.6 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.95 -0.06,
+                    0.06 0.95 -0.13,
+                    -0.06 0.95 -0.13,
+                    -0.13 0.95 -0.06,
+                    -0.13 0.95 0.06,
+                    -0.06 0.95 0.13,
+                    0.06 0.95 0.13,
+                    0.13 0.95 0.06,
+                    0 1.08 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.2 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Epilog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Epilog [recent update 1-Jan-1970; 30204 bytes; 9 links to ouside]"
+          url [
+            "../i_epilog.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.32 -1.7 1.35
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.03 0.0 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.86 -0.06,
+                    0.06 0.86 -0.13,
+                    -0.06 0.86 -0.13,
+                    -0.13 0.86 -0.06,
+                    -0.13 0.86 0.06,
+                    -0.06 0.86 0.13,
+                    0.06 0.86 0.13,
+                    0.13 0.86 0.06,
+                    0 0.99 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.11 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Ferreia"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Ferreia [recent update 7-Feb-2012; 20508 bytes; 29 links to ouside]"
+          url [
+            "../i_fr.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -2.37 -1.7 1.47
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.6 0.53
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.55 -0.06,
+                    0.06 0.55 -0.13,
+                    -0.06 0.55 -0.13,
+                    -0.13 0.55 -0.06,
+                    -0.13 0.55 0.06,
+                    -0.06 0.55 0.13,
+                    0.06 0.55 0.13,
+                    0.13 0.55 0.06,
+                    0 0.68 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.8 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["GNU Prolog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "GNU Prolog [recent update 1-Jan-1970; 3523 bytes; 5 links to ouside]"
+          url [
+            "../i_gnprlg.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.17 -1.7 1.6
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.03 0.0
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.59 -0.06,
+                    0.06 0.59 -0.13,
+                    -0.06 0.59 -0.13,
+                    -0.13 0.59 -0.06,
+                    -0.13 0.59 0.06,
+                    -0.06 0.59 0.13,
+                    0.06 0.59 0.13,
+                    0.13 0.59 0.06,
+                    0 0.72 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.84 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Goedel"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Goedel [recent update 4-Oct-2011; 4612 bytes; 10 links to ouside]"
+          url [
+            "../i_goedel.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.25 -1.7 1.73
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.6 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.84 -0.06,
+                    0.06 0.84 -0.13,
+                    -0.06 0.84 -0.13,
+                    -0.13 0.84 -0.06,
+                    -0.13 0.84 0.06,
+                    -0.06 0.84 0.13,
+                    0.06 0.84 0.13,
+                    0.13 0.84 0.06,
+                    0 0.97 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.09 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Guo"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Guo [recent update 13-Dec-2011; 18520 bytes; 9 links to ouside]"
+          url [
+            "../i_guo.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation -2.37 -1.7 1.86
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.57 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.89 -0.06,
+                    0.06 0.89 -0.13,
+                    -0.06 0.89 -0.13,
+                    -0.13 0.89 -0.06,
+                    -0.13 0.89 0.06,
+                    -0.06 0.89 0.13,
+                    0.06 0.89 0.13,
+                    0.13 0.89 0.06,
+                    0 1.02 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 1.14 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Gupta"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Gupta [recent update 1-Jan-1970; 23814 bytes; 71 links to ouside]"
+          url [
+            "../i_gupta.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.1 -1.7 1.99
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.0 0.27
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.64 -0.06,
+                    0.06 0.64 -0.13,
+                    -0.06 0.64 -0.13,
+                    -0.13 0.64 -0.06,
+                    -0.13 0.64 0.06,
+                    -0.06 0.64 0.13,
+                    0.06 0.64 0.13,
+                    0.13 0.64 0.06,
+                    0 0.77 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.89 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Hermenegildo"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Hermenegildo [recent update 6-Aug-2011; 6187 bytes; 8 links to ouside]"
+          url [
+            "../i_hrmngl.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.16 -1.7 2.12
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.0 0.6 0.24
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.56 -0.06,
+                    0.06 0.56 -0.13,
+                    -0.06 0.56 -0.13,
+                    -0.13 0.56 -0.06,
+                    -0.13 0.56 0.06,
+                    -0.06 0.56 0.13,
+                    0.06 0.56 0.13,
+                    0.13 0.56 0.06,
+                    0 0.69 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.81 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Huang"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Huang [recent update 1-Oct-2011; 3738 bytes; 10 links to ouside]"
+          url [
+            "../i_huang.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 2.13 -1.7 2.24
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.4 0.0 0.6
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.66 -0.06,
+                    0.06 0.66 -0.13,
+                    -0.06 0.66 -0.13,
+                    -0.13 0.66 -0.06,
+                    -0.13 0.66 0.06,
+                    -0.06 0.66 0.13,
+                    0.06 0.66 0.13,
+                    0.13 0.66 0.06,
+                    0 0.79 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.91 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["Huntbach"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "Huntbach [recent update 5-Sep-2011; 7117 bytes; 15 links to ouside]"
+          url [
+            "../i_hntbch.html"
+          ]
+        }
+      ]
+    }
+    Transform{
+      translation 0.73 -1.7 2.37
+      children[
+        Anchor{
+          children[
+            Shape{
+              appearance Appearance{
+                material Material{
+                  diffuseColor 0.6 0.0 0.21
+                  emissiveColor 0 0 0
+                  ambientIntensity 1
+                  shininess 0.7
+                  specularColor 1 1 1
+                  transparency 0.3
+                }
+              }
+              geometry IndexedFaceSet{
+                coord Coordinate{
+                  point [
+                    0.13 0 -0.06,
+                    0.06 0 -0.13,
+                    -0.06 0 -0.13,
+                    -0.13 0 -0.06,
+                    -0.13 0 0.06,
+                    -0.06 0 0.13,
+                    0.06 0 0.13,
+                    0.13 0 0.06,
+                    0.13 0.68 -0.06,
+                    0.06 0.68 -0.13,
+                    -0.06 0.68 -0.13,
+                    -0.13 0.68 -0.06,
+                    -0.13 0.68 0.06,
+                    -0.06 0.68 0.13,
+                    0.06 0.68 0.13,
+                    0.13 0.68 0.06,
+                    0 0.81 0
+                    ]
+                  }
+                  coordIndex [
+                    0 1 9 8 -1
+                    1 2 10 9 -1
+                    2 3 11 10 -1
+                    3 4 12 11 -1
+                    4 5 13 12 -1
+                    5 6 14 13 -1
+                    6 7 15 14 -1
+                    7 0 8 15 -1
+                    0 7 6 5 4 3 2 1 0 -1
+                    8 9 16 -1
+                    9 10 16 -1
+                    10 11 16 -1
+                    11 12 16 -1
+                    12 13 16 -1
+                    13 14 16 -1
+                    14 15 16 -1
+                    15 8 16 -1
+                  ]
+                solid FALSE
+              }
+            }
+            Transform{
+              translation 0 0.93 0
+              children[
+                LOD{
+                  range [1.5]
+                  level[
+                    Billboard{
+                      axisOfRotation 0 0 0
+                      children[
+                        Shape{
+                          geometry Text{
+                            string ["IF/Prolog"]
+                            fontStyle FontStyle{
+                              family "SERIF"
+                              size 0.1
+                              justify "MIDDLE"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    Group{
+                      children[]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+          description "IF/Prolog [recent update 17-Dec-2007; 8126 bytes; 12 links to ouside]"
+          url [
+            "../i_ifprlg.html"
+          ]
+        }
+      ]
+    }
+    DEF P1 PositionInterpolator{
+      key [0.0, 0.03, 0.05, 0.08, 0.11, 0.13, 0.16, 0.18, 0.21, 0.24, 0.26, 0.29, 0.32, 0.34, 0.37, 0.39, 0.42, 0.45, 0.47, 0.5, 0.53, 0.55, 0.58, 0.61, 0.63, 0.66, 0.68, 0.71, 0.74, 0.76, 0.79, 0.82, 0.84, 0.87, 0.89, 0.92, 0.95, 0.97, 1 ]
+      keyValue[
+      0.07 -0.93 0.7,
+      -2.37 -0.9 1.47,
+      -2.37 -0.9 0.96,
+      2.16 -0.89 2.12,
+      2.17 -0.86 1.6,
+      0.71 -0.82 1.09,
+      2.1 -0.81 1.99,
+      -2.37 -0.8 -0.96,
+      2.13 -0.79 2.24,
+      0.73 -0.77 2.37,
+      2.3 -0.73 0.32,
+      0.64 -0.72 -2.12,
+      -0.4 -0.67 0.45,
+      1.35 -0.63 0.83,
+      2.25 -0.61 1.73,
+      -2.37 -0.61 -0.32,
+      2.32 -0.59 1.35,
+      -2.37 -0.58 -2.37,
+      -2.37 -0.56 1.86,
+      0.05 -0.52 0.58,
+      2.35 -0.51 -1.22,
+      -2.37 -0.5 1.22,
+      -2.37 -0.49 0.19,
+      0.44 -0.47 -1.48,
+      2.37 -0.42 -1.99,
+      1.71 -0.26 -0.58,
+      2.31 -0.14 -2.25,
+      2.15 -0.1 -1.09,
+      2.15 -0.01 -0.84,
+      -2.37 0.0 0.06,
+      -2.37 0.22 -0.07,
+      2.37 0.25 -0.71,
+      0.38 0.33 -0.45,
+      2.0 0.33 -1.73,
+      2.37 0.35 -0.19,
+      -0.01 0.62 -1.35,
+      0.65 0.73 -1.86,
+      2.37 1.7 -1.61,
+      0.07 -0.93 0.7
+      ]
+    }
+    DEF OI1 OrientationInterpolator{
+      key [0.0, 0.03, 0.05, 0.08, 0.11, 0.14, 0.16, 0.19, 0.22, 0.24, 0.27, 0.3, 0.32, 0.35, 0.38, 0.41, 0.43, 0.46, 0.49, 0.51, 0.54, 0.57, 0.59, 0.62, 0.65, 0.68, 0.7, 0.73, 0.76, 0.78, 0.81, 0.84, 0.86, 0.89, 0.92, 0.95, 0.97, 1 ]
+      keyValue[
+        -0.01 -1.0 0.0 1.27,
+        0.0 0.0 -1.0 0.0,
+        0.0 1.0 0.0 1.32,
+        -0.95 0.32 0.0 3.08,
+        -0.03 -1.0 0.0 1.91,
+        -0.01 1.0 0.0 1.0,
+        0.0 -1.0 0.0 2.15,
+        0.0 1.0 0.0 0.95,
+        -0.01 -1.0 0.0 1.48,
+        -0.03 1.0 0.0 2.49,
+        -0.01 -1.0 0.0 2.54,
+        -0.05 -1.0 0.0 0.38,
+        -0.02 1.0 0.0 1.36,
+        -0.02 1.0 0.0 0.79,
+        0.0 -1.0 0.0 1.99,
+        0.0 1.0 0.0 1.23,
+        0.0 -1.0 0.0 2.24,
+        -1.0 0.0 0.0 0.0,
+        -0.02 1.0 0.0 2.06,
+        0.0 1.0 0.0 2.23,
+        0.0 -1.0 0.0 1.09,
+        -1.0 0.0 0.0 3.13,
+        -0.01 1.0 0.0 2.11,
+        -0.03 1.0 0.0 1.83,
+        -0.24 -0.97 0.0 0.45,
+        -0.2 0.98 0.0 2.79,
+        -0.24 -0.97 0.0 0.14,
+        -1.0 0.0 0.0 0.35,
+        0.0 -1.0 0.0 1.37,
+        -1.0 0.0 0.0 2.1,
+        -0.01 1.0 0.0 1.71,
+        -0.04 -1.0 0.0 1.44,
+        0.0 1.0 0.0 2.24,
+        -0.05 1.0 0.0 0.24,
+        -0.11 -0.99 0.0 2.02,
+        -0.16 0.99 0.0 2.22,
+        -0.49 0.87 0.0 1.44,
+        0.75 -0.66 0.0 0.99
+        -0.01 -1.0 0.0 1.27,
+      ]
+    }
+    DEF TR Transform{
+      children[
+        DEF MVP Viewpoint{
+          position 0 0 0
+          fieldOfView 0.78
+          description "Moving"
+        }
+      ]
+    }
+  ]
+}
+ROUTE SENSOR1.rotation_changed TO TRAN1.rotation
+DEF TV TimeSensor{
+  cycleInterval 370
+  loop TRUE
+}
+ROUTE TV.fraction_changed TO OI1.set_fraction
+ROUTE TV.fraction_changed TO P1.set_fraction
+ROUTE OI1.value_changed TO TR.set_rotation
+ROUTE P1.value_changed TO TR.set_translation
+DEF SVP Viewpoint{
+  position 5 2 7
+  orientation 20 -40 3 -0.7
+  fieldOfView 0.78
+}
+ROUTE SENSOR1.isActive TO SVP.set_bind
+DEF SVP Viewpoint{
+  position 5 2 7
+  orientation 20 -40 3 -0.7
+  fieldOfView 0.78
+}
+ROUTE TS1.isOver TO MVP.set_bind
+DEF TRAN_PL_1 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T1 TimeSensor{
+  cycleInterval 17
+  loop TRUE
+}
+DEF CI1 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25
+  ]
+}
+ROUTE T1.fraction_changed TO CI1.set_fraction
+ROUTE CI1.value_changed TO TRAN_PL_1.translation
+DEF TRAN_PL_2 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T2 TimeSensor{
+  cycleInterval 11
+  loop TRUE
+}
+DEF CI2 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25
+  ]
+}
+ROUTE T2.fraction_changed TO CI2.set_fraction
+ROUTE CI2.value_changed TO TRAN_PL_2.translation
+DEF TRAN_PL_3 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T3 TimeSensor{
+  cycleInterval 7
+  loop TRUE
+}
+DEF CI3 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25
+  ]
+}
+ROUTE T3.fraction_changed TO CI3.set_fraction
+ROUTE CI3.value_changed TO TRAN_PL_3.translation
+DEF TRAN_PL_3 Transform{
+  children [
+    PointLight{
+      location 0 0 0
+      color 1 1 1
+      attenuation 1 0 0
+    }
+  ]
+}
+DEF T3 TimeSensor{
+  cycleInterval 3
+  loop TRUE
+}
+DEF CI3 PositionInterpolator{
+  key [ 0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1 ]
+  keyValue [
+    -25 -25 25,
+    25 25 -25,
+    25 25 25,
+    -25 -25 -25,
+    25 -25 -25,
+    -25 25 25,
+    -25 25 -25,
+    25 -25 25,
+    -25 -25 25
+  ]
+}
+ROUTE T3.fraction_changed TO CI3.set_fraction
+ROUTE CI3.value_changed TO TRAN_PL_3.translation

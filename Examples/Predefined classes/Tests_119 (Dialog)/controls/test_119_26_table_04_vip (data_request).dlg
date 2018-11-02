@@ -1,0 +1,28 @@
+mesh(80,25)
+dialog_font('helvetica',24)
+padding(1.5,0.3)
+
+dialog 'MyDialog'("Table Demo",default,default,default,centered,centered,default)
+hbox(up)
+vbox(center)
+	vbox(left)
+		radiobuttons(my_objects)
+			radiobutton("Fruits")
+			radiobutton("Vegetables")
+			radiobutton("Flowers")
+		end_of_radiobuttons
+	end_of_vbox
+	table['MultiSelect'](1020,1030,33,5,
+		[
+		-- title_color('Lemon','Maroon'),
+		column("Name",9,center,default,'Emerald'),
+		column("Color",7,center,default,default),
+		column("Taste",7,right,default,'Lemon'),
+		column("Smell",7,center,default,'SkyBlue')
+		],
+		"TABLE1",
+		-- Initial set of selected rows:
+		[1,5])
+end_of_vbox
+end_of_hbox
+end_of_dialog

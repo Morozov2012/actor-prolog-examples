@@ -1,0 +1,53 @@
+Input image: 720x480.jpg
+Expected minimal X: -1 [m]
+Expected maximal X: 1 [m]
+Expected minimal Y: -1 [m]
+Expected maximal Y: 1 [m]
+X,Y co-ordinates of defining points in meters:
+0.0000 0.0000
+0.5600 0.0000
+0.5600 0.3000
+0.0000 0.3000
+X,Y co-ordinates of defining points in pixels:
+ 73.0000  84.2500
+664.5000  72.7500
+683.5000 427.2500
+ 73.7500 422.7500
+Projective transformation matrix:
+989.8792  -26.0041   -0.0789
+ -4.4553 1073.7559   -0.0939
+ 72.0362   83.1376    0.9868
+Inverse matrix of projective transformation:
+ 0.0010  0.0000  0.0001
+-0.0000  0.0009  0.0001
+-0.0731 -0.0792  1.0000
+This matrix is to be used in the demos.
+=======================================
+Self-check (1): Image -> Physical space
+=======================================
+Expected: u=73 v=84.25
+Obtained: u=73 v=84.25
+Expected: u=664.5 v=72.75
+Obtained: u=664.5 v=72.75
+Expected: u=683.5 v=427.25
+Obtained: u=683.5 v=427.25
+Expected: u=73.75 v=422.75
+Obtained: u=73.75 v=422.75
+=======================================
+Self-check (2): Physical space -> Image
+=======================================
+Expected: x=0 y=0
+Obtained: x=0 y=1.3695e-17
+Expected: x=0.56 y=0
+Obtained: x=0.56 y=-3.9244e-17
+Expected: x=0.56 y=0.3
+Obtained: x=0.56 y=0.3
+Expected: x=0 y=0.3
+Obtained: x=0 y=0.3
+=======================================
+Read and display input image
+=======================================
+=======================================
+Reconstruct and display source image
+=======================================
+>> 

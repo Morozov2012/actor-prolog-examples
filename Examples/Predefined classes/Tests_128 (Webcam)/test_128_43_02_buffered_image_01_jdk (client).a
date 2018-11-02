@@ -1,0 +1,71 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute the server example in the first environment and
+-- this example in the second one.
+-- Warning: the VIP version does not support the remote method
+-- invocation. Please translate this example to Java.
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	panel		= ('Canvas2D');
+--
+	text		= ('Text');
+	con		= ('Console');
+--
+	store		= ('DataStore',
+				name="MyDataStore1.dat",
+				access_mode='reading',
+				sharing_mode='shared_access');
+	database	= ('MyDatabase',
+				place=shared(store,"MyTable"));
+--
+[
+goal:-
+	con ? set_color('Orange'),
+	con ? write("LOADING THE DATA STORE... "),
+	store ? begin_transaction('modifying'),!,
+	store ? load,
+	store ? end_transaction,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	set_period(0.1),
+	panel ? show,
+	activate.
+goal:-!,
+	con ? set_color('Red'),
+	con ? writeln("Sorry, no shared database is found."),
+	con ? set_color('default').
+--
+tick:-
+	database ? get_buffered_image(BufferedImage),!,
+	panel ? show,
+	panel ? clear('no'),
+	panel ? draw_image(BufferedImage,0,0,1,1),
+	panel ? draw_now.
+tick:-!,
+	con ? set_color('Red'),
+	con ? writeln("Sorry, I cannot access the database."),
+	con ? set_color('default').
+--
+alarm(ExceptionName):-!,
+	con ? set_color('Red'),
+	con ? writeln(ExceptionName),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+[
+get_buffered_image(BufferedImage):-
+	begin_transaction('reading'),
+	find(BufferedImage),!,
+	end_transaction.
+]
+-----------------------------------------------------------------------

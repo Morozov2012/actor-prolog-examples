@@ -1,0 +1,19 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2005, IRE RAS, Alexei A. Morozov. --
+-------------------------------------------
+-- Use of the 'Dialog' predefined class. --
+-------------------------------------------
+class 'Main' (specialized 'Dialog'):
+
+con	= ('Console');
+
+[
+goal:-!,
+	show.
+--
+action(_):-
+	con ? note(?get("MyValue")),
+	put("MyValue","New text"),!.
+]
+-------------------------------------------

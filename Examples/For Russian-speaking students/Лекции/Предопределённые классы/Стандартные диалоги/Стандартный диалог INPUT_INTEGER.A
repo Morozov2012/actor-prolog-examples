@@ -1,0 +1,14 @@
+
+CLAUSES:
+
+goal:-
+	S1== ?input_integer("Сколько Вам лет?",10),
+	
+	writeln(S1),
+	
+	S2== ?input_integer(
+		"Проверка возраста",
+		"Сколько Вам лет?",
+		10),
+	
+	writeln(S2).

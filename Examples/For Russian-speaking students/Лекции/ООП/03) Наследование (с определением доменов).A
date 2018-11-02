@@ -1,0 +1,32 @@
+
+DOMAINS:
+
+D1	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+p;
+
+class 'Main' (specialized 'A1'):
+
+n	: D1 = 100;
+
+[
+
+goal:-
+	p.
+
+]
+
+class 'A1' (specialized 'DemoConsole'):
+
+n	: D1 = 300;
+
+[
+
+p:-
+	writeln(n).
+
+]

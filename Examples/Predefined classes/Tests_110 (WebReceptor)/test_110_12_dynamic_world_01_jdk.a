@@ -1,0 +1,43 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2012 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'WorldArray' from "Arrays"('TargetClass':='MyReceptor');
+
+class 'Main' (specialized 'Alpha'):
+--
+w	= 'WorldArray'[..] of ('MyReceptor');
+--
+[
+goal:-
+	w[1000] ? goal,!.
+]
+
+class 'MyReceptor' (specialized 'WebReceptor'):
+--
+constant:
+--
+attempt_period		= seconds(1);
+revision_period		= seconds(1);
+maximal_waiting_time	= 1.0;
+--
+location		= "data/report1.html";
+-- location		= "http://www.cplire.ru/Lab144/index.html";
+--
+internal:
+--
+con			= ('Console');
+--
+[
+PREDICATES:
+--
+goal;
+--
+CLAUSES:
+--
+goal:-!,
+	Parameters== ?get_parameters(),
+	con ? writeln(Parameters).
+]
+-----------------------------------------------------------------------

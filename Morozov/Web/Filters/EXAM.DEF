@@ -1,0 +1,66 @@
+package "Morozov/Web/Filters/Exam":
+---------------------------------------------------------------
+--         The "FILTERS/EXAM" Actor Prolog package.          --
+--        (c) 2002-2011, IRE RAS, Alexei A. Morozov.         --
+---------------------------------------------------------------
+-- This package checks given list of Web resources.          --
+---------------------------------------------------------------
+import 'WebAddressFilter' from "Morozov/Web/Data/Address";
+import "Morozov/Web/Scanning/Counter";
+import "Morozov/Web/Engines/Control";
+---------------------------------------------------------------
+interface 'Check_Resources'
+(specialized 'WebAddressFilter', 'Dialog'):
+--
+variable:
+--
+	search_pattern	: SearchPattern;
+--
+internal:
+--
+	receptor	: 'WebReceptor';
+	report		: 'Report';
+--
+protecting:
+--
+	limit_of_length	: Size;
+--
+internal:
+--
+	text		: 'Text';
+	store		: 'ExamStore';
+--
+[
+PREDICATES:
+--
+visible:
+--
+show;
+--
+private:
+--
+determ:
+--
+'<='(ResourceSize,Size)				- (i,i);
+--
+]
+---------------------------------------------------------------
+interface 'ExamStore' (specialized 'Database'):
+[
+DOMAINS:
+--
+mixed:
+--
+Target	= es(WebAddressList,SearchPattern,Size,IsOK).
+--
+ground:
+--
+IsOK	= 'yes'; 'no'.
+--
+PREDICATES:
+--
+imperative:
+--
+update_record(WebAddressList,SearchPattern,Size,IsOK);
+]
+---------------------------------------------------------------

@@ -1,0 +1,104 @@
+resource("images/dsc_0798_l2_72ppi_24bit.bmp")
+
+mesh(80,25)
+padding(1,1)
+-- draft('on')
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',8)
+
+dialog 'MyDialog'("Grid demo",default,default,default,centered,centered,default)
+grid
+	row
+		column
+		end_of_column
+		column
+			"left"
+		end_of_column
+		column
+			"right"
+		end_of_column
+		column
+			"center"
+		end_of_column
+		column
+			"justify"
+		end_of_column
+	end_of_row
+	row(up)
+		column
+			"up"
+		end_of_column
+		column(left)
+			scaling(2,3.5)
+			button("action11","&Action 1,1")
+			end_of_scaling
+		end_of_column
+		column(right)
+			image['KeepProportions'](1020,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+		column(center)
+			image['KeepProportions'](1030,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+		column(justify)
+			image['KeepProportions'](1040,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+	end_of_row
+	row(down)
+		column
+			"down"
+		end_of_column
+		column(left)
+			image['KeepProportions'](2010,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+		column(right)
+			scaling(2,3.5)
+			button("action22","&Action 2,2")
+			end_of_scaling
+		end_of_column
+		column(center)
+			image['KeepProportions'](2030,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+		column(justify)
+			image['KeepProportions'](2040,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+	end_of_row
+	row(center)
+		column
+			"center"
+		end_of_column
+		column(left)
+			image['KeepProportions'](3010,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+		column(right)
+			image['KeepProportions'](3020,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+		column(center)
+			scaling(2,3.5)
+			button("action33","&Action 3,3")
+			end_of_scaling
+		end_of_column
+		column(justify)
+			image['KeepProportions'](3040,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+	end_of_row
+	row(justify)
+		column(center)
+			"justify"
+		end_of_column
+		column(left)
+			image['KeepProportions'](4010,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+		column(right)
+			image['KeepProportions'](4020,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+		column(center)
+			image['KeepProportions'](4030,10,3,"images/dsc_0798_l2_72ppi_24bit.bmp")
+		end_of_column
+		column(justify)
+			scaling(2,3.5)
+			button("action44","&Action 4,4")
+			end_of_scaling
+		end_of_column
+	end_of_row
+end_of_grid
+end_of_dialog

@@ -1,0 +1,82 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+test1;
+test2;
+test3;
+test4;
+test5;
+test6;
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Console'):
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5,
+	test6.
+--
+test1:-
+	writeln("Test 1:"),
+	?ask("Are you sure?"),!,
+	writeln("\tUser answer: Yes").
+test1:-
+	writeln("\tUser answer: No").
+--
+test2:-
+	writeln("Test 2:"),
+	?ask("Answer a question, please!","Are you sure?"),!,
+	writeln("\tUser answer: Yes").
+test2:-
+	writeln("\tUser answer: No").
+--
+test3:-
+	writeln("Test 3:"),
+	Answer== ?ask(
+		"Question",
+		"Are you sure?",
+		["Yes","No","Oh dear!"]),!,
+	writeln("\tUser answer: ",Answer).
+test3:-
+	writeln("\tThe input was canceled by user.").
+--
+test4:-
+	writeln("Test 4:"),
+	?ask(
+		"Question",
+		"Are you sure?",
+		["Yes","No","Oh dear!"]),!,
+	writeln("\tUser have answered something.").
+test4:-
+	writeln("\tThe input was canceled by user.").
+--
+test5:-
+	writeln("Test 5:"),
+	Answer== ?ask(
+		"Answer a question, please!",
+		"Are you sure?",
+		["Yes","No","Oh dear!"]),!,
+	writeln("\tUser answer: ",Answer).
+test5:-
+	writeln("\tThe input was canceled by user.").
+--
+test6:-
+	writeln("Test 6:"),
+	?ask(
+		"Answer a question, please!",
+		"Are you sure?",
+		["Yes","No","Oh dear!"]),!,
+	writeln("\tUser have answered something.").
+test6:-
+	writeln("\tThe input was canceled by user.").
+]
+-----------------------------------------------------------------------

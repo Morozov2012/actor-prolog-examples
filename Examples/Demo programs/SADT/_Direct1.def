@@ -1,0 +1,57 @@
+-------------------------------------------
+-- An example of Actor Prolog program.   --
+-- (c) 2007, Alexei A. Morozov, IRE RAS. --
+-- Transmitting of direct messages       --
+-- between blocks of SADT model.         --
+-------------------------------------------
+DOMAINS:
+--
+reference:
+--
+MyText		= STRING.
+--
+-------------------------------------------
+interface 'MyProtocol':
+[
+--
+visible:
+--
+user_message(MyText)	- (i);
+]
+-------------------------------------------
+interface '_Sender'
+(specialized '_Block', 'Dialog'):
+--
+constant:
+--
+	entry_o1	: 'MyProtocol';
+--
+variable:
+--
+	value_o1	: _;
+--
+variable:
+--
+	text		: MyText;
+--
+[
+]
+-------------------------------------------
+interface '_Receiver'
+(specialized '_Block', 'MyProtocol'):
+--
+constant:
+--
+	entry_i1	: 'MyProtocol';
+--
+variable:
+--
+	value_i1	: _;
+--
+internal:
+--
+	con		: 'Report';
+--
+[
+]
+-------------------------------------------

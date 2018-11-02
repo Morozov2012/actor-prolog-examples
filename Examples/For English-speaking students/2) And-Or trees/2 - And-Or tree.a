@@ -1,0 +1,126 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: And-Or trees.              --
+-- Non-deterministic logic programs.     --
+--                                       --
+-- Questions: What is the And-Or tree?   --
+-- What is a search tree (the Or tree)   --
+-- of a logic program? What is a proof   --
+-- tree (the And tree) of the logic      --
+-- program? How the search tree of a     --
+-- non-deterministic logic program looks --
+-- like? How the proof tree of the       --
+-- non-deterministic logic program looks --
+-- like?                                 --
+--                                       --
+-------------------------------------------
+
+CLAUSES:
+
+goal:-
+	a,
+	fail.
+
+a:-
+	b,
+	c,
+	d.
+
+b:-
+	writeln("B").
+
+c:-
+	e,
+	f.
+c:-
+	g.
+
+e:-
+	writeln("E").
+
+f:-
+	writeln("F").
+
+g:-
+	writeln("G").
+
+d:-
+	writeln("D").
+
+/*
+This program corresponds to several
+(two) And trees (proof trees).
+
+Here is the first tree (it looks like
+the tree in the previous example):
+
+                 the goal
+                 statement
+                 /    \
+                a      fail
+              / | \
+             b  c  d
+               / \
+              e   f
+
+This is the second And tree:
+
+                 the goal
+                 statement
+                 /    \
+                a      fail
+              / | \
+             b  c  d
+                |
+                g
+
+(The b, d, e, f, and g sub-goals are not
+detailed for the sake of simplicity.)
+
+Here is the Or tree (the search tree) of
+the program:
+
+                Sub-goals: a, fail.
+                (the goal statement
+                of the program)
+                |
+                | a :- b, c, d.
+                |
+                Sub-goals: b, c, d, fail.
+                |
+                | b.
+                |
+                Sub-goals: c, d, fail.
+               / \
+   c :- e, f. /   \ c :- g.
+             /     \
+            /       \
+           /         \
+          /           \
+         /             \
+        /               \
+       /                 \
+      /                   \
+     /                     \
+Sub-goals: e, f, d, fail.   Sub-goals: g, d, fail.
+|                           |
+| e.                        | g.
+|                           |
+Sub-goals: f, d, fail.      Sub-goals: d, fail.
+|                           |
+| f.                        | d.
+|                           |
+Sub-goals: d, fail.         Sub-goals: fail.
+|                           |
+| d.                        This branch of the Or tree
+|                           of the program is terminated
+Sub-goals: fail.            with a failure too.
+|
+This branch of the Or tree
+of the program is terminated
+with a failure.
+
+*/

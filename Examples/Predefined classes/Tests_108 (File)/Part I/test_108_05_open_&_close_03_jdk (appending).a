@@ -1,0 +1,176 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+test6(Color,Color)	- (i,i);
+test7;
+test8;
+
+class 'Main':
+--
+constant:
+--
+	testbed1	= (('Test',
+				name= "test.asc",
+				time_delay= 1));
+	testbed2	= (('Test',
+				name= 'stdin',
+				time_delay= 2));
+	testbed3	= (('Test',
+				name= 'stdout',
+				time_delay= 3));
+	testbed4	= (('Test',
+				name= 'stderr',
+				time_delay= 4));
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!.
+--
+alarm(_):-
+	fail.
+]
+
+class 'Test' (specialized 'Timer'):
+--
+constant:
+--
+	name		: FileName;
+	time_delay	: INTEGER;
+--
+internal:
+--
+	file	= ('File',
+			name);
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	delay(time_delay).
+--
+tick:-!,
+	con ? writeln("=== File: ",name," ==="),
+	test5,
+	test6('DkGreen','Red'),
+	test1,
+	test3,
+	test3,
+	test8,
+	test4,
+	test2,
+	test3,
+	test3,
+	test4,
+	test7.
+--
+test1:-
+	con ? writeln("Test 1"),
+	con ? writeln("\tI will try to open the file for appending."),
+	file ? open('appending'),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tDone."),
+	con ? set_color('default').
+--
+test2:-
+	con ? writeln("Test 2"),
+	con ? writeln("\tI will try to open the file for appending."),
+	file ? open(name,'appending'),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tDone."),
+	con ? set_color('default').
+--
+test3:-
+	con ? writeln("Test 3"),
+	con ? writeln("\tI will try to write a line."),
+	con ? set_color('Violet'),
+	file ? write("Hello world!"),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tDone."),
+	con ? set_color('default').
+--
+test4:-
+	con ? writeln("Test 4"),
+	con ? writeln("\tI will try to close the file."),
+	file ? close(),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tThe file was closed successfully."),
+	con ? set_color('default').
+--
+test5:-
+	con ? writeln("Test 5"),
+	string(name),!,
+	con ? writeln("\tI will try to create the file."),
+	con ? set_color('Violet'),
+	file ? set_string(
+		"..... initial content .....\n"
+		"..... initial content .....\n"
+		"..... initial content .....\n"
+		"..... initial content .....\n"
+		"..... initial content .....\n"),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tDone."),
+	con ? set_color('default').
+test5:-
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"\tThe ",name," standard file is already created."),
+	con ? set_color('default').
+--
+test6(Color,_):-
+	con ? writeln("Test 6"),
+	con ? writeln("\tDoes the file exist?"),
+	file ? does_exist(),!,
+	con ? set_color(Color),
+	con ? writeln("\tYes, it does."),
+	con ? set_color('default').
+test6(_,Color):-
+	con ? set_color(Color),
+	con ? writeln("\tNo, it doesn't."),
+	con ? set_color('default').
+--
+test7:-
+	con ? writeln("Test 7"),
+	con ? writeln("\tI will try to read the file."),
+	Text== file?get_string(),!,
+	con ? set_color('DkGreen'),
+	con ? write("\t>>>"),
+	con ? set_color('Blue'),
+	con ? write(Text),
+	con ? set_color('DkGreen'),
+	con ? writeln("<<<"),
+	con ? set_color('default').
+test7:-
+	con ? set_color('DkGreen'),
+	con ? writeln(
+		"\tI cannot read from the ",
+		name,
+		" file."),
+	con ? set_color('default').
+--
+test8:-
+	con ? writeln("Test 8"),
+	con ? writeln("\tI will try to flush the file."),
+	file ? flush(),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tThe file was flushed successfully."),
+	con ? set_color('default').
+--
+alarm(Exception):-!,
+	con ? set_color('Red'),
+	con ? writeln("Error: ",Exception),
+	con ? set_color('default').
+]

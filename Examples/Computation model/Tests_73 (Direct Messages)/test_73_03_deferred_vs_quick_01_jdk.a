@@ -1,0 +1,129 @@
+-----------------------------------------------------------------------
+--                An example of Actor Prolog program.                --
+--                (c) 2012 IRE RAS Alexei A. Morozov                 --
+-----------------------------------------------------------------------
+--
+PREDICATES:
+--
+imperative:
+--
+send_deferred_messages;
+send_deferred_messages_and_backtrack;
+loop1(INTEGER,INTEGER)				- (i,i);
+--
+send_quick_messages;
+send_quick_messages_and_backtrack;
+loop2(INTEGER,INTEGER)				- (i,i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+	p1	= (('Receiver'));
+--
+internal:
+--
+	env	= ('Timer');
+	con	= ('Report',
+			y= 0,
+			height= 10);
+--
+[
+goal:-!,
+	Time1== env?time(),
+	con ? writeln("Current time is: ",Time1),
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"Sender: ",
+		"I will send deferred messages."),
+	send_deferred_messages,
+	con ? set_color('default'),
+	Time2== env?time(),
+	con ? writeln("Current time is: ",Time2),
+	con ? set_color('Black','Lemon'),
+	con ? writeln(
+		"Sender: ",
+		"I will send quick messages."),
+	send_quick_messages,
+	con ? set_color('default'),
+	Time3== env?time(),
+	con ? writeln("Current time is: ",Time3).
+--
+send_deferred_messages:-
+	p1 << message1("First message1"),
+	send_deferred_messages_and_backtrack,
+	env ? sleep(0.1),
+	p1 << message1("Last message1").
+--
+send_deferred_messages_and_backtrack:-
+	loop1(1,5),
+	fail.
+send_deferred_messages_and_backtrack.
+--
+loop1(N,Max):-
+	N <= Max,!,
+	env ? sleep(0.1),
+	Message== "message1 #" + ?convert_to_string(N),
+	p1 << message1(Message),
+	loop1(N+1,Max).
+loop1(_,_).
+--
+send_quick_messages:-
+	[p1] << message2("First message2"),
+	send_quick_messages_and_backtrack,
+	env ? sleep(0.1),
+	[p1] << message2("Last message2").
+--
+send_quick_messages_and_backtrack:-
+	loop2(1,5),
+	fail.
+send_quick_messages_and_backtrack.
+--
+loop2(N,Max):-
+	N <= Max,!,
+	env ? sleep(0.1),
+	Message== "message2 #" + ?convert_to_string(N),
+	[p1] << message2(Message),
+	loop2(N+1,Max).
+loop2(_,_).
+]
+-----------------------------------------------------------------------
+class 'Receiver' (specialized 'Alpha'):
+--
+internal:
+--
+	env	= ('Timer');
+	con	= ('Report',
+			y= 10,
+			height= 15);	
+--
+[
+PREDICATES:
+--
+imperative:
+--
+message1(STRING)		- (i);
+message2(STRING)		- (i);
+--
+CLAUSES:
+--
+goal:-!.
+--
+message1(Text):-
+	Time== env?time(),
+	con ? set_color('RoyalBlue'),
+	con ? writeln(
+		"Receiver: ",
+		"I have received message1: \"",
+		Text,"\" at ",Time),
+	con ? set_color('default').
+--
+message2(Text):-
+	Time== env?time(),
+	con ? set_color('Black','Lemon'),
+	con ? writeln(
+		"Receiver: ",
+		"I have received message2: \"",
+		Text,"\" at ",Time),
+	con ? set_color('default').
+]
+-----------------------------------------------------------------------

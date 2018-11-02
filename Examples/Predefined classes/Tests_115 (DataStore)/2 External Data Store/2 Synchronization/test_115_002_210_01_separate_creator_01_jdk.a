@@ -1,0 +1,101 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Note: one should start two instances of the Editor
+-- environment to study this example. Please compile and
+-- execute this example in the first environment and
+-- the watch_datastore example in the second one.
+-- Warning: the VIP version does not support the activate and
+-- the update predicates of the Database and the DataStore classes.
+-- Please translate this example to Java.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	store	= ('DataStore',
+			name="SharedDataStore.dat",
+			access_mode='modifying',
+			sharing_mode='shared_access');
+	writer	= ('MyDatabase',
+			store,
+			con);
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	-- store ? delete,
+	con ? set_color('Orange'),
+	con ? write("OPENING DATA STORE... "),
+	store ? open,
+	con ? writeln("DONE."),
+	con ? set_color('default'),
+	set_period(1,0),
+	activate.
+--
+tick:-!,
+	writer ? update_database.
+]
+-----------------------------------------------------------------------
+class 'MyDatabase' (specialized 'Database'):
+--
+internal:
+--
+	store;
+	con;
+--
+[
+update_database:-
+	con ? set_color('Black'),
+	N== ?random(9000000),
+	TableName== con?format("Table_%07d",N),
+	con ? writeln("Update table: ",TableName),
+	set_place(shared(store,TableName)),
+	con ? writeln("Test database update."),
+	con ? set_color('default'),
+	begin_transaction('modifying'),!,
+	modify_database,
+	end_transaction.
+update_database:-
+	con ? set_color('White','Violet'),
+	con ? writeln("Time-out!\nI cannot open transaction."),
+	con ? set_color('default','default').
+--
+modify_database:-
+	check_database('Black'),
+	fail.
+modify_database:-
+	Delta== ?random(101) - 50.0,
+	modify_database(Delta),
+	modify_database(-(Delta)).
+--
+modify_database(Delta):-
+	T1== ?match(_),
+	T1 == my_data(V1),
+	retract(T1),!,
+	insert(my_data(V1 + Delta)).
+modify_database(Delta):-
+	insert(my_data(Delta)).
+--
+check_database(Color):-
+	T1== ?match(_),
+	T1 == my_data(V1),!,
+	report_checksum(V1,Color).
+check_database(_).
+--
+report_checksum(V1,_):-
+	V1 <> 0.0,
+	con ? set_color('White','Red'),
+	con ? writeln("Illegal check sum value!"),
+	con ? set_color('default','default'),
+	fail.
+report_checksum(V1,Color):-
+	con ? set_color(Color,'default'),
+	con ? writeln("Check sum: ",V1),
+	con ? set_color('default','default').
+]
+-----------------------------------------------------------------------

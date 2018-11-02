@@ -1,0 +1,38 @@
+dialog 'List' (
+	"List of Resources",default,default,default,
+	centered,centered,default)
+vbox(center)
+	listbox(list_of_resources,arguments,30,14,[])
+	hbox
+		ok("show_resource","&Show Resource")
+		button(close,"&Cancel")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog 'Selector' (
+	"List of Resources",default,default,default,
+	centered,centered,default)
+vbox(center)
+	listbox(list_of_resources,item,30,14,[])
+	hbox
+		ok("process_resource","&Select")
+		button(close,"&Cancel")
+	end_of_hbox
+end_of_vbox
+end_of_dialog
+
+dialog 'Edit' (
+	"List of Resources",default,default,default,
+	centered,centered,default)
+padding(1.7,1.7)
+	vbox(center)
+		listedit(list_of_resources,item,34,14,[])
+		hbox
+			button("select_resource","&Select")
+			ok("process_resource","&Process")
+			button(close,"&Cancel")
+		end_of_hbox
+	end_of_vbox
+end_of_padding
+end_of_dialog

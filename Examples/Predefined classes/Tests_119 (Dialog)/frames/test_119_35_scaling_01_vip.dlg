@@ -1,0 +1,15 @@
+mesh(80,25)
+padding(0,0)
+-- scaling(2,3)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',24)
+
+dialog 'MyDialog'("The Scaling Option Demo",default,default,default,centered,centered,default)
+	button("action11","&First")
+	scaling(2,3)
+		button("action12","&Second")
+		togglebutton("action13","&Third")
+	end_of_scaling
+	ok("action14","F&ourth")
+	button("action15","F&ifth")
+end_of_dialog

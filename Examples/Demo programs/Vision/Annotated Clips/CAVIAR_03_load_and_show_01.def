@@ -1,0 +1,151 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+--
+DOMAINS:
+--
+ground:
+--
+N		= INTEGER.
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha'):
+--
+constant:
+--
+data_directory		: STRING;
+target_directory	: STRING;
+sampling_rate		: INTEGER;
+--
+sender		: 'Sender';
+receiver	: 'Receiver';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'Sender' (specialized 'Timer'):
+--
+constant:
+--
+	target			: 'Receiver';
+--
+constant:
+--
+	data_directory		: STRING;
+	target_directory	: STRING;
+	sampling_rate		: INTEGER;
+--
+	target_CVML_description	: STRING;
+--
+internal:
+--
+	description	: 'CVML_Resource';
+	store		: 'CVML_Store';
+	state		: 'ProgramState';
+--
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+save_frames(TreeContent)			- (i);
+save_frame(ContentItem)				- (i);
+save_frame_content(ContentList,ContentList)	- (i,i);
+save_frame_number_and_content
+	(STRING,ContentList)			- (i,i);
+--
+load_figure(INTEGER,INTEGER)			- (i,i);
+--
+extract_object_list(ContentList,ContentList)	- (i,o);
+]
+-----------------------------------------------------------------------
+interface 'Receiver' (specialized 'Alpha'):
+--
+constant:
+--
+	data_directory		: STRING;
+	target_directory	: STRING;
+	sampling_rate		: INTEGER;
+--
+internal:
+--
+	image		: 'BufferedImage';
+	graphic_window	: 'Canvas2D';
+	prompt_window	: 'Report';
+	con		: 'Console';
+--
+[
+--
+PREDICATES:
+--
+imperative:
+--
+process_frame(N,ContentList)			- (i,i);
+--
+show_object_list(ContentList,PointX,PointY)	- (i,i,i);
+show_object(ContentItem,PointX,PointY)		- (i,i,i);
+show_object_attributes(
+	ContentList,STRING,PointX,PointY)	- (i,i,i,i);
+show_object_attribute(
+	ContentItem,STRING,PointX,PointY)	- (i,i,i,i);
+--
+show_box_attributes(
+		ContentList,
+		STRING,
+		STRING,
+		STRING,
+		STRING,
+		STRING,
+		PointX,
+		PointY,
+		Color,
+		Numerical)	- (i,i,i,i,i,i,i,i,i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+'-'(PointX,PointX) = PointX		- (i,i);
+'-'(PointY,PointY) = PointY		- (i,i);
+'/'(PointX,PointX) = PointX		- (i,i);
+'/'(PointY,PointY) = PointY		- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'CVML_Resource' (specialized 'WebReceptor'):
+[
+]
+-----------------------------------------------------------------------
+interface 'CVML_Store' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+TargetKey	= INTEGER.
+TargetValue	= ContentList.
+--
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= beginning_time(INTEGER);
+		  current_frame(INTEGER).
+--
+PREDICATES:
+--
+determ:
+--
+get_beginning_time(INTEGER)		- (o);
+get_current_frame(INTEGER)		- (o);
+--
+imperative:
+--
+set_beginning_time(INTEGER)		- (i);
+set_current_frame(INTEGER)		- (i);
+]
+-----------------------------------------------------------------------

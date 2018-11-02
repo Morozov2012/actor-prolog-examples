@@ -1,0 +1,119 @@
+-----------------------------------------------------------------------
+--                                                                   --
+--  DERIV                                                            --
+--                                                                   --
+--  http:\\www.sics.se\isl\sicstuswww\site\performance.html          --
+--                                                                   --
+-----------------------------------------------------------------------
+--                                                                   --
+--  2015.06.28 02:32                                                 --
+--  Intel(R) Core(TM) i5-2410M CPU@2.30GHz, 2.30 GHz, 4.00GB         --
+--  Windows7 - PM.64 (RUS)                                           --
+--  ========================================================         --
+--  AS K73E-3DTY, 2410M(I5), DDR3 1333 4GB                           --
+--                                                                   --
+--  g:\temp1\jv>java -version                                        --
+--  java version "1.7.0_80"                                          --
+--  Java(TM) SE Runtime Environment (build 1.7.0_80-b15)             --
+--  Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)  --
+--                                                                   --
+--  java -Xrs -XX:+UseNUMA -server -XX:+TieredCompilation            --
+--  -XX:+AggressiveOpts -XX:+UseLargePages -Xshare:off -Xbatch       --
+--                                                                   --
+--  10000000 iterations take 554596 msec                             --
+--  0.055460 milliseconds per iteration                              --
+--                                                                   --
+--  EXE file:                                                        --
+--                                                                   --
+--  10000000 iterations take 27160 msec                              --
+--  0.002716 milliseconds per iteration                              --
+--                                                                   --
+-----------------------------------------------------------------------
+import 'TestFacilities' from "HARNESS"(Result:=Quadruple);
+-----------------------------------------------------------------------
+DOMAINS:
+--
+Expression	= '+'(Expression,Expression);
+		  '-'(Expression,Expression);
+		  '*'(Expression,Expression);
+		  '/'(Expression,Expression);
+		  '^'(Expression,INTEGER);
+		  minus(Expression);
+		  exp(Expression);
+		  ln(Expression);
+		  'x';
+		  INTEGER.
+--
+Quadruple	= quad(Expression,Expression,Expression,Expression).
+--
+PREDICATES:
+--
+imperative:
+--
+ops8(Expression)			- (o);
+divide10(Expression)			- (o);
+ln10(Expression)			- (o);
+times10(Expression)			- (o);
+d(Expression,Expression,Expression)	- (i,i,o);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'TestFacilities'):
+[
+DOMAINS:
+--
+-- Result	= Quadruple.
+--
+CLAUSES:
+--
+data([]).
+--
+benchmark(_,quad(E1,E2,E3,E4)):-
+	ops8(E1),
+	divide10(E2),
+	ln10(E3),
+	times10(E4).
+--
+ops8(E):-
+	-- d((x + 1) * ((^(x, 2) + 2) * (^(x, 3) + 3)), x, E).
+	d('*'(	'+'('x',1),
+		'*'(	'+'('^'('x',2),2),
+			'+'('^'('x',3),3))),'x',E).
+--
+divide10(E):-
+	-- ((((((((x / x) / x) / x) / x) / x) / x) / x) / x) / x
+	d(	'/'('/'('/'('/'('/'('/'('/'('/'('/'('x',
+		'x'),'x'),'x'),'x'),'x'),'x'),'x'),'x'),'x'),'x',E).
+--
+ln10(E):-
+	d(ln(ln(ln(ln(ln(ln(ln(ln(ln(ln('x')))))))))),'x',E).
+--
+times10(E):-
+	-- ((((((((x * x) * x) * x) * x) * x) * x) * x) * x) * x
+	d(	'*'('*'('*'('*'('*'('*'('*'('*'('*'('x',
+		'x'),'x'),'x'),'x'),'x'),'x'),'x'),'x'),'x'),'x',E).
+--
+d('+'(U,V),X,'+'(DU,DV)):-!,
+	d(U,X,DU),
+	d(V,X,DV).
+d('-'(U,V),X,'-'(DU,DV)):-!,
+	d(U,X,DU),
+	d(V,X,DV).
+d('*'(U,V),X,'+'('*'(DU,V),'*'(U,DV))):-!,
+	d(U,X,DU),
+	d(V,X,DV).
+d('/'(U,V),X,'/'('-'('*'(DU,V),'*'(U,DV)),'^'(V,2))):-!,
+	d(U,X,DU),
+	d(V,X,DV).
+d('^'(U,N1),X,'*'('*'(DU,N1),'^'(U,N2))):-!,
+	N2== N1 - 1,
+	d(U,X,DU).
+d(minus(U),X,minus(DU)):-!,
+	d(U,X,DU).
+d(exp(U),X,'*'(exp(U),DU)):-!,
+	d(U,X,DU).
+d(ln(U),X,'/'(DU,U)):-!,
+	d(U,X,DU).
+d(X,X,1) :-!.
+d(_,_,0).
+]
+-----------------------------------------------------------------------

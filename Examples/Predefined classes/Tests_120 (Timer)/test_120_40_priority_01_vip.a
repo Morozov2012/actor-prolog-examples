@@ -1,0 +1,82 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support the set_priority
+-- and the get_priority operations.
+--
+PREDICATES:
+--
+imperative:
+--
+test10;
+test11;
+--
+test21;
+test22;
+test23;
+test24(ProcessPriority)		- (i);
+test25;
+--
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	delay(1).
+--
+tick:-!,
+	test10,
+	test11,
+	test21,
+	test11,
+	test22,
+	test11,
+	test23,
+	test11,
+	test24(9),
+	test11,
+	test25,
+	test11.
+--
+test10:-
+	con ? writeln("Test 1.0:"),
+	get_priority(),
+	con ? writeln("\tDone.").
+--
+test11:-
+	con ? writeln("Test 1.1:"),
+	Priority== ?get_priority(),
+	con ? writeln("\tProcess priority: ",Priority).
+--
+test21:-
+	con ? writeln("Test 2.1:"),
+	set_priority('minimal'),
+	con ? writeln("\tDone.").
+--
+test22:-
+	con ? writeln("Test 2.2:"),
+	set_priority('maximal'),
+	con ? writeln("\tDone.").
+--
+test23:-
+	con ? writeln("Test 2.3:"),
+	set_priority('normal'),
+	con ? writeln("\tDone.").
+--
+test24(N):-
+	con ? writeln("Test 2.4:"),
+	set_priority(N),
+	con ? writeln("\tDone.").
+--
+test25:-
+	con ? writeln("Test 2.5:"),
+	P1== ?get_priority_number(),
+	set_priority(P1-1),
+	con ? writeln("\tDone.").
+]
+-----------------------------------------------------------------------

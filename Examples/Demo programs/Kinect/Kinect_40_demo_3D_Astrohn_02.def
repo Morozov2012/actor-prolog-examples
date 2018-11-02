@@ -1,0 +1,153 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Astrohn";
+import .. from "morozov/Kinect";
+import .. from "morozov/ColorMap";
+--
+-----------------------------------------------------------------------
+interface '3DTHzPlayer' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	first_frame	: INTEGER;
+	end_frame	: INTEGER;
+	frame_type	: KinectFrameType;
+	people_index	: KinectPeopleIndexMode;
+	skeletons	: KinectSkeletonsMode;
+	main_label	: NodeLabel;
+--
+	terahertz_data_file	: FileName;
+--
+internal:
+--
+	window		: 'Canvas3D';
+	dialog		: 'Dialog';
+	buffer		: 'BufferedScene';
+	astrohn		: 'Astrohn';
+	texture		: 'BufferedImage';
+	state		: 'ProgramState';
+	text		: 'Text';
+	con		: 'Console';
+--
+constant:
+--
+	cylinder_radius		: Radius;
+	joint_radius		: Radius;
+	head_radius		: Radius;
+	limb_transparency	: Numerical;
+	up_vector		: Point3D;
+--
+	texture_time_shift	: INTEGER;
+	lookup_table_file_name	: STRING;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+process_frame(FrameNumber,INTEGER)		- (i,i);
+redraw_scene;
+--
+show_skeletons(YesNo)				- (i);
+--
+create_list_of_nodes(NodeList)			- (o);
+create_main_group(Node)				- (o);
+--
+form_skeletons(Skeletons) = NodeList		- (i);
+--
+determ:
+--
+form_skeleton(Skeleton) = Node			- (i);
+--
+form_spine(SkeletonJoint,SkeletonSpine) = Node	- (i,i);
+form_arm(SkeletonSpine,SkeletonArm) = Node	- (i,i);
+--
+form_hand(
+	SkeletonJoint,
+	SkeletonJoint,
+	SkeletonArm) = Node		- (i,i,i);
+--
+form_leg(SkeletonSpine,SkeletonLeg) = Node	- (i,i);
+--
+form_link(SkeletonJoint,SkeletonJoint) = Node	- (i,i);
+form_joint(SkeletonJoint) = Node		- (i);
+form_head(SkeletonJoint) = Node			- (i);
+--
+imperative:
+--
+form_dummy_figure() = Node;
+--
+select_joint_color(
+	SkeletonJointStatus,MaterialAttributes)	- (i,o);
+--
+calc_rotation(Point3D) = Rotation		- (i);
+--
+normalize(Point3D) = Point3D			- (i);
+--
+cross(Point3D,Point3D) = Point3D		- (i,i);
+--
+angle(Point3D,Point3D) = Numerical		- (i,i);
+angle(Numerical) = Numerical			- (i);
+--
+dot(Point3D,Point3D) = Numerical		- (i,i);
+scale(Point3D,Numerical) = Point3D		- (i,i);
+length(Point3D) = Numerical			- (i);
+--
+PREDICATES:
+--
+imperative:
+--
+'-'(Numerical) = Numerical			- (i);
+'-'(Numerical,Numerical) = Numerical		- (i,i);
+'+'(Numerical,Numerical) = Numerical		- (i,i);
+'*'(Point3D,Point3D) = Numerical		- (i,i);
+'*'(Numerical,Numerical) = Numerical		- (i,i);
+'/'(Numerical,Numerical) = Numerical		- (i,i);
+sqrt(Numerical) = Numerical			- (i);
+power(Numerical,INTEGER) = Numerical		- (i,i);
+arccos(Numerical) = Numerical			- (i);
+]
+-----------------------------------------------------------------------
+interface 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	kinect_buffer	: '3DTHzPlayer';
+	astrohn		: 'Astrohn';
+	graphic_window	: 'Canvas3D';
+	color_maps	: 'ColorMap';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+update_color_map;
+update_displaying_mode;
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= f(INTEGER,INTEGER); 'create_skeletons'.
+--
+PREDICATES:
+--
+imperative:
+--
+set_first_frame_time(INTEGER,INTEGER)		- (i,i);
+get_first_frame_time(INTEGER,INTEGER)		- (o,o);
+--
+set_show_skeletons(YesNo)			- (i);
+--
+determ:
+--
+show_skeletons;
+]
+-----------------------------------------------------------------------

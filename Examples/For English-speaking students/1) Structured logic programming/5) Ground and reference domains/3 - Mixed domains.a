@@ -1,0 +1,46 @@
+-------------------------------------------
+--                                       --
+--         Actor Prolog lessons          --
+--      (c) 2015 Alexei A. Morozov       --
+--                                       --
+-- The topic: Basics of the structured   --
+-- logic programming. Ground, reference, --
+-- and mixed domains.                    --
+--                                       --
+-- Questions: What are ground and        --
+-- non-ground terms? What are mixed      --
+-- domains? What data structures can     --
+-- never be created during the           --
+-- processing of data items of the mixed --
+-- domains? What is the difference       --
+-- between the mixed and the ground      --
+-- domains? What is the difference       --
+-- between the mixed and the reference   --
+-- domains?                              --
+--                                       --
+-------------------------------------------
+
+DOMAINS:
+
+mixed:
+
+D1	= f(N,N,N).
+
+reference:
+
+N	= INTEGER.
+
+PREDICATES:
+
+nondeterm:
+
+p(D1)		- (o);
+
+CLAUSES:
+
+goal:-
+	p(X),
+	writeln(X).
+
+-- p(_).
+p(f(3,_,5)).

@@ -1,0 +1,169 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/IPCamera";
+-----------------------------------------------------------------------
+project: (('VideoPlayer'))
+-----------------------------------------------------------------------
+class 'VideoPlayer' (specialized 'Dialog'):
+--
+internal:
+--
+buffer			= ('VideoManager',
+				player=self,
+				main_window,
+				legend_window);
+main_window		= ('Canvas2D',
+				background_color='SystemControl');
+legend_window		= ('Canvas2D',
+				background_color='SystemControl');
+con			= ('Console');
+text			= ('Text');
+--
+constant:
+--
+is_top_level_window	= 'yes';
+exit_on_close		= 'yes';
+--
+[
+goal:-!,
+	update_displaying_mode,
+	show.
+--
+action("Select"):-
+	FileName== con?input_file_name(
+		"Please select data file",
+		"*.ap2j",
+		[
+		"*.ap2j","Data Files",
+		"*.*","All Files"
+		]),!,
+	buffer ? set_name(FileName),
+	put('title',"Video Player ["+FileName+"]"),
+	play_video.
+action("Play"):-!,
+	play_video.
+action("Pause"):-!,
+	buffer ? pause.
+action("Stop"):-!,
+	buffer ? stop.
+--
+play_video:-
+	check_file_name,!,
+	park_scroll_control,
+	buffer ? start.
+play_video.
+--
+check_file_name:-
+	buffer ? does_exist(),!.
+check_file_name:-
+	FileName== buffer?get_name(),
+	con ? error(
+		"Illegal File name",
+		text?format("The '%s' file does not exist.",FileName)),
+	fail.
+--
+modified_control(1010):-!,
+	update_displaying_mode,
+	buffer ? frame_obtained.
+modified_control(1020):-!,
+	update_displaying_mode,
+	buffer ? frame_obtained.
+modified_control(1030):-!,
+	update_displaying_mode,
+	buffer ? frame_obtained.
+modified_control(3012):-
+	Position== ?cast("INTEGER",?get(3012)),
+	buffer ? retrieve_buffered_frame(Position),!.
+--
+update_displaying_mode:-
+	DoNotControlZoom== ?val("YesNo",?get(1010)),
+	ZoomImage== ?val("YesNo",?get(1020)),
+	ZoomingCoefficient== ?val("Numerical",?get(1030)),!,
+	buffer ? set_use_recorded_zooming_commands(DoNotControlZoom),
+	buffer ? set_zoom_image(ZoomImage),
+	buffer ? set_zooming_coefficient(ZoomingCoefficient).
+update_displaying_mode.
+--
+set_read_buffer_size(Size):-
+	put(3011,[1,Size]).
+--
+park_scroll_control:-
+	Range== ?val("I_List",?get(3011)),
+	Range == [_,Right],!,
+	put(3012,Right).
+park_scroll_control.
+]
+-----------------------------------------------------------------------
+class 'VideoManager' (specialized 'IPCamera'):
+--
+constant:
+--
+	name;
+--
+	operating_mode			= 'PLAYING';
+	read_buffer_size		= 100;
+--
+internal:
+--
+	player;
+	main_window;
+	legend_window;
+--
+	image				= ('BufferedImage');
+	con				= ('Console');
+	text				= ('Text');
+	timer				= ('Timer');
+--
+[
+goal:-!,
+	player ? set_read_buffer_size(read_buffer_size).
+--
+frame_obtained:-
+	commit,!,
+	get_recent_image(image),
+	get_image_size_in_pixels(IW,IH),
+	get_recent_frame_number(FrameNumber),
+	get_recent_frame_time(FrameTime),
+	get_recent_frame_rate(FrameRate),
+	main_window ? suspend_redrawing,
+	resize_main_window(IW,IH),
+	main_window ? clear,
+	main_window ? draw_image(image,0,0,1,1),
+	report_time(FrameNumber,FrameTime,FrameRate),
+	main_window ? draw_now.
+--
+resize_main_window(IW,IH):-
+	IW > 0,
+	IH > 0,!,
+	main_window ? refine_width(IW/IH).
+resize_main_window(_,_).
+--
+data_transfer_error(ErrorName):-!,
+	con ? error("Data Transfer Error",ErrorName).
+--
+report_time(_,_,_):-
+	main_window ? set_brush('Green'),
+	main_window ? set_font({size:18}),
+	fail.
+report_time(FrameNumber,FrameTime,FrameRate):-
+	FrameNumber >= 0,
+	Time== timer?convert_to_time(FrameTime),
+	Time == time(Hours,Minutes,Seconds,Milliseconds),!,
+	main_window ? set_text_alignment('LEFT','TOP'),
+	main_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %02d:%02d:%02d.%03d; Frame Number: %d",
+			Hours,Minutes,Seconds,Milliseconds,
+			FrameNumber)),
+	main_window ? set_text_alignment('RIGHT','TOP'),
+	main_window ? draw_text(
+		0.95, 0.02,
+		text?format(
+			"Frame Rate: %2.1f",FrameRate)).
+report_time(_,_,_).
+]
+-----------------------------------------------------------------------

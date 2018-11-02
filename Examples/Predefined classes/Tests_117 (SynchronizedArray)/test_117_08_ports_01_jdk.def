@@ -1,0 +1,74 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+reference:
+
+MessageString		= STRING.
+
+-----------------------------------------------------------------------
+
+interface 'Main' (specialized 'Alpha'):
+
+internal:
+
+	link	: 'Link';
+
+constant:
+
+	p1	: 'Control';
+	p2	: 'Control';
+	p3	: 'Control';
+	p4	: 'Control';
+
+[
+]
+
+-----------------------------------------------------------------------
+
+interface 'Control' (specialized 'Dialog'):
+
+
+constant:
+
+	link	: 'Link';
+
+internal:
+
+	proxy	: 'Link';
+
+constant:
+
+	con	: 'Console';
+
+[
+PREDICATES:
+
+imperative:
+
+initiate_value(MessageString)		- (i);
+check_port;
+
+]
+
+-----------------------------------------------------------------------
+
+interface 'Link' (specialized 'SynchronizedArray'):
+[
+DOMAINS:
+
+reference:
+
+Target		= MessageString.
+
+PREDICATES:
+
+nondeterm:
+
+element(ArrayIndex*)	= MessageString	- (i);
+
+]
+-----------------------------------------------------------------------

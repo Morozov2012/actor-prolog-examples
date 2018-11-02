@@ -1,0 +1,55 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2011 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+test2;
+test3;
+
+class 'Main' (specialized 'Report'):
+--
+constant:
+--
+	x	= 'centered';
+	y	= 'centered';
+	height	= 5;
+	width	= 40;
+--
+internal:
+--
+	con	= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2,
+	test3.
+--
+test0:-
+	con ? writeln("Test 0"),
+	?upper(),
+	?upper("1234567890").
+--
+test1:-
+	con ? writeln("Test 1"),
+	set_string("aBCdEFghIJ"),
+	con ? writeln("\t",?upper()),
+	con ? writeln("\t",?upper("AbcDefGHij")).
+--
+test2:-
+	con ? writeln("Test 2"),
+	set_string("ÀÁÂÃÄÅ¨ÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞß"),
+	con ? writeln("\t",?upper()).
+--
+test3:-
+	con ? writeln("Test 3"),
+	set_string("àáâãäå¸æçèéêëìíîïğñòóôõö÷øùúûüışÿ"),
+	con ? writeln("\t",?upper()).
+]

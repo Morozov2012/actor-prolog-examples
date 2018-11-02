@@ -1,0 +1,268 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/TEV1";
+import .. from "morozov/ColorMap";
+-----------------------------------------------------------------------
+project: (('Viewer'))
+-----------------------------------------------------------------------
+class 'Viewer' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer		= ('CameraControl',
+				viewer=self,
+				main_window);
+	main_window	= ('Canvas2D',
+				background_color='SystemControl');
+	con		= ('Console');
+	color_maps	= ('ColorMap');
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+	exit_on_close		= 'yes';
+	--
+	dlg_ctrl_apply_anomalous_voltage_detector	= 1110;
+	dlg_ctrl_anomalous_voltage_threshold		= 1120;
+	dlg_ctrl_apply_anomalous_temperature_detector	= 1130;
+	dlg_ctrl_anomalous_temperature_threshold	= 1140;
+	--
+	dlg_ctrl_number_of_dead_pixels			= 1150;
+	dlg_ctrl_anomalous_voltage_pixels		= 1160;
+	dlg_ctrl_anomalous_temperature_pixels		= 1170;
+	dlg_ctrl_eliminate_anomalous_pixels		= 1180;
+	--
+	dlg_ctrl_color_map				= 1210;
+	dlg_ctrl_zoom_image				= 1220;
+	dlg_ctrl_zooming_coefficient			= 1230;
+	dlg_ctrl_camera_mode				= 1240;
+	dlg_ctrl_data_transfer_mode			= 1250;
+	dlg_ctrl_do_not_suspend_USB			= 1260;
+--
+[
+goal:-!,
+	update_displaying_mode,
+	report_system_mode,
+	show.
+--
+action("Open"):-!,
+	select_and_open_device.
+action("Start"):-!,
+	buffer ? start,
+	report_system_mode.
+action("Pause"):-!,
+	buffer ? pause,
+	report_system_mode.
+action("Stop"):-!,
+	buffer ? stop,
+	report_system_mode.
+action("Close"):-!,
+	buffer ? close,
+	report_system_mode.
+action("Calibrate"):-!,
+	buffer ? calibrate,
+	report_system_mode.
+action("AnnulCalibration"):-!,
+	buffer ? annul_calibration,
+	put(dlg_ctrl_number_of_dead_pixels,0),
+	put(dlg_ctrl_anomalous_voltage_pixels,0),
+	put(dlg_ctrl_anomalous_temperature_pixels,0),
+	report_system_mode.
+action("SaveSensorAttributes"):-
+	FileName== con?input_file_name(
+		"Please select sensor attributes file",
+		"*.bin",
+		[
+		"*.bin","Sensor Attributes Files",
+		"*.*","All Files"
+		]),!,
+	buffer ? save_sensor_attributes(FileName),
+	report_system_mode.
+action("LoadSensorAttributes"):-
+	FileName== con?input_file_name(
+		"Please select sensor attributes file",
+		"*.bin",
+		[
+		"*.bin","Sensor Attributes Files",
+		"*.*","All Files"
+		]),!,
+	buffer ? load_sensor_attributes(FileName),
+	report_system_mode.
+--
+select_and_open_device:-
+	List== buffer?get_device_list(),
+	initialize_data_acquisition(List).
+--
+initialize_data_acquisition([]):-!,
+	con ? error(
+		"Error",
+		"Sorry, the TE V1 device is not found!").
+initialize_data_acquisition(List):-
+	con ? select_item(
+		"Device Selection",
+		"Select device, please",
+		?cast("S_List",List),
+		1,
+		SelectedIdentifier,
+		_),!,
+	initialize_selected_device(SelectedIdentifier),
+	report_system_mode.
+initialize_data_acquisition(_).
+--
+initialize_selected_device(Identifier):-
+	set_title(con?format("Thermal Image Viewer [%s]",Identifier)),
+	buffer ? open(Identifier),!.
+initialize_selected_device(Identifier):-
+	con ? error(
+		"Error",
+		con?format(
+			"Sorry, I cannot open the\n%s\ndevice!",
+			Identifier)).
+--
+modified_control(dlg_ctrl_apply_anomalous_voltage_detector):-
+	Mode== ?val("YesNo",
+		?get(dlg_ctrl_apply_anomalous_voltage_detector)),!,
+	buffer ? set_apply_anomalous_voltage_pixel_detector(Mode).
+modified_control(dlg_ctrl_anomalous_voltage_threshold):-
+	Threshold== ?val("REAL",
+		?get(dlg_ctrl_anomalous_voltage_threshold)),!,
+	buffer ? set_anomalous_voltage_threshold(Threshold).
+modified_control(dlg_ctrl_apply_anomalous_temperature_detector):-
+	Mode== ?val("YesNo",
+		?get(dlg_ctrl_apply_anomalous_temperature_detector)),!,
+	buffer ? set_apply_anomalous_temperature_pixel_detector(Mode).
+modified_control(dlg_ctrl_anomalous_temperature_threshold):-
+	Threshold== ?val("REAL",
+		?get(dlg_ctrl_anomalous_temperature_threshold)),!,
+	buffer ? set_anomalous_temperature_threshold(Threshold).
+modified_control(dlg_ctrl_eliminate_anomalous_pixels):-
+	Mode== ?val("YesNo",
+		?get(dlg_ctrl_eliminate_anomalous_pixels)),!,
+	buffer ? set_eliminate_anomalous_pixels(Mode),
+	update_displaying_mode,
+	buffer ? frame_obtained.
+modified_control(dlg_ctrl_color_map):-!,
+	update_displaying_mode,
+	buffer ? frame_obtained.
+modified_control(dlg_ctrl_zoom_image):-!,
+	update_displaying_mode,
+	buffer ? frame_obtained.
+modified_control(dlg_ctrl_zooming_coefficient):-!,
+	update_displaying_mode,
+	buffer ? frame_obtained.
+modified_control(dlg_ctrl_do_not_suspend_USB):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_do_not_suspend_USB)),!,
+	buffer ? set_do_not_suspend_USB_data_transfer(Mode).
+--
+update_displaying_mode:-
+	TextCM== ?val("STRING",?get(dlg_ctrl_color_map)),
+	ZoomImage== ?val("YesNo",?get(dlg_ctrl_zoom_image)),
+	ZoomingCoefficient== ?val("Numerical",
+		?get(dlg_ctrl_zooming_coefficient)),!,
+	ColorMap== color_maps?string_to_color_map_name(TextCM),
+	buffer ? set_main_color_map(ColorMap),
+	buffer ? set_zoom_image(ZoomImage),
+	buffer ? set_zooming_coefficient(ZoomingCoefficient).
+update_displaying_mode.
+--
+report_anomalous_pixels(DP,AVP,ATP):-
+	put(dlg_ctrl_number_of_dead_pixels,DP),
+	put(dlg_ctrl_anomalous_voltage_pixels,AVP),
+	put(dlg_ctrl_anomalous_temperature_pixels,ATP).
+--
+report_system_mode:-
+	report_camera_mode,
+	report_data_transfer_mode.
+--
+report_camera_mode:-
+	buffer ? is_open,!,
+	put(dlg_ctrl_camera_mode,"Camera is Open"),
+	set_control_background_color(dlg_ctrl_camera_mode,'Green').
+report_camera_mode:-
+	put(dlg_ctrl_camera_mode,"Camera is Closed"),
+	set_control_background_color(dlg_ctrl_camera_mode,'Red').
+--
+report_data_transfer_mode:-
+	buffer ? contains_new_frame,!,
+	put(dlg_ctrl_data_transfer_mode,"Contains New Image").
+report_data_transfer_mode:-
+	put(dlg_ctrl_data_transfer_mode,"").
+]
+-----------------------------------------------------------------------
+class 'CameraControl' (specialized 'TEV1'):
+--
+constant:
+--
+	operating_mode			= 'LISTENING';
+--
+internal:
+--
+	viewer;
+	main_window;
+--
+	image				= ('BufferedImage');
+	con				= ('Console');
+	text				= ('Text');
+	timer				= ('Timer');
+--
+[
+frame_obtained:-
+	viewer ? report_system_mode,
+	fail.
+frame_obtained:-
+	commit,!,
+	get_recent_image(image),
+	get_image_size_in_pixels(IW,IH),
+	get_recent_frame_number(FrameNumber),
+	get_recent_frame_time(FrameTime),
+	get_recent_frame_rate(FrameRate),
+	main_window ? suspend_redrawing,
+	resize_main_window(IW,IH),
+	main_window ? clear,
+	main_window ? draw_image(image,0,0,1,1),
+	report_time(FrameNumber,FrameTime,FrameRate),
+	main_window ? draw_now,
+	viewer ? report_system_mode.
+--
+resize_main_window(IW,IH):-
+	IW > 0,
+	IH > 0,!,
+	main_window ? refine_width(IW/IH).
+resize_main_window(_,_).
+--
+complete_calibration():-!,
+	DP== ?get_number_of_dead_pixels(),
+	AVP== ?get_number_of_anomalous_voltage_pixels(),
+	ATP== ?get_number_of_anomalous_temperature_pixels(),
+	viewer ? report_anomalous_pixels(DP,AVP,ATP),
+	con ? note("Calibration is complete.").
+--
+data_transfer_error(ErrorName):-!,
+	con ? error("Data Transfer Error",ErrorName).
+--
+report_time(_,_,_):-
+	main_window ? set_brush('Green'),
+	main_window ? set_font({size:18}),
+	fail.
+report_time(FrameNumber,FrameTime,FrameRate):-
+	FrameNumber >= 0,
+	Time== timer?convert_to_time(FrameTime),
+	Time == time(Hours,Minutes,Seconds,Milliseconds),!,
+	main_window ? set_text_alignment('LEFT','TOP'),
+	main_window ? draw_text(
+		0.02, 0.02,
+		text?format(
+			"Time: %02d:%02d:%02d.%03d; Frame: %d",
+			Hours,Minutes,Seconds,Milliseconds,
+			FrameNumber)),
+	main_window ? set_text_alignment('RIGHT','TOP'),
+	main_window ? draw_text(
+		0.91, 0.02,
+		text?format(
+			"Frame Rate: %2.1f",FrameRate)).
+report_time(_,_,_).
+]
+-----------------------------------------------------------------------
