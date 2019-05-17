@@ -42,7 +42,7 @@ internal:
 				enable_scene_antialiasing='yes');
 	dialog		= ('MainDialog',
 				kinect_buffer=self,
-				graphic_window=window);
+				graphics_window=window);
 	buffer2D	= ('BufferedImage');
 	buffer3D	= ('BufferedScene');
 	image		= ('BufferedImage');
@@ -595,7 +595,7 @@ class 'MainDialog' (specialized 'Dialog'):
 internal:
 --
 	kinect_buffer;
-	graphic_window;
+	graphics_window;
 --
 constant:
 --

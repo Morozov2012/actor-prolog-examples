@@ -3,17 +3,19 @@
 -- (c) 2013, IRE RAS, Alexei A. Morozov. --
 -------------------------------------------
 
+import .. from "morozov/ActorPrologSyntax";
+import .. from "morozov/Astrohn";
 import .. from "morozov/ColorMap";
+import .. from "morozov/FFmpeg";
+import .. from "morozov/IPCamera";
 import .. from "morozov/Java2D";
 import .. from "morozov/Java3D";
+import .. from "morozov/Kinect";
+import .. from "morozov/ScreenCapture";
 import .. from "morozov/Sound";
+import .. from "morozov/TEV1";
+import .. from "morozov/VideoBuffer";
 import .. from "morozov/Vision";
 import .. from "morozov/Webcam";
-import .. from "morozov/Kinect";
-import .. from "morozov/Astrohn";
-import .. from "morozov/TEV1";
-import .. from "morozov/FFmpeg";
-import .. from "morozov/ScreenCapture";
-import .. from "morozov/ActorPrologSyntax";
 
 CLAUSES:

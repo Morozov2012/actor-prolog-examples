@@ -5,50 +5,32 @@
 
 package "Morozov/FFmpeg":
 
+pragma: INCLUDE_FFMPEG_LIBRARIES = ON;
+
+import 'ReadWriteBuffer' from "Morozov/VideoBuffer";
+
 --------------------------------------------------------------------
--- The 'FFmpeg' class is specialized class 'DataAbstraction'.     --
+-- The 'FFmpeg' class is specialized class 'ReadWriteBuffer'.     --
 --------------------------------------------------------------------
 
-class 'FFmpeg' (specialized 'DataAbstraction'):
+class 'FFmpeg' (specialized 'ReadWriteBuffer'):
 --
 constant:
 --
 operating_mode			= 'PLAYING';
-slow_motion_coefficient		= 1;
 --
--- The implementation of the 'WritableImageProducer' interface:
+-- The implementation of the 'ReadWriteBuffer' interface:
 --
-image_encoding_attributes	= {};
---
--- The implementation of the 'DataResourceConsumer' interface:
---
-maximal_waiting_time		= 'default';
+write_buffer_size		= 100;
 --
 -- The implementation of the 'OperatingSystemResource' interface:
 --
 name				= "a-prolog.mp4";
 extension			= ".mp4";
 --
--- The implementation of the 'AccessibleDataResource' interface:
---
-character_set			= 'none';
---
--- The implementation of the 'NamedDataResource' interface:
---
-backslash_always_is_separator			= 'yes';
-accept_only_uniform_resource_identifiers	= 'no';
---
 [
 SOURCE:
 	"morozov.built_in.FFmpeg";
-
-MODEL:
-
-?frame_obtained().
-?data_transfer_completion().
-?buffer_overflow().
-?buffer_deallocation().
-?data_transfer_error(ExceptionName).
 
 CLAUSES:
 --
@@ -63,11 +45,6 @@ open(FileName,FormatName,Streams):
 open(FileName,FormatName,Streams,CodecOptions):
 	[external "open"].
 --
-start:
-	[external "start"].
-pause:
-	[external "pause"].
---
 seek_frame_number(Number):
 	[external "seekFrameNumber"].
 seek_frame_time(Time):
@@ -81,16 +58,6 @@ close:
 --
 is_open:
 	[external "isOpen"].
-is_active:
-	[external "isActive"].
-is_suspended:
-	[external "isSuspended"].
---
-eof:
-	[external "eof"].
---
-commit:
-	[external "commit"].
 --
 get_recent_frame_number(Number):
 	[external "getRecentFrameNumber"].
@@ -113,11 +80,6 @@ get_image_size_in_pixels(Width,Height):
 write_image(BufferedImage):
 	[external "writeImage"].
 --
-recent_reading_error(NumberOfFrameToBeRead,ExceptionName):
-	[external "recentReadingError"].
-recent_writing_error(NumberOfFrameToBeWriten,ExceptionName):
-	[external "recentWritingError"].
---
 list_input_formats() = FFmpegInputFormats:
 	[external "listInputFormats"].
 list_output_formats() = FFmpegOutputFormats:
@@ -127,113 +89,4 @@ set_operating_mode(FFmpegOperatingMode):
 	[external "setOperatingMode"].
 get_operating_mode() = FFmpegOperatingMode:
 	[external "getOperatingMode"].
---
-set_slow_motion_coefficient(Coefficient):
-	[external "setSlowMotionCoefficient"].
-get_slow_motion_coefficient() = Coefficient:
-	[external "getSlowMotionCoefficient"].
---
--- The implementation of the 'WritableImageProducer' interface:
---
-set_image_encoding_attributes(ImageAttributes):
-	[external "setImageEncodingAttributes"].
-get_image_encoding_attributes() = ImageAttributes:
-	[external "getImageEncodingAttributes"].
---
--- The implementation of the 'DataResourceConsumer' interface:
---
-set_maximal_waiting_time(TimeInterval):
-	[external "setMaximalWaitingTime"].
-get_maximal_waiting_time() = TimeInterval:
-	[external "getMaximalWaitingTime"].
---
--- The implementation of the 'OperatingSystemResource' interface:
---
-delete:
-	[external "delete"].
-delete(FileName):
-	[external "delete"].
-rename(NewName):
-	[external "rename"].
-rename(OldName,NewName):
-	[external "rename"].
-copy(Destination):
-	[external "copy"].
-copy(Origin,Destination):
-	[external "copy"].
-is_standard_file:
-	[external "isStandardFile"].
-is_standard_file(FileName):
-	[external "isStandardFile"].
-set_current_directory(Path):
-	[external "setCurrentDirectory"].
-get_current_directory() = Path:
-	[external "getCurrentDirectory"].
-extract_path(Path,FileName):
-	[external "extractPath"].
-extract_path(OldFileName,Path,NewFileName):
-	[external "extractPath"].
-extract_extension(Name,Extension):
-	[external "extractExtension"].
-extract_extension(FileName,Name,Extension):
-	[external "extractExtension"].
-replace_extension(Extension) = NewFileName:
-	[external "replaceExtension"].
-replace_extension(OldFileName,Extension) = NewFileName:
-	[external "replaceExtension"].
-set_name(Name):
-	[external "setName"].
-get_name() = Name:
-	[external "getName"].
-set_extension(Extension):
-	[external "setExtension"].
-get_extension() = Extension:
-	[external "getExtension"].
---
--- The implementation of the 'AccessibleDataResource' interface:
---
-does_exist:
-	[external "doesExist"].
-does_exist(FileName):
-	[external "doesExist"].
-is_local_resource:
-	[external "isLocalResource"].
-is_local_resource(FileName):
-	[external "isLocalResource"].
-get_full_name = FullName:
-	[external "getFullName"].
-get_full_name(ShortName) = FullName:
-	[external "getFullName"].
-get_URL = FileName:
-	[external "getURL"].
-get_URL(ShortName) = FullName:
-	[external "getURL"].
-set_character_set(CharacterSet):
-	[external "setCharacterSet"].
-get_character_set() = CharacterSet:
-	[external "getCharacterSet"].
---
--- The implementation of the 'NamedDataResource' interface:
---
-set_backslash_always_is_separator(YesNo):
-	[external "setBackslashAlwaysIsSeparator"].
-get_backslash_always_is_separator() = YesNo:
-	[external "getBackslashAlwaysIsSeparator"].
-set_accept_only_uniform_resource_identifiers(YesNo):
-	[external "setAcceptOnlyUniformResourceIdentifiers"].
-get_accept_only_uniform_resource_identifiers() = YesNo:
-	[external "getAcceptOnlyUniformResourceIdentifiers"].
---
--- The default implementation of programmer-defined clauses:
---
-frame_obtained:
-	[external "frameObtained"].
-data_transfer_completion:
-	[external "dataTransferCompletion"].
-buffer_overflow:
-	[external "bufferOverflow"].
-buffer_deallocation:
-	[external "bufferDeallocation"].
-data_transfer_error(ExceptionName):
-	[external "dataTransferError"].
 ]

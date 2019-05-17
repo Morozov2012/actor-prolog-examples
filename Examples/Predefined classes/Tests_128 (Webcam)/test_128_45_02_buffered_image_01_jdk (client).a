@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 -- An example of Actor Prolog program.                               --
--- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-- (c) 2016-2019 IRE RAS Alexei A. Morozov                           --
 -----------------------------------------------------------------------
 -- Note: one should start two instances of the Editor
 -- environment to study this example. Please compile and
@@ -29,8 +29,8 @@ internal:
 constant:
 --
 	image_encoding_attributes = {
-				format:'JPEG',
-				compressionQuality:0.9};
+			format:'JPEG',
+			compressionQuality:0.9};
 --
 [
 goal:-!,
@@ -39,15 +39,15 @@ goal:-!,
 	store ? open,
 	con ? writeln("DONE."),
 	con ? set_color('default'),
-	watch_webcam_state('yes'),
 	-- set_default_resolution('VGA'),
 	set_default_resolution('HD720'),
-	open.
+	start.
 --
-webcam_image_obtained(_):-
-	database ? get_buffered_image(BufferedImage),!,
-	get_image(BufferedImage).
-webcam_image_obtained(_):-!,
+frame_obtained:-
+	database ? get_buffered_image(BufferedImage),
+	commit,!,
+	get_recent_image(BufferedImage).
+frame_obtained:-!,
 	con ? set_color('Red'),
 	con ? writeln("Sorry, I cannot access the database."),
 	con ? set_color('default').

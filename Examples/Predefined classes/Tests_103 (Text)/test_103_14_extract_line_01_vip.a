@@ -1,0 +1,85 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+N	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+test_loop(S_List,I_List,INTEGER)	- (i,i,i);
+test(STRING,INTEGER,INTEGER)		- (i,i,i);
+
+class 'Main' (specialized 'Text'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test_loop(
+		[
+		"A\nB\nC",
+		"ABCDEF\nGH\nIJK",
+		"ABCDEF\nGH\nIJK",
+		"ABCDEF\nGH\nIJK",
+		"ABCDEF\nGH\nIJK",
+		"ABCDEF\nGH\nIJK",
+		"ABC",
+		"ABC"],
+		[2,5,6,7,9,13,3,4],1).
+--
+test_loop([Text|Rest1],[TP|Rest2],N):-!,
+	test(Text,TP,N),
+	test_loop(Rest1,Rest2,N+1).
+test_loop(_,_,_).
+--
+test(Text,GivenTextPosition,N):-
+	con ? set_color('Black'),
+	con ? writeln("======"),
+	con ? writeln("Test ",N),
+	con ? writeln("======"),
+	con ? set_color('Black'),
+	con ? writeln("Input arguments:"),
+	con ? set_color('Black'),
+	con ? write("Text: >>>"),
+	con ? set_color('Blue'),
+	con ? write(Text),
+	con ? set_color('Black'),
+	con ? writeln("<<<"),
+	con ? write("Given position: "),
+	con ? set_color('Blue'),
+	con ? writeln(GivenTextPosition),
+	extract_line(
+		GivenTextPosition,
+		Text,
+		Line,
+		LineNumber,
+		PositionInLine),!,
+	con ? set_color('Black'),
+	con ? writeln("Results:"),
+	con ? set_color('Black'),
+	con ? write("Text line: >>>"),
+	con ? set_color('Violet'),
+	con ? write(Line),
+	con ? set_color('Black'),
+	con ? writeln("<<<"),
+	con ? set_color('Black'),
+	con ? write("Line number: "),
+	con ? set_color('Violet'),
+	con ? writeln(LineNumber),
+	con ? set_color('Black'),
+	con ? write("Position in line: "),
+	con ? set_color('Violet'),
+	con ? writeln(PositionInLine),
+	con ? set_color('DkGreen'),
+	con ? writeln("Test succeed.").
+test(_,_,_):-
+	con ? set_color('Red'),
+	con ? writeln("Test failed!").
+]

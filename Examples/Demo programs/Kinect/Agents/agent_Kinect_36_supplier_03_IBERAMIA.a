@@ -30,14 +30,14 @@ internal:
 	dialog		= ('MainDialog',
 				communicator=self,
 				video_supplier,
-				graphic_window,
+				graphics_window,
 				message_window=con);
-	graphic_window	= ('Canvas3D',
+	graphics_window	= ('Canvas3D',
 				enable_scene_antialiasing='yes');
 	video_supplier	= ('3DVideoSupplier',
 				communicator=self,
 				dialog,
-				graphic_window,
+				graphics_window,
 				con);
 	consumers 	= ('ConsumersList');
 	con		= ('Console');
@@ -140,7 +140,7 @@ internal:
 --
 	communicator;
 	dialog;
-	graphic_window;
+	graphics_window;
 	buffer2D	= ('BufferedImage');
 	buffer3D	= ('BufferedScene');
 	image		= ('BufferedImage');
@@ -167,7 +167,7 @@ constant:
 goal:-!,
 	dialog ? show,
 	create_list_of_nodes(VisualScene),
-	graphic_window ? show(VisualScene),
+	graphics_window ? show(VisualScene),
 	set_lookup_table(lookup_table_file_name),
 	start.
 --
@@ -194,7 +194,7 @@ process_frame(N1,Time1):-
 	-- con ? writeln(Time0," ",Time1," -> ",FileNumber),
 	image ? load(ImageToBeLoaded),
 	get_recent_scene(buffer3D,image),
-	graphic_window ? set_node(
+	graphics_window ? set_node(
 		"MyLabel",
 		'BranchGroup'({
 			label: "MyLabel",
@@ -263,7 +263,7 @@ internal:
 	communicator;
 	video_supplier;
 	message_window;
-	graphic_window;
+	graphics_window;
 --
 constant:
 --

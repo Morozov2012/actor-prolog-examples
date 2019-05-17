@@ -1,0 +1,90 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w01	= ('MyWindow',
+		target_x= 10);
+w02	= ('MyWindow',
+		target_x= 10.5);
+w03	= ('MyWindow',
+		target_x= 'centered');
+w04	= ('MyWindow',
+		target_x= 'default');
+--
+w05	= ('MyWindow',
+		target_x= -5);
+w06	= ('MyWindow',
+		target_x= -5.5);
+w07	= ('MyWindow',
+		target_x= 0);
+w08	= ('MyWindow',
+		target_x= 0.0);
+--
+w09	= ('MyWindow',
+		target_y= 1);
+w10	= ('MyWindow',
+		target_y= 1.5);
+w11	= ('MyWindow',
+		target_y= 'centered');
+w12	= ('MyWindow',
+		target_y= 'default');
+--
+w13	= ('MyWindow',
+		target_y= -5);
+w14	= ('MyWindow',
+		target_y= -5.5);
+w15	= ('MyWindow',
+		target_y= 0);
+w16	= ('MyWindow',
+		target_y= 0.0);
+--
+w17	= ('MyWindow',
+		target_x= 12,
+		target_y= 15);
+w18	= ('MyWindow',
+		target_x= 0,
+		target_y= 0);
+--
+[
+goal.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'MyWindow' (specialized 'Report'):
+--
+constant:
+--
+	target_x	: X = 'default';
+	target_y	: Y = 'default';
+--
+	x;
+	y;
+	width= 250;
+	height= 150;
+--
+	use_pixel_measurements= 'yes';
+--
+[
+goal:-!,
+	writeln("Hello world!"),
+	writeln("target_x= ",target_x),
+	writeln("target_y= ",target_y),
+	writeln("x= ",x),
+	writeln("y= ",y),
+	set_actual_position(target_x,target_y),
+	get_actual_position(X1,Y1),
+	writeln("X= ",X1),
+	writeln("Y= ",Y1),
+	get_actual_size(Width1,Height1),
+	writeln("Width= ",Width1),
+	writeln("Height= ",Height1),
+	get_actual_bounds(X2,Y2,Width2,Height2),
+	writeln("X= ",X2),
+	writeln("Y= ",Y2),
+	writeln("Width= ",Width2),
+	writeln("Height= ",Height2).
+]
+-----------------------------------------------------------------------

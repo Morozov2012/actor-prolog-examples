@@ -45,7 +45,7 @@ internal:
 	dialog	= ('MainDialog',
 			kinect_buffer= self,
 			tev1,
-			graphic_window= window);
+			graphics_window= window);
 	buffer	= ('BufferedScene');
 	tev1	= ('TEV1',
 			name=thermal_data_file,
@@ -106,8 +106,8 @@ process_frame(FrameNumber,_):-
 	FrameNumber > end_frame,!,
 	stop,
 	tev1 ? stop,
-	start,
-	tev1 ? start.
+	tev1 ? start,
+	start.
 process_frame(_,_).
 --
 redraw_scene:-
@@ -134,6 +134,8 @@ redraw_scene:-
 --
 data_transfer_completion:-!,
 	stop,
+	tev1 ? stop,
+	tev1 ? start,
 	start.
 -----------------------------------------------------------------------
 show_skeletons(Mode):-
@@ -539,7 +541,7 @@ internal:
 --
 	kinect_buffer;
 	tev1;
-	graphic_window;
+	graphics_window;
 --
 	color_maps		= ('ColorMap');
 --

@@ -93,7 +93,7 @@ internal:
 			skeleton_release_time=3);
 --
 	window	= ('Canvas2D',
-		background_color='SystemControl');
+			background_color='SystemControl');
 	image	= ('BufferedImage');
 	con	= ('Console');
 --

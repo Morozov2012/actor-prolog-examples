@@ -8,25 +8,227 @@ package "Morozov/VideoBuffer":
 import 'BufferedImage' from "Morozov/Java2D";
 import 'WritableImageProducer' from "Morozov/Java2D";
 import "Morozov/Vision";
+import "Morozov/ColorMap";
 
 --------------------------------------------------------------------
--- The 'VideoBuffer' class is                                     --
+-- The 'ThermalDataAcquisitionBuffer' class is specialized        --
+-- class 'ZoomDataAcquisitionBuffer'.                             --
+--------------------------------------------------------------------
+
+interface 'ThermalDataAcquisitionBuffer'
+
+(specialized 'ZoomDataAcquisitionBuffer'):
+
+autoranging_mode				: OnOff;
+averaging_mode					: OnOff;
+--
+double_color_map_mode				: OnOff;
+main_color_map					: ColorMap;
+auxiliary_color_map				: ColorMap;
+--
+lower_temperature_bound				: Numerical;
+upper_temperature_bound				: Numerical;
+lower_main_temperature_quantile			: Numerical;
+upper_main_temperature_quantile			: Numerical;
+lower_auxiliary_temperature_quantile		: Numerical;
+upper_auxiliary_temperature_quantile		: Numerical;
+--
+use_recorded_temperature_range_commands		: YesNo;
+use_recorded_color_map_commands			: YesNo;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+get_delivered_color_maps(ColorMap,ColorMap)		- (o,o);
+--
+set_autoranging_mode(OnOff)				- (i);
+get_autoranging_mode() = OnOff;
+--
+set_averaging_mode(OnOff)				- (i);
+get_averaging_mode() = OnOff;
+--
+set_double_color_map_mode(OnOff)			- (i);
+get_double_color_map_mode() = OnOff;
+--
+set_main_color_map(ColorMap)				- (i);
+get_main_color_map() = ColorMap;
+--
+set_auxiliary_color_map(ColorMap)			- (i);
+get_auxiliary_color_map() = ColorMap;
+--
+set_lower_temperature_bound(Numerical)			- (i);
+get_lower_temperature_bound() = Numerical;
+--
+set_upper_temperature_bound(Numerical)			- (i);
+get_upper_temperature_bound() = Numerical;
+--
+set_lower_main_temperature_quantile(Numerical)		- (i);
+get_lower_main_temperature_quantile() = Numerical;
+--
+set_upper_main_temperature_quantile(Numerical)		- (i);
+get_upper_main_temperature_quantile() = Numerical;
+--
+set_lower_auxiliary_temperature_quantile(Numerical)	- (i);
+get_lower_auxiliary_temperature_quantile() = Numerical;
+--
+set_upper_auxiliary_temperature_quantile(Numerical)	- (i);
+get_upper_auxiliary_temperature_quantile() = Numerical;
+--
+set_use_recorded_temperature_range_commands(YesNo)	- (i);
+get_use_recorded_temperature_range_commands() = YesNo;
+--
+set_use_recorded_color_map_commands(YesNo)		- (i);
+get_use_recorded_color_map_commands() = YesNo;
+]
+
+--------------------------------------------------------------------
+-- The 'ZoomDataAcquisitionBuffer' class is                       --
+-- specialized class 'DataAcquisitionBuffer'.                     --
+--------------------------------------------------------------------
+
+interface 'ZoomDataAcquisitionBuffer'
+
+(specialized 'DataAcquisitionBuffer'):
+
+zoom_image				: YesNo;
+zooming_coefficient			: Numerical;
+use_recorded_zooming_commands		: YesNo;
+
+[
+PREDICATES:
+--
+imperative:
+--
+set_zoom_image(YesNo)					- (i);
+get_zoom_image() = YesNo;
+--
+set_zooming_coefficient(Numerical)			- (i);
+get_zooming_coefficient() = Numerical;
+--
+set_use_recorded_zooming_commands(YesNo)		- (i);
+get_use_recorded_zooming_commands() = YesNo;
+]
+
+--------------------------------------------------------------------
+-- The 'DataAcquisitionBuffer' class is                           --
 -- specialized class 'DataAbstraction'.                           --
 --------------------------------------------------------------------
 
 DOMAINS:
 
-VideoBufferOperatingMode =
+DataAcquisitionBufferOperatingMode =
 		'RECORDING';
 		'PLAYING';
 		'READING';
 		'SPECULATIVE_READING';
 		'LISTENING'.
+
+interface 'DataAcquisitionBuffer' (specialized 'ReadWriteBuffer'):
+
+operating_mode		: DataAcquisitionBufferOperatingMode;
+
+connection_attempt_period		: ActionPeriod;
+maximal_errors_quantity			: INTEGER;
+
+[
+PREDICATES:
 --
+determ:
+--
+recent_data_acquisition_error(ExceptionName)		- (o);
+--
+imperative:
+--
+set_operating_mode(DataAcquisitionBufferOperatingMode)	- (i);
+get_operating_mode() = DataAcquisitionBufferOperatingMode;
+--
+set_connection_attempt_period(ActionPeriod)		- (i);
+get_connection_attempt_period() = ActionPeriod;
+--
+set_maximal_errors_quantity(INTEGER)			- (i);
+get_maximal_errors_quantity() = INTEGER;
+]
+
+--------------------------------------------------------------------
+-- The 'MultimediaBuffer' class is                                --
+-- specialized class 'ReadWriteBuffer'.                           --
+--------------------------------------------------------------------
+
+DOMAINS:
+
+MultimediaBufferOperatingMode =
+		'RECORDING';
+		'PLAYING';
+		'READING';
+		'SPECULATIVE_READING'.
+--
+MultimediaComponentName		= STRING; INTEGER.
+
+interface 'MultimediaBuffer' (specialized 'ReadWriteBuffer'):
+
+operating_mode			: MultimediaBufferOperatingMode;
+
+[
+PREDICATES:
+--
+imperative:
+--
+open;
+open(FileName)						- (i);
+--
+close;
+--
+assign_frame_time(INTEGER)				- (i);
+--
+insert_data_frame(
+	MultimediaComponentName,'ReadWriteBuffer')	- (i,i);
+insert_settings_frame(
+	MultimediaComponentName,'ReadWriteBuffer')	- (i,i);
+insert_term(
+	MultimediaComponentName,_)			- (i,i);
+insert_label(
+	MultimediaComponentName)			- (i);
+--
+get_recent_frame_number(FrameNumber)			- (o);
+get_recent_frame_time(INTEGER)				- (o);
+get_recent_frame_relative_time(INTEGER)			- (o);
+get_recent_frame_rate(REAL)				- (o);
+--
+retrieve_frame(
+	MultimediaComponentName,'ReadWriteBuffer')	- (i,i);
+retrieve_term(MultimediaComponentName) = _		- (i);
+--
+delete_component(MultimediaComponentName)		- (i);
+--
+determ:
+--
+has_component(MultimediaComponentName)			- (i);
+frame_is_formed;
+is_data_frame;
+is_control_frame;
+--
+imperative:
+--
+record_data_frame;
+record_control_frame;
+--
+set_operating_mode(MultimediaBufferOperatingMode)	- (i);
+get_operating_mode() = MultimediaBufferOperatingMode;
+]
+
+--------------------------------------------------------------------
+-- The 'ReadWriteBuffer' class is                                 --
+-- specialized class 'DataAbstraction'.                           --
+--------------------------------------------------------------------
+
+DOMAINS:
+
 TextAttribute		= STRING; 'default'.
 IntegerAttribute	= INTEGER; 'default'.
 
-interface 'VideoBuffer'
+interface 'ReadWriteBuffer'
 
 (specialized
 	'DataAbstraction',
@@ -34,20 +236,18 @@ interface 'VideoBuffer'
 	'DataResourceConsumer',
 	'WritableImageProducer'):
 
-operating_mode				: VideoBufferOperatingMode;
 description				: TextAttribute;
 copyright				: TextAttribute;
 registration_date			: TextAttribute;
 registration_time			: TextAttribute;
-zoom_image				: YesNo;
-zooming_coefficient			: Numerical;
-use_recorded_zooming_commands		: YesNo;
-opening_attempt_period			: ActionPeriod;
+--
 write_buffer_size			: INTEGER;
 read_buffer_size			: INTEGER;
+--
 slow_motion_coefficient			: Numerical;
 maximal_frame_delay			: IntegerAttribute;
-
+output_debug_information		: INTEGER;
+--
 [
 PREDICATES:
 --
@@ -59,26 +259,28 @@ stop;
 --
 determ:
 --
+is_open;
 is_active;
 is_suspended;
 is_committed;
 contains_new_frame;
---
-imperative:
---
-retrieve_buffered_frame(INTEGER)			- (i);
---
-determ:
---
-retrieve_timed_frame(TimeInterval)			- (i);
---
-determ:
 --
 eof;
 --
 commit;
 --
 imperative:
+--
+request_buffered_frame(INTEGER)				- (i);
+--
+determ:
+--
+retrieve_timed_frame(TimeInterval)			- (i);
+--
+imperative:
+--
+reset_all_counters;
+reset_frame_rate;
 --
 get_delivered_description(STRING)			- (o);
 get_delivered_copyright(STRING)				- (o);
@@ -88,12 +290,9 @@ get_delivered_registration_time(STRING)			- (o);
 determ:
 --
 recent_reading_error(INTEGER,ExceptionName)		- (o,o);
-recent_data_acquisition_error(ExceptionName)		- (o);
+recent_writing_error(INTEGER,ExceptionName)		- (o,o);
 --
 imperative:
---
-set_operating_mode(VideoBufferOperatingMode)		- (i);
-get_operating_mode() = VideoBufferOperatingMode;
 --
 set_description(TextAttribute)				- (i);
 get_description() = TextAttribute;
@@ -107,18 +306,6 @@ get_registration_date() = TextAttribute;
 set_registration_time(TextAttribute)			- (i);
 get_registration_time() = TextAttribute;
 --
-set_zoom_image(YesNo)					- (i);
-get_zoom_image() = YesNo;
---
-set_zooming_coefficient(Numerical)			- (i);
-get_zooming_coefficient() = Numerical;
---
-set_use_recorded_zooming_commands(YesNo)		- (i);
-get_use_recorded_zooming_commands() = YesNo;
---
-set_opening_attempt_period(ActionPeriod)		- (i);
-get_opening_attempt_period() = ActionPeriod;
---
 set_write_buffer_size(INTEGER)				- (i);
 get_write_buffer_size() = INTEGER;
 --
@@ -130,6 +317,9 @@ get_slow_motion_coefficient() = Numerical;
 --
 set_maximal_frame_delay(IntegerAttribute)		- (i);
 get_maximal_frame_delay() = IntegerAttribute;
+--
+set_output_debug_information(INTEGER)			- (i);
+get_output_debug_information() = INTEGER;
 --
 -- These methods are to be implemented by the programmer:
 --

@@ -1,0 +1,7 @@
+mesh(80,25)
+failure_color('Magenta','Yellow')
+dialog_font('helvetica',18)
+
+dialog 'NonClosableDialog'("Non-Closable Dialog",default,default,default,centered,centered,default)
+button("Hello","&Hello")
+end_of_dialog

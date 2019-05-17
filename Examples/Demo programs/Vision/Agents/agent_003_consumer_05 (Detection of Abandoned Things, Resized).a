@@ -155,7 +155,7 @@ internal:
 --
 	subtractor	= ('SynchronizedImageSubtractor',
 				image_subtractor= low_level_analyzer);
-	graphic_window	= ('Canvas2D');
+	graphics_window	= ('Canvas2D');
 	image		= ('BufferedImage');
 	timer		= ('Timer');
 	text		= ('Text');
@@ -167,19 +167,19 @@ constant:
 [
 goal:-!,
 	timer ? set_priority('minimal'),
-	graphic_window ? show.
+	graphics_window ? show.
 --
 draw_scene(N,FrameRate):-
 	subtractor ? commit,
 	subtractor ? get_recent_image(image),
 	subtractor ? get_tracks(Tracks),
-	graphic_window ? suspend_redrawing,
-	graphic_window ? clear,
-	graphic_window ? draw_image(image,0,0,1,1),
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
+	graphics_window ? draw_image(image,0,0,1,1),
 	image ? get_size_in_pixels(IW,IH),
 	report_time(N,FrameRate),
 	draw_tracks(IW,IH,Tracks,N,FrameRate),
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 --
 draw_tracks(IW,IH,[{segments:TrackSegments|_}|R],N,FR):-!,
 	draw_track(IW,IH,TrackSegments,N,FR),
@@ -203,11 +203,11 @@ draw_track_segment(IW,IH,TrackSegment,N,FrameRate):-
 	Y1r== Y1a / IH,
 	X2r== X2a / IW,
 	Y2r== Y2a / IH,
-	graphic_window ? set_brush('Blue'),
+	graphics_window ? set_brush('Blue'),
 	draw_track_of_blobs(IW,IH,TrackOfBlobs),
 	draw_rectangle(IW,IH,TrackOfBlobs,N),
-	graphic_window ? set_pen({color:'Green',lineWidth:1}),
-	graphic_window ? draw_line(X1r,Y1r,X2r,Y2r),
+	graphics_window ? set_pen({color:'Green',lineWidth:1}),
+	graphics_window ? draw_line(X1r,Y1r,X2r,Y2r),
 	draw_circle(X1r,Y1r),
 	draw_circle(X2r,Y2r),
 	Duration== (T2 - T1) / FrameRate,
@@ -226,8 +226,8 @@ draw_track_of_blobs(IW,IH,X1,Y1,[Blob|Rest]):-
 	Blob== {x:Xa,y:Ya|_},!,
 	X2== Xa / IW,
 	Y2== Ya / IH,
-	graphic_window ? set_pen({color:'Magenta',lineWidth:2}),
-	graphic_window ? draw_line(X1,Y1,X2,Y2),
+	graphics_window ? set_pen({color:'Magenta',lineWidth:2}),
+	graphics_window ? draw_line(X1,Y1,X2,Y2),
 	draw_track_of_blobs(IW,IH,X2,Y2,Rest).
 draw_track_of_blobs(_,_,_,_,_).
 --
@@ -254,17 +254,17 @@ fuzzy_metrics(X,T,H) = V :-
 --
 draw_rectangle(IW,IH,[Blob],N):-
 	Blob == {frame:N,x:X0,y:Y0,width:W1,height:H1|_},!,
-	graphic_window ? set_brush('off'),
-	graphic_window ? set_pen({color:'Red',lineWidth:5}),
+	graphics_window ? set_brush('off'),
+	graphics_window ? set_pen({color:'Red',lineWidth:5}),
 	X2== (X0 - W1 / 2) / IW,
 	Y2== (Y0 - H1 / 2) / IH,
 	W2== W1 / IW,
 	H2== H1 / IH,
-	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
-	graphic_window ? set_font({size:28,weight:'WEIGHT_BOLD'}),
-	graphic_window ? set_pen({color:'Red'}),
-	graphic_window ? draw_text(
+	graphics_window ? draw_rectangle(X2,Y2,W2,H2),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? set_font({size:28,weight:'WEIGHT_BOLD'}),
+	graphics_window ? set_pen({color:'Red'}),
+	graphics_window ? draw_text(
 		0.5,0.5,"Abandoned thing is detected!").
 draw_rectangle(IW,IH,[_|R],N):-!,
 	draw_rectangle(IW,IH,R,N).
@@ -275,31 +275,31 @@ draw_circle(X0,Y0):-
 	Y1== Y0 - circle_radius,
 	Width== circle_radius * 2,
 	Height== circle_radius * 2,
-	graphic_window ? set_pen({color:'Green',lineWidth:1}),
-	graphic_window ? set_brush('Green'),
-	graphic_window ? draw_ellipse(X1,Y1,Width,Height).
+	graphics_window ? set_pen({color:'Green',lineWidth:1}),
+	graphics_window ? set_brush('Green'),
+	graphics_window ? draw_ellipse(X1,Y1,Width,Height).
 --
 draw_blob_identifier(X1,Y1,Duration):-
 	Text== text?format("%1.2f",Duration),
-	graphic_window ? set_text_alignment('LEFT','BOTTOM'),
-	graphic_window ? set_pen('Green'),
-	graphic_window ? set_font({size:64,background:'Orange'}),
-	graphic_window ? draw_text(X1,Y1,Text).
+	graphics_window ? set_text_alignment('LEFT','BOTTOM'),
+	graphics_window ? set_pen('Green'),
+	graphics_window ? set_font({size:64,background:'Orange'}),
+	graphics_window ? draw_text(X1,Y1,Text).
 --
 report_time(_,_):-
-	graphic_window ? set_text_alignment('LEFT','TOP'),
-	graphic_window ? set_font({size:18,background:'Yellow'}),
-	graphic_window ? set_brush('Navy'),
+	graphics_window ? set_text_alignment('LEFT','TOP'),
+	graphics_window ? set_font({size:18,background:'Yellow'}),
+	graphics_window ? set_brush('Navy'),
 	fail.
 report_time(FrameN,FrameRate):-
 	FrameN >= 0,!,
-	graphic_window ? draw_text(
+	graphics_window ? draw_text(
 		0.02, 0.02,
 		text?format(
 			"Time: %3.2f [sec]; Frame: %s",
 			FrameN/FrameRate,FrameN)).
 report_time(_,_):-
-	graphic_window ? draw_text(
+	graphics_window ? draw_text(
 		0.02, 0.02,
 		"Training... Please wait a minute...").
 ]

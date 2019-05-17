@@ -9,8 +9,8 @@ import "Morozov/ColorMap";
 import 'BufferedScene' from "Morozov/Java3D";
 import 'BufferedImage' from "Morozov/Java2D";
 import 'WritableImageProducer' from "Morozov/Java2D";
+import 'DataAcquisitionBuffer' from "Morozov/VideoBuffer";
 import "Morozov/Vision";
-import "Morozov/VideoBuffer";
 
 DOMAINS:
 
@@ -142,15 +142,12 @@ get_correction_in_pixels(INTEGER,INTEGER)		- (o,o);
 ]
 
 --------------------------------------------------------------------
--- The 'KinectBuffer' class is                                    --
--- specialized class 'DataAbstraction'.                           --
+-- The 'KinectBuffer' class is specialized                        --
+-- class 'DataAcquisitionBuffer'.                                 --
 --------------------------------------------------------------------
 
 DOMAINS:
 
-KinectBufferOperatingMode =
-		'RECORDING'; 'PLAYING'; 'READING'; 'LISTENING'.
---
 KinectDisplayingMode	= {
 			frame_type: KinectFrameType,
 			people_index: KinectPeopleIndexMode,
@@ -199,29 +196,17 @@ KinectPerformanceOptimization	= 'DATA_FLOW'; 'OPERATION_SPEED'; 'default'.
 --
 KinectSurfaceType		= 'CONVEX'; 'CONCAVE'; 'default'.
 
-interface 'KinectBuffer'
+interface 'KinectBuffer' (specialized 'DataAcquisitionBuffer'):
 
-(specialized
-	'DataAbstraction',
-	'OperatingSystemResource',
-	'DataResourceConsumer',
-	'WritableImageProducer'):
-
-operating_mode			: KinectBufferOperatingMode;
 displaying_mode			: KinectDisplayingMode;
 input_device			: KinectDevice;
 data_acquisition_optimization	: KinectPerformanceOptimization;
-description			: TextAttribute;
-copyright			: TextAttribute;
-registration_date		: TextAttribute;
-registration_time		: TextAttribute;
+--
 color_map			: ColorMap;
 people_colors			: ColorMap;
-write_buffer_size		: INTEGER;
-read_buffer_size		: INTEGER;
+--
 maximal_chronicle_length	: Numerical;
-slow_motion_coefficient		: Numerical;
-maximal_frame_delay		: IntegerAttribute;
+--
 scene_depth_threshold		: Numerical;
 scene_surface_type		: KinectSurfaceType;
 
@@ -230,28 +215,17 @@ PREDICATES:
 --
 imperative:
 --
-start;
 start(YesNo)						- (i);
-pause;
-stop;
 --
 connect;
 connect(YesNo)						- (i);
 --
-determ:
---
-is_active;
-is_suspended;
+disconnect;
 --
 determ:
 --
-retrieve_buffered_frame(INTEGER)			- (i);
---
-determ:
---
-eof;
---
-commit;
+is_connected;
+has_exclusive_access;
 --
 imperative:
 --
@@ -287,25 +261,14 @@ get_color_image_size_in_pixels(INTEGER,INTEGER)		- (o,o);
 --
 get_computed_correction(INTEGER,INTEGER)		- (o,o);
 --
+get_delivered_frame_type(KinectFrameType)		- (o);
 get_delivered_data_acquisition_mode(
 	KinectDataAcquisitionMode)			- (o);
 get_delivered_people_index_mode(KinectPeopleIndexMode)	- (o);
 get_delivered_circumscription_modes(
 	KinectCircumscriptionModes)			- (o);
 get_delivered_skeletons_mode(KinectSkeletonsMode)	- (o);
-get_delivered_description(STRING)			- (o);
-get_delivered_copyright(STRING)				- (o);
-get_delivered_registration_date(STRING)			- (o);
-get_delivered_registration_time(STRING)			- (o);
---
-determ:
---
-recent_reading_error(INTEGER,ExceptionName)		- (o,o);
---
-imperative:
---
-set_operating_mode(KinectBufferOperatingMode)		- (i);
-get_operating_mode() = KinectBufferOperatingMode;
+get_delivered_correction(INTEGER,INTEGER)		- (o,o);
 --
 set_displaying_mode(KinectDisplayingMode)		- (i);
 get_displaying_mode() = KinectDisplayingMode;
@@ -318,52 +281,18 @@ set_data_acquisition_optimization
 get_data_acquisition_optimization()
 	= KinectPerformanceOptimization;
 --
-set_description(TextAttribute)				- (i);
-get_description() = TextAttribute;
---
-set_copyright(TextAttribute)				- (i);
-get_copyright() = TextAttribute;
---
-set_registration_date(TextAttribute)			- (i);
-get_registration_date() = TextAttribute;
---
-set_registration_time(TextAttribute)			- (i);
-get_registration_time() = TextAttribute;
---
 set_color_map(ColorMap)					- (i);
 get_color_map() = ColorMap;
 --
 set_people_colors(ColorMap)				- (i);
 get_people_colors() = ColorMap;
 --
-set_write_buffer_size(INTEGER)				- (i);
-get_write_buffer_size() = INTEGER;
---
-set_read_buffer_size(INTEGER)				- (i);
-get_read_buffer_size() = INTEGER;
---
 set_maximal_chronicle_length(Numerical)			- (i);
 get_maximal_chronicle_length() = Numerical;
---
-set_slow_motion_coefficient(Numerical)			- (i);
-get_slow_motion_coefficient() = Numerical;
---
-set_maximal_frame_delay(IntegerAttribute)		- (i);
-get_maximal_frame_delay() = IntegerAttribute;
 --
 set_scene_depth_threshold(Numerical)			- (i);
 get_scene_depth_threshold() = Numerical;
 --
 set_scene_surface_type(KinectSurfaceType)		- (i);
 get_scene_surface_type() = KinectSurfaceType;
---
--- These methods are to be implemented by the programmer:
---
-frame_obtained;
-data_transfer_completion;
---
-buffer_overflow;
-buffer_deallocation;
---
-data_transfer_error(ExceptionName)			- (i);
 ]

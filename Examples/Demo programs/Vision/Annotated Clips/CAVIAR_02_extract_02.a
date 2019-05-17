@@ -97,7 +97,7 @@ internal:
 	coordinates	= ('ObjectCoordinates');
 --
 	image		= ('BufferedImage');
-	graphic_window	= ('Canvas2D',
+	graphics_window	= ('Canvas2D',
 				background_color= 'SystemControl',
 				y= 0,
 				height= 22);
@@ -122,7 +122,7 @@ imperative:
 CLAUSES:
 --
 goal:-!,
-	graphic_window ? show,
+	graphics_window ? show,
 	prompt_window ? write(
 		"The data are coming from the EC Funded CAVIAR ",
 		"project / IST 2001 37540,\n",
@@ -165,10 +165,10 @@ show_frame_number_and_content(T,FrameContent):-
 		con?format("%03d",N) + ".jpg",
 	image ? load(ImageToBeDrawn),
 	image ? get_size_in_pixels(IW,IH),
-	graphic_window ? clear('no'),
-	graphic_window ? draw_image(image,0,0,1,1),
+	graphics_window ? clear('no'),
+	graphics_window ? draw_image(image,0,0,1,1),
 	show_frame_content(FrameContent,N,IW,IH),
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 show_frame_number_and_content(_,_).
 --
 show_frame_content([attribute("NUMBER",_)|Rest],N,IW,IH):-!,
@@ -276,12 +276,12 @@ show_box_attributes(
 	Y2== (Y1 - H1 / 2) / IH,
 	W2== W1 / IW,
 	H2== H1 / IH,
-	graphic_window ? set_pen({color:Color,lineWidth:LineWidth}),
-	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
-	graphic_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	graphics_window ? set_pen({color:Color,lineWidth:LineWidth}),
+	graphics_window ? draw_rectangle(X2,Y2,W2,H2),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
 	Text== con?format("%s : %s",Id,N),
-	graphic_window ? draw_text(X1/IW,Y1/IH,Text).
+	graphics_window ? draw_text(X1/IW,Y1/IH,Text).
 show_box_attributes(_,_,_,_,_,_,_,_,_,_,_).
 ]
 -----------------------------------------------------------------------

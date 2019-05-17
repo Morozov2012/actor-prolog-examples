@@ -5,15 +5,19 @@
 
 package "Morozov/TEV1":
 
-import 'ThermalVideoBuffer' from "Morozov/ThermalVideoBuffer";
+-- pragma: INCLUDE_USB4JAVA_LIBRARIES = ON;
+
+import 'ThermalDataAcquisitionBuffer'
+	from "Morozov/VideoBuffer";
 import 'BufferedImage' from "Morozov/Java2D";
 import "Morozov/Vision";
 
 --------------------------------------------------------------------
--- The 'TEV1' class is specialized class 'ThermalVideoBuffer'.    --
+-- The 'TEV1' class is specialized                                --
+-- class 'ThermalDataAcquisitionBuffer'.                          --
 --------------------------------------------------------------------
 
-class 'TEV1' (specialized 'ThermalVideoBuffer'):
+class 'TEV1' (specialized 'ThermalDataAcquisitionBuffer'):
 
 default_identifier				= 'default';
 --
@@ -31,7 +35,9 @@ do_not_suspend_USB_data_transfer		= 'yes';
 read_time_out					= 70;
 write_time_out					= 70;
 --
-output_debug_information			= 1;
+-- The implementation of the 'DataAcquisitionBuffer' interface:
+--
+maximal_errors_quantity				= 30;
 --
 [
 SOURCE:
@@ -44,10 +50,10 @@ MODEL:
 
 CLAUSES:
 --
-open():
-	[external "open"].
-open(DeviceIdentifier):
-	[external "open"].
+connect():
+	[external "connect"].
+connect(DeviceIdentifier):
+	[external "connect"].
 --
 calibrate:
 	[external "calibrate"].
@@ -59,11 +65,11 @@ save_sensor_attributes(FileName):
 load_sensor_attributes(FileName):
 	[external "loadSensorAttributes"].
 --
-close:
-	[external "close"].
+disconnect:
+	[external "disconnect"].
 --
-is_open:
-	[external "isOpen"].
+is_connected:
+	[external "isConnected"].
 --
 get_recent_frame_number(
 		NumberOfRecentCommittedFrame):
@@ -100,9 +106,6 @@ get_recent_frame_rate(
 		FrameRateOfValidFrames,
 		FrameRateOfCorruptedFrames):
 	[external "getRecentFrameRate"].
---
-reset_frame_rate:
-	[external "resetFrameRate"].
 --
 get_recent_image(BufferedImage):
 	[external "getRecentImage"].
@@ -184,11 +187,6 @@ set_write_time_out(Milliseconds):
 	[external "setWriteTimeOut"].
 get_write_time_out() = Milliseconds:
 	[external "getWriteTimeOut"].
---
-set_output_debug_information(VerbosityLevel):
-	[external "setOutputDebugInformation"].
-get_output_debug_information() = VerbosityLevel:
-	[external "getOutputDebugInformation"].
 --
 -- These methods are to be implemented by the programmer:
 --

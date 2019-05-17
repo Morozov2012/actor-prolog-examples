@@ -1,0 +1,57 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+DOMAINS:
+
+ValueList	= Value*.
+Value		= INTEGER; REAL.
+
+PREDICATES:
+
+imperative:
+
+loop(ValueList)	- (i);
+test0(Value)	- (i);
+test1(Value)	- (i);
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+div(Value,Value) = INTEGER			- (i,i);
+mod(Value,Value) = Value			- (i,i);
+--
+CLAUSES:
+--
+goal:-!,
+	loop([-2.0123,-2,-1.13,0,1.13,2,2.0123]),
+	con ? write("===\n"),
+	loop([-2.0123,-2.0,-1.13,0.0,1.13,2.0,2.0123]),
+	con ? write("===\n"),
+	loop([-3.9,-2.0123,2.0123,3.9]).
+--
+loop([Head|Rest]):-!,
+	test0(Head),
+	test1(Head),
+	loop(Rest).
+loop(_).
+--
+test0(X):-
+	?div(X,-2.1),
+	?mod(X,-2.1).
+--
+test1(X):-
+	Y1== ?div(X,-2.1),
+	Y2== ?mod(X,-2.1),
+	con ? writeln(X," div -2.1=",Y1),
+	con ? writeln(X," mod -2.1=",Y2).
+]

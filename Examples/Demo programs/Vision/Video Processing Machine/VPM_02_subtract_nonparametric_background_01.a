@@ -17,7 +17,7 @@ internal:
 --
 	vpm		= ('VideoProcessingMachine',
 				synthesized_image_transparency= 48);
-	graphic_window	= ('Canvas2D',
+	graphics_window	= ('Canvas2D',
 				background_color= 'SystemControl',
 				y= 0,
 				height= 22);
@@ -31,7 +31,7 @@ internal:
 --
 [
 goal:-!,
-	graphic_window ? show,
+	graphics_window ? show,
 	prompt_window ? write(
 		"The data are coming from "
 		"the Actor Prolog project."),
@@ -73,16 +73,16 @@ load_figure(_,T2):-
 --
 draw_scene:-
 	vpm ? commit,
-	graphic_window ? suspend_redrawing,
-	graphic_window ? clear,
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
 	-- vpm ? get_recent_image(image2),
 	-- vpm ? get_background_image(image2),
 	-- vpm ? get_sigma_image(image2),
 	-- vpm ? get_foreground_image(image2),
 	vpm ? get_synthesized_image(image2),
-	graphic_window ? draw_image(image2,0,0,1,1),
+	graphics_window ? draw_image(image2,0,0,1,1),
 	draw_legend,
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 --
 draw_legend:-
 	state ? get_current_frame(FrameNumber),!,
@@ -91,16 +91,16 @@ draw_legend:-
 	state ? get_global_counter(GlobalCounter),
 	Time== Delay / 1000.0,
 	FrameRate== FrameQuantity / Time,
-	graphic_window ? set_brush('Red'),
-	graphic_window ? set_font({size:32}),
-	graphic_window ? set_text_alignment('LEFT','TOP'),
-	graphic_window ? draw_text(
+	graphics_window ? set_brush('Red'),
+	graphics_window ? set_font({size:32}),
+	graphics_window ? set_text_alignment('LEFT','TOP'),
+	graphics_window ? draw_text(
 		0.02, 0.02,
 		text?format(
 			"Time: %3.2f [sec]; Frame: %d (%d)",
 			Time,FrameNumber,GlobalCounter)),
-	graphic_window ? set_text_alignment('RIGHT','TOP'),
-	graphic_window ? draw_text(
+	graphics_window ? set_text_alignment('RIGHT','TOP'),
+	graphics_window ? draw_text(
 		0.98, 0.02,
 		text?format(
 			"Frame Rate: %3.2f [Hz]",

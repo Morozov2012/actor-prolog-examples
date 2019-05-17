@@ -116,7 +116,7 @@ interface 'MainDialog' (specialized 'Dialog'):
 internal:
 --
 	kinect_buffer	: 'KinectBuffer';
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 --
 [
 ]

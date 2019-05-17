@@ -23,7 +23,7 @@ internal:
 	datastore	: 'DataStore';
 	database	: '3DDataSources';
 	dialog		: 'MainDialog';
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 	video_supplier	: '3DVideoSupplier';
 	state		: 'DataSupplierState';
 	con		: 'Console';
@@ -66,7 +66,7 @@ internal:
 --
 	main_label	: NodeLabel;
 	communicator	: 'Main';
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 	buffer2D	: 'BufferedImage';
 	buffer3D	: 'BufferedScene';
 	image		: 'BufferedImage';
@@ -102,7 +102,7 @@ internal:
 --
 	communicator	: 'Main';
 	video_supplier	: '3DVideoSupplier';
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 	message_window	: 'Report';
 --
 [

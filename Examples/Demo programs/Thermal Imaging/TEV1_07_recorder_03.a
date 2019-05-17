@@ -59,7 +59,7 @@ constant:
 	--
 	dlg_ctrl_togglebutton_double_color_map	= 4010;
 	dlg_ctrl_editname_frame_number		= 4030;
-	dlg_ctrl_togglebutton_color_map		= 4040;
+	dlg_ctrl_listbutton_color_map		= 4040;
 	--
 	dlg_ctrl_togglebutton_connect		= 5010;
 	dlg_ctrl_scrollbar_frame_number_range	= 5021;
@@ -225,13 +225,13 @@ modified_control(dlg_ctrl_togglebutton_zoom):-
 	buffer ? set_zoom_image(Mode),
 	switch_controls,
 	buffer ? frame_obtained.
-modified_control(dlg_ctrl_togglebutton_color_map):-!,
+modified_control(dlg_ctrl_listbutton_color_map):-!,
 	update_displaying_mode,
 	buffer ? frame_obtained.
 modified_control(dlg_ctrl_scrollbar_frame_number_value):-
 	Position== ?cast("INTEGER",
 		?get(dlg_ctrl_scrollbar_frame_number_value)),
-	buffer ? retrieve_buffered_frame(Position),!.
+	buffer ? request_buffered_frame(Position),!.
 --
 accept_lower_scrollbar_value:-
 	Value== ?val("INTEGER",?get(dlg_ctrl_lower_scrollbar_value)),!,
@@ -292,7 +292,7 @@ complete_data_transfer:-
 update_displaying_mode:-
 	ZoomImage== ?val("YesNo",?get(dlg_ctrl_togglebutton_zoom)),
 	TextCM== ?val("STRING",
-		?get(dlg_ctrl_togglebutton_color_map)),!,
+		?get(dlg_ctrl_listbutton_color_map)),!,
 	ColorMap== color_maps?string_to_color_map_name(TextCM),
 	buffer ? set_zoom_image(ZoomImage),
 	buffer ? set_main_color_map(ColorMap).
@@ -341,12 +341,12 @@ is_loaded:-
 	buffer ? does_exist().
 --
 is_reading_mode:-
-	Mode== ?val("VideoBufferOperatingMode",
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
 		buffer?get_operating_mode()),
 	Mode == 'READING'.
 --
 is_recording_mode:-
-	Mode== ?val("VideoBufferOperatingMode",
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
 		buffer?get_operating_mode()),
 	Mode == 'RECORDING'.
 --

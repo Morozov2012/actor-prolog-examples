@@ -24,7 +24,7 @@ internal:
 	datastore	: 'DataStore';
 	database	: '3DDataSources';
 	dialog		: 'MainDialog';
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 	video_supplier	: '3DVideoSupplier';
 	consumers 	: 'ConsumersList';
 	con		: 'Console';
@@ -67,7 +67,7 @@ internal:
 --
 	communicator	: 'Main';
 	dialog		: 'Dialog';
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 	buffer2D	: 'BufferedImage';
 	buffer3D	: 'BufferedScene';
 	image		: 'BufferedImage';
@@ -101,7 +101,7 @@ internal:
 --
 	communicator	: 'Main';
 	video_supplier	: '3DVideoSupplier';
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 	message_window	: 'Report';
 --
 [

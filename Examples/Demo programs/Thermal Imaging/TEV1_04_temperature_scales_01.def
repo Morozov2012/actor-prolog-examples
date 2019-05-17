@@ -38,7 +38,7 @@ constant:
 	--
 	dlg_ctrl_togglebutton_double_color_map	: DialogFieldName;
 	dlg_ctrl_togglebutton_average		: DialogFieldName;
-	dlg_ctrl_togglebutton_color_map		: DialogFieldName;
+	dlg_ctrl_listbutton_color_map		: DialogFieldName;
 --
 [
 PREDICATES:

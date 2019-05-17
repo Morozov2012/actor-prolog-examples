@@ -1,0 +1,165 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Kinect";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	frame_type	: KinectFrameType;
+	people_index	: KinectPeopleIndexMode;
+	circumscription	: KinectCircumscriptionModes;
+	skeletons	: KinectSkeletonsMode;
+	color_map_name	: ColorMapName;
+--
+internal:
+--
+	kinect	: 'Kinect';
+	window	: 'Canvas2D';
+	image	: 'BufferedImage';
+	text	: 'Text';
+	con	: 'Console';
+--
+constant:
+--
+	ellipse_radius	: INTEGER;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+get_image_size_in_pixels(
+	PointX,
+	PointY,
+	KinectFrameType)		- (o,o,i);
+--
+draw_skeletons(
+	PointX,
+	PointY,
+	Skeletons,
+	KinectFrameType)		- (i,i,i,i);
+draw_skeleton(
+	PointX,
+	PointY,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_spine(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonSpine,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_arm(
+	PointX,
+	PointY,
+	SkeletonSpine,
+	SkeletonArm,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_hand(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonJoint,
+	SkeletonArm,
+	KinectFrameType)		- (i,i,i,i,i,i);
+draw_leg(
+	PointX,
+	PointY,
+	SkeletonSpine,
+	SkeletonLeg,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_link(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i,i);
+--
+select_line_width(
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	INTEGER)			- (i,i,o);
+--
+draw_joint(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_parallelepipeds(
+	PointX,
+	PointY,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i);
+draw_parallelepiped(
+	PointX,
+	PointY,
+	Parallelepiped,
+	KinectFrameType,
+	Color,
+	Numerical)			- (i,i,i,i,i,i);
+--
+draw_rectangles(
+	PointX,
+	PointY,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i);
+draw_rectangle(
+	PointX,
+	PointY,
+	Rectangle,
+	KinectFrameType,
+	Color,
+	Numerical)			- (i,i,i,i,i,i);
+--
+draw_line(
+	PointX,
+	PointY,
+	VertexPosition2D,
+	VertexPosition2D,
+	KinectFrameType,
+	Color,
+	Numerical,
+	PenAttributes)			- (i,i,i,i,i,i,i,i);
+draw_line(
+	PointX,
+	PointY,
+	VertexPosition3D,
+	VertexPosition3D,
+	KinectFrameType,
+	Color,
+	Numerical,
+	PenAttributes)			- (i,i,i,i,i,i,i,i);
+--
+report_right_arm(SkeletonArm)		- (i);
+--
+pitch(JointOrientation3D) = Numerical		- (i);
+yaw(JointOrientation3D) = Numerical		- (i);
+roll(JointOrientation3D) = Numerical		- (i);
+--
+PREDICATES:
+--
+imperative:
+--
+'-'(Numerical) = Numerical			- (i);
+'-'(Numerical,Numerical) = Numerical		- (i,i);
+'+'(Numerical,Numerical) = Numerical		- (i,i);
+'*'(Point3D,Point3D) = Numerical		- (i,i);
+'*'(Numerical,Numerical) = Numerical		- (i,i);
+'/'(Numerical,Numerical) = Numerical		- (i,i);
+sqrt(Numerical) = Numerical			- (i);
+power(Numerical,INTEGER) = Numerical		- (i,i);
+arcsin(Numerical) = Numerical			- (i);
+arccos(Numerical) = Numerical			- (i);
+arctan2(Numerical,Numerical) = Numerical	- (i,i);
+min(Numerical*) = Numerical			- (i);
+max(Numerical*) = Numerical			- (i);
+]
+-----------------------------------------------------------------------

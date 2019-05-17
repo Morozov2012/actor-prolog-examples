@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 -- An example of Actor Prolog program.                               --
--- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
 -----------------------------------------------------------------------
 import .. from "morozov/Webcam";
 -----------------------------------------------------------------------
@@ -20,6 +20,7 @@ constant:
 --
 [
 goal:-!,
+	modified_control(1001),
 	show.
 --
 modified_control(Address):-

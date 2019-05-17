@@ -1,0 +1,75 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("Test 1"),
+	test1,
+	con ? writeln("Test 2"),
+	test2,
+	con ? writeln("O.K.").
+--
+test1:-
+	?apply_radix(10,20,1234567123),
+	?apply_radix(10,20,-1234567123),
+	?apply_radix(10,20,123.456712345671234567),
+	?apply_radix(10,20,-123.456712345671234567),
+	?apply_radix(16,20,1234567),
+	?apply_radix(16,20,123.4567),
+	?apply_radix(10,16#12D687#),
+	?apply_radix(10,16#7B.74EA4A8C154C#),
+	?apply_radix(16,11259375),
+	?apply_radix(16,171.8044281005859375),
+	?apply_radix(16,16#ABCDEF#),
+	?apply_radix(16,16#AB.CDEF#),
+	?apply_radix(10,16#000ABCDEF#),
+	?apply_radix(10,16#AB0000#),
+	?apply_radix(10,16#AB.CDEF#),
+	?apply_radix(16,16#AB.CDEF#E3),
+	?apply_radix(16,16#AB.CDEF#E-25),
+	?apply_radix(16,16#AB.CDEF#E-170),
+	?apply_radix(10,16#0#),
+	?apply_radix(10,16#0.0#),
+	?apply_radix(10,-16#0#),
+	?apply_radix(10,-16#0.0#).
+--
+test2:-
+	con ? writeln(?apply_radix(10,20,1234567123)),
+	con ? writeln(?apply_radix(10,20,-1234567123)),
+	con ? writeln(10#4171510507#),
+	con ? writeln(?apply_radix(10,20,123.456712345671234567)),
+	con ? writeln(?apply_radix(10,20,-123.456712345671234567)),
+	con ? writeln(?apply_radix(16,20,1234567)),
+	con ? writeln(?apply_radix(16,20,123.4567)),
+	con ? writeln(?apply_radix(10,16#12D687#)),
+	con ? writeln(?apply_radix(10,16#7B.74EA4A8C154C#)),
+	con ? writeln(?apply_radix(16,11259375)),
+	con ? writeln(?apply_radix(16,171.8044281005859375)),
+	con ? writeln(?apply_radix(16,16#ABCDEF#)),
+	con ? writeln(?apply_radix(16,16#AB.CDEF#)),
+	con ? writeln(?apply_radix(16,16#000ABCDEF#)),
+	con ? writeln(?apply_radix(16,16#AB0000#)),
+	con ? writeln(?apply_radix(10,16#AB.CDEF#)),
+	con ? writeln(?apply_radix(16,16#AB.CDEF#E3)),
+	con ? writeln(?apply_radix(16,16#AB.CDEF#E-25)),
+	con ? writeln(?apply_radix(16,16#AB.CDEF#E-170)),
+	con ? writeln(?apply_radix(10,16#0#)),
+	con ? writeln(?apply_radix(10,16#0.0#)),
+	con ? writeln(?apply_radix(10,-16#0#)),
+	con ? writeln(?apply_radix(10,-16#0.0#)).
+]

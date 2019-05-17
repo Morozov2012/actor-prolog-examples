@@ -20,6 +20,7 @@ test5(Value)	- (i);
 test6(Value)	- (i);
 test7(Value)	- (i);
 test8(Value)	- (i);
+test9(Value)	- (i);
 test10(Value)	- (i);
 
 class 'Main' (specialized 'Alpha'):
@@ -41,7 +42,7 @@ goal:-!,
 	test6(X),
 	test7(X),
 	test8(X),
-	-- test9(X),
+	test9(X),
 	test10(X).
 --
 test0(X):-
@@ -70,8 +71,8 @@ test0(X):-
 	X*X,
 	X-X,
 	X/X,
-	-- ?div(X,3),
-	-- ?mod(X,3),
+	?div(X,3),
+	?mod(X,3),
 	con ? writeln("   O.K.").
 --
 test1(X):-
@@ -141,6 +142,13 @@ test8(X):-
 	con ? writeln("   ((x*x)+x)/x=",C),
 	D== C - X,
 	con ? writeln("   ((x*x)+x/x)-x=",D).
+--
+test9(X):-
+	con ? writeln("Test 9:"),
+	A== ?div(X,3),
+	con ? writeln("   x div 2=",A),
+	B== ?mod(X,3),
+	con ? writeln("   x mod 3",B).
 --
 test10(X):-
 	con ? writeln("Test 10:"),

@@ -30,7 +30,7 @@ internal:
 	video			: 'VideoReader';
 	vpm			: 'VideoProcessingMachine';
 	timer			: 'Timer';
-	graphic_window		: 'Canvas2D';
+	graphics_window		: 'Canvas2D';
 	text			: 'Text';
 	file			: 'File';
 	image1			: 'BufferedImage';

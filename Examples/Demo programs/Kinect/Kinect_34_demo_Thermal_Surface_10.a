@@ -50,7 +50,7 @@ internal:
 	window	= ('Canvas3D');
 	dialog	= ('MainDialog',
 			kinect_buffer= self,
-			graphic_window= window);
+			graphics_window= window);
 	buffer	= ('BufferedScene');
 	image	= ('BufferedImage');
 	state	= ('ProgramState');
@@ -541,7 +541,7 @@ class 'MainDialog' (specialized 'Dialog'):
 internal:
 --
 	kinect_buffer;
-	graphic_window;
+	graphics_window;
 --
 constant:
 --

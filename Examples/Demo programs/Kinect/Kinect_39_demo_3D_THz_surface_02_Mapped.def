@@ -74,7 +74,7 @@ interface 'MainDialog' (specialized 'Dialog'):
 internal:
 --
 	kinect_buffer	: 'KinectBuffer';
-	graphic_window	: 'Canvas2D';
+	graphics_window	: 'Canvas2D';
 --
 [
 ]

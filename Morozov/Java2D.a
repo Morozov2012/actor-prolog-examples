@@ -38,6 +38,7 @@ title				= "";
 x				= 'default';
 y				= 'default';
 background_color		= 'default';
+use_pixel_measurements		= 'no';
 --
 -- The implementation of the 'NamedDataResource' interface:
 --
@@ -273,6 +274,10 @@ set_background_color(Color):
 	[external "setBackgroundColor"].
 get_background_color() = Color:
 	[external "getBackgroundColor"].
+set_use_pixel_measurements(YesNo):
+	[external "setUsePixelMeasurements"].
+get_use_pixel_measurements() = YesNo:
+	[external "getUsePixelMeasurements"].
 --
 -- The implementation of the 'DisplayableFrame' interface:
 --

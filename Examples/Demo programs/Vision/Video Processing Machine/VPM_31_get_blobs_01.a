@@ -23,7 +23,7 @@ internal:
 				horizontal_extra_border_coefficient= -1.0,
 				vertical_extra_border_coefficient= -1.0,
 				synthesized_image_transparency= 48);
-	graphic_window	= ('Canvas2D',
+	graphics_window	= ('Canvas2D',
 				background_color= 'SystemControl',
 				y= 0,
 				height= 22);
@@ -37,7 +37,7 @@ internal:
 --
 [
 goal:-!,
-	graphic_window ? show,
+	graphics_window ? show,
 	prompt_window ? write(
 		"The data are coming from "
 		"the Actor Prolog project."),
@@ -97,8 +97,8 @@ load_figure(_,T2):-
 --
 draw_scene:-
 	vpm ? commit,
-	graphic_window ? suspend_redrawing,
-	graphic_window ? clear,
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
 	-- vpm ? get_recent_image(image2),
 	-- vpm ? get_preprocessed_image(image2),
 	-- vpm ? get_background_image(image2),
@@ -106,11 +106,11 @@ draw_scene:-
 	-- vpm ? get_foreground_image(image2),
 	vpm ? get_synthesized_image(image2),
 	vpm ? get_blobs(BlobList),
-	graphic_window ? draw_image(image2,0,0,1,1),
+	graphics_window ? draw_image(image2,0,0,1,1),
 	image2 ? get_size_in_pixels(IW,IH),
 	draw_blob_list(BlobList,IW,IH),
 	draw_legend,
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 --
 draw_blob_list([Blob|Rest],IW,IH):-
 	draw_blob(Blob,IW,IH),
@@ -119,23 +119,23 @@ draw_blob_list([],_,_).
 --
 draw_blob(Blob,IW,IH):-
 	Blob == {identifier:Id,x:X0,y:Y0,width:W1,height:H1|_},
-	graphic_window ? set_pen({color:'Yellow',lineWidth:3}),
-	graphic_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? set_pen({color:'Yellow',lineWidth:3}),
+	graphics_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
 	X2== (X0 - W1 / 2) / IW,
 	Y2== (Y0 - H1 / 2) / IH,
 	W2== W1 / IW,
 	H2== H1 / IH,
-	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	graphics_window ? draw_rectangle(X2,Y2,W2,H2),
 	draw_blob_identifier(Id,X0,Y0,IW,IH),
 	fail.
 draw_blob(_,_,_).
 --
 draw_blob_identifier(Id,X0,Y0,IW,IH):-!,
 	Text== text?format("%d",Id),
-	graphic_window ? set_font({size:18}),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
-	graphic_window ? draw_text(X0/IW,Y0/IH,Text).
+	graphics_window ? set_font({size:18}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? draw_text(X0/IW,Y0/IH,Text).
 --
 draw_legend:-
 	state ? get_current_frame(FrameNumber),!,
@@ -144,16 +144,16 @@ draw_legend:-
 	state ? get_global_counter(GlobalCounter),
 	Time== Delay / 1000.0,
 	FrameRate== FrameQuantity / Time,
-	graphic_window ? set_brush('Red'),
-	graphic_window ? set_font({size:32}),
-	graphic_window ? set_text_alignment('LEFT','TOP'),
-	graphic_window ? draw_text(
+	graphics_window ? set_brush('Red'),
+	graphics_window ? set_font({size:32}),
+	graphics_window ? set_text_alignment('LEFT','TOP'),
+	graphics_window ? draw_text(
 		0.02, 0.02,
 		text?format(
 			"Time: %3.2f [sec]; Frame: %d (%d)",
 			Time,FrameNumber,GlobalCounter)),
-	graphic_window ? set_text_alignment('RIGHT','TOP'),
-	graphic_window ? draw_text(
+	graphics_window ? set_text_alignment('RIGHT','TOP'),
+	graphics_window ? draw_text(
 		0.98, 0.02,
 		text?format(
 			"Frame Rate: %3.2f [Hz]",

@@ -1,0 +1,41 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+-- Sorry, the VIP version does not support these operations.
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+w1	= ('NormalDialog');
+w2	= ('AlwaysOnTopDialog');
+--
+[
+goal:-
+	w1 ? show,
+	w2 ? show.
+]
+-----------------------------------------------------------------------
+class 'NormalDialog' (specialized 'Dialog'):
+--
+constant:
+--
+is_top_level_window	= 'yes';
+is_always_on_top	= 'no';
+--
+[
+]
+-----------------------------------------------------------------------
+class 'AlwaysOnTopDialog' (specialized 'Dialog'):
+--
+constant:
+--
+is_top_level_window	= 'yes';
+is_always_on_top	= 'yes';
+--
+[
+]
+-----------------------------------------------------------------------

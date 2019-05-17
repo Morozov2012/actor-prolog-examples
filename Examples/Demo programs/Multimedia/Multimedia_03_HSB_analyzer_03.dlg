@@ -1,0 +1,183 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+draft('off')
+
+dialog 'MultichannelViewer' (
+	"Multichannel Viewer",
+	default,default,default,centered,centered,default)
+vbox(justify)
+	hbox(center)
+		vbox(center)
+			edittext['ReadOnly','AlignCenter'](1011,15,1,"")
+			edittext['ReadOnly','AlignCenter'](1012,15,1,"")
+			edittext['ReadOnly','AlignCenter'](1013,15,1,"")
+			edittext['ReadOnly','AlignCenter'](1014,15,1,"")
+			--
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			--
+			scaling(1.5,2.0)
+			button("Photo","P&hoto")
+			end_of_scaling
+			--
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			--
+			statictext(0000,1,"Video data:")
+			listbutton(0,1015,15,4,
+				[
+				"Astrohn THz Camera",
+				"Astrohn IP Camera",
+				"Thermal Camera",
+				"Kinect Point Clouds",
+				"Kinect Skeletons",
+				"Webcam"
+				],
+				"Thermal Camera"
+				)
+			listbutton(0,1016,15,7,
+				[
+				"Aqua",
+				"Autumn",
+				"Blackhot",
+				"Blaze",
+				"BlueRed",
+				"Bone",
+				"Bright Rainbow",
+				"Cool",
+				"Copper",
+				"Gray",
+				"Green",
+				"Hot",
+				"HSV",
+				"Iron",
+				"Jet",
+				"LightJet",
+				"Medical",
+				"Ocean",
+				"Parula",
+				"Pink",
+				"Prism",
+				"Purple",
+				"Red",
+				"Reptiloid",
+				"Soft Rainbow",
+				"Spring",
+				"Summer",
+				"Winter",
+				"Optical",
+				"None"
+				],
+				-- "Blackhot"
+				"Gray"
+				-- "Green"
+				-- "Purple"
+				)
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			--
+			scaling(1.5,2.0)
+			button("SaveTrajectory","Sa&ve Trajectory")
+			end_of_scaling
+		end_of_vbox
+		custom['KeepProportions'](main_window,50,45,"Control2D")
+		statictext(0000,1,"")
+	end_of_hbox
+	hbox(justify)
+		grid
+		row
+		column(right)
+			"Minimal Hue"
+		end_of_column
+		column(right)
+			hscroll(3011,minimal_hue,25,[0,255],0)
+		end_of_column
+		column(right)
+			editinteger(minimal_hue,3,0)
+		end_of_column
+		column
+			statictext(0000,1,"")
+		end_of_column
+		column(right)
+			"Maximal Hue"
+		end_of_column
+		column(right)
+			hscroll(3012,maximal_hue,25,[0,255],255)
+		end_of_column
+		column(right)
+			editinteger(maximal_hue,3,255)
+		end_of_column
+		end_of_row
+		row
+		column(right)
+			"Minimal Saturation"
+		end_of_column
+		column(right)
+			hscroll(3021,minimal_saturation,25,[0,255],0)
+		end_of_column
+		column(right)
+			editinteger(minimal_saturation,3,0)
+		end_of_column
+		column
+			statictext(0000,1,"")
+		end_of_column
+		column(right)
+			"Maximal Saturation"
+		end_of_column
+		column(right)
+			hscroll(3022,maximal_saturation,25,[0,255],255)
+		end_of_column
+		column(right)
+			editinteger(maximal_saturation,3,255)
+		end_of_column
+		end_of_row
+		row
+		column(right)
+			"Minimal Brightness"
+		end_of_column
+		column(right)
+			hscroll(3031,minimal_brightness,25,[0,255],0)
+		end_of_column
+		column(right)
+			editinteger(minimal_brightness,3,0)
+		end_of_column
+		column
+			statictext(0000,1,"")
+		end_of_column
+		column(right)
+			"Maximal Brightness"
+		end_of_column
+		column(right)
+			hscroll(3032,maximal_brightness,25,[0,255],255)
+		end_of_column
+		column(right)
+			editinteger(maximal_brightness,3,255)
+		end_of_column
+		end_of_row
+		end_of_grid
+	end_of_hbox
+	hscroll(8011,8012,30,[0,255],0)
+	hbox(justify)
+	scaling(2.7,1.0)
+		button("Choose","Ch&oose")
+		togglebutton(9013,"&Play")
+		togglebutton(9014,"Pau&se",'no')
+		button("Stop","S&top")
+		togglebutton(9018,"E&xport",'no')
+		button(close,"&Quit")
+	end_of_scaling
+	end_of_hbox
+	padding(0,0)
+		statictext(
+			"The project is supported by the Russian "
+			"Foundation for Basic Research, "
+			"grant 16-29-09626-ofi_m. "
+			"WebSite: www.fullvision.ru")
+	end_of_padding
+end_of_vbox
+end_of_dialog

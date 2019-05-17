@@ -1,0 +1,649 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import 'MultimediaBuffer' from "morozov/VideoBuffer";
+import .. from "morozov/Kinect";
+import .. from "morozov/Astrohn";
+import .. from "morozov/TEV1";
+import .. from "morozov/Webcam";
+import .. from "morozov/ColorMap";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+NameOrNumber	= name(STRING); number(INTEGER); time(INTEGER); 'none'.
+--
+-----------------------------------------------------------------------
+interface 'VideoRecorder' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer			: 'MultimediaControl';
+	--
+	kinect			: 'KinectCameraControl';
+	near_infrared		: 'KinectNearInfraredImageControl';
+	kinect_host		: 'Kinect';
+	astrohn			: 'AstrohnCameraControl';
+	tev1			: 'ThermalCameraControl';
+	webcam			: 'WebcamControl';
+	timer			: 'WriteTimingControl';
+	--
+	window_kinect		: 'Canvas2D';
+	window_astrohn		: 'Canvas2D';
+	window_tev1		: 'Canvas2D';
+	window_webcam		: 'Canvas2D';
+	--
+	buffered_image		: 'BufferedImage';
+	--
+	kinect_error_handler	: 'CameraErrorHandler';
+	ni_error_handler	: 'CameraErrorHandler';
+	astrohn_error_handler	: 'CameraErrorHandler';
+	tev1_error_handler	: 'CameraErrorHandler';
+	webcam_error_handler	: 'CameraErrorHandler';
+	--
+	automatic_recorder	: 'AutomaticRecorder';
+	--
+	directory_name		: 'DirectoryName';
+	use_NI_but_not_webcam	: 'Switch';
+	data_are_to_be_saved	: 'Switch';
+	file_operations		: 'File';
+	timer_operations	: 'Timer';
+	text_operations		: 'Text';
+	color_maps		: 'ColorMap';
+	con			: 'Console';
+--
+constant:
+--
+	temporary_file_name		: FileName;
+	export_encoding_attributes	: ImageEncodingAttributes;
+	--
+	base_time_shift			: INTEGER;
+	kinect_time_shift		: INTEGER;
+	astrohn_time_shift		: INTEGER;
+	tev1_time_shift			: INTEGER;
+	webcam_time_shift		: INTEGER;
+	--
+	dlg_ctrl_edittext_description		: DialogFieldName;
+	dlg_ctrl_edittext_copyright		: DialogFieldName;
+	dlg_ctrl_edittext_registration_date	: DialogFieldName;
+	dlg_ctrl_edittext_registration_time	: DialogFieldName;
+	--
+	dlg_ctrl_edittext_timer_frame_rate	: DialogFieldName;
+	dlg_ctrl_listbutton_write_timing	: DialogFieldName;
+	dlg_ctrl_edittext_recording_time	: DialogFieldName;
+	dlg_ctrl_edittext_recorded_frames	: DialogFieldName;
+	dlg_ctrl_edittext_start_recording_after	: DialogFieldName;
+	dlg_ctrl_edittext_maximal_record_length	: DialogFieldName;
+	--
+	dlg_ctrl_checkbox_select_kinect		: DialogFieldName;
+	dlg_ctrl_listbutton_kinect_mode		: DialogFieldName;
+	dlg_ctrl_listbutton_people_index_mode	: DialogFieldName;
+	dlg_ctrl_edittext_kinect_dx		: DialogFieldName;
+	dlg_ctrl_edittext_kinect_dy		: DialogFieldName;
+	--
+	dlg_ctrl_checkbox_select_astrohn	: DialogFieldName;
+	dlg_ctrl_listbutton_astrohn_mode	: DialogFieldName;
+	dlg_ctrl_listbutton_astrohn_color_map	: DialogFieldName;
+	dlg_ctrl_togglebutton_astrohn_zoom	: DialogFieldName;
+	--
+	dlg_ctrl_checkbox_select_tev1		: DialogFieldName;
+	dlg_ctrl_listbutton_tev1_color_map	: DialogFieldName;
+	dlg_ctrl_togglebutton_tev1_zoom		: DialogFieldName;
+	--
+	dlg_ctrl_checkbox_select_webcam		: DialogFieldName;
+	dlg_ctrl_togglebutton_webcam_zoom	: DialogFieldName;
+	dlg_ctrl_listbutton_webcam_or_NI	: DialogFieldName;
+	--
+	dlg_ctrl_scrollbar_frame_number_range	: DialogFieldName;
+	dlg_ctrl_scrollbar_frame_number_value	: DialogFieldName;
+	--
+	dlg_ctrl_togglebutton_connect		: DialogFieldName;
+	dlg_ctrl_togglebutton_play		: DialogFieldName;
+	dlg_ctrl_togglebutton_record		: DialogFieldName;
+	dlg_ctrl_togglebutton_export		: DialogFieldName;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+activate_automatic_recording(INTEGER,INTEGER)		- (i,i);
+start_recording;
+stop_recording;
+--
+set_Connect_mode(YesNo)					- (i);
+set_Connect_mode_ON;
+set_Webcam_Connect_mode_ON;
+reactivate_webcam_or_NI;
+set_Record_mode(YesNo)					- (i);
+set_Play_mode(YesNo)					- (i);
+set_Export_mode(YesNo)					- (i);
+set_Export_mode_YES(STRING)				- (i);
+--
+accept_sub_frames(STRING,FrameNumber)			- (i,i);
+accept_sub_frames(FrameNumber)				- (i);
+accept_webcam_sub_frames(FrameNumber)			- (i);
+--
+display_components(
+	MultimediaBufferOperatingMode,
+	FrameNumber)					- (i,i);
+display_webcam_components(
+	MultimediaBufferOperatingMode,
+	FrameNumber)					- (i,i);
+--
+complete_data_transfer;
+--
+record_device_settings;
+--
+export_frame_if_necessary(
+	MultimediaBufferOperatingMode,
+	NameOrNumber,
+	STRING,
+	'BufferedImage')				- (i,i,i,i);
+--
+take_photo(STRING)					- (i);
+take_webcam_photo(STRING)				- (i);
+--
+stop_data_reading_and_writing;
+stop_all_devices;
+reset_all_counters;
+--
+load_temporary_file_if_possible;
+choose_and_play_file(STRING)				- (i);
+choose_file(STRING)					- (i);
+update_dialog_title(STRING)				- (i);
+start_reading;
+--
+determ:
+--
+check_whether_data_are_to_be_saved;
+check_whether_data_are_not_saved;
+--
+imperative:
+--
+park_scroll_control;
+set_read_buffer_size(INTEGER)				- (i);
+--
+redraw_recent_frame;
+scroll_video;
+--
+get_frame_type() = STRING;
+--
+update_mode_and_switch_controls;
+switch_webcam_or_NI;
+update_acquisition_mode;
+--
+update_write_timing_period;
+update_displaying_mode;
+--
+switch_controls;
+switch_button_Connect;
+switch_button_Choose;
+switch_button_Play;
+switch_button_Pause;
+switch_button_Record;
+switch_button_Stop;
+switch_button_Save;
+switch_button_Export;
+switch_Kinect_controls;
+switch_Kinect_frame_type;
+switch_text_area_Correction;
+switch_text_area_Description;
+switch_auxiliary_controls;
+--
+determ:
+--
+data_acquisition_is_active;
+--
+buffer_is_playing;
+playing_is_suspended;
+buffer_is_recording;
+buffer_is_exporting;
+--
+is_ON(DialogFieldName)					- (i);
+--
+imperative:
+--
+create_new_file_name() = STRING;
+]
+-----------------------------------------------------------------------
+interface 'MultimediaControl' (specialized 'MultimediaBuffer'):
+--
+internal:
+--
+	video_recorder			: 'VideoRecorder';
+	stop_after_the_first_frame	: 'Switch';
+	file_operation_error_handler	: 'FileOperationErrorHandler';
+	file_operations			: 'File';
+	text_operations			: 'Text';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_file_name;
+--
+rename_temporary_file(STRING)			- (i);
+--
+imperative:
+--
+list_directory(STRING) = S_List			- (i);
+make_directory(FileName)			- (i);
+make_directory(STRING)				- (i);
+--
+imperative:
+--
+read_all_frames;
+read_only_the_first_frame;
+--
+control_export(MultimediaBufferOperatingMode)	- (i);
+continue_reading_if_necessary;
+]
+-----------------------------------------------------------------------
+interface 'KinectNearInfraredImageControl'
+(specialized 'KinectCameraControl'):
+[
+PREDICATES:
+--
+imperative:
+--
+update_displaying_mode(STRING)			- (i);
+]
+-----------------------------------------------------------------------
+interface 'KinectCameraControl' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	target_frame_type	: KinectFrameType;
+	target_people_index	: KinectPeopleIndexMode;
+	circumscription_mode	: KinectCircumscriptionModes;
+	skeletons_mode		: KinectSkeletonsMode;
+	color_map_name		: ColorMapName;
+	file_name_suffix	: STRING;
+	copyright_color		: Color;
+	ellipse_radius		: INTEGER;
+--
+internal:
+--
+	graphics_window			: 'Canvas2D';
+	video_recorder			: 'VideoRecorder';
+	time_reporter			: 'TimeReporter';
+	image				: 'BufferedImage';
+	timer				: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+display_frame(
+	MultimediaBufferOperatingMode,
+	NameOrNumber) = INTEGER			- (i,i);
+--
+imperative:
+--
+get_image_size_in_pixels(
+	KinectFrameType,
+	INTEGER,
+	INTEGER)				- (i,o,o);
+--
+resize_main_window(INTEGER,INTEGER)		- (i,i);
+--
+draw_skeletons_if_necessary(
+	KinectPeopleIndexMode,
+	KinectFrameType,
+	INTEGER,
+	INTEGER)				- (i,i,i,i);
+--
+update_displaying_mode(STRING,STRING)			- (i,i);
+--
+determ:
+--
+string_to_frame_type(STRING) = KinectFrameType		- (i);
+frame_type_to_string(KinectFrameType) = STRING		- (i);
+string_to_people_index(STRING) = KinectPeopleIndexMode	- (i);
+people_index_to_string(KinectPeopleIndexMode) = STRING	- (i);
+--
+imperative:
+--
+draw_skeletons(
+	PointX,
+	PointY,
+	Skeletons,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_skeleton(
+	PointX,
+	PointY,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_spine(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonSpine,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_arm(
+	PointX,
+	PointY,
+	SkeletonSpine,
+	SkeletonArm,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_hand(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonJoint,
+	SkeletonArm,
+	KinectFrameType)		- (i,i,i,i,i,i);
+draw_leg(
+	PointX,
+	PointY,
+	SkeletonSpine,
+	SkeletonLeg,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_link(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i,i);
+--
+select_line_width(
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	INTEGER)			- (i,i,o);
+select_line_width(
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	INTEGER)			- (i,i,i,o);
+--
+draw_joint(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX				- (i,i);
+'+'(PointY,PointY) = PointY				- (i,i);
+'-'(PointX,PointX) = PointX				- (i,i);
+'-'(PointY,PointY) = PointY				- (i,i);
+'/'(PointX,PointX) = PointX				- (i,i);
+'/'(PointY,PointY) = PointY				- (i,i);
+'/'(PointX,PointY) = REAL				- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'AstrohnCameraControl' (specialized 'Astrohn'):
+--
+internal:
+--
+	graphics_window			: 'Canvas2D';
+	video_recorder			: 'VideoRecorder';
+	time_reporter			: 'TimeReporter';
+	image				: 'BufferedImage';
+	timer				: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+display_frame(
+	MultimediaBufferOperatingMode,
+	NameOrNumber) = INTEGER			- (i,i);
+get_image(
+	STRING,INTEGER,INTEGER,
+	INTEGER,INTEGER,REAL,FontSize)		- (i,o,o,o,o,o,o);
+--
+resize_main_window(INTEGER,INTEGER)		- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'ThermalCameraControl' (specialized 'TEV1'):
+--
+internal:
+--
+	graphics_window			: 'Canvas2D';
+	video_recorder			: 'VideoRecorder';
+	time_reporter			: 'TimeReporter';
+	image				: 'BufferedImage';
+	timer				: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+display_frame(
+	MultimediaBufferOperatingMode,
+	NameOrNumber) = INTEGER			- (i,i);
+--
+resize_main_window(INTEGER,INTEGER)		- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'WebcamControl' (specialized 'Webcam'):
+--
+internal:
+--
+	graphics_window			: 'Canvas2D';
+	video_recorder			: 'VideoRecorder';
+	time_reporter			: 'TimeReporter';
+	image				: 'BufferedImage';
+	timer				: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+display_frame(
+	MultimediaBufferOperatingMode,
+	NameOrNumber) = INTEGER			- (i,i);
+--
+resize_main_window(INTEGER,INTEGER)		- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'WriteTimingControl' (specialized 'Timer'):
+--
+internal:
+--
+	video_recorder			: 'VideoRecorder';
+--
+	con				: 'Console';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'TimeReporter' (specialized 'Text'):
+--
+internal:
+--
+	graphics_window		: 'Canvas2D';
+	timer_operations	: 'Timer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+report_time(FrameNumber,INTEGER,REAL)		- (i,i,i);
+report_time(INTEGER,INTEGER,REAL,FontSize)	- (i,i,i,i);
+report_copyright(FontSize)			- (i);
+report_copyright(FontSize,Color)		- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'DirectoryName' (specialized 'Database'):
+--
+internal:
+--
+	file_operation_error_handler	: 'FileOperationErrorHandler';
+	file_operations			: 'File';
+	text_operations			: 'Text';
+--
+[
+DOMAINS:
+--
+Target	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+remember_name(STRING)				- (i);
+--
+determ:
+--
+create_directory_if_necessary(STRING)		- (i);
+--
+imperative:
+--
+delete_files(S_List)				- (i);
+--
+list_directory(STRING) = S_List			- (i);
+delete(FileName)				- (i);
+delete(STRING)					- (i);
+make_directory(FileName)			- (i);
+make_directory(STRING)				- (i);
+rename(FileName)				- (i);
+rename(STRING)					- (i);
+]
+-----------------------------------------------------------------------
+interface 'Switch' (specialized 'Database'):
+[
+DOMAINS:
+Target	= YesNo.
+PREDICATES:
+imperative:
+assign(YesNo)			- (i);
+determ:
+is_true;
+is_false;
+]
+-----------------------------------------------------------------------
+interface 'CameraErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler;
+	--
+	graphics_window		: 'Canvas2D';
+	--
+	text_operations		: 'Text';
+	con			: 'Console';
+--
+[
+PREDICATES:
+determ:
+start;
+stop;
+imperative:
+alarm(ExceptionName,SYMBOL,_*)				- (i,i,i);
+]
+-----------------------------------------------------------------------
+interface 'FileOperationErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler;
+	--
+	con		: 'Console';
+--
+[
+PREDICATES:
+determ:
+does_exist(FileName)					- (i);
+does_exist(STRING)					- (i);
+list_directory(STRING) = S_List				- (i);
+delete(FileName)					- (i);
+delete(STRING)						- (i);
+make_directory(FileName)				- (i);
+make_directory(STRING)					- (i);
+rename(FileName)					- (i);
+rename(STRING)						- (i);
+imperative:
+alarm(ExceptionName,SYMBOL,_*)				- (i,i,i);
+]
+-----------------------------------------------------------------------
+interface 'AutomaticRecorder' (specialized 'Dialog'):
+--
+internal:
+--
+	video_recorder	: 'VideoRecorder';
+	window_time	: 'Canvas2D';
+	starter		: 'Starter';
+	interrupter	: 'Interrupter';
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+open(INTEGER,INTEGER)			- (i,i);
+start_recording;
+stop_recording;
+output_number(INTEGER,Color)		- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'Starter' (specialized 'Timer'):
+--
+internal:
+--
+	target		: 'AutomaticRecorder';
+	counter		: 'Counter';
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_delay(INTEGER)			- (i);
+]
+-----------------------------------------------------------------------
+interface 'Interrupter' (specialized 'Timer'):
+--
+internal:
+--
+	target		: 'AutomaticRecorder';
+	counter		: 'Counter';
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_delay(INTEGER)			- (i);
+]
+-----------------------------------------------------------------------
+interface 'Counter' (specialized 'Database'):
+[
+DOMAINS:
+Target	= INTEGER.
+PREDICATES:
+imperative:
+set(Target)				- (i);
+get(Target)				- (o);
+get_and_decrease(Target)		- (o);
+]
+-----------------------------------------------------------------------

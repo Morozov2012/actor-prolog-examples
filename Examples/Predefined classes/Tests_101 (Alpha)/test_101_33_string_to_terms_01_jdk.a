@@ -31,9 +31,9 @@ goal:-!,
 --
 test0:-
 	con ? writeln("Test 0:"),
-	T1==	"f(1,[])"
-		"f(2,[{}])"
-		"f(3,[{a:3.14}])"
+	T1==	"f(1,[]);"
+		"f(2,[{}])."
+		"f(3,[{a:3.14}]),\n"
 		"f(4,[{b:'name',c:\"Text\"}])"
 		"f(5,[{a:100.0,b:'name',c:\"Text\"}])",
 	con ? writeln("\tInput:  ",T1," (string)"),
@@ -44,9 +44,9 @@ test0:-
 --
 test1:-
 	con ? writeln("Test 1:"),
-	T1==	"f(1,[])"
-		"f(2,[{}])"
-		"f(3,[{a:3.14}])"
+	T1==	"f(1,[]);"
+		"f(2,[{}])."
+		"f(3,[{a:3.14}]),\n"
 		"f(4,[{b:'name',c:\"Text\"}])"
 		"f(5,[{a:100.0,b:'name',c:\"Text\"}])",
 	con ? writeln("\tInput:  ",T1," (string)"),

@@ -19,6 +19,7 @@ window_movement_policy		= 'PHYSICAL_WORLD';
 visibility_policy		= 'VISIBILITY_DRAW_VISIBLE';
 transparency_sorting_policy	= 'TRANSPARENCY_SORT_NONE';
 minimum_frame_cycle_time	= 'default';
+enable_compatibility_mode	= 'no';
 --
 field_of_view			= 'default';
 front_clip_distance		= 'default';
@@ -47,6 +48,7 @@ title				= "";
 x				= 'default';
 y				= 'default';
 background_color		= 'default';
+use_pixel_measurements		= 'no';
 --
 -- The implementation of the 'NamedDataResource' interface:
 --
@@ -93,10 +95,20 @@ attach_offscreen_canvas():
 detach_offscreen_canvas():
 	[external "detachOffScreenCanvas"].
 --
+go_home():
+	[external "goHome"].
+go_home(PointX,PointY,PointZ):
+	[external "goHome"].
+--
 get_image(BufferedImage):
 	[external "getImage"].
 get_image(BufferedImage,Width,Height):
 	[external "getImage"].
+--
+set_vpc_to_ec(Transform3D):
+	[external "setVPCtoEC"].
+reset_vpc_to_ec():
+	[external "resetVPCtoEC"].
 --
 set_projection_policy(ProjectionPolicy):
 	[external "setProjectionPolicy"].
@@ -110,6 +122,8 @@ set_transparency_sorting_policy(TransparencySortingPolicy):
 	[external "setTransparencySortingPolicy"].
 set_minimum_frame_cycle_time(WaitingInterval):
 	[external "setMinimumFrameCycleTime"].
+set_enable_compatibility_mode(YesNo):
+	[external "setEnableCompatibilityMode"].
 set_field_of_view(FieldOfView):
 	[external "setFieldOfView"].
 set_front_clip_distance(ClipDistance):
@@ -135,6 +149,8 @@ get_transparency_sorting_policy() = TransparencySortingPolicy:
 	[external "getTransparencySortingPolicy"].
 get_minimum_frame_cycle_time() = WaitingInterval:
 	[external "getMinimumFrameCycleTime"].
+get_enable_compatibility_mode() = YesNo:
+	[external "getEnableCompatibilityMode"].
 get_field_of_view() = FieldOfView:
 	[external "getFieldOfView"].
 get_front_clip_distance() = ClipDistance:
@@ -230,6 +246,10 @@ set_background_color(Color):
 	[external "setBackgroundColor"].
 get_background_color() = Color:
 	[external "getBackgroundColor"].
+set_use_pixel_measurements(YesNo):
+	[external "setUsePixelMeasurements"].
+get_use_pixel_measurements() = YesNo:
+	[external "getUsePixelMeasurements"].
 --
 -- The implementation of the 'DisplayableFrame' interface:
 --

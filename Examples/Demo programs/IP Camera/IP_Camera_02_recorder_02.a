@@ -87,7 +87,7 @@ action("Record"):-
 	buffer?get_operating_mode() == 'LISTENING',
 	check_whether_data_are_to_be_saved,!,
 	buffer ? set_name(temporary_file_name),
-	put('title',"IP Video Recorder"),
+	update_dialog_title(""),
 	buffer ? set_operating_mode('RECORDING'),
 	buffer ? stop,
 	buffer ? start,
@@ -149,6 +149,8 @@ choose_file(FileName):-
 	start_reading,
 	switch_buttons.
 --
+update_dialog_title(""):-!,
+	put('title',"IP Video Recorder").
 update_dialog_title(FileName):-
 	put('title',"IP Video Recorder ["+FileName+"]").
 --
@@ -179,7 +181,7 @@ redraw_recent_frame:-
 	buffer ? frame_obtained.
 --
 scroll_video:-
-	buffer ? retrieve_buffered_frame(?cast("INTEGER",?get(3012))),!.
+	buffer ? request_buffered_frame(?cast("INTEGER",?get(3012))),!.
 scroll_video.
 --
 update_displaying_mode:-
@@ -505,6 +507,7 @@ save_frame_if_necessary('READING',_):-!,
 save_frame_if_necessary(_,_).
 --
 rename_temporary_file(TargetFileName):-
+	file_operation_error_handler ? delete(TargetFileName),
 	file_operation_error_handler ? rename(TargetFileName).
 --
 continue_exporting_if_necessary:-

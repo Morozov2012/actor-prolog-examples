@@ -440,9 +440,13 @@ msk_flip_foreground(INTEGER,INTEGER)			- (i,i);
 msk_flip_foreground(ImageChannelName,INTEGER,INTEGER)	- (i,i,i);
 --
 msk_select_polygon(PointList)				- (i);
+msk_select_polygon(PointList,YesNo)			- (i,i);
 msk_add_polygon(PointList)				- (i);
+msk_add_polygon(PointList,YesNo)			- (i,i);
 msk_exclude_polygon(PointList)				- (i);
+msk_exclude_polygon(PointList,YesNo)			- (i,i);
 msk_flip_polygon(PointList)				- (i);
+msk_flip_polygon(PointList,YesNo)			- (i,i);
 --
 msk_select_all;
 msk_deselect_all;

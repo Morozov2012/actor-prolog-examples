@@ -48,7 +48,7 @@ internal:
 	dialog	= ('MainDialog',
 			kinect_buffer=self,
 			astrohn,
-			graphic_window=window);
+			graphics_window=window);
 	buffer	= ('BufferedScene');
 	astrohn	= ('Astrohn',
 			name=terahertz_data_file,
@@ -108,8 +108,8 @@ process_frame(FrameNumber,_):-
 	FrameNumber > end_frame,!,
 	stop,
 	astrohn ? stop,
-	start,
-	astrohn ? start.
+	astrohn ? start,
+	start.
 process_frame(_,_).
 --
 redraw_scene:-
@@ -136,6 +136,8 @@ redraw_scene:-
 --
 data_transfer_completion:-!,
 	stop,
+	astrohn ? stop,
+	astrohn ? start,
 	start.
 -----------------------------------------------------------------------
 show_skeletons(Mode):-
@@ -294,7 +296,8 @@ form_arm(Spine,Arm) = Figure:-
 		wrist: Wrist,
 		hand: Hand
 		|Rest},!,
-	SpineShoulderArmShoulder== ?form_link(SpineShoulder,ArmShoulder),
+	SpineShoulderArmShoulder==
+		?form_link(SpineShoulder,ArmShoulder),
 	ArmShoulderElbow== ?form_link(ArmShoulder,Elbow),
 	ElbowWrist== ?form_link(Elbow,Wrist),
 	WristHand== ?form_link(Wrist,Hand),
@@ -406,6 +409,7 @@ form_link(Joint1,Joint2) = Figure :-
 			transparencyAttributes: 'TransparencyAttributes'({
 				transparency: limb_transparency,
 				transparencyMode: 'FASTEST'
+				-- transparencyMode: 'NICEST'
 				})
 			})
 		}),
@@ -543,7 +547,7 @@ internal:
 --
 	kinect_buffer;
 	astrohn;
-	graphic_window;
+	graphics_window;
 --
 	color_maps		= ('ColorMap');
 --
@@ -573,7 +577,7 @@ modified_control(1020):-!,
 update_color_map:-
 	TextCM== ?val("STRING",?get(1010)),!,
 	ColorMap== color_maps?string_to_color_map_name(TextCM),
-	astrohn ? set_color_map(ColorMap).
+	astrohn ? set_main_color_map(ColorMap).
 update_color_map.
 --
 update_displaying_mode:-

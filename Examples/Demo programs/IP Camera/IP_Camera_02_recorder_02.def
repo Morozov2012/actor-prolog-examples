@@ -65,7 +65,7 @@ switch_auxiliary_controls;
 --
 determ:
 --
-ip_camera_is_connected(VideoBufferOperatingMode)	- (i);
+ip_camera_is_connected(DataAcquisitionBufferOperatingMode)	- (i);
 ]
 -----------------------------------------------------------------------
 interface 'VideoManager' (specialized 'IPCamera'):
@@ -110,7 +110,7 @@ read_all_frames;
 read_only_the_first_frame;
 --
 save_frame_if_necessary(
-	VideoBufferOperatingMode,
+	DataAcquisitionBufferOperatingMode,
 	FrameNumber)			- (i,i);
 --
 determ:

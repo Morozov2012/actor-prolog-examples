@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 -- An example of Actor Prolog program.                               --
--- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
 -----------------------------------------------------------------------
 
 import .. from "morozov/Webcam";
@@ -54,9 +54,11 @@ test_webcam(Name):-
 	con ? write("\tWebcam name: "),
 	con ? set_color('DkGreen'),
 	con ? writeln(Name),
-	webcam ? open(Name),
-	webcam ? get_image(buffer),
-	webcam ? close,
+	webcam ? start(Name),
+	webcam ? commit,!,
+	webcam ? get_recent_image(buffer),
+	webcam ? stop,
 	draw_image(buffer,0,0,1,1),
 	show.
+test_webcam(_).
 ]

@@ -13,7 +13,7 @@ class 'ActorPrologScanner' (specialized 'Text'):
 --
 constant:
 --
-keywords = [
+	keywords = [
 		"as",
 		"class",
 		"CLASSES",
@@ -49,11 +49,22 @@ keywords = [
 		"visible"
 		];
 --
-keep_text_positions	= 'yes';
+	keep_text_positions	= 'yes';
+--
+	stop_translation_after_first_error	= 'no';
+	raise_runtime_exceptions		= 'yes';
+	send_error_messages			= 'no';
 --
 [
 SOURCE:
 	"morozov.built_in.ActorPrologScanner";
+
+MODEL:
+
+?syntax_error(	ErrorType,
+		ErrorName,
+		TextPosition,
+		SupplementaryInformation).
 
 CLAUSES:
 
@@ -69,4 +80,86 @@ set_keep_text_positions(YesNo):
 	[external "setKeepTextPositions"].
 get_keep_text_positions() = YesNo:
 	[external "getKeepTextPositions"].
+--
+set_stop_translation_after_first_error(YesNo):
+	[external "setStopTranslationAfterFirstError"].
+get_stop_translation_after_first_error() = YesNo:
+	[external "getStopTranslationAfterFirstError"].
+--
+set_raise_runtime_exceptions(YesNo):
+	[external "setRaiseRuntimeExceptions"].
+get_raise_runtime_exceptions() = YesNo:
+	[external "getRaiseRuntimeExceptions"].
+--
+set_send_error_messages(YesNo):
+	[external "setSendErrorMessages"].
+get_send_error_messages() = YesNo:
+	[external "getSendErrorMessages"].
+--
+syntax_error(	ErrorType,
+		ErrorName,
+		TextPosition,
+		SupplementaryInformation):
+	[external "syntaxError"].
+]
+
+--------------------------------------------------------------------
+-- The 'ActorPrologBacktrackableParser' class is                  --
+-- specialized class 'ActorPrologScanner'.                        --
+--------------------------------------------------------------------
+
+class 'ActorPrologBacktrackableParser'
+(specialized 'ActorPrologScanner'):
+--
+constant:
+--
+	slot_names				= [];
+--
+[
+SOURCE:
+	"morozov.built_in.ActorPrologBacktrackableParser";
+
+CLAUSES:
+
+scan_text(Text):
+	[external "scanText"].
+
+pop_token(Token) = TextPosition:
+	[external "popToken"].
+pop_ground_term(GroundTerm) = TextPosition:
+	[external "popGroundTerm"].
+pop_meta_term(MetaTerm) = TextPosition:
+	[external "popMetaTerm"].
+pop_meta_expression(MetaTerm) = TextPosition:
+	[external "popMetaExpression"].
+pop_simple_atom(ActorPrologAtom) = TextPosition:
+	[external "popSimpleAtom"].
+pop_function_call(ActorPrologFunctionCall) = TextPosition:
+	[external "popFunctionCall"].
+pop_binary_relation(ActorPrologSubgoal) = TextPosition:
+	[external "popBinaryRelation"].
+pop_atom(ActorPrologAtom) = TextPosition:
+	[external "popAtom"].
+pop_subgoal(ActorPrologSubgoal) = TextPosition:
+	[external "popSubgoal"].
+pop_clause(ActorPrologClause) = TextPosition:
+	[external "popClause"].
+--
+check_end_of_text() = TextPosition:
+	[external "checkEndOfText"].
+--
+get_variable_names() = NameList:
+	[external "getVariableNames"].
+forget_variable_names:
+	[external "forgetVariableNames"].
+--
+get_function_call_table() = ActorPrologFunctionCallTable:
+	[external "getFunctionCallTable"].
+clear_function_call_table:
+	[external "clearFunctionCallTable"].
+--
+set_slot_names(SymbolList):
+	[external "setSlotNames"].
+get_slot_names() = SymbolList:
+	[external "getSlotNames"].
 ]

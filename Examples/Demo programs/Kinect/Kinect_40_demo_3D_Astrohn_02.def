@@ -119,7 +119,7 @@ internal:
 --
 	kinect_buffer	: '3DTHzPlayer';
 	astrohn		: 'Astrohn';
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 	color_maps	: 'ColorMap';
 --
 [

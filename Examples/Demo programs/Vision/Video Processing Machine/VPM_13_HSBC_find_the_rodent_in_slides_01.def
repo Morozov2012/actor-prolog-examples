@@ -39,7 +39,7 @@ internal:
 --
 	vpm			: 'VideoProcessingMachine';
 	timer			: 'SpecialTimer';
-	graphic_window		: 'Canvas2D';
+	graphics_window		: 'Canvas2D';
 	text			: 'Text';
 	image1			: 'BufferedImage';
 	image2			: 'BufferedImage';

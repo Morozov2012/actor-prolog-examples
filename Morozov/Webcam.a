@@ -7,27 +7,25 @@ package "Morozov/Webcam":
 
 pragma: INCLUDE_WEBCAM_LIBRARIES = ON;
 
+import 'ZoomDataAcquisitionBuffer' from "Morozov/VideoBuffer";
 import 'BufferedImage' from "Morozov/Java2D";
 
 --------------------------------------------------------------------
--- The 'Webcam' class is specialized class 'DataAbstraction'.     --
+-- The 'Webcam' class is specialized                              --
+-- class 'ZoomDataAcquisitionBuffer'.                             --
 --------------------------------------------------------------------
 
-class 'Webcam' (specialized 'DataAbstraction'):
+class 'Webcam' (specialized 'ZoomDataAcquisitionBuffer'):
 --
-default_name				= 'default';
+default_name			= 'default';
 --
-width					= 'default';
-height					= 'default';
+width				= 'default';
+height				= 'default';
 --
--- The implementation of the 'WritableImageProducer' interface:
+-- The implementation of the 'DataAcquisitionBuffer' interface:
 --
-image_encoding_attributes		= {};
---
--- The implementation of the 'DataResourceConsumer' interface:
---
-maximal_waiting_time			= 'default';
---
+operating_mode			= 'LISTENING';
+
 [
 SOURCE:
 	"morozov.built_in.Webcam";
@@ -37,34 +35,33 @@ MODEL:
 ?webcam_added(WebcamName).
 ?webcam_removed(WebcamName).
 --
-?webcam_open(WebcamName).
-?webcam_image_obtained(WebcamName).
-?webcam_closed(WebcamName).
+?webcam_started(WebcamName).
+?webcam_stopped(WebcamName).
 ?webcam_disposed(WebcamName).
 
 CLAUSES:
 
-open() = YesNo:
-	[external "open"].
-open(WebcamName) = YesNo:
-	[external "open"].
-open(WebcamName,Seconds) = YesNo:
-	[external "open"].
+start(WebcamName) = YesNo:
+	[external "start"].
+start(WebcamName,Seconds) = YesNo:
+	[external "start"].
 --
-close:
-	[external "close"].
+get_recent_image(BufferedImage):
+	[external "getRecentImage"].
 --
-is_open:
-	[external "isOpen"].
-contains_new_image:
-	[external "containsNewImage"].
+get_recent_frame_number(Number):
+	[external "getRecentFrameNumber"].
+get_recent_frame_time(Milliseconds):
+	[external "getRecentFrameTime"].
+get_recent_frame_relative_time(Milliseconds):
+	[external "getRecentFrameRelativeTime"].
+get_recent_frame_rate(FrameRate):
+	[external "getRecentFrameRate"].
 --
+get_image_size_in_pixels(Width,Height):
+	[external "getImageSizeInPixels"].
 get_actual_name() = WebcamName:
 	[external "getActualName"].
-get_image(BufferedImage):
-	[external "getImage"].
-get_FPS() = FramesPerSecond:
-	[external "getFPS"].
 --
 get_webcam_list() = WebcamNameList:
 	[external "getWebcamList"].
@@ -73,9 +70,6 @@ get_webcam_list(Seconds) = WebcamNameList:
 --
 watch_webcam_list(YesNo):
 	[external "watchWebcamList"].
---
-watch_webcam_state(YesNo):
-	[external "watchWebcamState"].
 --
 get_view_sizes() = ViewSizeList:
 	[external "getViewSizes"].
@@ -113,26 +107,10 @@ webcam_added(WebcamName):
 webcam_removed(WebcamName):
 	[external "webcamRemoved"].
 --
-webcam_open(WebcamName):
-	[external "webcamOpen"].
-webcam_image_obtained(WebcamName):
-	[external "webcamImageObtained"].
-webcam_closed(WebcamName):
-	[external "webcamClosed"].
+webcam_started(WebcamName):
+	[external "webcamStarted"].
+webcam_stopped(WebcamName):
+	[external "webcamStopped"].
 webcam_disposed(WebcamName):
 	[external "webcamDisposed"].
---
--- The implementation of the 'WritableImageProducer' interface:
---
-set_image_encoding_attributes(ImageAttributes):
-	[external "setImageEncodingAttributes"].
-get_image_encoding_attributes() = ImageAttributes:
-	[external "getImageEncodingAttributes"].
---
--- The implementation of the 'DataResourceConsumer' interface:
---
-set_maximal_waiting_time(TimeInterval):
-	[external "setMaximalWaitingTime"].
-get_maximal_waiting_time() = TimeInterval:
-	[external "getMaximalWaitingTime"].
 ]

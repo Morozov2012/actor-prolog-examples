@@ -43,7 +43,7 @@ internal:
 	window		= ('Canvas2D');
 	dialog		= ('MainDialog',
 				kinect_buffer= self,
-				graphic_window= window,
+				graphics_window= window,
 				thermal_data);
 	buffer		= ('BufferedImage');
 	image		= ('BufferedImage');
@@ -162,7 +162,7 @@ class 'MainDialog' (specialized 'Dialog'):
 internal:
 --
 	kinect_buffer;
-	graphic_window;
+	graphics_window;
 	thermal_data;
 --
 constant:

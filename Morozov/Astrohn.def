@@ -5,22 +5,24 @@
 
 package "Morozov/Astrohn":
 
-import 'ThermalVideoBuffer' from "Morozov/ThermalVideoBuffer";
+import 'ThermalDataAcquisitionBuffer' from "Morozov/VideoBuffer";
 import "Morozov/ColorMap";
 import 'BufferedImage' from "Morozov/Java2D";
 import 'WritableImageProducer' from "Morozov/Java2D";
 import "Morozov/Vision";
 
 --------------------------------------------------------------------
--- The 'Astrohn' class is specialized class 'ThermalVideoBuffer'. --
+-- The 'Astrohn' class is specialized                             --
+-- class 'ThermalDataAcquisitionBuffer'.                          --
 --------------------------------------------------------------------
 
-interface 'Astrohn' (specialized 'ThermalVideoBuffer'):
+interface 'Astrohn' (specialized 'ThermalDataAcquisitionBuffer'):
 
 terahertz_camera_address		: STRING;
 terahertz_camera_port			: INTEGER;
 color_camera_url			: STRING;
 synchronize_terahertz_and_color_streams	: YesNo;
+color_camera_delay_queue_size		: INTEGER;
 
 [
 PREDICATES:
@@ -76,6 +78,8 @@ determ:
 get_recent_terahertz_image('BufferedImage')		- (i);
 get_recent_color_image('BufferedImage')			- (i);
 get_recent_combined_image('BufferedImage')		- (i);
+get_recent_bordered_image('BufferedImage')		- (i);
+get_recent_bordered_image('BufferedImage',Color)	- (i,i);
 get_recent_color_map(ColorMap)				- (o);
 --
 get_temperature(PointX,PointY) = REAL			- (i,i);
@@ -98,4 +102,7 @@ get_color_camera_url() = STRING;
 --
 set_synchronize_terahertz_and_color_streams(YesNo)	- (i);
 get_synchronize_terahertz_and_color_streams() = YesNo;
+--
+set_color_camera_delay_queue_size(INTEGER)		- (i);
+get_color_camera_delay_queue_size() = INTEGER;
 ]

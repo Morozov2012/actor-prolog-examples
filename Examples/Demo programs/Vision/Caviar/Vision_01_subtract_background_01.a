@@ -25,7 +25,7 @@ internal:
 				background_rank_filter_threshold= 4,
 				background_standard_deviation_factor= 1.2,
 				contour_foreground= 'no');
-	graphic_window	= ('Canvas2D',
+	graphics_window	= ('Canvas2D',
 				background_color= 'SystemControl',
 				y= 0,
 				height= 22);
@@ -38,7 +38,7 @@ internal:
 --
 [
 goal:-!,
-	graphic_window ? show,
+	graphics_window ? show,
 	prompt_window ? write(
 		"The data are coming from the EC Funded CAVIAR ",
 		"project / IST 2001 37540,\n",
@@ -75,16 +75,16 @@ load_figure(_,T2):-
 --
 draw_scene:-
 	subtractor ? commit,
-	graphic_window ? suspend_redrawing,
-	graphic_window ? clear,
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
 	-- subtractor ? get_recent_image(image),
 	-- subtractor ? get_background_image(image),
 	-- subtractor ? get_sigma_image(image),
 	subtractor ? get_foreground_image(image),
 	-- Set track_blobs='yes' to see synthesized images.
 	-- subtractor ? get_synthesized_image(image),
-	graphic_window ? draw_image(image,0,0,1,1),
-	graphic_window ? draw_now.
+	graphics_window ? draw_image(image,0,0,1,1),
+	graphics_window ? draw_now.
 ]
 -----------------------------------------------------------------------
 class 'ProgramState' (specialized 'Database'):

@@ -6,27 +6,51 @@ class 'Main' (specialized 'Timer'):
 --
 internal:
 --
-	con	= ('Console',
-			x= 15,
-			y= 5,
-			width= 50,
-			height= 15,
-			maximal_line_number= 'no_limit');
+	report	= ('MyReport');
+	con	= ('Console');
 --
 [
 goal:-!,
-	set_period(1.5),
+	con ? set_text_color('Blue'),
+	con ? writeln("Start the test..."),
+	set_period(3,1),
 	activate.
 --
 tick:-
-	con ? is_visible(),!,
+	report ? is_visible(),!,
+	con ? set_text_color('Red'),
 	con ? writeln("I will hide the window."),
-	con ? hide.
+	report ? hide.
 tick:-
-	con ? is_hidden(),!,
+	report ? is_hidden(),!,
+	con ? set_text_color('DkGreen'),
 	con ? writeln("I will show the window."),
-	con ? show.
+	report ? show,
+	report ? writeln("Hello world!").
 tick:-!,
-	con ? writeln("The window is created.").
+	con ? set_text_color('Blue'),
+	con ? writeln("The window is to be created."),
+	report ? show,
+	report ? writeln("The window is created.").
+]
+-----------------------------------------------------------------------
+class 'MyReport' (specialized 'Report'):
+--
+internal:
+--
+	con			= ('Console');
+--
+constant:
+--
+	x			= 15;
+	y			= 5;
+	width			= 50;
+	height			= 15;
+	maximal_line_number	= 'no_limit';
+--
+[
+window_closed:-!,
+	con ? set_text_color('Blue'),
+	con ? writeln("The window is closed.").
 ]
 -----------------------------------------------------------------------

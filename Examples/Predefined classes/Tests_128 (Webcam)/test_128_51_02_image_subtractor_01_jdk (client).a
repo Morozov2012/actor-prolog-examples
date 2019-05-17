@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 -- An example of Actor Prolog program.                               --
--- (c) 2016 IRE RAS Alexei A. Morozov                                --
+-- (c) 2016-2019 IRE RAS Alexei A. Morozov                           --
 -----------------------------------------------------------------------
 -- Note: one should start two instances of the Editor
 -- environment to study this example. Please compile and
@@ -44,9 +44,9 @@ goal:-!,
 	con ? set_color('default').
 --
 tick:-
+	subtractor ? commit,
 	subtractor ? get_recent_frame_number(FrameNumber),
 	counter ? check_and_update(FrameNumber),!,
-	subtractor ? commit,
 	panel ? suspend_redrawing,
 	panel ? clear('no'),
 	subtractor ? get_synthesized_image(buffer),

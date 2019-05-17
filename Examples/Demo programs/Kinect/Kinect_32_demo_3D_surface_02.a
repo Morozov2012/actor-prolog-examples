@@ -37,7 +37,7 @@ internal:
 --
 	window	= ('Canvas3D');
 	dialog	= ('MainDialog',
-		graphic_window= window);
+		graphics_window= window);
 	buffer	= ('BufferedScene');
 	con	= ('Console');
 --
@@ -164,7 +164,7 @@ class 'MainDialog' (specialized 'Dialog'):
 --
 internal:
 --
-	graphic_window;
+	graphics_window;
 --
 constant:
 --

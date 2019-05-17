@@ -1,0 +1,57 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2013 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Timer'):
+--
+internal:
+--
+	dialog	= ('MyDialog');
+	con	= ('Console');
+--
+[
+goal:-!,
+	con ? set_text_color('Blue'),
+	con ? writeln("Start the test..."),
+	set_period(3,1),
+	activate.
+--
+tick:-
+	dialog ? is_visible(),!,
+	con ? set_text_color('Red'),
+	con ? writeln("I will hide the dialog box."),
+	dialog ? hide.
+tick:-
+	dialog ? is_hidden(),!,
+	con ? set_text_color('DkGreen'),
+	con ? writeln("I will show the dialog box."),
+	dialog ? show.
+tick:-!,
+	con ? set_text_color('Blue'),
+	con ? writeln("The dialog box is to be created."),
+	dialog ? show.
+]
+-----------------------------------------------------------------------
+class 'MyDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	con	= ('Console');
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+action("action1"):-!,
+	maximize.
+action("action2"):-!,
+	minimize.
+action("action3"):-!,
+	restore.
+--
+window_closed:-!,
+	con ? set_text_color('Blue'),
+	con ? writeln("The dialog box is closed.").
+]
+-----------------------------------------------------------------------

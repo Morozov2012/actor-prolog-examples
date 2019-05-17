@@ -18,8 +18,8 @@ internal:
 --
 	vpm		= ('VideoProcessingMachine');
 	dialog		= ('DemoPanel',
-				graphic_window);
-	graphic_window	= ('Canvas2D');
+				graphics_window);
+	graphics_window	= ('Canvas2D');
 	image1		= ('BufferedImage');
 	image2		= ('BufferedImage');
 --
@@ -81,11 +81,11 @@ draw_scene:-
 	vpm ? get_recent_image(image2),
 	image2 ? get_size_in_pixels(IW,IH),
 	vpm ? get_blobs(BlobList),
-	graphic_window ? suspend_redrawing,
-	graphic_window ? clear,
-	graphic_window ? draw_image(image2,0,0,1,1),
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
+	graphics_window ? draw_image(image2,0,0,1,1),
 	draw_blob_list(BlobList,IW,IH),
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 --
 draw_blob_list([Blob|Rest],IW,IH):-
 	draw_blob(Blob,IW,IH),
@@ -99,8 +99,8 @@ draw_blob(Blob,IW,IH):-
 	W2== W1 / IW,
 	H2== H1 / IH,
 	select_blob_color(Type,Color),
-	graphic_window ? set_pen({color:Color,lineWidth:3}),
-	graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+	graphics_window ? set_pen({color:Color,lineWidth:3}),
+	graphics_window ? draw_rectangle(X2,Y2,W2,H2),
 	fail.
 draw_blob(_,_,_).
 --
@@ -111,7 +111,7 @@ select_blob_color('blue_object','Navy').
 -----------------------------------------------------------------------
 class 'DemoPanel' (specialized 'Dialog'):
 internal:
-	graphic_window;
+	graphics_window;
 [
 ]
 -----------------------------------------------------------------------

@@ -127,11 +127,19 @@ msk_flip_foreground(ImageChannelName,LowerBound,UpperBound):
 --
 msk_select_polygon(PointList):
 	[external "mskSelectPolygon"].
+msk_select_polygon(PointList,UseStandardizedCoordinates):
+	[external "mskSelectPolygon"].
 msk_add_polygon(PointList):
+	[external "mskAddPolygon"].
+msk_add_polygon(PointList,UseStandardizedCoordinates):
 	[external "mskAddPolygon"].
 msk_exclude_polygon(PointList):
 	[external "mskExcludePolygon"].
+msk_exclude_polygon(PointList,UseStandardizedCoordinates):
+	[external "mskExcludePolygon"].
 msk_flip_polygon(PointList):
+	[external "mskFlipPolygon"].
+msk_flip_polygon(PointList,UseStandardizedCoordinates):
 	[external "mskFlipPolygon"].
 --
 msk_select_all:

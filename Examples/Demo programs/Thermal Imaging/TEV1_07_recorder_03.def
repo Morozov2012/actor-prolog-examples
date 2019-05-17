@@ -47,7 +47,7 @@ constant:
 	--
 	dlg_ctrl_togglebutton_double_color_map	: DialogFieldName;
 	dlg_ctrl_editname_frame_number		: DialogFieldName;
-	dlg_ctrl_togglebutton_color_map		: DialogFieldName;
+	dlg_ctrl_listbutton_color_map		: DialogFieldName;
 	--
 	dlg_ctrl_togglebutton_connect		: DialogFieldName;
 	dlg_ctrl_scrollbar_frame_number_range	: DialogFieldName;

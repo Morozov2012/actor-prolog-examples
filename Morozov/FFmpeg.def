@@ -7,6 +7,7 @@ package "Morozov/FFmpeg":
 
 import 'WritableImageProducer' from "Morozov/Java2D";
 import 'BufferedImage' from "Morozov/Java2D";
+import 'ReadWriteBuffer' from "Morozov/VideoBuffer";
 import "Morozov/Vision";
 
 DOMAINS:
@@ -1689,19 +1690,12 @@ FFmpegCodecOptions	= {_}; FFmpegCodecOption*.
 FFmpegCodecOption	= option(STRING/*Name*/,STRING/*Value*/).
 
 --------------------------------------------------------------------
--- The 'FFmpeg' class is specialized class 'DataAbstraction'.     --
+-- The 'FFmpeg' class is specialized class 'ReadWriteBuffer'.     --
 --------------------------------------------------------------------
 
-interface 'FFmpeg'
+interface 'FFmpeg' (specialized 'ReadWriteBuffer'):
 
-(specialized
-	'DataAbstraction',
-	'OperatingSystemResource',
-	'DataResourceConsumer',
-	'WritableImageProducer'):
-
-operating_mode		: FFmpegOperatingMode;
-slow_motion_coefficient	: Numerical;
+operating_mode			: FFmpegOperatingMode;
 
 [
 PREDICATES:
@@ -1720,27 +1714,12 @@ open(	FileName,
 	FFmpegStreams,
 	FFmpegCodecOptions)			- (i,i,i,i);
 --
-start;
-pause;
---
 seek_frame_number(INTEGER)				- (i);
 seek_frame_time(REAL)					- (i);
 --
 get_video_sequence_size(INTEGER)			- (o);
 --
 close;
---
-determ:
---
-is_open;
-is_active;
-is_suspended;
---
-eof;
---
-commit;
---
-imperative:
 --
 get_recent_frame_number(FrameNumber)			- (o);
 get_recent_frame_time(REAL)				- (o);
@@ -1753,11 +1732,6 @@ get_image_size_in_pixels(INTEGER,INTEGER)		- (o,o);
 --
 write_image('BufferedImage')				- (i);
 --
-determ:
---
-recent_reading_error(INTEGER,ExceptionName)		- (o,o);
-recent_writing_error(INTEGER,ExceptionName)		- (o,o);
---
 imperative:
 --
 list_input_formats() = FFmpegInputFormats;
@@ -1767,17 +1741,4 @@ imperative:
 --
 set_operating_mode(FFmpegOperatingMode)			- (i);
 get_operating_mode() = FFmpegOperatingMode;
---
-set_slow_motion_coefficient(Numerical)			- (i);
-get_slow_motion_coefficient() = Numerical;
---
--- These methods are to be implemented by the programmer:
---
-frame_obtained;
-data_transfer_completion;
---
-buffer_overflow;
-buffer_deallocation;
---
-data_transfer_error(ExceptionName)			- (i);
 ]

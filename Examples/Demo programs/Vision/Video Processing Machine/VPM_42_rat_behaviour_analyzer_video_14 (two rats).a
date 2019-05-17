@@ -37,7 +37,7 @@ internal:
 				velocity_median_filter_halfwidth= 3,
 				synthesized_image_transparency= 150);
 	timer		= ('Timer');
-	graphic_window	= ('Canvas2D',
+	graphics_window	= ('Canvas2D',
 				enable_scene_antialiasing= 'yes',
 				background_color= 'SystemControl',
 				y= 0,
@@ -262,15 +262,15 @@ data_transfer_error(ErrorCode):-!,
 -----------------------------------------------------------------------
 draw_scene(VideoFrame,TimeInSeconds,TimeInMilliseconds):-
 	vpm ? commit,
-	graphic_window ? suspend_redrawing,
-	graphic_window ? clear,
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
 	-- vpm ? get_recent_image(image2),
 	vpm ? get_preprocessed_image(image2),
 	-- vpm ? get_background_image(image2),
 	-- vpm ? get_sigma_image(image2),
 	-- vpm ? get_foreground_image(image2),
 	-- vpm ? get_synthesized_image(image2),
-	graphic_window ? draw_image(image2,0,0,1,1),
+	graphics_window ? draw_image(image2,0,0,1,1),
 	-- vpm ? get_recent_frame_time(BlobTime),
 	vpm ? get_recent_frame_number(BlobFrame),
 	vpm ? get_tracks(Tracks1),
@@ -286,7 +286,7 @@ draw_scene(VideoFrame,TimeInSeconds,TimeInMilliseconds):-
 	draw_invisible_objects(IW,IH),
 	draw_arrow(IW,IH),
 	draw_legend(TimeInSeconds),
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 -----------------------------------------------------------------------
 analyse_existing_tracks([Track|Rest1],Rest2,FN):-
 	analyse_existing_track(Track,FN),!,
@@ -614,8 +614,8 @@ select_line_style(_,{}).
 --
 draw_invisible_object(ObjectId,Xp,Yp,Attributes,IW,IH):-
 	select_color(ObjectId,Color,_),
-	graphic_window ? set_brush('off'),
-	graphic_window ? set_pen(
+	graphics_window ? set_brush('off'),
+	graphics_window ? set_pen(
 		{color:Color,lineWidth:main_line_width|Attributes}),!,
 	Xs== Xp / IW,
 	Ys== Yp / IH,
@@ -633,23 +633,23 @@ draw_arrow(Xa,Ya,Xb,Yb,Color,IW,IH):-
 	FYa2== Ya / IH,
 	SXb2== Xb / IW,
 	SYb2== Yb / IH,
-	graphic_window ? set_brush(Color),
-	graphic_window ? set_pen({
+	graphics_window ? set_brush(Color),
+	graphics_window ? set_pen({
 			color:Color,lineWidth:main_line_width,
 			dashArray:[3,5]}),
-	graphic_window ? draw_line(FXa2,FYa2,SXb2,SYb2),
+	graphics_window ? draw_line(FXa2,FYa2,SXb2,SYb2),
 	draw_circle(FXa2,FYa2,3.0),
 	draw_circle(SXb2,SYb2,3.0).
 --
 draw_arrow_label(Xa,Ya,Xb,Yb,TargetDistance,IW,IH):-
 	Xc== (Xa + Xb) / 2,
 	Yc== (Ya + Yb) / 2,
-	graphic_window ? set_font({size:48}),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? set_font({size:48}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
 	Text== text?format("%1.2f",TargetDistance),
 	Xt== Xc / IW,
 	Yt== Yc / IH,
-	graphic_window ? draw_text(Xt,Yt,Text).
+	graphics_window ? draw_text(Xt,Yt,Text).
 -----------------------------------------------------------------------
 draw_track_segments([S2],S1,IsMature,C1,C2,IW,IH):-!,
 	draw_track_segment(S2,S1,'yes',IsMature,C1,C2,IW,IH).
@@ -675,14 +675,14 @@ draw_track_of_blob(_,_,_,_,_,_,_,_).
 draw_blob_rectangle(Blob,IsMature,Color,LW,IW,IH):-
 	Blob == {x:X0,y:Y0,width:W1,height:H1|_},
 	select_dash_array(IsMature,DashArray),
-	graphic_window ? set_pen(
+	graphics_window ? set_pen(
 		{color:Color,lineWidth:LW|DashArray}),!,
-	graphic_window ? set_brush('off'),
+	graphics_window ? set_brush('off'),
 	X2== (X0 - W1 / 2) / IW,
 	Y2== (Y0 - H1 / 2) / IH,
 	W2== W1 / IW,
 	H2== H1 / IH,
-	graphic_window ? draw_rectangle(X2,Y2,W2,H2).
+	graphics_window ? draw_rectangle(X2,Y2,W2,H2).
 draw_blob_rectangle(_,_,_,_,_,_).
 --
 select_dash_array('no',{dashArray:[3,5]}):-!.
@@ -695,10 +695,10 @@ draw_blob_link(Blob2,Blob1,Color,IW,IH):-
 	Y1b== Y1a / IH,
 	X2b== X2a / IW,
 	Y2b== Y2a / IH,
-	graphic_window ? set_brush('off'),
-	graphic_window ? set_pen(
+	graphics_window ? set_brush('off'),
+	graphics_window ? set_pen(
 		{color:Color,lineWidth:main_line_width}),
-	graphic_window ? draw_line(X1b,Y1b,X2b,Y2b).
+	graphics_window ? draw_line(X1b,Y1b,X2b,Y2b).
 draw_blob_link(_,_,_,_,_).
 --
 draw_segment_link(Segment2,Segment1,IW,IH):-
@@ -708,10 +708,10 @@ draw_segment_link(Segment2,Segment1,IW,IH):-
 	Y1r== Y1a / IH,
 	X2r== X2a / IW,
 	Y2r== Y2a / IH,
-	graphic_window ? set_brush('Black'),
-	graphic_window ? set_pen(
+	graphics_window ? set_brush('Black'),
+	graphics_window ? set_pen(
 		{color:'Black',lineWidth:main_line_width}),
-	graphic_window ? draw_line(X1r,Y1r,X2r,Y2r),
+	graphics_window ? draw_line(X1r,Y1r,X2r,Y2r),
 	draw_circle(X1r,Y1r,1.0),
 	draw_circle(X2r,Y2r,1.0).
 draw_segment_link(_,_,_,_).
@@ -721,7 +721,7 @@ draw_circle(X0,Y0,C):-
 	Y1== Y0 - small_circle_radius * C,
 	Width== small_circle_radius * 2 * C,
 	Height== small_circle_radius * 2 * C,
-	graphic_window ? draw_ellipse(X1,Y1,Width,Height).
+	graphics_window ? draw_ellipse(X1,Y1,Width,Height).
 --
 select_color(ObjectId,'Cyan','Green'):-
 	model ? is_largest_object(ObjectId),
@@ -736,16 +736,16 @@ draw_legend(Time):-
 	state ? get_current_frame(FrameNumber),!,
 	state ? get_frame_counter(FrameQuantity),
 	FrameRate== FrameQuantity / Time,
-	graphic_window ? set_brush('Red'),
-	graphic_window ? set_font({size:28}),
-	graphic_window ? set_text_alignment('LEFT','TOP'),
-	graphic_window ? draw_text(
+	graphics_window ? set_brush('Red'),
+	graphics_window ? set_font({size:28}),
+	graphics_window ? set_text_alignment('LEFT','TOP'),
+	graphics_window ? draw_text(
 		0.02, 0.02,
 		text?format(
 			"Time: %3.2f [sec]; Frame: %d",
 			Time,FrameNumber)),
-	graphic_window ? set_text_alignment('RIGHT','TOP'),
-	graphic_window ? draw_text(
+	graphics_window ? set_text_alignment('RIGHT','TOP'),
+	graphics_window ? draw_text(
 		0.98, 0.02,
 		text?format(
 			"Frame Rate: %3.2f [Hz]",

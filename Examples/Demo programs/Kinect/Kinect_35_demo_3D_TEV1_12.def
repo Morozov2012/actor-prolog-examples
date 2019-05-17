@@ -118,7 +118,7 @@ internal:
 --
 	kinect_buffer	: '3DThermalPlayer';
 	tev1		: 'TEV1';
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 	color_maps	: 'ColorMap';
 --
 [

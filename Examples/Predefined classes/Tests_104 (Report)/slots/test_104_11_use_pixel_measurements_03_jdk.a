@@ -1,0 +1,106 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w01	= ('WindowX',
+		x= 100,
+		width= 300);
+w02	= ('WindowX',
+		x= 100,
+		width= 300.9);
+w03	= ('WindowX',
+		x= 100,
+		width= 0);
+w04	= ('WindowX',
+		x= 100,
+		width= -30);
+w05	= ('WindowX',
+		x= 100,
+		width= 'default');
+w06	= ('WindowX',
+		x= 'centered',
+		width= 300);
+w07	= ('WindowX',
+		x= 'centered',
+		width= 300.9);
+w08	= ('WindowX',
+		x= 'centered',
+		width= 0);
+w09	= ('WindowX',
+		x= 'centered',
+		width= -30);
+w10	= ('WindowX',
+		x= 'centered',
+		width= 'default');
+--
+w11	= ('WindowY',
+		y= 100,
+		height= 50);
+w12	= ('WindowY',
+		y= 100,
+		height= 50.9);
+w13	= ('WindowY',
+		y= 100,
+		height= 0);
+w14	= ('WindowY',
+		y= 100,
+		height= -30);
+w15	= ('WindowY',
+		y= 100,
+		height= 'default');
+w16	= ('WindowY',
+		y= 'centered',
+		height= 50);
+w17	= ('WindowY',
+		y= 'centered',
+		height= 50.9);
+w18	= ('WindowY',
+		y= 'centered',
+		height= 0);
+w19	= ('WindowY',
+		y= 'centered',
+		height= -30);
+w20	= ('WindowY',
+		y= 'centered',
+		height= 'default');
+--
+[
+goal.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'WindowX' (specialized 'Report'):
+--
+constant:
+--
+	x;
+	width;
+--
+	use_pixel_measurements= 'yes';
+--
+[
+goal:-!,
+	writeln("Hello world!"),
+	writeln("x= ",x),
+	writeln("width= ",width).
+]
+-----------------------------------------------------------------------
+class 'WindowY' (specialized 'Report'):
+--
+constant:
+--
+	y;
+	height;
+--
+	use_pixel_measurements= 'yes';
+--
+[
+goal:-!,
+	writeln("Hello world!"),
+	writeln("y= ",y),
+	writeln("height= ",height).
+]
+-----------------------------------------------------------------------

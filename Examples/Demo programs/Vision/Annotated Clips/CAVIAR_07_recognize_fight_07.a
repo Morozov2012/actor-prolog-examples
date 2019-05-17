@@ -311,7 +311,7 @@ internal:
 	store		= ('RecentHistory');
 --
 	image		= ('BufferedImage');
-	graphic_window	= ('Canvas2D',
+	graphics_window	= ('Canvas2D',
 				background_color= 'SystemControl',
 				y= 0,
 				height= 22);
@@ -322,7 +322,7 @@ internal:
 --
 [
 goal:-!,
-	graphic_window ? show,
+	graphics_window ? show,
 	prompt_window ? write(
 		"The data are coming from the EC Funded CAVIAR ",
 		"project / IST 2001 37540,\n",
@@ -350,11 +350,11 @@ draw_scene(N):-
 		text?format("%03d",N) + ".jpg",
 	image ? load(ImageToBeDrawn),
 	image ? get_size_in_pixels(IW,IH),
-	graphic_window ? clear('no'),
-	graphic_window ? draw_image(image,0,0,1,1),
+	graphics_window ? clear('no'),
+	graphics_window ? draw_image(image,0,0,1,1),
 	-- show_recent_history(N,IW,IH,'yes'),
 	show_groups(N,IW,IH),
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 --
 show_recent_history(N,IW,IH,Mode):-
 	N > 0,!,
@@ -367,27 +367,27 @@ select_line_attributes('yes',{color:'Yellow',lineWidth:3}):-!.
 select_line_attributes(_,{color:'Blue',lineWidth:1,dashArray:[2.0]}).
 --
 show_object_list(N,IW,IH,Mode,PenAttributes):-
-	graphic_window ? set_pen(PenAttributes),
-	graphic_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? set_pen(PenAttributes),
+	graphics_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
 	Item== store?match(object(N,_,_,_,_,_)),
 		Item == object(_,Id,X1,Y1,W1,H1),
 		X2== (X1 - W1 / 2) / IW,
 		Y2== (Y1 - H1 / 2) / IH,
 		W2== W1 / IW,
 		H2== H1 / IH,
-		graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+		graphics_window ? draw_rectangle(X2,Y2,W2,H2),
 		draw_object_name(Mode,X1,Y1,IW,IH,Id),
 		fail.
 show_object_list(_,_,_,_,_).
 --
 draw_object_name('yes',X1,Y1,IW,IH,Id):-!,
-	graphic_window ? draw_text(X1/IW,Y1/IH,Id).
+	graphics_window ? draw_text(X1/IW,Y1/IH,Id).
 draw_object_name(_,_,_,_,_,_).
 --
 show_groups(N,IW,IH):-
-	graphic_window ? set_font({size:18,weight:'WEIGHT_BOLD'}),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? set_font({size:18,weight:'WEIGHT_BOLD'}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
 	Item== store?match(group(_,_,_)),
 		Item == group(Id1,Id2,Status),
 		store ? retrieve_coordinates(N,Id1,X1,Y1,W1,H1),
@@ -401,12 +401,12 @@ show_groups(N,IW,IH):-
 		W3== (MaxX - MinX) / IW,
 		H3== (MaxY - MinY) / IH,
 		select_color_of_group(Status,Color,Text),
-		graphic_window ? set_pen({color:Color,lineWidth:3}),
-		graphic_window ? draw_rectangle(X3,Y3,W3,H3),
+		graphics_window ? set_pen({color:Color,lineWidth:3}),
+		graphics_window ? draw_rectangle(X3,Y3,W3,H3),
 		-- Text== text?format("%s & %s",Id1,Id2),
 		X4== (MinX + MaxX) / 2 / IW,
 		Y4== (MinY + MaxY) / 2 / IH,
-		graphic_window ? draw_text(X4,Y4,Text),
+		graphics_window ? draw_text(X4,Y4,Text),
 		fail.
 show_groups(_,_,_).
 --

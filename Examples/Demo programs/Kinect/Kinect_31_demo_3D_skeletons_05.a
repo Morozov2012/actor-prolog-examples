@@ -24,7 +24,7 @@ internal:
 --
 	window	= ('Canvas3D');
 	dialog	= ('MainDialog',
-			graphic_window= window);
+			graphics_window= window);
 	con	= ('Console');
 --
 constant:
@@ -429,7 +429,7 @@ class 'MainDialog' (specialized 'Dialog'):
 --
 internal:
 --
-	graphic_window;
+	graphics_window;
 --
 constant:
 --

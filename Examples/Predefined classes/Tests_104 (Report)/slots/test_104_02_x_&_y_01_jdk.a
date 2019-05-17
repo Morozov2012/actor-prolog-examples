@@ -40,6 +40,13 @@ w15	= ('MyWindow',
 w16	= ('MyWindow',
 		y= 0.0);
 --
+w17	= ('MyWindow',
+		x= 12,
+		y= 15);
+w18	= ('MyWindow',
+		x= 0,
+		y= 0);
+--
 [
 goal.
 alarm(_):-
@@ -59,6 +66,17 @@ constant:
 goal:-!,
 	writeln("Hello world!"),
 	writeln("x= ",x),
-	writeln("y= ",y).
+	writeln("y= ",y),
+	get_actual_position(X1,Y1),
+	writeln("X= ",X1),
+	writeln("Y= ",Y1),
+	get_actual_size(Width1,Height1),
+	writeln("Width= ",Width1),
+	writeln("Height= ",Height1),
+	get_actual_bounds(X2,Y2,Width2,Height2),
+	writeln("X= ",X2),
+	writeln("Y= ",Y2),
+	writeln("Width= ",Width2),
+	writeln("Height= ",Height2).
 ]
 -----------------------------------------------------------------------

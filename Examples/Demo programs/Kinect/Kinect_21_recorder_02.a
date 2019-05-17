@@ -98,7 +98,7 @@ action("Record"):-
 	buffer ? is_active,
 	check_whether_data_are_to_be_saved,
 	buffer ? set_name(temporary_file_name),
-	put('title',"2.5D Video Recorder"),
+	update_dialog_title(""),
 	update_recorder_mode,
 	recorder ? start,
 	buffer ? start,!,
@@ -158,6 +158,8 @@ choose_file(FileName):-
 	start_reading,
 	switch_buttons.
 --
+update_dialog_title(""):-!,
+	put('title',"2.5D Video Recorder").
 update_dialog_title(FileName):-
 	put('title',"2.5D Video Recorder ["+FileName+"]").
 --
@@ -202,7 +204,7 @@ redraw_recent_frame:-
 	buffer ? frame_obtained.
 --
 scroll_video:-
-	buffer ? retrieve_buffered_frame(?cast("INTEGER",?get(3012))),!.
+	buffer ? request_buffered_frame(?cast("INTEGER",?get(3012))),!.
 scroll_video.
 --
 update_recorder_mode:-
@@ -627,7 +629,7 @@ internal:
 --
 	analyzer		= ('BehaviorAnalyzer',
 					buffer=self,
-					graphic_window=main_window);
+					graphics_window=main_window);
 --
 	image			= ('BufferedImage');
 	directory_name		= ('DirectoryName');
@@ -1248,6 +1250,7 @@ save_frame_if_necessary('READING',_):-!,
 save_frame_if_necessary(_,_).
 --
 rename_temporary_file(TargetFileName):-
+	file_operation_error_handler ? delete(TargetFileName),
 	file_operation_error_handler ? rename(TargetFileName).
 --
 continue_exporting_if_necessary:-
@@ -1270,7 +1273,7 @@ class 'BehaviorAnalyzer' (specialized 'Alpha'):
 internal:
 --
 buffer;
-graphic_window;
+graphics_window;
 --
 con			= ('Console');
 --
@@ -1288,18 +1291,18 @@ analyse_skeletons(Skeletons,Past):-
 --
 analyse_moving_arm(Skeletons,Past,Id,Side,Point,V,T):-
 	is_near_a_head_of_a_person(Skeletons,Past,Id,Side,Point,V,T),!,
-	graphic_window ? set_font({size:38,weight:'WEIGHT_BOLD'}),
-	graphic_window ? set_pen({color:'Red'}),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
-	graphic_window ? draw_text(
+	graphics_window ? set_font({size:38,weight:'WEIGHT_BOLD'}),
+	graphics_window ? set_pen({color:'Red'}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? draw_text(
 		0.5,0.1,
 		"A punch in the face is detected!").
 analyse_moving_arm(Skeletons,Past,Id,Side,Point,_,T):-
 	is_near_a_hand_of_a_person(Skeletons,Past,Id,Side,Point,T),!,
-	graphic_window ? set_font({size:38,weight:'WEIGHT_BOLD'}),
-	graphic_window ? set_pen({color:'Cyan'}),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
-	graphic_window ? draw_text(
+	graphics_window ? set_font({size:38,weight:'WEIGHT_BOLD'}),
+	graphics_window ? set_pen({color:'Cyan'}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? draw_text(
 		0.5,0.1,
 		"A handshake is detected!").
 -----------------------------------------------------------------------

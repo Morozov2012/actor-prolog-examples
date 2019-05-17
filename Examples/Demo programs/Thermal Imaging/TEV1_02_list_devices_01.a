@@ -36,7 +36,7 @@ initialize_data_acquisition(List):-
 initialize_data_acquisition(_).
 --
 initialize_selected_device(Identifier):-
-	open(Identifier),!,
+	connect(Identifier),!,
 	start.
 initialize_selected_device(Identifier):-
 	con ? error(

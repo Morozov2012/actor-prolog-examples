@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 -- An example of Actor Prolog program.                               --
--- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
 -----------------------------------------------------------------------
 
 import .. from "morozov/Webcam";
@@ -23,10 +23,10 @@ internal:
 --
 [
 goal:-!,
-	webcam ? open,
+	webcam ? start,
 	test1,
 	test2,
-	webcam ? close.
+	webcam ? stop.
 --
 test1:-
 	set_color('RoyalBlue'),

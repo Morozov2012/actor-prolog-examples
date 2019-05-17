@@ -29,13 +29,13 @@ internal:
 					"3DDataSources"));
 	dialog		= ('MainDialog',
 				communicator=self,
-				graphic_window,
+				graphics_window,
 				message_window=con);
-	graphic_window	= ('Canvas3D',
+	graphics_window	= ('Canvas3D',
 				enable_scene_antialiasing='yes');
 	video_supplier	= ('3DVideoProducer',
 				communicator=self,
-				graphic_window,
+				graphics_window,
 				con);
 	state		= ('DataProducerState');
 	con		= ('Console');
@@ -144,7 +144,7 @@ constant:
 internal:
 --
 	communicator;
-	graphic_window;
+	graphics_window;
 	buffer2D	= ('BufferedImage');
 	buffer3D	= ('BufferedScene');
 	image		= ('BufferedImage');
@@ -175,7 +175,7 @@ constant:
 initialize:-!,
 	set_lookup_table(lookup_table_file_name),
 	create_list_of_nodes(VisualScene),
-	graphic_window ? show(VisualScene).
+	graphics_window ? show(VisualScene).
 --
 frame_obtained:-
 	commit,!,
@@ -203,7 +203,7 @@ process_frame(FrameNumber,Time1):-
 	get_skeletons(Skeletons),
 	communicator ? notify_all_consumers(
 		Skeletons,buffer2D?get_binary()),
-	graphic_window ? set_node(
+	graphics_window ? set_node(
 		main_label,
 		'BranchGroup'({
 			label: main_label,
@@ -261,7 +261,7 @@ internal:
 --
 	communicator;
 	message_window;
-	graphic_window;
+	graphics_window;
 --
 constant:
 --

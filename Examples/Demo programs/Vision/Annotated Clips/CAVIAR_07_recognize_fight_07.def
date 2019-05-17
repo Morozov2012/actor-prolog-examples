@@ -212,7 +212,7 @@ internal:
 	store		: 'RecentHistory';
 --
 	image		: 'BufferedImage';
-	graphic_window	: 'Canvas2D';
+	graphics_window	: 'Canvas2D';
 	prompt_window	: 'Report';
 --
 	text		: 'Text';

@@ -13,7 +13,7 @@ modeless dialog 'DemoPanel' (
 vbox(center)
 	hbox(center)
 		custom['KeepProportions']
-			(graphic_window,64,48,"Control2D")
+			(graphics_window,64,48,"Control2D")
 	end_of_hbox
 	"The data are coming from "
 	"the Institute of Higher Nervous Activity "

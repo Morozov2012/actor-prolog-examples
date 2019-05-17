@@ -1,0 +1,37 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+project: (('NonClosableDialog'))
+-----------------------------------------------------------------------
+class 'NonClosableDialog' (specialized 'Dialog'):
+--
+constant:
+--
+	closing_confirmation	= 'on';
+	is_top_level_window	= 'no';  /*'yes';*/
+	--
+	is_modal		= 'no';
+	exit_on_close		= 'no';
+--
+internal:
+--
+	con			= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("I will open the dialog box..."),
+	show.
+--
+action("Hello"):-!,
+	con ? writeln("Hello!").
+--
+window_closing:-
+	con ? writeln("Do you want to close the dialog?"),
+	con ? ask("Do you want to close the dialog?"),!,
+	hide.
+--
+window_closed:-!,
+	con ? writeln("The dialog box is closed.").
+]
+-----------------------------------------------------------------------

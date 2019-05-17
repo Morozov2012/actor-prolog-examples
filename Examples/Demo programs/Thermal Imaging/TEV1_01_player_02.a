@@ -84,7 +84,7 @@ modified_control(1050):-!,
 	buffer ? frame_obtained.
 modified_control(3012):-
 	Position== ?cast("INTEGER",?get(3012)),
-	buffer ? retrieve_buffered_frame(Position),!.
+	buffer ? request_buffered_frame(Position),!.
 --
 update_displaying_mode:-
 	DoNotControlZoom== ?val("YesNo",?get(1010)),

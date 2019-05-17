@@ -1,0 +1,98 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+test3;
+test4;
+test5;
+
+class 'Main' (specialized 'Canvas2D'):
+--
+internal:
+--
+	webcam	= ('Webcam');
+	buffer	= ('BufferedImage');
+	con	= ('Console');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	test3,
+	test4,
+	test5.
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1"),
+	webcam ? start,
+	webcam ? commit,!,
+	webcam ? get_recent_image(buffer),
+	webcam ? stop,
+	set_title("Test 1"),
+	draw_image(buffer,0,0,1,1),
+	show.
+test1.
+--
+test2:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2"),
+	webcam ? start('default'),
+	webcam ? commit,!,
+	webcam ? get_recent_image(buffer),
+	webcam ? stop,
+	set_title("Test 2"),
+	draw_image(buffer,0,0,1,1),
+	show.
+test2.
+--
+test3:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 3"),
+	Result== webcam?start('default'),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tWebcam is open: ",Result),
+	webcam ? commit,!,
+	webcam ? get_recent_image(buffer),
+	webcam ? stop,
+	set_title("Test 3"),
+	draw_image(buffer,0,0,1,1),
+	show.
+test3.
+--
+test4:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 4"),
+	webcam ? start('default',1.0),
+	webcam ? commit,!,
+	webcam ? get_recent_image(buffer),
+	webcam ? stop,
+	set_title("Test 4"),
+	draw_image(buffer,0,0,1,1),
+	show.
+test4.
+--
+test5:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 5"),
+	Result== webcam?start('default',1.0),
+	con ? set_color('DkGreen'),
+	con ? writeln("\tWebcam is open: ",Result),
+	webcam ? commit,!,
+	webcam ? get_recent_image(buffer),
+	webcam ? stop,
+	set_title("Test 5"),
+	draw_image(buffer,0,0,1,1),
+	show.
+test5.
+]

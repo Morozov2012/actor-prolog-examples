@@ -6,7 +6,7 @@ import .. from "morozov/Java2D";
 import .. from "morozov/FFmpeg";
 import .. from "morozov/Java3D";
 -----------------------------------------------------------------------
-class 'Main' (specialized 'Timer')
+class 'Main' (specialized 'Timer'):
 --
 constant:
 --

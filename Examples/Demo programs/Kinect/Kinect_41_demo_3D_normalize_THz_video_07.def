@@ -1,0 +1,280 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Astrohn";
+import .. from "morozov/Kinect";
+import .. from "morozov/ColorMap";
+--
+-----------------------------------------------------------------------
+interface '3DTHzPlayer' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	first_frame	: INTEGER;
+	end_frame	: INTEGER;
+	frame_type	: KinectFrameType;
+	people_index	: KinectPeopleIndexMode;
+	skeletons	: KinectSkeletonsMode;
+	main_label	: NodeLabel;
+--
+	terahertz_data_file	: FileName;
+--
+internal:
+--
+	desktop			: 'DesktopWindow';
+	operating_window	: 'Canvas3D';
+	graphics_window 		: 'Canvas2D';
+	dialog			: 'Dialog';
+	buffer			: 'BufferedScene';
+	astrohn			: 'Astrohn';
+	texture			: 'BufferedImage';
+	export			: 'BufferedImage';
+	state			: 'ProgramState';
+	text			: 'Text';
+	file			: 'File';
+	con			: 'Console';
+--
+constant:
+--
+	export_image_wight	: PointX;
+	export_image_height	: PointY;
+	demo_window_width	: Width;
+	demo_window_height	: Height;
+--
+	cylinder_radius		: Radius;
+	joint_radius		: Radius;
+	head_radius		: Radius;
+	limb_transparency	: Numerical;
+	up_vector		: Point3D;
+--
+	texture_time_shift	: INTEGER;
+	lookup_table_file_name	: STRING;
+--
+	acceptable_yaw		: Numerical;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_suspend_reading(YesNo)			- (i);
+set_export_frames(YesNo)			- (i);
+set_show_skeletons(YesNo)			- (i);
+--
+create_list_of_nodes(NodeList)			- (o);
+create_main_group(Node)				- (o);
+create_light_nodes(NodeList)			- (o);
+--
+process_frame(FrameNumber,INTEGER)		- (i,i);
+--
+determ:
+--
+redraw_scene(Numerical)				- (o);
+redraw_scene_with_sceletons(
+	Skeletons,Numerical)			- (i,o);
+--
+imperative:
+--
+redraw_scene_with_sceleton(
+	NodeList,
+	Translation,
+	Rotation,
+	Numerical,
+	Numerical,
+	Numerical,
+	Numerical)			- (i,i,i,i,i,i,i);
+--
+export_image(FrameNumber,Numerical)		- (i,i);
+--
+determ:
+--
+is_acceptable_angle(Numerical)			- (i);
+--
+imperative:
+--
+save_image_if_necessary(FrameNumber,Numerical)	- (i,i);
+--
+determ:
+--
+project_skeleton(
+	Skeleton,
+	Skeleton,
+	JointOrientation3D,
+	JointOrientation3D,
+	Point3D)			- (i,o,i,i,i);
+project_spine(
+	SkeletonSpine,
+	SkeletonSpine,
+	JointOrientation3D,
+	JointOrientation3D,
+	Point3D)			- (i,o,i,i,i);
+project_arm(
+	SkeletonArm,
+	SkeletonArm,
+	JointOrientation3D,
+	JointOrientation3D,
+	Point3D)			- (i,o,i,i,i);
+project_leg(
+	SkeletonLeg,
+	SkeletonLeg,
+	JointOrientation3D,
+	JointOrientation3D,
+	Point3D)			- (i,o,i,i,i);
+project_joint(
+	SkeletonJoint,
+	SkeletonJoint,
+	JointOrientation3D,
+	JointOrientation3D,
+	Point3D)			- (i,o,i,i,i);
+--
+imperative:
+--
+compute_mid_attributes(
+	Skeleton,
+	Translation,
+	Rotation)			- (i,o,o);
+compute_yaw(
+	Skeleton,
+	Numerical)			- (i,o);
+compute_height(
+	Skeleton,
+	Numerical,
+	Numerical,
+	Numerical)			- (i,o,o,o);
+--
+form_skeleton_figure(Skeleton) = NodeList	- (i);
+--
+determ:
+--
+form_skeleton(Skeleton) = Node			- (i);
+--
+form_spine(SkeletonJoint,SkeletonSpine) = Node	- (i,i);
+form_arm(SkeletonSpine,SkeletonArm) = Node	- (i,i);
+--
+form_hand(
+	SkeletonJoint,
+	SkeletonJoint,
+	SkeletonArm) = Node		- (i,i,i);
+--
+form_leg(SkeletonSpine,SkeletonLeg) = Node	- (i,i);
+--
+form_link(SkeletonJoint,SkeletonJoint) = Node	- (i,i);
+form_joint(SkeletonJoint) = Node		- (i);
+form_head(SkeletonJoint) = Node			- (i);
+--
+imperative:
+--
+select_joint_color(
+	SkeletonJointStatus,MaterialAttributes)	- (i,o);
+--
+calc_rotation(Point3D) = Rotation		- (i);
+--
+normalize_vector(Point3D) = Point3D		- (i);
+--
+cross(Point3D,Point3D) = Point3D		- (i,i);
+--
+angle(Point3D,Point3D) = Numerical		- (i,i);
+angle(Numerical) = Numerical			- (i);
+--
+dot(Point3D,Point3D) = Numerical		- (i,i);
+scale(Point3D,Numerical) = Point3D		- (i,i);
+length(Point3D) = Numerical			- (i);
+--
+create_quaternion
+	(Rotation) = JointOrientation3D	- (i);
+--
+normalize_rotation
+	(Rotation) = Rotation		- (i);
+normalize_quaternion
+	(JointOrientation3D) =
+		JointOrientation3D	- (i);
+--
+invert_quaternion(JointOrientation3D) =
+		JointOrientation3D	- (i);
+hamilton_product(
+	JointOrientation3D,
+	JointOrientation3D) =
+		JointOrientation3D	- (i,i);
+--
+axis_and_angle
+	(JointOrientation3D) = Rotation	- (i);
+--
+select_axis_and_angle(
+	Numerical,
+	Numerical,
+	Numerical,
+	Numerical,
+	Numerical) = Rotation		- (i,i,i,i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+'-'(Numerical) = Numerical			- (i);
+'-'(Numerical,Numerical) = Numerical		- (i,i);
+'+'(Numerical,Numerical) = Numerical		- (i,i);
+'*'(Point3D,Point3D) = Numerical		- (i,i);
+'*'(Numerical,Numerical) = Numerical		- (i,i);
+'/'(Numerical,Numerical) = Numerical		- (i,i);
+'mod'(Numerical,Numerical) = Numerical		- (i,i);
+sqrt(Numerical) = Numerical			- (i);
+power(Numerical,INTEGER) = Numerical		- (i,i);
+sin(Numerical) = Numerical			- (i);
+cos(Numerical) = Numerical			- (i);
+arcsin(Numerical) = Numerical			- (i);
+arccos(Numerical) = Numerical			- (i);
+arctan2(Numerical,Numerical) = Numerical	- (i,i);
+min(Numerical*) = Numerical			- (i);
+max(Numerical*) = Numerical			- (i);
+]
+-----------------------------------------------------------------------
+interface 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	kinect_buffer		: '3DTHzPlayer';
+	astrohn			: 'Astrohn';
+	graphics_window		: 'Canvas2D';
+	report			: 'Report';
+	color_maps		: 'ColorMap';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+update_color_map;
+update_displaying_mode;
+]
+-----------------------------------------------------------------------
+interface 'ProgramState' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target		= f(INTEGER,INTEGER);
+		  'suspend_reading';
+		  'export_frames';
+		  'create_skeletons'.
+--
+PREDICATES:
+--
+imperative:
+--
+set_first_frame_time(INTEGER,INTEGER)		- (i,i);
+get_first_frame_time(INTEGER,INTEGER)		- (o,o);
+--
+set_suspend_reading(YesNo)			- (i);
+set_export_frames(YesNo)			- (i);
+set_show_skeletons(YesNo)			- (i);
+--
+determ:
+--
+suspend_reading;
+export_frames;
+show_skeletons;
+]
+-----------------------------------------------------------------------

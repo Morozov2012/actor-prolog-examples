@@ -133,7 +133,7 @@ internal:
 	store		= ('RecentHistory');
 --
 	image		= ('BufferedImage');
-	graphic_window	= ('Canvas2D',
+	graphics_window	= ('Canvas2D',
 				background_color= 'SystemControl',
 				y= 0,
 				height= 22);
@@ -147,7 +147,7 @@ internal:
 --
 [
 goal:-!,
-	graphic_window ? show,
+	graphics_window ? show,
 	prompt_window ? write(
 		"The data are coming from the EC Funded CAVIAR ",
 		"project / IST 2001 37540,\n",
@@ -194,11 +194,11 @@ draw_scene(N):-
 		con?format("%03d",N) + ".jpg",
 	image ? load(ImageToBeDrawn),
 	image ? get_size_in_pixels(IW,IH),
-	graphic_window ? clear('no'),
-	graphic_window ? draw_image(image,0,0,1,1),
+	graphics_window ? clear('no'),
+	graphics_window ? draw_image(image,0,0,1,1),
 	show_recent_history(N,IW,IH,'yes'),
 	show_groups(N,IW,IH),
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 --
 show_recent_history(N,IW,IH,F1):-
 	N > 0,!,
@@ -217,9 +217,9 @@ show_object_list(N,IW,IH,Color,LineWidth):-
 		Y2== (Y1 - H1 / 2) / IH,
 		W2== W1 / IW,
 		H2== H1 / IH,
-		graphic_window ? set_pen(
+		graphics_window ? set_pen(
 			{color:Color,lineWidth:LineWidth}),
-		graphic_window ? draw_rectangle(X2,Y2,W2,H2),
+		graphics_window ? draw_rectangle(X2,Y2,W2,H2),
 		fail.
 show_object_list(_,_,_,_,_).
 --
@@ -236,9 +236,9 @@ show_groups(N,IW,IH):-
 		Y3== MinY / IH,
 		W3== (MaxX - MinX) / IW,
 		H3== (MaxY - MinY) / IH,
-		graphic_window ? set_pen(
+		graphics_window ? set_pen(
 			{color:'Cyan',lineWidth:3}),
-		graphic_window ? draw_rectangle(X3,Y3,W3,H3),
+		graphics_window ? draw_rectangle(X3,Y3,W3,H3),
 		fail.
 show_groups(_,_,_).
 --

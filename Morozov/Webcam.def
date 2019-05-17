@@ -5,8 +5,8 @@
 
 package "Morozov/Webcam":
 
+import 'ZoomDataAcquisitionBuffer' from "Morozov/VideoBuffer";
 import 'BufferedImage' from "Morozov/Java2D";
-import 'WritableImageProducer' from "Morozov/Java2D";
 
 DOMAINS:
 
@@ -34,18 +34,13 @@ ViewSize		= size(ViewWidth,ViewHeight).
 ViewWidth, ViewHeight	= INTEGER.
 
 --------------------------------------------------------------------
--- The 'Webcam' class is specialized class 'DataAbstraction'.     --
+-- The 'Webcam' class is specialized                              --
+-- class 'ZoomDataAcquisitionBuffer'.                             --
 --------------------------------------------------------------------
 
-interface 'Webcam'
-
-(specialized
-	'DataAbstraction',
-	'WritableImageProducer'):
+interface 'Webcam' (specialized 'ZoomDataAcquisitionBuffer'):
 --
 default_name				: WebcamName;
---
-maximal_waiting_time			: WaitingInterval;
 --
 width					: Width;
 height					: Height;
@@ -55,22 +50,18 @@ PREDICATES:
 --
 imperative:
 --
-open() = YesNo;
-open(WebcamName) = YesNo			- (i);
-open(WebcamName,TimeInterval) = YesNo		- (i,i);
+start(WebcamName) = YesNo			- (i);
+start(WebcamName,TimeInterval) = YesNo		- (i,i);
 --
-close;
+get_recent_image('BufferedImage')		- (i);
 --
-determ:
+get_recent_frame_number(FrameNumber)		- (o);
+get_recent_frame_time(INTEGER)			- (o);
+get_recent_frame_relative_time(INTEGER)		- (o);
+get_recent_frame_rate(REAL)			- (o);
 --
-is_open;
-contains_new_image;
---
-imperative:
---
+get_image_size_in_pixels(INTEGER,INTEGER)	- (o,o);
 get_actual_name() = STRING;
-get_image('BufferedImage')			- (i);
-get_FPS() = REAL;
 --
 -- Get list of webcams to use. This method will wait given time
 -- interval for webcam devices to be discovered. Time argument
@@ -80,7 +71,6 @@ get_webcam_list = WebcamNameList;
 get_webcam_list(TimeInterval) = WebcamNameList;
 --
 watch_webcam_list(YesNo)			- (i)(o);
-watch_webcam_state(YesNo)			- (i)(o);
 --
 get_view_sizes() = ViewSizeList;
 --
@@ -104,16 +94,13 @@ get_actual_resolution(INTEGER,INTEGER)		- (o,o);
 --
 set_default_name(WebcamName)			- (i);
 get_default_name() = WebcamName;
-set_maximal_waiting_time(WaitingInterval)	- (i);
-get_maximal_waiting_time() = WaitingInterval;
 --
 -- These methods are to be implemented by the programmer:
 --
 webcam_added(WebcamName)			- (i);
 webcam_removed(WebcamName)			- (i);
 --
-webcam_open(WebcamName)				- (i);
-webcam_image_obtained(WebcamName)		- (i);
-webcam_closed(WebcamName)			- (i);
+webcam_started(WebcamName)			- (i);
+webcam_stopped(WebcamName)			- (i);
 webcam_disposed(WebcamName)			- (i);
 ]

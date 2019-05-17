@@ -15,8 +15,8 @@ modeless dialog 'DialogHSB' (
 	centered,centered,default)
 vbox(center)
 	hbox(center)
-		-- custom(graphic_window,48,36,"Control2D")
-		custom['KeepProportions'](graphic_window,64,48,"Control2D")
+		-- custom(graphics_window,48,36,"Control2D")
+		custom['KeepProportions'](graphics_window,64,48,"Control2D")
 	end_of_hbox
 	grid
 	row

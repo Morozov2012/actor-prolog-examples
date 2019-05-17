@@ -60,7 +60,7 @@ action("Stop"):-!,
 	buffer ? stop,
 	report_system_mode.
 action("Close"):-!,
-	buffer ? close,
+	buffer ? disconnect,
 	report_system_mode.
 action("Calibrate"):-!,
 	buffer ? calibrate,
@@ -114,7 +114,7 @@ initialize_data_acquisition(_).
 --
 initialize_selected_device(Identifier):-
 	set_title(con?format("Thermal Image Viewer [%s]",Identifier)),
-	buffer ? open(Identifier),!.
+	buffer ? connect(Identifier),!.
 initialize_selected_device(Identifier):-
 	con ? error(
 		"Error",
@@ -178,7 +178,7 @@ report_system_mode:-
 	report_data_transfer_mode.
 --
 report_camera_mode:-
-	buffer ? is_open,!,
+	buffer ? is_connected,!,
 	put(dlg_ctrl_camera_mode,"Camera is Open"),
 	set_control_background_color(dlg_ctrl_camera_mode,'Green').
 report_camera_mode:-

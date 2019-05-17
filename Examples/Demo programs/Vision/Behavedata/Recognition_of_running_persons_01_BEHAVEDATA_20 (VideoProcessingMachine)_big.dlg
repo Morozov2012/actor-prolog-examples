@@ -11,7 +11,7 @@ dialog 'ImageAnalyzer'("Image Subtractor Demo",default,default,default,centered,
 vbox(justify)
 hbox(center)
 	vbox(right)
-		custom['KeepProportions'](graphic_window,50,50,"Control2D")
+		custom['KeepProportions'](graphics_window,50,50,"Control2D")
 	end_of_vbox
 	vbox(center)
 		button("SelectDirectory","&Select Data Set")

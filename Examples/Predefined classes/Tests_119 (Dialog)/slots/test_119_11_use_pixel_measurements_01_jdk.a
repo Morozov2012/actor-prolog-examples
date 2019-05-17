@@ -1,0 +1,108 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+R_STRING= STRING.
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+w01	= ('DemoPanel',
+		x= 100);
+w02	= ('DemoPanel',
+		x= 100.5);
+w03	= ('DemoPanel',
+		x= 'centered');
+w04	= ('DemoPanel',
+		x= 'default');
+--
+w05	= ('DemoPanel',
+		x= -50);
+w06	= ('DemoPanel',
+		x= -50.5);
+w07	= ('DemoPanel',
+		x= 0);
+w08	= ('DemoPanel',
+		x= 0.0);
+--
+w09	= ('DemoPanel',
+		y= 100);
+w10	= ('DemoPanel',
+		y= 100.5);
+w11	= ('DemoPanel',
+		y= 'centered');
+w12	= ('DemoPanel',
+		y= 'default');
+--
+w13	= ('DemoPanel',
+		y= -50);
+w14	= ('DemoPanel',
+		y= -50.5);
+w15	= ('DemoPanel',
+		y= 0);
+w16	= ('DemoPanel',
+		y= 0.0);
+--
+w17	= ('DemoPanel',
+		x= 'centered',
+		y= 'centered');
+w18	= ('DemoPanel',
+		x= 120,
+		y= 130);
+--
+[
+goal.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+--
+constant:
+--
+	x;
+	y;
+--
+	use_pixel_measurements= 'yes';
+--
+variable:
+--
+	title	: R_STRING = _;
+--
+internal:
+--
+	text_tools	= ('Text');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+output_information;
+--
+CLAUSES:
+--
+goal:-!,
+	title== text_tools?format("x=%s, y=%s",x,y),
+	show,
+	output_information.
+--
+action(_):-!,
+	output_information.
+--
+output_information:-
+	get_actual_position(X1,Y1),
+	Text== text_tools?format(
+		"%s\nx= %s\ny= %s\n\n%s\nX= %s\nY= %s",
+		"Given position:",
+		x,y,
+		"Actual position:",
+		X1,Y1),
+	put(1010,Text).
+]
+-----------------------------------------------------------------------

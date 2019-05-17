@@ -1,0 +1,20 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',28)
+
+dialog 'ControlPanel'("Webcam State Control",default,default,default,centered,centered,default)
+vbox(center)
+	hbox(center)
+		checkbox(1001,"Open webcam",'yes')
+	end_of_hbox
+	custom(report,35,12,"ReportControl")
+	hbox(center)
+		button("clear","&Clear")
+		button("exit","&O.K.")
+	end_of_hbox
+end_of_vbox
+end_of_dialog

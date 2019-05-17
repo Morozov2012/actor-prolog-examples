@@ -61,7 +61,7 @@ action("Pause"):-!,
 action("Stop"):-!,
 	buffer ? stop.
 action("Close"):-!,
-	buffer ? close.
+	buffer ? disconnect.
 action("Calibrate"):-!,
 	buffer ? calibrate.
 action("AnnulCalibration"):-!,
@@ -109,7 +109,7 @@ initialize_data_acquisition(_).
 --
 initialize_selected_device(Identifier):-
 	set_title(con?format("Thermal Image Viewer [%s]",Identifier)),
-	buffer ? open(Identifier),!.
+	buffer ? connect(Identifier),!.
 initialize_selected_device(Identifier):-
 	con ? error(
 		"Error",

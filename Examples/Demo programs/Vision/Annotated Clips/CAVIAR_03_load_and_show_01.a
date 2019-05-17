@@ -126,7 +126,7 @@ constant:
 internal:
 --
 	image		= ('BufferedImage');
-	graphic_window	= ('Canvas2D',
+	graphics_window	= ('Canvas2D',
 				background_color= 'SystemControl',
 				y= 0,
 				height= 22);
@@ -140,7 +140,7 @@ internal:
 --
 [
 goal:-!,
-	graphic_window ? show,
+	graphics_window ? show,
 	prompt_window ? write(
 		"The data are coming from the EC Funded CAVIAR ",
 		"project / IST 2001 37540,\n",
@@ -155,10 +155,10 @@ process_frame(N,Objects):-
 		con?format("%03d",N) + ".jpg",
 	image ? load(ImageToBeDrawn),
 	image ? get_size_in_pixels(IW,IH),
-	graphic_window ? clear('no'),
-	graphic_window ? draw_image(image,0,0,1,1),
+	graphics_window ? clear('no'),
+	graphics_window ? draw_image(image,0,0,1,1),
 	show_object_list(Objects,IW,IH),
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 --
 show_object_list([Object|Rest],IW,IH):-!,
 	show_object(Object,IW,IH),
@@ -215,8 +215,8 @@ show_box_attributes(
 	Y2== (Y1 - H1 / 2) / IH,
 	W2== W1 / IW,
 	H2== H1 / IH,
-	graphic_window ? set_pen({color:Color,lineWidth:LineWidth}),
-	graphic_window ? draw_rectangle(X2,Y2,W2,H2).
+	graphics_window ? set_pen({color:Color,lineWidth:LineWidth}),
+	graphics_window ? draw_rectangle(X2,Y2,W2,H2).
 show_box_attributes(_,_,_,_,_,_,_,_,_,_).
 ]
 -----------------------------------------------------------------------

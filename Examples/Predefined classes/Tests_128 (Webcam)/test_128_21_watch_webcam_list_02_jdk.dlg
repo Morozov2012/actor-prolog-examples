@@ -1,9 +1,14 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+
 mesh(80,25)
 dialog_font('helvetica',28)
 
 dialog 'ControlPanel'("Webcam Discovery Control",default,default,default,centered,centered,default)
 vbox(center)
-	checkbox(1001,"Watch webcam list",'no')
+	checkbox(1001,"Watch webcam connection/disconnection",'yes')
 	custom(report,35,12,"ReportControl")
 	hbox(center)
 		button("clear","&Clear")

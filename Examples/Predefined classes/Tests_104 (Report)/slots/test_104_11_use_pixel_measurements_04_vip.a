@@ -1,0 +1,140 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+class 'Main':
+--
+w01	= ('WindowX',
+		x= 100,
+		target_width= 300);
+w02	= ('WindowX',
+		x= 100,
+		target_width= 300.9);
+w03	= ('WindowX',
+		x= 100,
+		target_width= 0);
+w04	= ('WindowX',
+		x= 100,
+		target_width= -30);
+w05	= ('WindowX',
+		x= 100,
+		target_width= 'default');
+w06	= ('WindowX',
+		x= 'centered',
+		target_width= 300);
+w07	= ('WindowX',
+		x= 'centered',
+		target_width= 300.9);
+w08	= ('WindowX',
+		x= 'centered',
+		target_width= 0);
+w09	= ('WindowX',
+		x= 'centered',
+		target_width= -30);
+w10	= ('WindowX',
+		x= 'centered',
+		target_width= 'default');
+--
+w11	= ('WindowY',
+		y= 100,
+		target_height= 50);
+w12	= ('WindowY',
+		y= 100,
+		target_height= 50.9);
+w13	= ('WindowY',
+		y= 100,
+		target_height= 0);
+w14	= ('WindowY',
+		y= 100,
+		target_height= -30);
+w15	= ('WindowY',
+		y= 100,
+		target_height= 'default');
+w16	= ('WindowY',
+		y= 'centered',
+		target_height= 50);
+w17	= ('WindowY',
+		y= 'centered',
+		target_height= 50.9);
+w18	= ('WindowY',
+		y= 'centered',
+		target_height= 0);
+w19	= ('WindowY',
+		y= 'centered',
+		target_height= -30);
+w20	= ('WindowY',
+		y= 'centered',
+		target_height= 'default');
+--
+[
+goal.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'WindowX' (specialized 'Report'):
+--
+constant:
+--
+	target_width	: Width = 'default';
+	target_height	: Height = 'default';
+--
+	x;
+	width;
+--
+	use_pixel_measurements= 'yes';
+--
+[
+goal:-!,
+	writeln("Hello world!"),
+	writeln("target_width= ",target_width),
+	writeln("target_height= ",target_height),
+	set_actual_size(target_width,target_height),
+	writeln("x= ",x),
+	writeln("width= ",width),
+	get_actual_position(X1,Y1),
+	writeln("X= ",X1),
+	writeln("Y= ",Y1),
+	get_actual_size(Width1,Height1),
+	writeln("Width= ",Width1),
+	writeln("Height= ",Height1),
+	get_actual_bounds(X2,Y2,Width2,Height2),
+	writeln("X= ",X2),
+	writeln("Y= ",Y2),
+	writeln("Width= ",Width2),
+	writeln("Height= ",Height2).
+]
+-----------------------------------------------------------------------
+class 'WindowY' (specialized 'Report'):
+--
+constant:
+--
+	target_width	: Width = 'default';
+	target_height	: Height = 'default';
+--
+	y;
+	height;
+--
+	use_pixel_measurements= 'yes';
+--
+[
+goal:-!,
+	writeln("Hello world!"),
+	writeln("target_width= ",target_width),
+	writeln("target_height= ",target_height),
+	set_actual_size(target_width,target_height),
+	writeln("y= ",y),
+	writeln("height= ",height),
+	get_actual_position(X1,Y1),
+	writeln("X= ",X1),
+	writeln("Y= ",Y1),
+	get_actual_size(Width1,Height1),
+	writeln("Width= ",Width1),
+	writeln("Height= ",Height1),
+	get_actual_bounds(X2,Y2,Width2,Height2),
+	writeln("X= ",X2),
+	writeln("Y= ",Y2),
+	writeln("Width= ",Width2),
+	writeln("Height= ",Height2).
+]
+-----------------------------------------------------------------------

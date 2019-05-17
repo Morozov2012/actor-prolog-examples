@@ -122,7 +122,7 @@ constant:
 --
 	ball_radius	: Radius	= 0.03;
 --
-	enable_scene_antialiasing	= 'yes';
+	enable_scene_antialiasing	= 'no';
 	background_color		= 'Black';
 --
 [

@@ -1,0 +1,24 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016-2019 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',18)
+
+draft('off')
+
+dialog 'ControlPanel'("Webcam Demo",default,default,default,centered,centered,default)
+vbox(center)
+	hbox(center)
+		listbutton(1010,1020,35,3,[],"")
+		listbutton(2010,2020,15,3,[],"")
+	end_of_hbox
+	vbox(center)
+		hbox(center)
+			custom(graphics_window,80,17,"Control2D")
+		end_of_hbox
+		custom(report_window,80,5,"ReportControl")
+	end_of_vbox
+end_of_vbox
+end_of_dialog

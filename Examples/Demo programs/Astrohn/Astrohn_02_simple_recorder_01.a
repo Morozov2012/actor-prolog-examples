@@ -5,6 +5,7 @@
 -- Please set the following network attributes:
 -- IP address: 192.168.11.1
 -- Mask: 225.225.225.0
+-- Default Gateway: 192.168.11.1
 -- Probably you should switch off the firewall.
 -----------------------------------------------------------------------
 import .. from "morozov/Java2D";
@@ -135,7 +136,7 @@ modified_control(dlg_ctrl_togglebutton_connect):-
 modified_control(dlg_ctrl_scrollbar_frame_number_value):-
 	Position== ?cast("INTEGER",
 		?get(dlg_ctrl_scrollbar_frame_number_value)),
-	buffer ? retrieve_buffered_frame(Position),!.
+	buffer ? request_buffered_frame(Position),!.
 -----------------------------------------------------------------------
 play_video_if_possible:-
 	check_file_name,!,
@@ -213,12 +214,12 @@ is_loaded:-
 	buffer ? does_exist().
 --
 is_reading_mode:-
-	Mode== ?val("VideoBufferOperatingMode",
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
 		buffer?get_operating_mode()),
 	Mode == 'READING'.
 --
 is_recording_mode:-
-	Mode== ?val("VideoBufferOperatingMode",
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
 		buffer?get_operating_mode()),
 	Mode == 'RECORDING'.
 -----------------------------------------------------------------------

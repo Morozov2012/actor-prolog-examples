@@ -5,13 +5,14 @@
 
 package "Morozov/Astrohn":
 
-import 'ThermalVideoBuffer' from "Morozov/ThermalVideoBuffer";
+import 'ThermalDataAcquisitionBuffer' from "Morozov/VideoBuffer";
 
 --------------------------------------------------------------------
--- The 'Astrohn' class is specialized class 'ThermalVideoBuffer'. --
+-- The 'Astrohn' class is specialized                             --
+-- class 'ThermalDataAcquisitionBuffer'.                          --
 --------------------------------------------------------------------
 
-class 'Astrohn' (specialized 'ThermalVideoBuffer'):
+class 'Astrohn' (specialized 'ThermalDataAcquisitionBuffer'):
 
 constant:
 --
@@ -20,6 +21,10 @@ terahertz_camera_port			= 41865;
 color_camera_url			= "http://192.168.10.230/mjpg/video.mjpg";
 --
 synchronize_terahertz_and_color_streams	= 'yes';
+color_camera_delay_queue_size		= 6;
+--
+-- The implementation of the
+-- 'ThermalDataAcquisitionBuffer' interface:
 --
 lower_temperature_bound				= 0.0;
 upper_temperature_bound				= 65536.0;
@@ -104,6 +109,10 @@ get_recent_color_image(BufferedImage):
 	[external "getRecentColorImage"].
 get_recent_combined_image(BufferedImage):
 	[external "getRecentCombinedImage"].
+get_recent_bordered_image(BufferedImage):
+	[external "getRecentBorderedImage"].
+get_recent_bordered_image(BufferedImage,BackgroundColor):
+	[external "getRecentBorderedImage"].
 get_recent_color_map(ColorMap):
 	[external "getRecentColorMap"].
 --
@@ -138,4 +147,9 @@ set_synchronize_terahertz_and_color_streams(YesNo):
 	[external "setSynchronizeTerahertzAndColorStreams"].
 get_synchronize_terahertz_and_color_streams() = YesNo:
 	[external "getSynchronizeTerahertzAndColorStreams"].
+--
+set_color_camera_delay_queue_size(QueueSize):
+	[external "setColorCameraDelayQueueSize"].
+get_color_camera_delay_queue_size() = QueueSize:
+	[external "getColorCameraDelayQueueSize"].
 ]

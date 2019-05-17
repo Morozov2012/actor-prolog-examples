@@ -1,0 +1,117 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+draft('off')
+
+dialog 'MultichannelViewer' (
+	"Multichannel Viewer",
+	default,default,default,centered,centered,default)
+vbox(justify)
+	hbox(center)
+		vbox(center)
+			edittext['ReadOnly','AlignCenter'](1011,15,1,"")
+			edittext['ReadOnly','AlignCenter'](1012,15,1,"")
+			edittext['ReadOnly','AlignCenter'](1013,15,1,"")
+			edittext['ReadOnly','AlignCenter'](1014,15,1,"")
+			--
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			--
+			scaling(1.5,2.0)
+			button("Photo","P&hoto")
+			end_of_scaling
+			--
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			--
+			statictext(0000,1,"Video data:")
+			listbutton(0,1015,15,4,
+				[
+				"Terahertz Camera",
+				"Thermal Camera",
+				"Webcam",
+				"None"
+				],
+				"Terahertz Camera"
+				)
+			listbutton(0,1016,15,7,
+				[
+				"Aqua",
+				"Autumn",
+				"Blackhot",
+				"Blaze",
+				"BlueRed",
+				"Bone",
+				"Bright Rainbow",
+				"Cool",
+				"Copper",
+				"Gray",
+				"Green",
+				"Hot",
+				"HSV",
+				"Iron",
+				"Jet",
+				"LightJet",
+				"Medical",
+				"Ocean",
+				"Parula",
+				"Pink",
+				"Prism",
+				"Purple",
+				"Red",
+				"Reptiloid",
+				"Soft Rainbow",
+				"Spring",
+				"Summer",
+				"Winter",
+				"Optical",
+				"None"
+				],
+				-- "Blackhot"
+				"Purple"
+				-- "Green"
+				)
+			togglebutton(1017,"Show S&keletons",'no')
+			button("GoHome","Go &Home")
+		end_of_vbox
+		grid
+		row
+		column
+			custom['KeepProportions'](main_window,45,30,"Control3D")
+		end_of_column
+		column
+			vscroll(5011,5012,45,[0,500],250)
+		end_of_column
+		end_of_row
+		row
+		column
+			hscroll(7011,7012,30,[0,500],250)
+		end_of_column
+		end_of_row
+		end_of_grid
+		statictext(0000,1,"")
+	end_of_hbox
+	hscroll(8011,8012,50,[0,255],0)
+	hbox(justify)
+	scaling(2.7,1.0)
+		button("Choose","Ch&oose")
+		togglebutton(9013,"&Play")
+		button("Pause","Pau&se")
+		button("Stop","S&top")
+		togglebutton(9018,"E&xport",'no')
+		button(close,"&Quit")
+	end_of_scaling
+	end_of_hbox
+	padding(0,0)
+		statictext(
+			"The project is supported by the Russian "
+			"Foundation for Basic Research, "
+			"grant 16-29-09626-ofi_m. "
+			"WebSite: www.fullvision.ru")
+	end_of_padding
+end_of_vbox
+end_of_dialog

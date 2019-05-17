@@ -5,13 +5,14 @@
 
 package "Morozov/IPCamera":
 
-import 'VideoBuffer' from "Morozov/VideoBuffer";
+import 'ZoomDataAcquisitionBuffer' from "Morozov/VideoBuffer";
 
 --------------------------------------------------------------------
--- The 'IPCamera' class is specialized class 'VideoBuffer'.       --
+-- The 'IPCamera' class is specialized                            --
+-- class 'ZoomDataAcquisitionBuffer'.                             --
 --------------------------------------------------------------------
 
-class 'IPCamera' (specialized 'VideoBuffer'):
+class 'IPCamera' (specialized 'ZoomDataAcquisitionBuffer'):
 
 constant:
 

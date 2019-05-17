@@ -31,11 +31,11 @@ internal:
 				place= shared(
 					datastore,
 					"3DDataSources"));
-	graphic_window	= ('Canvas3D',
+	graphics_window	= ('Canvas3D',
 				enable_scene_antialiasing='yes');
 	dialog		= ('MainDialog',
 				communicator=self,
-				graphic_window,
+				graphics_window,
 				message_window=con);
 	buffer2D	= ('BufferedImage');
 	data_supplier	= ('CurrentDataSupplier');
@@ -65,7 +65,7 @@ CLAUSES:
 goal:-!,
 	dialog ? show,
 	create_list_of_nodes(VisualScene),
-	graphic_window ? show(VisualScene),
+	graphics_window ? show(VisualScene),
 	set_period(3.0),
 	activate.
 --
@@ -115,7 +115,7 @@ new_frame(Skeletons,BinaryData):-
 	suspend,
 	buffer2D ? set_binary(BinaryData),
 	SkeletonFigures== ?form_skeletons(Skeletons,buffer2D),
-	graphic_window ? set_node(
+	graphics_window ? set_node(
 		main_label,
 		'BranchGroup'({
 			label: main_label,
@@ -597,7 +597,7 @@ class 'MainDialog' (specialized 'Dialog'):
 internal:
 --
 	communicator;
-	graphic_window;
+	graphics_window;
 	message_window;
 --
 constant:

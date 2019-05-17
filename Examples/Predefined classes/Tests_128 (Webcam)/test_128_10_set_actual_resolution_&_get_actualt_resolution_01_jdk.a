@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 -- An example of Actor Prolog program.                               --
--- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
 -----------------------------------------------------------------------
 
 import .. from "morozov/Webcam";
@@ -43,10 +43,10 @@ internal:
 --
 [
 goal:-!,
-	webcam ? open,
+	webcam ? start,
 	test1(0),
 	test2,
-	webcam ? close.
+	webcam ? stop.
 --
 test1(T):-
 	webcam ? get_actual_resolution(Width,Height),
@@ -57,7 +57,7 @@ test1(T):-
 	write_tabulation(T),
 	con ? writeln(" Width=",Width," Height=",Height),
 	test_image,
-	FrameRate== webcam?get_FPS(),
+	webcam ? get_recent_frame_rate(FrameRate),
 	con ? set_color('Gray'),
 	write_tabulation(T),
 	con ? write(" Frame rate: "),
@@ -67,7 +67,8 @@ test1(T):-
 	con ? writeln("O.K.").
 --
 test_image:-
-	webcam ? get_image(buffer),
+	webcam ? commit,!,
+	webcam ? get_recent_image(buffer),
 	panel ? show,
 	panel ? get_size_in_pixels(WP,HP),
 	buffer ? get_size_in_pixels(WI,HI),
@@ -78,6 +79,7 @@ test_image:-
 	panel ? clear('no'),
 	panel ? draw_image(buffer,X0,Y0,Width,Height),
 	panel ? draw_now.
+test_image.
 --
 test2:-
 	con ? set_color('RoyalBlue'),

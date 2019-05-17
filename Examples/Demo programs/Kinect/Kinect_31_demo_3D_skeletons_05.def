@@ -92,7 +92,7 @@ interface 'MainDialog' (specialized 'Dialog'):
 --
 internal:
 --
-	graphic_window	: 'Canvas3D';
+	graphics_window	: 'Canvas3D';
 --
 [
 ]

@@ -35,7 +35,7 @@ internal:
 				-- sampling_rate,
 				synthesized_image_transparency= 48);
 	timer		= ('Timer');
-	graphic_window	= ('Canvas2D',
+	graphics_window	= ('Canvas2D',
 				enable_scene_antialiasing= 'yes',
 				background_color= 'SystemControl',
 				y= 0,
@@ -307,22 +307,22 @@ data_transfer_error(ErrorCode):-!,
 --
 draw_scene(N):-
 	vpm ? commit,
-	graphic_window ? suspend_redrawing,
-	graphic_window ? clear,
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
 	-- vpm ? get_recent_image(image2),
 	-- vpm ? get_preprocessed_image(image2),
 	-- vpm ? get_background_image(image2),
 	-- vpm ? get_sigma_image(image2),
 	-- vpm ? get_foreground_image(image2),
 	vpm ? get_synthesized_image(image2),
-	graphic_window ? draw_image(image2,0,0,1,1),
+	graphics_window ? draw_image(image2,0,0,1,1),
 	-- vpm ? select_superior_track(
 	--	'NUMBER_OF_FRAMES','DESCENDING_ORDER'),
 	vpm ? get_chronicle(Chronicle),
 	image2 ? get_size_in_pixels(IW,IH),
 	draw_chronicle(Chronicle,N,IW,IH),
 	draw_legend,
-	graphic_window ? draw_now.
+	graphics_window ? draw_now.
 --
 draw_chronicle(Chronicle,FN,IW,IH):-
 	draw_dynamic_object('cap',Chronicle,IW,IH),
@@ -336,13 +336,13 @@ draw_dynamic_object(Type,Chronicle,IW,IH):-
 	get_blob_of_type(Type,Blobs,Object),
 	Object== {x:X0,y:Y0,width:W1,height:H1|_},
 	compute_object_color(Type,Color),
-	graphic_window ? set_pen({color:Color,lineWidth:2}),!,
-	graphic_window ? set_brush('off'),
+	graphics_window ? set_pen({color:Color,lineWidth:2}),!,
+	graphics_window ? set_brush('off'),
 	X2== (X0 - W1 / 2) / IW,
 	Y2== (Y0 - H1 / 2) / IH,
 	W2== W1 / IW,
 	H2== H1 / IH,
-	graphic_window ? draw_rectangle(X2,Y2,W2,H2).
+	graphics_window ? draw_rectangle(X2,Y2,W2,H2).
 draw_dynamic_object(_,_,_,_).
 --
 draw_static_object(Type,Chronicle,_,_):-
@@ -366,15 +366,15 @@ draw_static_object(Type,_,IW,IH):-
 	accumulator ? get_average_value(Type,'y1',Y1b),
 	accumulator ? get_average_value(Type,'y2',Y2b),!,
 	compute_object_color(Type,Color),
-	graphic_window ? set_pen({color:Color,lineWidth:2}),!,
-	graphic_window ? set_brush('off'),
+	graphics_window ? set_pen({color:Color,lineWidth:2}),!,
+	graphics_window ? set_brush('off'),
 	X1p== X1b / IW,
 	X2p== X2b / IW,
 	Y1p== Y1b / IH,
 	Y2p== Y2b / IH,
 	Width== X2p - X1p,
 	Height== Y2p - Y1p,
-	graphic_window ? draw_rectangle(X1p,Y1p,Width,Height).
+	graphics_window ? draw_rectangle(X1p,Y1p,Width,Height).
 draw_static_object(_,_,_,_).
 --
 compute_object_color('cap','Cyan'):-!.
@@ -413,46 +413,46 @@ draw_arrows(Chronicle,FrameNumber,IW,IH):-
 	check_whether_frame_is_marked_by_expert(FrameNumber,Sniffing2),
 	select_sniffing_color(Sniffing1,Sniffing2,ArrowColor),
 	-- Draw line: body - nearest point (3) of the object.
-	graphic_window ? set_brush('Blue'),
-	graphic_window ? set_pen(
+	graphics_window ? set_brush('Blue'),
+	graphics_window ? set_pen(
 		{color:'Blue',lineWidth:1,dashArray:[3,5]}),
-	graphic_window ? draw_line(X1b,Y1b,X3b,Y3b),
+	graphics_window ? draw_line(X1b,Y1b,X3b,Y3b),
 	-- draw_circle(X3b,Y3b,1.0),
 	-- Draw line: cap - nearest point (3) of the object.
-	graphic_window ? set_brush('Lemon'),
-	graphic_window ? set_pen(
+	graphics_window ? set_brush('Lemon'),
+	graphics_window ? set_pen(
 		{color:'Lemon',lineWidth:1,dashArray:[3,5]}),
-	graphic_window ? draw_line(X2b,Y2b,X3b,Y3b),
+	graphics_window ? draw_line(X2b,Y2b,X3b,Y3b),
 	draw_circle(X3b,Y3b,1.0),
 	-- Draw line: body - nearest point (4) of the object.
-	graphic_window ? set_brush('Pink'),
-	graphic_window ? set_pen(
+	graphics_window ? set_brush('Pink'),
+	graphics_window ? set_pen(
 		{color:'Pink',lineWidth:1,dashArray:[3,5]}),
-	graphic_window ? draw_line(X1b,Y1b,X5b,Y5b),
+	graphics_window ? draw_line(X1b,Y1b,X5b,Y5b),
 	draw_circle(X5b,Y5b,1.0),
 	-- Draw line: body - cap.
-	graphic_window ? set_brush(ArrowColor),
-	graphic_window ? set_pen({color:ArrowColor,lineWidth:1}),
-	graphic_window ? draw_line(X1b,Y1b,X2b,Y2b),
+	graphics_window ? set_brush(ArrowColor),
+	graphics_window ? set_pen({color:ArrowColor,lineWidth:1}),
+	graphics_window ? draw_line(X1b,Y1b,X2b,Y2b),
 	draw_circle(X1b,Y1b,1.0),
 	draw_circle(X2b,Y2b,3.0),
 	-- Draw text label: angle.
-	graphic_window ? set_pen({color:'Aqua',lineWidth:1}),
+	graphics_window ? set_pen({color:'Aqua',lineWidth:1}),
 	draw_text_label(X1b,Y1b-0.02,text?format("%1.2f",Angle)),
 	-- Draw text label: velocity.
-	graphic_window ? set_pen({color:'Fuchsia',lineWidth:1}),
+	graphics_window ? set_pen({color:'Fuchsia',lineWidth:1}),
 	draw_text_label(X1b,Y1b+0.02,text?format("%1.3f",Velocity)),
 	-- Draw text label: the distance between the cap and
 	-- the nearest point (3) of the object.
 	X6b== (X2b + X3b) / 2,
 	Y6b== (Y2b + Y3b) / 2,
-	graphic_window ? set_pen({color:'Lemon',lineWidth:1}),
+	graphics_window ? set_pen({color:'Lemon',lineWidth:1}),
 	draw_text_label(X6b,Y6b-0.02,text?format("%1.3f",Distance3)),
 	-- Draw text label: the distance between the body and
 	-- the nearest point (4) of the object.
 	X7b== (X1b + X5b) / 2,
 	Y7b== (Y1b + Y5b) / 2,
-	graphic_window ? set_pen({color:'Pink',lineWidth:1}),
+	graphics_window ? set_pen({color:'Pink',lineWidth:1}),
 	draw_text_label(X7b,Y7b-0.02,text?format("%1.3f",Distance5)),
 	--
 	protocol ? add_frame(
@@ -690,13 +690,13 @@ draw_circle(X0,Y0,C):-
 	Y1== Y0 - circle_radius * C,
 	Width== circle_radius * 2 * C,
 	Height== circle_radius * 2 * C,
-	graphic_window ? draw_ellipse(X1,Y1,Width,Height).
+	graphics_window ? draw_ellipse(X1,Y1,Width,Height).
 --
 draw_text_label(_,_,""):-!.
 draw_text_label(X,Y,Text):-!,
-	graphic_window ? set_font({size:18}),
-	graphic_window ? set_text_alignment('CENTER','CENTER'),
-	graphic_window ? draw_text(X,Y,Text).
+	graphics_window ? set_font({size:18}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
+	graphics_window ? draw_text(X,Y,Text).
 --
 show_recognition_results:-
 	protocol ? get_cumulative_interval(
@@ -739,16 +739,16 @@ draw_legend:-
 	DelayInSeconds== DelayInMilliseconds / 1000.0,
 	RealFrameRate== FrameQuantity / DelayInSeconds,
 	FrameTime== (FrameNumber-1) / DeclaredFrameRate,
-	graphic_window ? set_brush('DkGreen'),
-	graphic_window ? set_font({size:18}),
-	graphic_window ? set_text_alignment('LEFT','TOP'),
-	graphic_window ? draw_text(
+	graphics_window ? set_brush('DkGreen'),
+	graphics_window ? set_font({size:18}),
+	graphics_window ? set_text_alignment('LEFT','TOP'),
+	graphics_window ? draw_text(
 		0.02, 0.02,
 		text?format(
 			"Time: %3.2f [sec]; Frame: %d (%d)",
 			FrameTime,FrameNumber,GlobalCounter)),
-	graphic_window ? set_text_alignment('RIGHT','TOP'),
-	graphic_window ? draw_text(
+	graphics_window ? set_text_alignment('RIGHT','TOP'),
+	graphics_window ? draw_text(
 		0.98, 0.02,
 		text?format(
 			"Frame Rate: %3.2f [Hz]",

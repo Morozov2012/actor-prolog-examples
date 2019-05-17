@@ -1,0 +1,590 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import 'MultimediaBuffer' from "morozov/VideoBuffer";
+import .. from "morozov/Kinect";
+import .. from "morozov/Astrohn";
+import .. from "morozov/TEV1";
+import .. from "morozov/Webcam";
+import .. from "morozov/ColorMap";
+import .. from "morozov/Vision";
+--
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+NameOrNumber	= name(STRING); number(INTEGER); time(INTEGER); 'none'.
+--
+Hue		= INTEGER; STRING.
+Saturation	= INTEGER; STRING.
+Brightness	= INTEGER; STRING.
+--
+-----------------------------------------------------------------------
+interface 'MultichannelViewer' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer			: 'MultimediaControl';
+	--
+	kinect			: 'KinectCameraControl';
+	astrohn			: 'AstrohnCameraControl';
+	tev1			: 'ThermalCameraControl';
+	webcam			: 'WebcamControl';
+	--
+	main_window		: 'Canvas2D';
+	--
+	buffered_image		: 'BufferedImage';
+	--
+	vpm			: 'VideoProcessingMachine';
+	trajectory		: 'Trajectory';
+	--
+	directory_name		: 'DirectoryName';
+	file_operations		: 'File';
+	text_operations		: 'Text';
+	timer_operations	: 'Timer';
+	color_maps		: 'ColorMap';
+	con			: 'Console';
+--
+constant:
+--
+	temporary_file_name		: FileName;
+	export_encoding_attributes	: ImageEncodingAttributes;
+	--
+	dlg_ctrl_edittext_description		: DialogFieldName;
+	dlg_ctrl_edittext_copyright		: DialogFieldName;
+	dlg_ctrl_edittext_registration_date	: DialogFieldName;
+	dlg_ctrl_edittext_registration_time	: DialogFieldName;
+	--
+	dlg_ctrl_listbutton_video_data_mode	: DialogFieldName;
+	dlg_ctrl_listbutton_color_map		: DialogFieldName;
+	--
+	dlg_ctrl_scrollbar_frame_number_range	: DialogFieldName;
+	dlg_ctrl_scrollbar_frame_number_value	: DialogFieldName;
+	--
+	dlg_ctrl_togglebutton_play		: DialogFieldName;
+	dlg_ctrl_togglebutton_pause		: DialogFieldName;
+	dlg_ctrl_togglebutton_export		: DialogFieldName;
+--
+variable:
+--
+	minimal_hue			: Hue;
+	maximal_hue			: Hue;
+	minimal_saturation		: Saturation;
+	maximal_saturation		: Saturation;
+	minimal_brightness		: Brightness;
+	maximal_brightness		: Brightness;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+set_Play_mode(YesNo)					- (i);
+set_Pause_mode(YesNo)					- (i);
+set_Export_mode(YesNo)					- (i);
+set_Export_mode_YES(STRING)				- (i);
+--
+display_components(
+	MultimediaBufferOperatingMode,
+	FrameNumber)					- (i,i);
+display_components(
+	STRING,
+	MultimediaBufferOperatingMode,
+	FrameNumber)					- (i,i,i);
+--
+complete_data_transfer;
+--
+export_frame_if_necessary(
+	MultimediaBufferOperatingMode,
+	NameOrNumber,
+	STRING,
+	'BufferedImage')				- (i,i,i,i);
+--
+take_photo(STRING)					- (i);
+take_photo(STRING,STRING)				- (i,i);
+--
+stop_data_reading_and_writing;
+stop_all_devices;
+reset_all_counters;
+--
+load_temporary_file_if_possible;
+choose_and_play_file(STRING)				- (i);
+choose_file(STRING)					- (i);
+update_dialog_title(STRING)				- (i);
+start_reading;
+--
+imperative:
+--
+park_scroll_control;
+set_read_buffer_size(INTEGER)				- (i);
+--
+redraw_recent_frame;
+scroll_video;
+--
+update_mode_and_switch_controls;
+--
+update_displaying_mode;
+update_video_data_mode;
+update_video_data_mode(STRING)				- (i);
+update_vpm_mode;
+update_vpm_mode(STRING)					- (i);
+select_polygon(STRING)					- (i);
+--
+switch_controls;
+switch_button_Choose;
+switch_button_Play;
+switch_button_Pause;
+switch_button_Stop;
+switch_button_Export;
+switch_text_area_Description;
+--
+determ:
+--
+buffer_is_playing;
+playing_is_suspended;
+buffer_is_exporting;
+--
+is_ON(DialogFieldName)					- (i);
+--
+imperative:
+--
+create_new_file_name() = STRING;
+--
+imperative:
+--
+resize_main_window(INTEGER,INTEGER)			- (i,i);
+indicate_blob(BlobList,INTEGER,INTEGER)			- (i,i,i);
+indicate_blob(PointX,PointY,PointX,PointY)		- (i,i,i,i);
+store_blob(PointX,PointY,PointX,PointY)			- (i,i,i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX				- (i,i);
+'+'(PointY,PointY) = PointY				- (i,i);
+'-'(PointX,PointX) = PointX				- (i,i);
+'-'(PointY,PointY) = PointY				- (i,i);
+'/'(PointX,PointX) = PointX				- (i,i);
+'/'(PointY,PointY) = PointY				- (i,i);
+'/'(PointX,PointY) = REAL				- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'MultimediaControl' (specialized 'MultimediaBuffer'):
+--
+internal:
+--
+	viewer				: 'MultichannelViewer';
+	stop_after_the_first_frame	: 'Switch';
+	file_operation_error_handler	: 'FileOperationErrorHandler';
+	file_operations			: 'File';
+	text_operations			: 'Text';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+check_file_name;
+--
+rename_temporary_file(STRING)			- (i);
+--
+imperative:
+--
+list_directory(STRING) = S_List			- (i);
+make_directory(FileName)			- (i);
+make_directory(STRING)				- (i);
+--
+imperative:
+--
+read_all_frames;
+read_only_the_first_frame;
+--
+control_export(MultimediaBufferOperatingMode)	- (i);
+continue_reading_if_necessary;
+]
+-----------------------------------------------------------------------
+interface 'AstrohnCameraControl' (specialized 'Astrohn'):
+--
+internal:
+--
+	graphics_window			: 'Canvas2D';
+	vpm				: 'VideoProcessingMachine';
+	viewer				: 'MultichannelViewer';
+	time_reporter			: 'TimeReporter';
+	image				: 'BufferedImage';
+	timer				: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+display_frame(
+	MultimediaBufferOperatingMode,
+	NameOrNumber,
+	STRING)					- (i,i,i);
+--
+get_image(
+	STRING,
+	INTEGER,
+	INTEGER,
+	INTEGER,
+	INTEGER,
+	REAL)					- (i,o,o,o,o,o);
+]
+-----------------------------------------------------------------------
+interface 'ThermalCameraControl' (specialized 'TEV1'):
+--
+internal:
+--
+	graphics_window			: 'Canvas2D';
+	vpm				: 'VideoProcessingMachine';
+	viewer				: 'MultichannelViewer';
+	time_reporter			: 'TimeReporter';
+	image				: 'BufferedImage';
+	timer				: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+display_frame(
+	MultimediaBufferOperatingMode,
+	NameOrNumber)				- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'KinectCameraControl' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	target_frame_type	: KinectFrameType;
+	target_people_index	: KinectPeopleIndexMode;
+	circumscription_mode	: KinectCircumscriptionModes;
+	skeletons_mode		: KinectSkeletonsMode;
+--
+	file_name_suffix	: STRING;
+	ellipse_radius		: INTEGER;
+--
+internal:
+--
+	graphics_window			: 'Canvas2D';
+	vpm				: 'VideoProcessingMachine';
+	viewer				: 'MultichannelViewer';
+	time_reporter			: 'TimeReporter';
+	image				: 'BufferedImage';
+	timer				: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+display_frame(
+	MultimediaBufferOperatingMode,
+	NameOrNumber,
+	STRING)					- (i,i,i);
+--
+imperative:
+--
+get_image_size_in_pixels(
+	KinectFrameType,
+	INTEGER,
+	INTEGER)				- (i,o,o);
+--
+draw_skeletons(
+	PointX,
+	PointY,
+	Skeletons,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_skeleton(
+	PointX,
+	PointY,
+	Skeleton,
+	KinectFrameType)		- (i,i,i,i);
+--
+draw_spine(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonSpine,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_arm(
+	PointX,
+	PointY,
+	SkeletonSpine,
+	SkeletonArm,
+	KinectFrameType,
+	YesNo)				- (i,i,i,i,i,i);
+draw_hand(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonJoint,
+	SkeletonArm,
+	KinectFrameType,
+	YesNo)				- (i,i,i,i,i,i,i);
+indicate_blob(
+	YesNo,
+	PointX,
+	PointY,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_leg(
+	PointX,
+	PointY,
+	SkeletonSpine,
+	SkeletonLeg,
+	KinectFrameType)		- (i,i,i,i,i);
+draw_link(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i,i);
+--
+select_line_width(
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	INTEGER)			- (i,i,o);
+select_line_width(
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	SkeletonJointStatus,
+	INTEGER)			- (i,i,i,o);
+--
+draw_joint(
+	PointX,
+	PointY,
+	SkeletonJoint,
+	KinectFrameType)		- (i,i,i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX				- (i,i);
+'+'(PointY,PointY) = PointY				- (i,i);
+'-'(PointX,PointX) = PointX				- (i,i);
+'-'(PointY,PointY) = PointY				- (i,i);
+'/'(PointX,PointX) = PointX				- (i,i);
+'/'(PointY,PointY) = PointY				- (i,i);
+'/'(PointX,PointY) = REAL				- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'WebcamControl' (specialized 'Webcam'):
+--
+internal:
+--
+	graphics_window			: 'Canvas2D';
+	vpm				: 'VideoProcessingMachine';
+	viewer				: 'MultichannelViewer';
+	time_reporter			: 'TimeReporter';
+	image				: 'BufferedImage';
+	timer				: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+determ:
+--
+display_frame(
+	MultimediaBufferOperatingMode,
+	NameOrNumber)				- (i,i);
+]
+-----------------------------------------------------------------------
+interface 'WriteTimingControl' (specialized 'Timer'):
+--
+internal:
+--
+	viewer				: 'MultichannelViewer';
+--
+	con				: 'Console';
+--
+[
+]
+-----------------------------------------------------------------------
+interface 'TimeReporter' (specialized 'Text'):
+--
+internal:
+--
+	graphics_window		: 'Canvas2D';
+	timer_operations	: 'Timer';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+report_time(FrameNumber,INTEGER,REAL)		- (i,i,i);
+report_time(INTEGER,INTEGER,REAL,FontSize)	- (i,i,i,i);
+report_copyright;
+report_copyright(FontSize)			- (i);
+]
+-----------------------------------------------------------------------
+interface 'DirectoryName' (specialized 'Database'):
+--
+internal:
+--
+	file_operation_error_handler	: 'FileOperationErrorHandler';
+	file_operations			: 'File';
+	text_operations			: 'Text';
+--
+[
+DOMAINS:
+--
+Target	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+remember_name(STRING)				- (i);
+--
+determ:
+--
+create_directory_if_necessary(STRING)		- (i);
+--
+imperative:
+--
+delete_files(S_List)				- (i);
+--
+list_directory(STRING) = S_List			- (i);
+delete(FileName)				- (i);
+delete(STRING)					- (i);
+make_directory(FileName)			- (i);
+make_directory(STRING)				- (i);
+rename(FileName)				- (i);
+rename(STRING)					- (i);
+]
+-----------------------------------------------------------------------
+interface 'Switch' (specialized 'Database'):
+[
+DOMAINS:
+Target	= YesNo.
+PREDICATES:
+imperative:
+assign(YesNo)			- (i);
+determ:
+is_true;
+is_false;
+]
+-----------------------------------------------------------------------
+interface 'TextStore' (specialized 'Database'):
+[
+DOMAINS:
+Target	= STRING.
+PREDICATES:
+imperative:
+set(Target)			- (i);
+determ:
+get(Target)			- (o)(i);
+]
+-----------------------------------------------------------------------
+interface 'FileOperationErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler;
+	--
+	con		: 'Console';
+--
+[
+PREDICATES:
+determ:
+does_exist(FileName)					- (i);
+does_exist(STRING)					- (i);
+list_directory(STRING) = S_List				- (i);
+delete(FileName)					- (i);
+delete(STRING)						- (i);
+make_directory(FileName)				- (i);
+make_directory(STRING)					- (i);
+rename(FileName)					- (i);
+rename(STRING)						- (i);
+imperative:
+alarm(ExceptionName,SYMBOL,_*)				- (i,i,i);
+]
+-----------------------------------------------------------------------
+DOMAINS:
+--
+TrajectoryPoint		= point(PointX,		-- Xc
+				PointY,		-- Yc
+				PointX,		-- IW
+				PointY,		-- IH
+				INTEGER,	-- Frame Number
+				INTEGER).	-- Time
+--
+TrajectoryPoints	= TrajectoryPoint*.
+--
+interface 'TrajectoryFinder' (specialized 'FindAll'):
+[
+PREDICATES:
+--
+imperative:
+--
+get_points() = TrajectoryPoints;
+]
+-----------------------------------------------------------------------
+interface 'Trajectory' (specialized 'Database'):
+--
+internal:
+--
+	graphics_window		: 'Canvas2D';
+--
+	set			: 'TrajectoryFinder';
+	file			: 'File';
+--
+[
+DOMAINS:
+--
+Target		= TrajectoryPoint.
+--
+PREDICATES:
+--
+imperative:
+--
+append_point(
+	PointX,
+	PointY,
+	PointX,
+	PointY,
+	INTEGER,
+	INTEGER)		- (i,i,i,i,i,i);
+--
+nondeterm:
+--
+get_points() = Target;
+--
+imperative:
+--
+draw(Color)						- (i);
+draw_points(TrajectoryPoints,PointX,PointY)		- (i,i,i);
+--
+write_table(STRING)					- (i);
+--
+PREDICATES:
+--
+imperative:
+--
+'+'(PointX,PointX) = PointX				- (i,i);
+'+'(PointY,PointY) = PointY				- (i,i);
+'-'(PointX,PointX) = PointX				- (i,i);
+'-'(PointY,PointY) = PointY				- (i,i);
+'/'(PointX,PointX) = PointX				- (i,i);
+'/'(PointY,PointY) = PointY				- (i,i);
+'/'(PointX,PointY) = REAL				- (i,i);
+]
+-----------------------------------------------------------------------

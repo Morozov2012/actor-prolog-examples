@@ -17,7 +17,7 @@ internal:
 --
 	vpm			: 'VideoProcessingMachine';
 	dialog			: 'DemoPanel';
-	graphic_window		: 'Canvas2D';
+	graphics_window		: 'Canvas2D';
 	image1			: 'BufferedImage';
 	image2			: 'BufferedImage';
 --
@@ -40,7 +40,7 @@ select_blob_color(BlobType,Color)		- (i,o);
 -----------------------------------------------------------------------
 interface 'DemoPanel' (specialized 'Dialog'):
 internal:
-	graphic_window		: 'Canvas2D';
+	graphics_window		: 'Canvas2D';
 [
 ]
 -----------------------------------------------------------------------

@@ -1,0 +1,112 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+reference:
+--
+R_STRING= STRING.
+--
+-----------------------------------------------------------------------
+class 'Main':
+--
+w01	= ('DemoPanel',
+		target_x= 100);
+w02	= ('DemoPanel',
+		target_x= 100.5);
+w03	= ('DemoPanel',
+		target_x= 'centered');
+w04	= ('DemoPanel',
+		target_x= 'default');
+--
+w05	= ('DemoPanel',
+		target_x= -50);
+w06	= ('DemoPanel',
+		target_x= -50.5);
+w07	= ('DemoPanel',
+		target_x= 0);
+w08	= ('DemoPanel',
+		target_x= 0.0);
+--
+w09	= ('DemoPanel',
+		target_y= 100);
+w10	= ('DemoPanel',
+		target_y= 100.5);
+w11	= ('DemoPanel',
+		target_y= 'centered');
+w12	= ('DemoPanel',
+		target_y= 'default');
+--
+w13	= ('DemoPanel',
+		target_y= -50);
+w14	= ('DemoPanel',
+		target_y= -50.5);
+w15	= ('DemoPanel',
+		target_y= 0);
+w16	= ('DemoPanel',
+		target_y= 0.0);
+--
+w17	= ('DemoPanel',
+		target_x= 'centered',
+		target_y= 'centered');
+w18	= ('DemoPanel',
+		target_x= 120,
+		target_y= 130);
+--
+[
+goal.
+alarm(_):-
+	fail.
+]
+-----------------------------------------------------------------------
+class 'DemoPanel' (specialized 'Dialog'):
+--
+constant:
+--
+	target_x	: X = 'default';
+	target_y	: Y = 'default';
+--
+	x;
+	y;
+--
+	use_pixel_measurements= 'yes';
+--
+variable:
+--
+	title	: R_STRING = _;
+--
+internal:
+--
+	text_tools	= ('Text');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+output_information;
+--
+CLAUSES:
+--
+goal:-!,
+	title== text_tools?format("x=%s, y=%s",x,y),
+	show,
+	set_actual_position(target_x,target_y),
+	output_information.
+--
+action(_):-!,
+	output_information.
+--
+output_information:-
+	get_actual_position(X1,Y1),
+	Text== text_tools?format(
+		"%s\nx= %s\ny= %s\n\n%s\nX= %s\nY= %s",
+		"Given position:",
+		target_x,target_y,
+		"Actual position:",
+		X1,Y1),
+	put(1010,Text).
+]
+-----------------------------------------------------------------------

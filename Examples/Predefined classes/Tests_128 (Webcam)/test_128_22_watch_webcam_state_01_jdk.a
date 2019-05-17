@@ -1,16 +1,8 @@
 -----------------------------------------------------------------------
 -- An example of Actor Prolog program.                               --
--- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
 -----------------------------------------------------------------------
 import .. from "morozov/Webcam";
------------------------------------------------------------------------
---
-PREDICATES:
---
-imperative:
---
-check_watcher;
---
 -----------------------------------------------------------------------
 class 'Main' (specialized 'Webcam'):
 --
@@ -22,29 +14,21 @@ internal:
 --
 [
 goal:-!,
-	check_watcher,
 	con ? set_color('RoyalBlue'),
 	con ? writeln("Opening webcam..."),
-	open,
-	watch_webcam_state('yes'),
-	check_watcher,
+	start,
 	con ? set_color('RoyalBlue'),
 	con ? writeln("Listening for events...").
 --
-check_watcher:-
-	watch_webcam_state(Mode),
-	con ? set_color('default'),
-	con ? writeln("Webcam state watcher is active: ",Mode).
---
-webcam_open(WebcamName):-!,
+webcam_started(WebcamName):-!,
 	con ? set_color('Violet'),
 	con ? writeln("This webcam is open: ",WebcamName).
 --
-webcam_image_obtained(WebcamName):-!,
+frame_obtained:-!,
 	con ? set_color('DkGreen'),
-	con ? writeln("This webcam has a new image: ",WebcamName).
+	con ? writeln("The webcam has a new image.").
 --
-webcam_closed(WebcamName):-!,
+webcam_stopped(WebcamName):-!,
 	con ? set_color('Orange'),
 	con ? writeln("This webcam is closed: ",WebcamName).
 --
@@ -64,6 +48,6 @@ goal:-!,
 	delay(10).
 --
 tick:-!,
-	webcam ? close.
+	webcam ? stop.
 ]
 -----------------------------------------------------------------------

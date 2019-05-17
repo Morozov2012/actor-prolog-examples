@@ -99,11 +99,12 @@ Transform3D_Attributes
 		rotX: Angle,
 		rotY: Angle,
 		rotZ: Angle,
-		scale: Numerical,
+		scale: Scaling,
 		translation: Translation
 		}.
 --
 Rotation	= Numerical*.
+Scaling		= Numerical; Numerical*.
 Translation	= Numerical*.
 --
 -- Box
@@ -840,6 +841,7 @@ window_movement_policy		: WindowMovementPolicy;
 visibility_policy		: VisibilityPolicy;
 transparency_sorting_policy	: TransparencySortingPolicy;
 minimum_frame_cycle_time	: WaitingInterval;
+enable_compatibility_mode	: YesNo;
 --
 field_of_view			: FieldOfView;
 front_clip_distance		: ClipDistance;
@@ -870,8 +872,14 @@ set_string(NodeLabel,_)				- (i,i);
 attach_offscreen_canvas();
 detach_offscreen_canvas();
 --
+go_home();
+go_home(Numerical,Numerical,Numerical)		- (i,i,i);
+--
 get_image('BufferedImage')			- (i);
 get_image('BufferedImage',PointX,PointY)	- (i,i,i);
+--
+set_vpc_to_ec(Transform3D)					- (i);
+reset_vpc_to_ec();
 --
 set_projection_policy(ProjectionPolicy)				- (i);
 set_window_resize_policy(WindowResizePolicy)			- (i);
@@ -879,6 +887,7 @@ set_window_movement_policy(WindowMovementPolicy)		- (i);
 set_visibility_policy(VisibilityPolicy)				- (i);
 set_transparency_sorting_policy(TransparencySortingPolicy)	- (i);
 set_minimum_frame_cycle_time(WaitingInterval)			- (i);
+set_enable_compatibility_mode(YesNo)				- (i);
 set_field_of_view(FieldOfView)					- (i);
 set_front_clip_distance(ClipDistance)				- (i);
 set_back_clip_distance(ClipDistance)				- (i);
@@ -892,6 +901,7 @@ get_window_movement_policy() = WindowMovementPolicy;
 get_visibility_policy() = VisibilityPolicy;
 get_transparency_sorting_policy() = TransparencySortingPolicy;
 get_minimum_frame_cycle_time() = WaitingInterval;
+get_enable_compatibility_mode() = YesNo;
 get_field_of_view() = FieldOfView;
 get_front_clip_distance() = ClipDistance;
 get_back_clip_distance() = ClipDistance;

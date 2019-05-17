@@ -44,7 +44,7 @@ constant:
 	--
 	dlg_ctrl_togglebutton_double_color_map	= 4010;
 	dlg_ctrl_togglebutton_average		= 4020;
-	dlg_ctrl_togglebutton_color_map		= 4040;
+	dlg_ctrl_listbutton_color_map		= 4040;
 --
 [
 goal:-!,
@@ -62,7 +62,7 @@ action("Pause"):-!,
 action("Stop"):-!,
 	buffer ? stop.
 action("Close"):-!,
-	buffer ? close.
+	buffer ? disconnect.
 action("CalibrateCamera"):-!,
 	buffer ? calibrate.
 action("AdjustRange"):-!,
@@ -147,7 +147,7 @@ modified_control(dlg_ctrl_togglebutton_average):-
 		?get(dlg_ctrl_togglebutton_average))),!,
 	buffer ? set_averaging_mode(Mode),
 	switch_controls.
-modified_control(dlg_ctrl_togglebutton_color_map):-!,
+modified_control(dlg_ctrl_listbutton_color_map):-!,
 	update_displaying_mode.
 -----------------------------------------------------------------------
 select_and_open_device:-
@@ -171,7 +171,7 @@ initialize_data_acquisition(_).
 --
 initialize_selected_device(Identifier):-
 	set_title(con?format("Thermal Image Viewer [%s]",Identifier)),
-	buffer ? open(Identifier),!.
+	buffer ? connect(Identifier),!.
 initialize_selected_device(Identifier):-
 	con ? error(
 		"Error",
@@ -181,7 +181,7 @@ initialize_selected_device(Identifier):-
 -----------------------------------------------------------------------
 update_displaying_mode:-
 	TextCM== ?val("STRING",
-		?get(dlg_ctrl_togglebutton_color_map)),!,
+		?get(dlg_ctrl_listbutton_color_map)),!,
 	ColorMap== color_maps?string_to_color_map_name(TextCM),
 	buffer ? set_main_color_map(ColorMap).
 update_displaying_mode.

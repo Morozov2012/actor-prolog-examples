@@ -21,7 +21,7 @@ constant:
 internal:
 --
 	subtractor		: 'ImageSubtractor';
-	graphic_window		: 'Canvas2D';
+	graphics_window		: 'Canvas2D';
 	prompt_window		: 'Report';
 	text			: 'Text';
 	image			: 'BufferedImage';

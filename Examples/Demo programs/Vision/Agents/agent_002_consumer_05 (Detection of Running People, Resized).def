@@ -70,7 +70,7 @@ constant:
 internal:
 --
 	subtractor		: 'SynchronizedImageSubtractor';
-	graphic_window		: 'Canvas2D';
+	graphics_window		: 'Canvas2D';
 	image			: 'BufferedImage';
 	timer			: 'Timer';
 	text			: 'Text';

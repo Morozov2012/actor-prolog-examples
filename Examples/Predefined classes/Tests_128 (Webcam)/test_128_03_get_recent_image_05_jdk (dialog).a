@@ -1,0 +1,193 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2016-2019 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+-----------------------------------------------------------------------
+PREDICATES:
+--
+imperative:
+--
+update_webcam_list;
+--
+resolutions_to_strings(ViewSizeList,S_List)		- (i,o);
+resolution_to_string(ViewWidth,ViewHeight,STRING)	- (i,i,o);
+--
+determ:
+--
+string_to_resolution(STRING,ViewWidth,ViewHeight)	- (i,o,o);
+--
+resolution_string
+	(ViewWidth,ViewHeight,STRING)		- (i,i,o)(o,o,i);
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'Webcam'):
+--
+internal:
+--
+	panel		= ('ControlPanel',
+				report_window,
+				webcam= self,
+				background_color= 'SystemControl');
+	report_window	= ('Report',
+				font_name= 'helvetica',
+				font_size= 12);
+	buffer		= ('BufferedImage');
+	text		= ('Text');
+--
+[
+PREDICATES:
+--
+imperative:
+--
+update_webcam_resolutions;
+update_resolution(STRING)		- (i);
+--
+CLAUSES:
+--
+goal:-!,
+	update_webcam_list,
+	watch_webcam_list('yes'),
+	panel ? show,
+	-- start.
+--
+webcam_added(_):-!,
+	update_webcam_list.
+--
+webcam_removed(_):-!,
+	update_webcam_list.
+--
+update_webcam_list:-
+	List== ?get_webcam_list(),
+	panel ? put(1010,List),
+	update_webcam_resolutions.
+--
+update_webcam_resolutions:-
+	is_active,!,
+	List1== ?get_view_sizes(),
+	resolutions_to_strings(List1,List2),
+	panel ? put(2010,List2),
+	panel ? update_resolution.
+update_webcam_resolutions.
+--
+resolutions_to_strings([size(W,H)|Rest1],[R|Rest2]):-!,
+	resolution_to_string(W,H,R),
+	resolutions_to_strings(Rest1,Rest2).
+resolutions_to_strings(_,[]).
+--
+resolution_to_string(Width,Height,Name):-
+	resolution_string(Width,Height,Name),!.
+resolution_to_string(Width,Height,Name):-
+	Name== text?format("%d x %d",Width,Height).
+--
+string_to_resolution(Name,Width,Height):-
+	resolution_string(Width,Height,Name),!.
+string_to_resolution(Name,Width,Height):-
+	[WT,HT]== text?extract_tokens(Name),
+	Width== text?convert_to_integer(WT),
+	Height== text?convert_to_integer(HT).
+--
+resolution_string( 352, 288, "CIF (352x288)").
+resolution_string(1280, 720, "HD720 (1280x720)"):-!.
+resolution_string(1280, 720, "HD720P (1280x720)").
+resolution_string( 480, 400, "HVGA (480x400)").
+resolution_string( 768, 576, "PAL (768x576)").
+resolution_string( 176, 144, "QQVGA (176x144)").
+resolution_string( 320, 240, "QVGA (320x240)").
+resolution_string(2048,1536, "QXGA (2048x1536)").
+resolution_string( 800,600,  "SVGA (800x600)").
+resolution_string(1280,1024, "SXGA (1280x1024)").
+resolution_string(1600,1200, "UXGA (1600x1200)").
+resolution_string( 640, 480, "VGA (640x480)").
+resolution_string(1280, 768, "WXGA (1280x768)").
+resolution_string(1024, 768, "XGA (1024x768)").
+--
+update_resolution(Name):-
+	is_active,
+	string_to_resolution(Name,Width,Height),!,
+	report_window ? writeln(
+		"Set resolution: ",Width," x ",Height),
+	set_actual_resolution(Width,Height),
+	set_default_resolution(Width,Height).
+update_resolution(_).
+--
+frame_obtained:-
+	is_active,
+	commit,!,
+	get_recent_image(buffer),
+	panel ? set_image(buffer).
+]
+-----------------------------------------------------------------------
+class 'ControlPanel' (specialized 'Dialog'):
+--
+constant:
+--
+is_top_level_window	= 'yes';
+--
+internal:
+--
+graphics_window		= ('Canvas2D',
+				background_color= 'SystemControl');
+report_window;
+--
+webcam;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+initiate_webcam;
+--
+update_resolution;
+update_resolution(ViewSize)		- (i);
+--
+set_image('BufferedImage')		- (i);
+--
+CLAUSES:
+--
+created_control(1020):-!,
+	initiate_webcam.
+created_control(2020):-!,
+	update_resolution.
+--
+modified_control(1020):-!,
+	initiate_webcam.
+modified_control(2020):-!,
+	update_resolution.
+--
+initiate_webcam:-
+	SelectedWebcam== ?cast("WebcamName",?get(1020)),
+	webcam ? stop,
+	report_window ? writeln(
+		"Select webcam: ",SelectedWebcam),
+	webcam ? set_default_name(SelectedWebcam),
+	webcam ? start,
+	webcam ? update_webcam_resolutions.
+--
+update_resolution:-
+	ViewSize== ?val("STRING",?get(2020)),!,
+	webcam ? update_resolution(ViewSize).
+update_resolution.
+--
+update_resolution(size(Width,Height)):-
+	webcam ? is_active,!,
+	webcam ? set_actual_resolution(Width,Height),
+	webcam ? set_default_resolution(Width,Height).
+update_resolution(size(Width,Height)):-
+	webcam ? set_default_resolution(Width,Height).
+--
+set_image(Image):-
+	Image ? get_size_in_pixels(WI,HI),!,
+	graphics_window ? get_size_in_pixels(WP,HP),
+	X0== (WP - WI) / 2 / WP,
+	Y0== (HP - HI) / 2 / HP,
+	Width== WI / WP,
+	Height== HI / HP,
+	graphics_window ? clear('no'),
+	graphics_window ? draw_image(Image,X0,Y0,Width,Height),
+	graphics_window ? draw_now.
+set_image(_).
+]
+-----------------------------------------------------------------------

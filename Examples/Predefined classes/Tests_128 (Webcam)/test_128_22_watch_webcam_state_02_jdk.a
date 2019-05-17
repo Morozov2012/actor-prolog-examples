@@ -1,70 +1,74 @@
 -----------------------------------------------------------------------
 -- An example of Actor Prolog program.                               --
--- (c) 2015 IRE RAS Alexei A. Morozov                                --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
 -----------------------------------------------------------------------
 import .. from "morozov/Webcam";
 -----------------------------------------------------------------------
+project: (('ControlPanel'))
+-----------------------------------------------------------------------
+class 'ControlPanel' (specialized 'Dialog'):
 --
+internal:
+--
+	watcher			= ('WebcamWatcher',
+					report);
+	report			= ('Report');
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+goal:-!,
+	modified_control(1001),
+	show.
+--
+modified_control(Address):-
+	Address == 1001,
+	Mode== ?val("YesNo",?get(Address)),!,
+	watcher ? switch_webcam(Mode).
+--
+action("clear"):-!,
+	report ? clear.
+action("exit"):-!,
+	hide,
+	break.
+]
+-----------------------------------------------------------------------
+class 'WebcamWatcher' (specialized 'Webcam'):
+--
+internal:
+--
+	report		: 'Report';
+--
+[
 PREDICATES:
 --
 imperative:
 --
-check_watcher;
+switch_webcam(YesNo)		- (i);
 --
------------------------------------------------------------------------
-class 'Main' (specialized 'Webcam'):
+CLAUSES:
 --
-internal:
+switch_webcam('yes'):-!,
+	start.
+switch_webcam(_):-
+	stop.
 --
-	timer	= ('MyTimer',
-			webcam=self);
-	con	= ('Console');
+webcam_started(WebcamName):-!,
+	report ? set_color('Violet'),
+	report ? writeln("This webcam is open: ",WebcamName).
 --
-[
-goal:-!,
-	check_watcher,
-	watch_webcam_state('yes'),
-	check_watcher,
-	con ? set_color('RoyalBlue'),
-	con ? writeln("Opening webcam..."),
-	open,
-	check_watcher,
-	con ? set_color('RoyalBlue'),
-	con ? writeln("Listening for events...").
+frame_obtained:-!,
+	report ? set_color('DkGreen'),
+	report ? writeln("The webcam has a new image.").
 --
-check_watcher:-
-	watch_webcam_state(Mode),
-	con ? set_color('default'),
-	con ? writeln("Webcam state watcher is active: ",Mode).
---
-webcam_open(WebcamName):-!,
-	con ? set_color('Violet'),
-	con ? writeln("This webcam is open: ",WebcamName).
---
-webcam_image_obtained(WebcamName):-!,
-	con ? set_color('DkGreen'),
-	con ? writeln("This webcam has a new image: ",WebcamName).
---
-webcam_closed(WebcamName):-!,
-	con ? set_color('Orange'),
-	con ? writeln("This webcam is closed: ",WebcamName).
+webcam_stopped(WebcamName):-!,
+	report ? set_color('Orange'),
+	report ? writeln("This webcam is closed: ",WebcamName).
 --
 webcam_disposed(WebcamName):-!,
-	con ? set_color('Red'),
-	con ? writeln("This webcam is disposed: ",WebcamName).
-]
------------------------------------------------------------------------
-class 'MyTimer' (specialized 'Timer'):
---
-internal:
---
-	webcam		: 'Webcam';
---
-[
-goal:-!,
-	delay(10).
---
-tick:-!,
-	webcam ? close.
+	report ? set_color('Red'),
+	report ? writeln("This webcam is disposed: ",WebcamName).
 ]
 -----------------------------------------------------------------------

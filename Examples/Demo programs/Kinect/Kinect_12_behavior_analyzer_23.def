@@ -253,7 +253,7 @@ hide_legend;
 set_output_directory(STRING)		- (i);
 --
 save_frame_if_necessary(
-	KinectBufferOperatingMode,
+	DataAcquisitionBufferOperatingMode,
 	FrameNumber)			- (i,i);
 --
 continue_exporting_if_necessary;
@@ -278,7 +278,7 @@ interface 'BehaviorAnalyzer' (specialized 'Alpha'):
 --
 internal:
 --
-graphic_window		: 'Canvas2D';
+graphics_window		: 'Canvas2D';
 buffer			: 'KinectBuffer';
 con			: 'Console';
 --

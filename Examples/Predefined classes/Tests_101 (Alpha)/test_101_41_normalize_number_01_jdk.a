@@ -1,0 +1,74 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	con ? writeln("Test 1"),
+	test1,
+	con ? writeln("Test 2"),
+	test2,
+	con ? writeln("O.K.").
+--
+test1:-
+	?normalize_number(20,1234567123),
+	?normalize_number(20,-1234567123),
+	?normalize_number(20,123.456712345671234567),
+	?normalize_number(20,-123.456712345671234567),
+	?normalize_number(20,1234567),
+	?normalize_number(20,123.45678901234567890123456789),
+	?normalize_number(16#12D687#),
+	?normalize_number(16#7B.74EA4A8C154C#),
+	?normalize_number(11259375),
+	?normalize_number(171.8044281005859375),
+	?normalize_number(16#ABCDEF#),
+	?normalize_number(16#AB.CDEF#),
+	?normalize_number(16#AB.CDEF000#),
+	?normalize_number(10#1230000#),
+	?normalize_number(16#000AB.CDEF#),
+	?normalize_number(16#AB.CDEF#E3),
+	?normalize_number(16#AB.CDEF#E-25),
+	?normalize_number(16#AB.CDEF#E-170),
+	?normalize_number(16#0#),
+	?normalize_number(16#0.0#),
+	?normalize_number(-16#0#),
+	?normalize_number(-16#0.0#).
+--
+test2:-
+	con ? writeln(?normalize_number(20,1234567123)),
+	con ? writeln(?normalize_number(20,-1234567123)),
+	con ? writeln(?normalize_number(20,123.456712345671234567)),
+	con ? writeln(?normalize_number(20,-123.456712345671234567)),
+	con ? writeln(?normalize_number(20,1234567)),
+	con ? writeln(?normalize_number(20,123.45678901234567890123456789)),
+	con ? writeln(?normalize_number(16#12D687#)),
+	con ? writeln(?normalize_number(16#7B.74EA4A8C154C#)),
+	con ? writeln(?normalize_number(11259375)),
+	con ? writeln(?normalize_number(171.8044281005859375)),
+	con ? writeln(?normalize_number(16#ABCDEF#)),
+	con ? writeln(?normalize_number(16#AB.CDEF#)),
+	con ? writeln(?normalize_number(16#AB.CDEF000#)),
+	con ? writeln(?normalize_number(10#1230000#)),
+	con ? writeln(?normalize_number(16#000AB.CDEF#)),
+	con ? writeln(?normalize_number(16#AB.CDEF#E3)),
+	con ? writeln(?normalize_number(16#AB.CDEF#E-25)),
+	con ? writeln(?normalize_number(16#AB.CDEF#E-170)),
+	con ? writeln(?normalize_number(16#0#)),
+	con ? writeln(?normalize_number(16#0.0#)),
+	con ? writeln(?normalize_number(-16#0#)),
+	con ? writeln(?normalize_number(-16#0.0#)).
+]

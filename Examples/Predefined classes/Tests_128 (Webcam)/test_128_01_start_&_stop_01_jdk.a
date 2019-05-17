@@ -1,0 +1,24 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+
+class 'Main' (specialized 'Canvas2D'):
+--
+internal:
+--
+	webcam	= ('Webcam');
+	buffer	= ('BufferedImage');
+--
+[
+goal:-
+	webcam ? start,
+	webcam ? commit,!,
+	webcam ? get_recent_image(buffer),
+	webcam ? stop,
+	draw_image(buffer,0,0,1,1),
+	show.
+]

@@ -1,0 +1,37 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2015-2019 IRE RAS Alexei A. Morozov                           --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Webcam";
+import .. from "morozov/Java2D";
+
+PREDICATES:
+
+imperative:
+
+test;
+
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+	webcam	= ('Webcam');
+--
+[
+goal:-!,
+	webcam ? start,
+	test,
+	webcam ? stop.
+--
+test:-
+	set_color('RoyalBlue'),
+	writeln("Test"),
+	set_color('default'),
+	webcam ? get_recent_frame_rate(FrameRate),
+	write("\tFrame rate (Frames Per Second): "),
+	set_color('DkGreen'),
+	writeln(FrameRate),
+	set_color('RoyalBlue'),
+	writeln("O.K.").
+]

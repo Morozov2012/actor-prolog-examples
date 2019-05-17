@@ -1,0 +1,639 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-----------------------------------------------------------------------
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Thanks to Andrew Davison                                          --
+-- Davison A. Kinect Open Source Programming Secrets (KOPS). -       --
+-- McGraw Hill, 2012.                                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import .. from "morozov/Astrohn";
+import .. from "morozov/Kinect";
+import .. from "morozov/ColorMap";
+--
+-----------------------------------------------------------------------
+project: (('3DTHzPlayer'))
+-----------------------------------------------------------------------
+class '3DTHzPlayer' (specialized 'Astrohn'):
+--
+constant:
+--
+	name	=	"J:/J4K (2018-06-29-THz)/THz/"
+			"2018-06-29-03-54-52.ap2j";
+	first_frame	= 1;
+	end_frame	= 186;
+--
+	operating_mode	= 'PLAYING';
+--
+	frame_type	= 'POINT_CLOUDS';
+	people_index	= 'EXTRACT_PEOPLE';
+	skeletons	= 'DETECT_SKELETONS';
+--
+	displaying_mode	= {
+		frame_type,
+		people_index,
+		skeletons};
+--
+	color_map			= 'OPTICAL';
+--
+	use_recorded_color_map_commands	= 'no';
+--
+	kinect_data_file =
+		"J:/J4K (2018-06-29-THz)/Kinect2/"
+		"002.k2j";
+
+--
+internal:
+--
+	window	= ('Canvas3D');
+	dialog	= ('MainDialog',
+			astrohn=self,
+			kinect_buffer,
+			graphics_window=window);
+	buffer	= ('BufferedScene');
+--
+	kinect_buffer	= ('KinectBuffer',
+				name=kinect_data_file,
+				operating_mode='SPECULATIVE_READING',
+				displaying_mode,
+				color_map,
+				read_buffer_size=100);
+--
+	texture	= ('BufferedImage');
+	state	= ('ProgramState');
+	text	= ('Text');
+	con	= ('Console');
+--
+constant:
+--
+	main_label		= "Skeletons";
+	cylinder_radius		= 0.02;
+	joint_radius		= 0.03;
+	head_radius		= 0.05;
+	limb_transparency	= 0.1;
+	up_vector		= p(0,1,0);
+--
+	texture_time_shift	= 1210;
+--
+	lookup_table_file_name	=
+		"J:/J4K (2018-06-29-THz)/Stereo20_1_11000/"
+		"LookUpTable.txt";
+--
+-- constant:
+--
+--	slow_motion_coefficient	= 10.0;
+--
+[
+goal:-!,
+	dialog ? maximize,
+	kinect_buffer ? set_lookup_table(lookup_table_file_name),
+	create_list_of_nodes(VisualScene),
+	window ? show(VisualScene),
+	start,
+	kinect_buffer ? start.
+--
+frame_obtained:-
+	commit,!,
+	get_recent_terahertz_frame_number(FrameNumber1),
+	get_recent_terahertz_frame_time(Time1),
+	state ? set_first_frame_time(FrameNumber1,Time1),
+	process_frame(FrameNumber1,Time1).
+--
+process_frame(N1,Time1):-
+	N1 >= first_frame,
+	N1 <= end_frame,!,
+	-- con ? writeln(N1,") Time: ",Time1),
+	process_timed_frame(N1,Time1).
+process_frame(FrameNumber,_):-
+	FrameNumber >= first_frame,!,
+	stop,
+	kinect_buffer ? stop,
+	start,
+	kinect_buffer ? start.
+process_frame(_,_).
+--
+process_timed_frame(N1,Time1):-
+	kinect_buffer ? retrieve_timed_frame(Time1+texture_time_shift),
+	-- The commit command is not necessary here.
+	-- kinect_buffer ? commit,
+	-- kinect_buffer ? get_recent_frame_time(Time2),
+	-- con ? writeln(
+	--	N1,") ",
+	--	Time1+texture_time_shift," -> ",
+	--	Time2," D: ",Time1+texture_time_shift-Time2),
+	get_recent_combined_image(texture),!,
+	dialog ? put(1030,N1),
+	kinect_buffer ? get_recent_scene(buffer,texture),
+	redraw_scene,
+	kinect_buffer ? get_depth_image_size_in_pixels(IW,IH),
+	window ? refine_width(IW/IH).
+process_timed_frame(_,_):-
+	is_active,!.
+process_timed_frame(_,_):-
+	stop,
+	kinect_buffer ? stop,
+	start,
+	kinect_buffer ? start.
+--
+redraw_scene:-
+	state ? show_skeletons,!,
+	kinect_buffer ? get_skeletons(Skeletons),
+	SkeletonFigures== ?form_skeletons(Skeletons),
+	window ? set_node(
+		main_label,
+		'BranchGroup'({
+			label: main_label,
+			allowDetach: 'yes',
+			compile: 'yes',
+			branches: [buffer|SkeletonFigures]
+		})).
+redraw_scene:-
+	window ? set_node(
+		main_label,
+		'BranchGroup'({
+			label: main_label,
+			allowDetach: 'yes',
+			compile: 'yes',
+			branches: [buffer]
+		})).
+--
+data_transfer_completion:-!,
+	stop,
+	kinect_buffer ? stop,
+	kinect_buffer ? start,
+	start.
+-----------------------------------------------------------------------
+show_skeletons(Mode):-
+	state ? set_show_skeletons(Mode).
+--
+create_list_of_nodes(Nodes):-
+	Bounds== 'BoundingSphere'({radius:10.0}),
+	Attenuation== a(2,1,0),
+	create_main_group(MainGroup),
+	Nodes == [
+		MainGroup,
+		'OrbitBehavior'({
+			rotationCenter: p(0.0,0.0,-2.5),
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 1.5,
+			schedulingBounds: Bounds
+			}),
+		'AmbientLight'({
+			lightOn: 'yes',
+			color: 'Green',
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(-3,3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(-3,-3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(-3,-3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(3,3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Orange',
+			position: p(3,3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(3,-3,-3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(3,-3,3),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			})
+		].
+--
+create_main_group(MainGroup):-
+	MainGroup== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			-- scale: 3,
+			-- rotX: 0.5,
+			-- rotY: -0.5,
+			-- translation: [-1.5,-1.5,0]
+			}),
+		allowChildrenRead: 'yes',
+		allowChildrenWrite: 'yes',
+		branches: [
+			'BranchGroup'({
+				label: main_label,
+				allowDetach: 'yes',
+				compile: 'yes',
+				branches: []
+				})
+			]
+		}).
+-----------------------------------------------------------------------
+form_skeletons([Skeleton|Rest1]) = [Figure|Rest2] :-
+	Figure== ?form_skeleton(Skeleton),!,
+	Rest2== ?form_skeletons(Rest1).
+form_skeletons([_|Rest1]) = Rest2 :-!,
+	Rest2== ?form_skeletons(Rest1).
+form_skeletons(_) = [].
+-----------------------------------------------------------------------
+form_skeleton(Skeleton) = Figure :-
+	Skeleton == {
+		head: Head,
+		spine: Spine,
+		left_arm: LeftArm,
+		right_arm: RightArm,
+		left_leg: LeftLeg,
+		right_leg: RightLeg
+		|_},!,
+	HeadSpine== ?form_spine(Head,Spine),
+	SpineLeftArm== ?form_arm(Spine,LeftArm),
+	SpineRightArm== ?form_arm(Spine,RightArm),
+	SpineLeftLeg== ?form_leg(Spine,LeftLeg),
+	SpineRightLeg== ?form_leg(Spine,RightLeg),
+	Figure== 'Group'({
+		branches: [
+			HeadSpine,
+			SpineLeftArm,
+			SpineRightArm,
+			SpineLeftLeg,
+			SpineRightLeg
+		]
+	}).
+--
+form_spine(Head,Spine) = Figure :-
+	Spine == {
+		neck: Neck,
+		shoulder: Shoulder,
+		mid: Mid,
+		base: Base
+		|_},!,
+	HeadNeck== ?form_link(Head,Neck),
+	NeckShoulder== ?form_link(Neck,Shoulder),
+	ShoulderMid== ?form_link(Shoulder,Mid),
+	MidBase== ?form_link(Mid,Base),
+	Joint1== ?form_head(Head),
+	Joint2== ?form_joint(Neck),
+	Joint3== ?form_joint(Shoulder),
+	Joint4== ?form_joint(Mid),
+	Joint5== ?form_joint(Base),
+	Figure== 'Group'({
+		branches: [
+			HeadNeck,
+			NeckShoulder,
+			ShoulderMid,
+			MidBase,
+			Joint1,
+			Joint2,
+			Joint3,
+			Joint4,
+			Joint5
+		]
+	}).
+--
+form_arm(Spine,Arm) = Figure:-
+	Spine == {
+		shoulder: SpineShoulder
+		|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	SpineShoulderArmShoulder==
+		?form_link(SpineShoulder,ArmShoulder),
+	ArmShoulderElbow== ?form_link(ArmShoulder,Elbow),
+	ElbowWrist== ?form_link(Elbow,Wrist),
+	WristHand== ?form_link(Wrist,Hand),
+	WristHandRest== ?form_hand(Wrist,Hand,Rest),
+	Joint1== ?form_joint(ArmShoulder),
+	Joint2== ?form_joint(Elbow),
+	Joint3== ?form_joint(Wrist),
+	Figure== 'Group'({
+		branches: [
+			SpineShoulderArmShoulder,
+			ArmShoulderElbow,
+			ElbowWrist,
+			WristHand,
+			WristHandRest,
+			Joint1,
+			Joint2,
+			Joint3
+		]
+	}).
+form_arm(Spine,Arm) = Figure :-
+	Spine == {
+		neck: Neck
+		|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	NeckArmShoulder== ?form_link(Neck,ArmShoulder),
+	ArmShoulderElbow== ?form_link(ArmShoulder,Elbow),
+	ElbowWrist== ?form_link(Elbow,Wrist),
+	WristHand== ?form_link(Wrist,Hand),
+	Joint1== ?form_joint(ArmShoulder),
+	Joint2== ?form_joint(Elbow),
+	Joint3== ?form_joint(Wrist),
+	WristHandRest== ?form_hand(Wrist,Hand,Rest),
+	Figure== 'Group'({
+		branches: [
+			NeckArmShoulder,
+			ArmShoulderElbow,
+			ElbowWrist,
+			WristHand,
+			WristHandRest,
+			Joint1,
+			Joint2,
+			Joint3
+		]
+	}).
+--
+form_hand(Wrist,Hand,Rest) = Figure :-
+	Rest == {
+		tip: Tip,
+		thumb: Thumb
+		|_},!,
+	WristThum== ?form_link(Wrist,Thumb),
+	HandTip== ?form_link(Hand,Tip),
+	Figure== 'Group'({
+		branches: [
+			WristThum,
+			HandTip
+		]
+	}).
+--
+form_leg(Spine,Leg) = Figure :-
+	Spine == {
+		base: Base
+		|_},
+	Leg == {
+		hip: Hip,
+		knee: Knee,
+		ankle: Ankle,
+		foot: Foot
+		|_},!,
+	BaseHip== ?form_link(Base,Hip),
+	HipKnee== ?form_link(Hip,Knee),
+	KneeAnkle== ?form_link(Knee,Ankle),
+	AnkleFoot== ?form_link(Ankle,Foot),
+	Joint1== ?form_joint(Hip),
+	Joint2== ?form_joint(Knee),
+	Joint3== ?form_joint(Ankle),
+	Figure== 'Group'({
+		branches: [
+			BaseHip,
+			HipKnee,
+			KneeAnkle,
+			AnkleFoot,
+			Joint1,
+			Joint2,
+			Joint3
+		]
+	}).
+--
+form_link(Joint1,Joint2) = Figure :-
+	Joint1 == {
+		position:{point:p(J1X,J1Y,J1Z)|_}|_},
+	Joint2 == {
+		position:{point:p(J2X,J2Y,J2Z)|_}|_},!,
+	LengthVector== p(J1X-J2X,J2Y-J1Y,J1Z-J2Z),
+	Length== ?length(LengthVector),
+	Cylinder== 'Cylinder'({
+		radius: cylinder_radius,
+		height: Length,
+		generateNormals: 'yes',
+		xdivisions: 100,
+		ydivisions: 1,
+		appearance: 'Appearance'({
+			material: 'Material'({}),
+			transparencyAttributes: 'TransparencyAttributes'({
+				transparency: limb_transparency,
+				transparencyMode: 'FASTEST'
+				})
+			})
+		}),
+	BaseTG== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [0,Length/2,0]
+			}),
+		branches: [
+			Cylinder
+			]
+		}),
+	AxisAngle== ?calc_rotation(LengthVector),
+	Figure== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [-(J1X),J1Y,-(J1Z)],
+			rotation: AxisAngle
+			}),
+		branches: [
+			BaseTG
+			]
+		}).
+--
+form_joint(Joint) = Figure :-
+	Joint == {
+		status:Status,
+		position:{point:p(X,Y,Z)|_}|_},!,
+	select_joint_color(Status,MaterialAttributes),
+	Figure== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [-(X),Y,-(Z)]
+			}),
+		branches: [
+			'Sphere'({
+				radius: joint_radius,
+				generateNormals: 'yes',
+				divisions: 100,
+				appearance: 'Appearance'({
+					material: 'Material'(MaterialAttributes)
+					})
+				})
+			]
+		}).
+--
+form_head(Joint) = Figure :-
+	Joint == {
+		status:Status,
+		position:{point:p(X,Y,Z)|_}|_},!,
+	select_joint_color(Status,MaterialAttributes),
+	Figure== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [-(X),Y,-(Z)]
+			}),
+		branches: [
+			'Sphere'({
+				radius: head_radius,
+				generateNormals: 'yes',
+				divisions: 300,
+				appearance: 'Appearance'({
+					material: 'Material'(MaterialAttributes)
+					})
+				})
+			]
+		}).
+--
+form_dummy_figure() = Figure :-
+	Figure== 'Group'({
+		branches: [
+			'Sphere'({
+				radius: 0.1,
+				generateNormals: 'yes',
+				divisions: 100,
+				appearance: 'Appearance'({
+					material: 'Material'({}),
+					transparencyAttributes: 'TransparencyAttributes'({
+						transparency: 1,
+						transparencyMode: 'FASTEST'
+						})
+					})
+				})
+			]
+		}).
+--
+select_joint_color('INFERRED',Attributes):-!,
+	Color == 'Blue',
+	Attributes== {
+		ambientColor: Color,
+		emissiveColor: Color
+		}.
+select_joint_color(_,{}).
+-----------------------------------------------------------------------
+calc_rotation(LengthVector) = [X,Y,Z,AxisAngle] :-
+	NormalizedVector== ?normalize(LengthVector),
+	AxisVector== ?cross(up_vector,NormalizedVector),
+	AxisVector == p(X,Y,Z),!,
+	AxisAngle== ?angle(up_vector,LengthVector).
+calc_rotation(_) = [].
+--
+normalize(Vector) = ?scale(Vector,Norm) :-!,
+	Norm== 1.0 / ?length(Vector).
+normalize(_) = _ :-
+	break('CannotNormalize').
+--
+cross(p(X1,Y1,Z1),p(X2,Y2,Z2)) = p(X3,Y3,Z3) :-!,
+	X3== Y1*Z2 - Z1*Y2,
+	Y3== X2*Z1 - Z2*X1,
+	Z3== X1*Y2 - Y1*X2.
+cross(_,_) = _ :-
+	break('CannotCross').
+--
+angle(V1,V2) = V3 :-
+	VDot== ?dot(V1,V2) / (?length(V1)*?length(V2)),
+	V3== ?angle(VDot).
+--
+angle(VDot) = Angle :-
+	VDot < -1.0,!,
+	Angle== ?arccos(-1.0).
+angle(VDot) = Angle :-
+	VDot > 1.0,!,
+	Angle== ?arccos(1.0).
+angle(VDot) = Angle :-
+	Angle== ?arccos(VDot).
+--
+dot(p(X1,Y1,Z1),p(X2,Y2,Z2)) = X1*X2 + Y1*Y2 + Z1*Z2.
+--
+scale(p(X,Y,Z),N) = p(X*N,Y*N,Z*N).
+--
+length(p(X,Y,Z)) = Length :-!,
+	Length== ?sqrt(?power(X,2)+?power(Y,2)+?power(Z,2)).
+length(_) = 0.
+]
+-----------------------------------------------------------------------
+class 'MainDialog' (specialized 'Dialog'):
+--
+internal:
+--
+	astrohn;
+	kinect_buffer;
+	graphics_window;
+--
+	color_maps		= ('ColorMap');
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+goal:-!,
+	show,
+	update_color_map,
+	update_displaying_mode.
+--
+action("play"):-!,
+	astrohn ? start,
+	kinect_buffer ? start.
+action("pause"):-!,
+	astrohn ? pause,
+	kinect_buffer ? pause.
+action("stop"):-!,
+	astrohn ? stop,
+	kinect_buffer ? stop.
+--
+modified_control(1010):-!,
+	update_color_map,
+	astrohn ? frame_obtained.
+modified_control(1020):-!,
+	update_displaying_mode.
+--
+update_color_map:-
+	TextCM== ?val("STRING",?get(1010)),!,
+	ColorMap== color_maps?string_to_color_map_name(TextCM),
+	astrohn ? set_main_color_map(ColorMap).
+update_color_map.
+--
+update_displaying_mode:-
+	Mode== ?val("YesNo",?get(1020)),!,
+	astrohn ? show_skeletons(Mode).
+update_displaying_mode.
+]
+-----------------------------------------------------------------------
+class 'ProgramState' (specialized 'Database'):
+[
+set_first_frame_time(_,_):-
+	find(_),!.
+set_first_frame_time(Number,Time):-
+	insert(f(Number,Time)).
+--
+get_first_frame_time(Number,Time):-
+	Item== ?match(f(_,_)),
+	Item == f(Number,Time),!.
+get_first_frame_time(0,0).
+--
+set_show_skeletons('no'):-!,
+	retract_all('create_skeletons').
+set_show_skeletons('yes'):-
+	show_skeletons,!.
+set_show_skeletons(_):-
+	append('create_skeletons').
+--
+show_skeletons:-
+	find('create_skeletons'),!.
+]
+-----------------------------------------------------------------------
