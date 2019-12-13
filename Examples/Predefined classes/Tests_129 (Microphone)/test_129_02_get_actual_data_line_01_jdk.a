@@ -1,0 +1,115 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'Microphone' from "morozov/Sound";
+
+DOMAINS:
+
+Tabulation	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+loop(INTEGER,INTEGER)					- (i,i);
+write_microphone(MicrophoneDataLine)			- (i);
+write_audio_formats(AudioFormats,INTEGER,Tabulation)	- (i,i,i);
+write_audio_format(AudioFormat)				- (i);
+tabulation(Tabulation)					- (i);
+
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+	microphone	= ('Microphone',
+				output_audio_data='no');
+	timer		= ('Timer');
+--
+[
+goal:-!,
+	microphone ? start,
+	loop(1,100).
+--
+loop(_,_):-
+	set_color('default'),
+	microphone ? commit_audio_data,!,
+	MicrophoneDataLine== microphone?get_actual_data_line(),
+	set_color('RoyalBlue'),
+	writeln("Actual target data line:"),
+	microphone ? stop,
+	write_microphone(MicrophoneDataLine).
+loop(N,Limit):-
+	N <= Limit,!,
+	timer ? sleep(0.1),
+	loop(N+1,Limit).
+loop(_,_):-
+	microphone ? stop,
+	set_color('Red'),
+	writeln("\t\tTest failed!").
+--
+write_microphone({mixerName:Name|_}):-
+	set_color('DkGreen'),
+	write("Mixer name: "),
+	set_color('Violet'),
+	writeln(Name),
+	fail.
+write_microphone({mixerVendor:Name|_}):-
+	set_color('DkGreen'),
+	write("Mixer vendor: "),
+	set_color('Violet'),
+	writeln(Name),
+	fail.
+write_microphone({mixerDescription:Text|_}):-
+	set_color('DkGreen'),
+	write("Mixer description: "),
+	set_color('Violet'),
+	writeln(Text),
+	fail.
+write_microphone({mixerVersion:Text|_}):-
+	set_color('DkGreen'),
+	write("Mixer version: "),
+	set_color('Violet'),
+	writeln(Text),
+	fail.
+write_microphone({dataLine:Number|_}):-
+	set_color('DkGreen'),
+	write("Data line number: "),
+	set_color('Violet'),
+	writeln(Number),
+	fail.
+write_microphone({formats:List|_}):-
+	set_color('DkGreen'),
+	writeln("Audio formats:"),
+	write_audio_formats(List,1,1),
+	fail.
+write_microphone({format:Format|_}):-
+	set_color('DkGreen'),
+	write("Audio format: "),
+	write_audio_format(Format),
+	fail.
+write_microphone('default'):-
+	set_color('Violet'),
+	writeln("default"),
+	fail.
+write_microphone(_).
+--
+write_audio_formats([Format|Rest],N,T):-!,
+	set_color('DkGreen'),
+	tabulation(T),
+	write(N,") "),
+	write_audio_format(Format),
+	write_audio_formats(Rest,N+1,T).
+write_audio_formats(_,_,_).
+--
+write_audio_format(Format):-
+	set_color('Violet'),
+	writeln(Format).
+--
+tabulation(T):-
+	T > 0,!,
+	write("\t"),
+	tabulation(T-1).
+tabulation(_).
+]

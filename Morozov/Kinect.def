@@ -5,12 +5,16 @@
 
 package "Morozov/Kinect":
 
+--------------------------------------------------------------------
+
 import "Morozov/ColorMap";
 import 'BufferedScene' from "Morozov/Java3D";
 import 'BufferedImage' from "Morozov/Java2D";
 import 'WritableImageProducer' from "Morozov/Java2D";
 import 'DataAcquisitionBuffer' from "Morozov/VideoBuffer";
 import "Morozov/Vision";
+
+--------------------------------------------------------------------
 
 DOMAINS:
 
@@ -111,6 +115,8 @@ JointOrientation3D	= q(	Numerical,
 
 ExtendedCorrection	= 'default'; INTEGER.
 
+--------------------------------------------------------------------
+
 interface 'Kinect' (specialized 'DataAbstraction'):
 
 skeleton_release_time	: INTEGER;
@@ -196,6 +202,8 @@ KinectPerformanceOptimization	= 'DATA_FLOW'; 'OPERATION_SPEED'; 'default'.
 --
 KinectSurfaceType		= 'CONVEX'; 'CONCAVE'; 'default'.
 
+--------------------------------------------------------------------
+
 interface 'KinectBuffer' (specialized 'DataAcquisitionBuffer'):
 
 displaying_mode			: KinectDisplayingMode;
@@ -209,6 +217,7 @@ maximal_chronicle_length	: Numerical;
 --
 scene_depth_threshold		: Numerical;
 scene_surface_type		: KinectSurfaceType;
+color_substitution_mode		: ColorSubstitutionMode;
 
 [
 PREDICATES:
@@ -295,4 +304,8 @@ get_scene_depth_threshold() = Numerical;
 --
 set_scene_surface_type(KinectSurfaceType)		- (i);
 get_scene_surface_type() = KinectSurfaceType;
+--
+set_color_substitution_mode(ColorSubstitutionMode)	- (i);
+get_color_substitution_mode() = ColorSubstitutionMode;
+
 ]

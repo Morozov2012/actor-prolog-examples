@@ -189,7 +189,7 @@ set_Export_mode_YES(InitialName):-
 	Directory== con?input_directory_name(
 		"Please select output directory",
 		InitialName),
-	directory_name ? create_directory_if_necessary(Directory),!,
+	directory_name ? create_or_clear_directory(Directory),!,
 	directory_name ? remember_name(Directory),
 	stop_all_devices,
 	buffer ? set_operating_mode('READING'),
@@ -1227,11 +1227,17 @@ remember_name(Directory):-
 --
 create_directory_if_necessary(Directory):-
 	file_operation_error_handler ? does_exist(Directory),
-	Mask== text_operations?format("%s/ *.png",Directory),
+	fail.
+create_directory_if_necessary(Directory):-
+	file_operation_error_handler ? make_directory(Directory),!.
+--
+create_or_clear_directory(Directory):-
+	file_operation_error_handler ? does_exist(Directory),
+	Mask== text_operations?format("%s/*.png",Directory),
 	List== file_operation_error_handler?list_directory(Mask),
 	delete_files(List),
 	fail.
-create_directory_if_necessary(Directory):-
+create_or_clear_directory(Directory):-
 	file_operation_error_handler ? make_directory(Directory),!.
 --
 delete_files([FileName|Rest]):-

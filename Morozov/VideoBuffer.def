@@ -124,25 +124,36 @@ DataAcquisitionBufferOperatingMode =
 		'READING';
 		'SPECULATIVE_READING';
 		'LISTENING'.
+--
+IntegerAttribute	= INTEGER; 'default'.
 
 interface 'DataAcquisitionBuffer' (specialized 'ReadWriteBuffer'):
 
 operating_mode		: DataAcquisitionBufferOperatingMode;
-
+--
+attach_audio_data			: YesNo;
+--
 connection_attempt_period		: ActionPeriod;
 maximal_errors_quantity			: INTEGER;
 
 [
 PREDICATES:
 --
+flush_microphone_buffer;
+--
 determ:
 --
+microphone_is_available;
+microphone_is_active;
 recent_data_acquisition_error(ExceptionName)		- (o);
 --
 imperative:
 --
 set_operating_mode(DataAcquisitionBufferOperatingMode)	- (i);
 get_operating_mode() = DataAcquisitionBufferOperatingMode;
+--
+set_attach_audio_data(YesNo)				- (i);
+get_attach_audio_data() = YesNo;
 --
 set_connection_attempt_period(ActionPeriod)		- (i);
 get_connection_attempt_period() = ActionPeriod;
@@ -226,7 +237,6 @@ get_operating_mode() = MultimediaBufferOperatingMode;
 DOMAINS:
 
 TextAttribute		= STRING; 'default'.
-IntegerAttribute	= INTEGER; 'default'.
 
 interface 'ReadWriteBuffer'
 
@@ -243,6 +253,9 @@ registration_time			: TextAttribute;
 --
 write_buffer_size			: INTEGER;
 read_buffer_size			: INTEGER;
+--
+output_audio_data			: YesNo;
+audio_data_delay_correction		: IntegerAttribute;
 --
 slow_motion_coefficient			: Numerical;
 maximal_frame_delay			: IntegerAttribute;
@@ -263,13 +276,27 @@ is_open;
 is_active;
 is_suspended;
 is_committed;
+audio_data_is_committed;
 contains_new_frame;
+contains_new_audio_data;
 --
 eof;
 --
 commit;
+commit_audio_data;
 --
 imperative:
+--
+get_recent_audio_data() = BINARY;
+replay_committed_audio_data;
+replay_audio_data(BINARY)				- (i);
+--
+get_recent_audio_data_number(FrameNumber)		- (o);
+get_recent_audio_data_time(INTEGER)			- (o);
+get_recent_audio_data_relative_time(INTEGER)		- (o);
+get_recent_audio_data_rate(REAL)			- (o);
+--
+flush_audio_buffer;
 --
 request_buffered_frame(INTEGER)				- (i);
 --
@@ -312,6 +339,12 @@ get_write_buffer_size() = INTEGER;
 set_read_buffer_size(INTEGER)				- (i);
 get_read_buffer_size() = INTEGER;
 --
+set_output_audio_data(YesNo)				- (i);
+get_output_audio_data() = YesNo;
+--
+set_audio_data_delay_correction(IntegerAttribute)	- (i);
+get_audio_data_delay_correction() = IntegerAttribute;
+--
 set_slow_motion_coefficient(Numerical)			- (i);
 get_slow_motion_coefficient() = Numerical;
 --
@@ -324,6 +357,7 @@ get_output_debug_information() = INTEGER;
 -- These methods are to be implemented by the programmer:
 --
 frame_obtained;
+audio_data_obtained;
 data_transfer_completion;
 --
 buffer_overflow;

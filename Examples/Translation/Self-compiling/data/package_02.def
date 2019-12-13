@@ -1,0 +1,5 @@
+package "package_02" ('X2'):
+
+interface 'MyClass2' (specialized 'X2'):
+[
+]

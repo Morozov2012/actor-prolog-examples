@@ -1,0 +1,12 @@
+package "package_01" ('GeneralClass1'):
+
+import .. from "package_01_01";
+import "package_01_02";
+import 'MyClass3' as 'MyClass3' from "package_01_03";
+
+class 'MyClass1' (specialized 'GeneralClass1'):
+[
+CLAUSES:
+goal:-
+	writeln("Hello World!").
+]

@@ -1,0 +1,146 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	parser		= ('ActorPrologBacktrackableParser');
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	report		= ('PrettyPrinter',
+				report=self,
+				color_text='Black');
+--
+[
+goal:-!,
+	test_loop([
+		title("Predicates"),
+		test("p(A,B,C)-(i,o,_);",'positive'),
+		test("p(A,B,C*)-(_,o,i);",'positive'),
+		test("p;",'positive'),
+		test("p-();",'positive'),
+		test("p()-();",'positive'),
+		test("p",'negative'),
+		test("p();",'positive'),
+		test("p()",'negative'),
+		test("p(A,B,C);",'positive'),
+		test("{A};",'positive'),
+		test("{A,B,C};",'negative'),
+		test("{A*};",'negative'),
+		test("{A}-(i);",'positive'),
+		test("{_}-(i);",'positive'),
+		test("{A}=F;",'positive'),
+		test("{A}=F-(i);",'positive'),
+		test("{A}-(i)=F;",'negative'),
+		test("p(A,B,C)",'negative'),
+		test("p(A)-(i)(o);",'positive'),
+		test("p(A)-(i(o);",'negative'),
+		test("p(A)-(i,i)(o);",'negative'),
+		test("p(A,B,C*);",'positive'),
+		test("p=D;",'positive'),
+		test("p()=E;",'positive'),
+		test("p()=;",'negative'),
+		test("P(A,B,C)-(i,i,i);",'negative'),
+		test("p(A,B,)-(i,i);",'negative'),
+		test("p(A,B;C)-(i,i,i);",'negative'),
+		test("p(A,!,C)-(i,i,i);",'negative'),
+		test("p(A,B,C)-(i,i;i);",'negative'),
+		test("p(A,B,C)-(i,x,i);",'negative'),
+		test("p(A,B,C)-(i,ii);",'negative'),
+		test("p(A,B,C)-(i,i,i)",'negative'),
+		test("p(A,B)-(i,i,i);",'negative'),
+		test("p(A,B,C)=F;",'positive'),
+		test("p(A,_,C)=_;",'positive'),
+		test("p(A,B,C*)=F;",'positive'),
+		test("p(A,B,_*)=F;",'positive'),
+		test("p(A)=B-(i)(o);",'positive'),
+		test("p(A,B,-(i,i);",'negative')
+		],1,0,NumberOfErrors),
+	report_total_results(NumberOfErrors).
+--
+test_loop([Test|Rest],N1,E1,E3):-
+	test_example(Test,N1,N2,E1,E2),
+	test_loop(Rest,N2,E2,E3).
+test_loop([],_,NumberOfErrors,NumberOfErrors).
+--
+test_example(title(Text),N,N,E,E):-!,
+	set_text_color('Black'),
+	writeln("===== TESTING ",
+		?upper(Text),
+		" =====").
+test_example(test(Text,ExpectedResult),N,N+1,E1,E2):-
+	set_text_color('Black'),
+	writeln("Test #",N,":"),
+	test_bench ? parse_text(Text),!,
+	report_positive_result(ExpectedResult,E1,E2).
+test_example(test(_,ExpectedResult),N,N+1,E1,E2):-
+	report_negative_result(ExpectedResult,E1,E2).
+--
+parse_text(Text):-
+	parser ? scan_text(Text),
+	TP== parser?pop_predicate_declaration(Declaration),
+	parser ? check_end_of_text(),
+	set_text_color('Black'),
+	write("     Text:      "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Position:  "),
+	set_text_color('Violet'),
+	writeln(TP),
+	set_text_color('Black'),
+	write("     Predicate: "),
+	set_text_color('RoyalBlue'),
+	writeln(Declaration),
+	Mode1== {
+		print_text_positions:'yes',
+		print_position_indent:'yes',
+		extra_left_indent:0},
+	report ? print_predicate_declaration(Declaration,Mode1),
+	Mode2== {
+		print_text_positions:'no',
+		print_position_indent:'yes',
+		extra_left_indent:0},
+	report ? print_predicate_declaration(Declaration,Mode2).
+--
+report_positive_result('positive',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_positive_result('negative',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False positive!").
+--
+report_negative_result('negative',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_negative_result('positive',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False negative!").
+--
+report_total_results(0):-!,
+	set_text_color('DkGreen'),
+	writeln("All tests are completed with success.").
+report_total_results(NumberOfErrors):-
+	set_text_color('Red'),
+	writeln("One or more tests are completed with failure."),
+	writeln("Number of test failures: ",NumberOfErrors,".").
+--
+alarm(Exception,_,Text):-
+	set_text_color('Black'),
+	write("     Text:      "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Error:     "),
+	set_text_color('Orange'),
+	writeln(Exception).
+]
+---------------------------------------------------------------------

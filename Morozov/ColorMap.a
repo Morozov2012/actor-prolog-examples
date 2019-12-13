@@ -18,4 +18,7 @@ CLAUSES:
 --
 string_to_color_map_name(Text) = Value:
 	[external "stringToColorMapName"].
+--
+string_to_color_channel(Text) = Value:
+	[external "stringToColorChannel"].
 ]

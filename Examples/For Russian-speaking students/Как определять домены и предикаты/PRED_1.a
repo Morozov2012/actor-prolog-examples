@@ -6,6 +6,7 @@ Text		= STRING.
 RGB_Color	= 'Red'; 'Green'; 'Blue'.
 T		= INTEGER; REAL.
 Fun		= {a:INTEGER,v:REAL}.
+Value		= BINARY.
 
 PREDICATES:
 
@@ -24,7 +25,7 @@ PREDICATES:
 -- двоеточие. ѕо умолчанию предикаты
 -- объ€вл€ютс€ детерминированными.
 
-p(N);
+p1(N);
 s;
 u();
 
@@ -38,13 +39,13 @@ nondeterm:
 
 IMPERATIVES:
 
-p(INTEGER)	- (o);
+p2(INTEGER)	- (o);
 
 PREDICATES:
 
 imperative:
 
-p(INTEGER)	- (o);
+p3(INTEGER)	- (o);
 
 -- ѕосле имени предиката могут быть
 -- перечислены имена доменов аргументов.
@@ -158,10 +159,12 @@ goal:-!,
 p(1,2,3)= 4.
 p(1,2)= 3.
 p(1)= 2 :-!.
-p(1).
+p(1):-!.
 p(1)= 2.
+q(1,2,3,_*):-!.
 q(1,2).
 q(1).
+q().
 ]
 
 project: (('Test'))

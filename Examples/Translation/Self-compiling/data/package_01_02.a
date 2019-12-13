@@ -1,0 +1,8 @@
+package "package_01_02":
+
+class 'MyClass_1_2' (specialized 'DemoConsole'):
+[
+CLAUSES:
+goal:-
+	writeln("Hello World!").
+]

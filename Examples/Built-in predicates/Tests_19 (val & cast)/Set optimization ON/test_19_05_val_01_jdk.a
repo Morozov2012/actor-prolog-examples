@@ -71,4 +71,3 @@ test3(T):-
 test3(_):-
 	set_color('Magenta'),
 	writeln("\tFailure").
-]

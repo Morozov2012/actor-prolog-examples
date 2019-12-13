@@ -1,0 +1,129 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+TestSet		= Test*.
+--
+Test		= title(STRING);
+		  test(STRING,ExpectedResult).
+--
+ExpectedResult	= 'positive'; 'negative'.
+--
+---------------------------------------------------------------------
+interface 'Main' (specialized 'Alpha','TestProcedures'):
+--
+internal:
+--
+	parser		: 'MyParser';
+	test_store	: 'TestStore';
+	text_store	: 'TextInformationStore';
+	test_bench	: 'TestProcedures';
+	text_operations	: 'Text';
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test;
+--
+test_example(	Test,
+		INTEGER,
+		INTEGER,
+		INTEGER,
+		INTEGER)		- (i,i,o,i,o);
+--
+report_positive_result(
+		ExpectedResult,
+		INTEGER,
+		INTEGER)		- (i,i,o);
+report_negative_result(
+		ExpectedResult,
+		INTEGER,
+		INTEGER)		- (i,i,o);
+--
+report_total_results(INTEGER)			- (i);
+--
+determ:
+--
+alarm(ExceptionName,SYMBOL,STRING)		- (i,i,i);
+
+]
+---------------------------------------------------------------------
+interface 'MyParser' (specialized 'ActorPrologBacktrackableParser'):
+--
+internal:
+--
+	text_store	: 'TextInformationStore';
+	text_operations	: 'SymbolicInformation';
+	con		: 'Console';
+--
+[
+--
+PREDICATES:
+--
+imperative:
+--
+print_error_line(INTEGER,STRING)		- (i,i);
+print_position(INTEGER)				- (i);
+]
+---------------------------------------------------------------------
+interface 'TestStore' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	=
+	test(Test);
+	current_test_number(INTEGER);
+	number_of_errors(INTEGER).
+--
+PREDICATES:
+--
+imperative:
+--
+remember_test_set(TestSet)			- (i);
+set_test_number(INTEGER)			- (i);
+set_number_of_errors(INTEGER)			- (i);
+--
+determ:
+--
+get_test(Test)					- (o);
+--
+imperative:
+--
+get_test_number(INTEGER)			- (o);
+get_number_of_errors(INTEGER)			- (o);
+]
+---------------------------------------------------------------------
+interface 'TextInformationStore' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	= STRING.
+--
+PREDICATES:
+--
+imperative:
+--
+put(STRING)					- (i);
+get(STRING)					- (o);
+]
+---------------------------------------------------------------------
+interface 'TestProcedures':
+[
+PREDICATES:
+--
+determ:
+--
+parse_text(STRING)				- (i);
+]
+---------------------------------------------------------------------

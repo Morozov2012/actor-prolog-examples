@@ -1,0 +1,178 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	parser		= ('ActorPrologBacktrackableParser',
+				slot_names=[
+					'w1','w2','w3',
+					'w4','w5','w6',
+					'w7','w8']);
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	report		= ('PrettyPrinter',
+				report=self,
+				color_text='Black');
+--
+[
+goal:-!,
+	test_loop([
+		title("Slot Definitions"),
+		test(	"s01;\n"
+			"visible:\n"
+			"s02;\n"
+			"s03;\n"
+			"private:\n"
+			"s04:D1;\n"
+			"s05:D2;\n"
+			"visible:\n"
+			"private:\n"
+			"s06;\n"
+			"visible:\n"
+			"s07;\n"
+			"s08:D3;\n"
+			"s09:D4;\n"
+			"protecting:\n"
+			"s10:'MyClass';\n"
+			"internal:\n"
+			"s11:'MyClass';",
+			'positive'),
+		test(	"s01:'ClassA';",
+			'positive'),
+		test(	"s01:'ClassA';",
+			'positive'),
+		test(	"s01;\n"
+			"s01;",
+			'negative'),
+		test(	"s01;;",
+			'negative'),
+		test(	"s01;\n"
+			"visible\n"
+			"s02;",
+			'negative'),
+		test(	"s01;\n"
+			"invisible:\n"
+			"s02;",
+			'negative'),
+		test(	"visible:\n"
+			"constant:\n"
+			"s01:'MyClass';\n"
+			"private:\n"
+			"s02:'MyClass';\n"
+			"s03;\n"
+			"variable:\n"
+			"s04;\n"
+			"internal:\n"
+			"s05;\n"
+			"suspending:\n"
+			"s06;\n"
+			"protecting:\n"
+			"s07;\n"
+			"protecting:\n"
+			"s08;\n"
+			"variable:\n"
+			"s09;\n"
+			"s10;",
+			'positive'),
+		test(	"s01'MyClass';",
+			'negative'),
+		test(	"s01:('MyClass');",
+			'negative'),
+		test(	"s01::'C';",
+			'negative'),
+		test(	"s01:'Array';\n"
+			"s02:'Array' of 'Class';",
+			'positive')
+		],1,0,NumberOfErrors),
+	report_total_results(NumberOfErrors).
+--
+test_loop([Test|Rest],N1,E1,E3):-
+	test_example(Test,N1,N2,E1,E2),
+	test_loop(Rest,N2,E2,E3).
+test_loop([],_,NumberOfErrors,NumberOfErrors).
+--
+test_example(title(Text),N,N,E,E):-!,
+	set_text_color('Black'),
+	writeln("===== TESTING ",
+		?upper(Text),
+		" =====").
+test_example(test(Text,ExpectedResult),N,N+1,E1,E2):-
+	set_text_color('Black'),
+	writeln("Test #",N,":"),
+	test_bench ? parse_text(Text),!,
+	report_positive_result(ExpectedResult,E1,E2).
+test_example(test(_,ExpectedResult),N,N+1,E1,E2):-
+	report_negative_result(ExpectedResult,E1,E2).
+--
+parse_text(Text):-
+	parser ? forget_parsed_variable_names,
+	-- parser ? clear_function_call_table,
+	parser ? scan_text(Text),
+	TP== parser?pop_slot_declarations(SlotList),
+	parser ? check_end_of_text(),
+	SlotNames== parser?get_parsed_slot_names(),
+	VariableNames== parser?get_parsed_variable_names(),
+	set_text_color('Black'),
+	write("     Text:\n"),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Slot names:        "),
+	set_text_color('Violet'),
+	writeln(SlotNames),
+	set_text_color('Black'),
+	write("     Position:          "),
+	set_text_color('Violet'),
+	writeln(TP),
+	set_text_color('Black'),
+	write("     Slot declarations: "),
+	set_text_color('RoyalBlue'),
+	writeln(SlotList),
+	Mode== {print_text_positions:'yes',
+		variable_names:VariableNames,
+		print_position_indent:'yes',
+		extra_left_indent:8},
+	report ? print_slot_declarations(SlotList,Mode).
+--
+report_positive_result('positive',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_positive_result('negative',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False positive!").
+--
+report_negative_result('negative',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_negative_result('positive',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False negative!").
+--
+report_total_results(0):-!,
+	set_text_color('DkGreen'),
+	writeln("All tests are completed with success.").
+report_total_results(NumberOfErrors):-
+	set_text_color('Red'),
+	writeln("One or more tests are completed with failure."),
+	writeln("Number of test failures: ",NumberOfErrors,".").
+--
+alarm(Exception,_,Text):-
+	set_text_color('Black'),
+	write("     Text:\n"),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Error:             "),
+	set_text_color('Orange'),
+	writeln(Exception).
+]
+---------------------------------------------------------------------

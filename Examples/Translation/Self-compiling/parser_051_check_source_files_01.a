@@ -1,0 +1,380 @@
+-----------------------------------------------------------------------
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+--
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+	input		= ('File');
+	store		= ('FileNameStore',
+				con=self,
+				print_comments='yes');
+				-- print_comments='no');
+--
+constant:
+--
+	case_sensitivity	= 'off';
+--
+[
+CLAUSES:
+--
+goal:-!,
+	Path== "D:/Morozov/z/z-dj/DEMO/EXE",
+	-- Path== "G:/= tests =",
+	set_text_color('Black'),
+	writeln("=============================="),
+	writeln(Path),
+	writeln("=============================="),
+	explore_directory(Path),
+	-- store ? list_files,
+	store ? sort_by('directory'),
+	-- store ? list_directories,
+	-- store ? list_files,
+	store ? analyse_files,
+	input ? set_current_directory(Path),
+	set_text_color('Black'),
+	writeln("=============================="),
+	writeln("Done!").
+--
+explore_directory(Path):-
+	input ? set_current_directory(Path),
+	List== input?list_directory(),
+	explore_subdirectories(Path,List).
+--
+explore_subdirectories(Path1,[FN|Rest]):-
+	input ? extract_path(FN,_,ShortName),
+	concat("=",_,ShortName),!,
+	explore_subdirectories(Path1,Rest).
+explore_subdirectories(Path1,[FN|Rest]):-
+	input ? is_directory(FN),!,
+	explore_directory(FN),
+	input ? set_current_directory(Path1),
+	explore_subdirectories(Path1,Rest).
+explore_subdirectories(Path1,[FN1|Rest]):-
+	input ? extract_extension(FN1,_,Extension),
+	-- ?search(Path1,"morozov"),
+	is_source_file(?lower(Extension)),!,
+	-- writeln(">>> ",FN1),
+	store ? save_file_name(Path1,FN1),
+	explore_subdirectories(Path1,Rest).
+explore_subdirectories(Path1,[_|Rest]):-!,
+	explore_subdirectories(Path1,Rest).
+explore_subdirectories(_,_).
+--
+is_source_file(".a").
+is_source_file(".def").
+]
+---------------------------------------------------------------------
+class 'FileNameStore' (specialized 'HashSet'):
+--
+internal:
+--
+	file		= ('File');
+	bagof		= ('MyBag',
+				world=self);
+	text_store	= ('TextInformationStore');
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	parser		= ('MyParser',
+				text_store);
+	report		= ('PrettyPrinter',
+				report=con,
+				color_text='Black');
+	text_operations	= ('Text');
+	con		= ('Console');
+--
+constant:
+--
+	print_comments	= 'yes';
+--
+[
+save_file_name(Path,FN):-
+	append(file_name(Path,FN)),
+	append({directory:Path}).
+--
+list_files:-
+	FileName== ?match(file_name(_,_)),
+		FileName == file_name(_,FN),
+		con ? writeln(FN),
+		fail.
+list_files.
+--
+list_directories:-
+	DirectoryName== ?match({directory:_|_}),
+		DirectoryName == {directory:Path|_},
+		con ? writeln(Path),
+		fail.
+list_directories.
+--
+analyse_files:-
+	con ? set_text_color('Black'),
+	con ? writeln("= TEXT ANALYSIS =============="),
+	List== bagof?get_file_name(),
+	self << analyse_files(List).
+--
+analyse_files([FN|Rest]):-!,
+	analyse_file(FN),
+	self << analyse_files(Rest).
+analyse_files(_).
+--
+analyse_file(FN):-
+	print_file_name(FN),
+	Text== file?get_string(FN),
+	test_bench ? parse_text(FN,Text),!.
+analyse_file(_).
+--
+get_file_name() = FileName :-
+	Item== ?match(file_name(_,_)),
+	Item == file_name(_,FileName).
+--
+print_file_name(FN):-
+	print_comments=='yes',!,
+	con ? set_text_color('Black'),
+	con ? writeln(FN).
+print_file_name(_).
+--
+parse_text(FileName,Text):-
+	text_store ? put(FileName,Text),
+	parser ? forget_parsed_variable_names,
+	parser ? scan_text(Text),
+	parser?pop_package(
+		_/*PackageName*/,
+		_/*FormalParameters*/,
+		_/*PragmaList*/,
+		_/*ImportCommands*/,
+		_/*DomainDefinitions*/,
+		_/*PredicateDeclarations*/,
+		_/*ClassesAndInterfaces*/,
+		_/*Project*/,
+		_/*PackageVariableNames*/),
+	parser ? check_end_of_text(),
+	/*
+	VariableNames== parser?get_parsed_variable_names(),
+	*/
+	/*
+	con ? set_text_color('Black'),
+	con ? write("     Text:\n"),
+	con ? set_text_color('DkGray'),
+	con ? writeln(Text),
+	con ? set_text_color('Black'),
+	con ? write("     Position:               "),
+	con ? set_text_color('Violet'),
+	con ? writeln(TP),
+	con ? set_text_color('Black'),
+	con ? write("     Actual arguments:       "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(ActualArguments),
+	con ? set_text_color('Black'),
+	con ? write("     Package name:           "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(PackageName),
+	con ? set_text_color('Black'),
+	con ? write("     Formal parameters:      "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(FormalParameters),
+	con ? set_text_color('Black'),
+	con ? write("     Pragma list:            "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(PragmaList),
+	con ? set_text_color('Black'),
+	con ? write("     Import commands:        "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(ImportCommands),
+	con ? set_text_color('Black'),
+	con ? write("     Domain definitions:     "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(DomainDefinitions),
+	con ? set_text_color('Black'),
+	con ? write("     Predicate declarations: "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(PredicateDeclarations),
+	con ? set_text_color('Black'),
+	con ? write("     Classes and interfaces: "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(ClassesAndInterfaces),
+	con ? set_text_color('Black'),
+	con ? write("     Project:                "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(Project),
+	*/
+	/*
+	Table== parser?get_function_call_table(),
+	Mode== {print_text_positions:'no',
+		variable_names:VariableNames,
+		unroll_function_calls:'yes',
+		function_call_table:Table,
+		print_position_indent:'no',
+		extra_left_indent:13,
+		indent_constructor_arguments:'yes',
+		tabulator_size:5},
+	report ? print_package(
+		PackageName,
+		FormalParameters,
+		PragmaList,
+		ImportCommands,
+		DomainDefinitions,
+		PredicateDeclarations,
+		ClassesAndInterfaces,
+		Project,
+		TP,
+		Mode).
+	*/
+	/**/
+	con ? set_text_color('DkGreen'),
+	con ? writeln("     Test succeed."),
+	con ? set_text_color('default').
+	/**/
+--
+alarm(Exception,_,_/*FN*/,_/*Text*/):-
+	/*
+	con ? set_text_color('Black'),
+	con ? write("     Text:\n"),
+	con ? set_text_color('DkGray'),
+	con ? writeln(Text),
+	*/
+	con ? set_text_color('Black'),
+	con ? write("     Error:                  "),
+	con ? set_text_color('Orange'),
+	con ? writeln(Exception).
+]
+---------------------------------------------------------------------
+class 'MyBag' (specialized 'FindAll'):
+--
+constant:
+--
+	mode	= 'bag';
+--
+[
+]
+---------------------------------------------------------------------
+class 'MyParser' (specialized 'ActorPrologBacktrackableParser'):
+--
+internal:
+--
+	text_store;
+	error_counter		= ('Counter');
+	text_operations		= ('SymbolicInformation');
+	con			= ('Console');
+--
+constant:
+--
+	slot_names				= [];
+	stop_translation_after_first_error	= 'yes';
+	raise_runtime_exceptions		= 'no';
+	send_error_messages			= 'yes';
+--
+[
+syntax_error(_/*ErrorType*/,_/*ErrorName*/,Position,Etc):-!,
+	error_counter ? increment_and_get(ErrorNumber),
+	con ? set_text_color('default'),
+	con ? writeln(
+		"===== ERROR MESSAGE #",ErrorNumber,
+		" IS RECEIVED ====="),
+	text_store ? get(FN,Text),
+	con ? set_text_color('default'),
+	con ? write("File name:      "),
+	con ? set_text_color('Navy'),
+	con ? writeln(FN),
+	/*
+	con ? set_text_color('default'),
+	con ? write("Error type:     "),
+	con ? set_text_color('Navy'),
+	con ? writeln(ErrorType),
+	con ? set_text_color('default'),
+	con ? write("ErrorName:      "),
+	con ? set_text_color('Navy'),
+	con ? writeln(ErrorName),
+	con ? set_text_color('default'),
+	con ? write("TextPosition:   "),
+	con ? set_text_color('Navy'),
+	con ? writeln(TextPosition),
+	*/
+	con ? set_text_color('default'),
+	con ? write("Comments:       "),
+	con ? set_text_color('Navy'),
+	con ? writeln(Etc),
+	print_error_line(Position,Text).
+--
+/*
+print_error_line(TextPosition,Text):-
+	TextPosition == text_operations?length(Text),!,
+	con ? set_text_color('Red'),
+	con ? writeln(
+		"This bug was revealed in the end of the text.").
+*/
+print_error_line(TextPosition,Text):-
+	text_operations ? extract_line(
+		TextPosition,
+		Text,
+		Line1,
+		LineNumber,
+		PositionInLine),!,
+	con ? set_text_color('default'),
+	con ? write("LineNumber:     "),
+	con ? set_text_color('Navy'),
+	con ? writeln(LineNumber),
+	con ? set_text_color('Indigo'),
+	split_line(PositionInLine,Line1,Line2),
+	replace_tabulators(Line1,Line3,0,_),
+	replace_tabulators(Line2,_,0,N),
+	con ? writeln(Line3),
+	con ? set_text_color('Red'),
+	print_position(PositionInLine+N).
+print_error_line(_,_):-
+	con ? set_text_color('Red'),
+	con ? writeln("Text position is incorrect.").
+--
+split_line(Position,Line1,Line2):-
+	text_operations ? split(Position,Line1,Line2,_),!.
+split_line(_,Line,Line).
+--
+replace_tabulators(T1,T3,N1,N2):-
+	T2== text_operations ? replace(T1,"\t","      "),!,
+	replace_tabulators(T2,T3,N1+5,N2).
+replace_tabulators(T,T,N,N).
+--
+print_position(P):-
+	P <= 0,!,
+	con ? writeln("^").
+print_position(P):-
+	con ? write("_"),
+	print_position(P-1).
+]
+---------------------------------------------------------------------
+class 'TextInformationStore' (specialized 'Database'):
+[
+put(FileName,Text):-
+	retract_all,
+	append(file_content(FileName,Text)).
+--
+get(FileName,Text):-
+	Item== ?match(_),
+	Item == file_content(FileName,Text),!.
+get("","").
+]
+---------------------------------------------------------------------
+class 'Counter' (specialized 'Database'):
+[
+put(N):-
+	retract_all,
+	append(N).
+--
+get(N):-
+	find(N),!.
+get(0).
+--
+increment_and_get(N2):-
+	find(N1),!,
+	N2== N1 + 1,
+	put(N2).
+increment_and_get(1):-
+	put(1).
+]
+---------------------------------------------------------------------

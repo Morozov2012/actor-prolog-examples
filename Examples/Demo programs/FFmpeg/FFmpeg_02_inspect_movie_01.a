@@ -1,0 +1,106 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'FFmpeg'):
+--
+constant:
+--
+	-- name		= "Test01.avi";
+	-- name		= "recorder.avi";
+	name		= "2019-12-08-21-40-49.avi";
+	-- name		= "data/2019-11-04-05-47-24.avi";
+	-- name		= "data/2019-11-04-05-35-13.avi";
+	-- name		= "data/2019-11-03-002-176x144-Recorded-XP-25Hz.avi";
+	-- name		= "data/2019-11-04-04-03-07.avi";
+	-- name		= "data/2019-11-04-02-56-59.avi";
+	-- name		= "data/2017-11-04-01-07-21.avi";
+	-- name		= "data/2019-11-03-23-30-45.avi";
+	-- name		= "data/2019-10-31-19-52-51.avi";
+	-- name		= "data/2019-10-31-001-176x144-Recorded-XP-41Hz.avi";
+	-- name		= "data/2019-10-31-004-640x480-Recorded-XP-6_5Hz.avi";
+	-- name		= "data/red.avi";
+	-- name		= "data/vid.3gp";
+--
+	operating_mode			= 'READING';
+--
+internal:
+--
+	window	= ('Canvas2D',
+		background_color='SystemControl');
+	image	= ('BufferedImage');
+	con	= ('Console');
+--
+[
+goal:-!,
+	window ? show,
+	start.
+--
+frame_obtained:-
+	commit,!,
+	get_recent_frame_number(FrameNumber),
+	get_recent_frame_time(FrameTime),
+	get_recent_frame_rate(FrameRate),
+	get_recent_frame_PTS(PTS),
+	get_average_frame_rate(AFR),
+	print_movie_attributes(FrameNumber),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln("====================="),
+	con ? writeln("FrameNumber: ",FrameNumber),
+	con ? writeln("FrameTime: ",FrameTime),
+	con ? writeln("FramePTS: ",PTS),
+	con ? writeln("FrameRate: ",FrameRate," (",AFR,")"),
+	con ? writeln("====================="),
+	get_recent_image(image),
+	window ? suspend_redrawing,
+	window ? clear,
+	window ? draw_image(image,0,0,1,1),
+	window ? draw_now,
+	start.
+frame_obtained:-!.
+--
+audio_data_obtained:-
+	commit_audio_data,!,
+	get_recent_audio_data_number(FrameNumber),
+	get_recent_audio_data_time(FrameTime),
+	get_recent_audio_data_rate(FrameRate),
+	con ? set_text_color('Magenta'),
+	con ? writeln("     ====================="),
+	con ? writeln("     AudioDataNumber: ",FrameNumber),
+	con ? writeln("     AudioDataTime: ",FrameTime),
+	con ? writeln("     AudioDataRate: ",FrameRate),
+	con ? writeln("     ====================="),
+	start.
+audio_data_obtained:-!.
+--
+data_transfer_completion:-
+	flush_audio_buffer,
+	fail.
+data_transfer_completion:-!,
+	con ? writeln("End of file!").
+--
+data_transfer_error(_):-
+	flush_audio_buffer,
+	fail.
+data_transfer_error(ErrorCode):-!,
+	con ? writeln("Error: ",ErrorCode).
+--
+print_movie_attributes(FrameNumber):-
+	FrameNumber < 1,!,
+	get_delivered_description(Description),
+	get_delivered_copyright(Copyright),
+	get_delivered_registration_date(Data),
+	get_delivered_registration_time(Time),
+	con ? set_text_color('DkGreen'),
+	con ? writeln("Description: ",Description),
+	con ? writeln("Copyright: ",Copyright),
+	con ? writeln("RegistrationDate: ",Data),
+	con ? writeln("RegistrationTime: ",Time).
+print_movie_attributes(_).	
+]
+-----------------------------------------------------------------------

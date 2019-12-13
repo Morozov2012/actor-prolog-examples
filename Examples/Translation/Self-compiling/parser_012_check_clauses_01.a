@@ -1,0 +1,180 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	parser		= ('ActorPrologBacktrackableParser',
+				slot_names=[
+					'w1','w2','w3',
+					'w4','w5','w6',
+					'w7','w8']);
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	report		= ('PrettyPrinter',
+				report=self,
+				color_text='Black');
+--
+[
+goal:-!,
+	test_loop([
+		title("Clauses"),
+		test(	"p:-q,r.\n"
+			"p=3.14:-q.\n"
+			"p:-X==?f(),q(X),r.\n"
+			"p:-?f()==X,q(X),r.\n"
+			"p:-q,?f()==?g(),r.\n"
+			"A<=B:-q(A),r(B).\n"
+			"?f(A)>=?h(B):-q(A),r(B).\n"
+			"q(A):-q(A,B),r(B).\n"
+			"q(A):-?q(A,B),?r(B).\n"
+			"q(A,B,C*):-q(A,B),r(C*).\n"
+			"q(A,B,_*):-q(A,B).\n"
+			"q(A,B,C*):-q(A,B,C).\n"
+			"_(A,B,C*):-q(A,B,C).\n"
+			"_:-q(1,2,3).\n"
+			"r:-w1<-q,w1<<r,w1?s.\n"
+			"r(A,B,C)=V:-q(A,B,C,V).\n"
+			"V(A,100,C):-s(V),q(A,C).",
+			'positive'),
+		test(	"p(A,B,C):-q(A,B,C);\n"
+			"q(_,_,_)",
+			'negative'),
+		test(	"p.\n"
+			"q.\n"
+			"p.",
+			'negative'),
+		test(	"p.\n"
+			"p(1).\n"
+			"p.",
+			'negative'),
+		test(	"p.\n"
+			"q.\n"
+			"Q:-Q.\n"
+			"p.",
+			'negative'),
+		test(	"p.\n"
+			"p(1).\n"
+			"Q:-Q.\n"
+			"p.",
+			'negative'),
+		test(	"P(A,B,C*):-s(P,C),q(A,B,C*),r(C).\n"
+			"p(A,B,C*)=3.14:-q(A,B,C*).\n"
+			"P(A,B,_*):-q(A),s(P),r(B).\n"
+			"P:-q,w1?P,r.\n"
+			"P:-q,s(w1?P),r.\n"
+			"P:-q,w1<-P,r.\n"
+			"P:-q,w1<<P,r.\n"
+			"P(A,B,R*):-q,w1?P(B,R*),r(A).\n"
+			"P(A,B,R*):-q,s(w1?P(B,R*)),r(A).\n"
+			"P(A,B,w1?P(B,R*),R*):-q,r(A).\n"
+			"P(A,B,R*)=w1?P(A,R*):-q(B),r.\n"
+			"P(A,B,R*):-q(B),w1<-P(A,R*),r.\n"
+			"P(A,B,R*):-q(B),w1<<P(R*),r(A).\n"
+			"p:-a(V),q(w1?f(1,2,3)),z(V).\n"
+			"p(w1?f(1,2,3)):-q().\n"
+			"p(w1?f(1,2,3))=3.14:-q().\n"
+			"p(w1?f(1,2,3)).\n"
+			"q:-a(V),q(w1?f(1,w2?g(),3)),z(V).",
+			'positive'),
+		test(	"p(w3?h(w4?i()),w5?j(w6?k())):-a(V),q(w1?f(1,w2?g(),3)),z(V).\n"
+			"p(w3?h(w4?i()),w5?j(w6?k()))=w7?n(w8?m()):-a(V),q(w1?f(w2?g())),z(V).\n"
+			"p(A,B,C):[external\"p\"].\n"
+			"p(A,B,C)=V:[external\"p\"].\n"
+			"p(A,B,C)=V:[external].\n",
+			'positive'),
+		test(	"?p(A,B,C).",
+			'negative'),
+		test(	"?p(A,B,C)=V.",
+			'negative')
+		],1,0,NumberOfErrors),
+	report_total_results(NumberOfErrors).
+--
+test_loop([Test|Rest],N1,E1,E3):-
+	test_example(Test,N1,N2,E1,E2),
+	test_loop(Rest,N2,E2,E3).
+test_loop([],_,NumberOfErrors,NumberOfErrors).
+--
+test_example(title(Text),N,N,E,E):-!,
+	set_text_color('Black'),
+	writeln("===== TESTING ",
+		?upper(Text),
+		" =====").
+test_example(test(Text,ExpectedResult),N,N+1,E1,E2):-
+	set_text_color('Black'),
+	writeln("Test #",N,":"),
+	test_bench ? parse_text(Text),!,
+	report_positive_result(ExpectedResult,E1,E2).
+test_example(test(_,ExpectedResult),N,N+1,E1,E2):-
+	report_negative_result(ExpectedResult,E1,E2).
+--
+parse_text(Text):-
+	parser ? forget_parsed_variable_names,
+	-- parser ? clear_function_call_table,
+	parser ? scan_text(Text),
+	TP== parser?pop_clauses('no',Term),
+	parser ? check_end_of_text(),
+	VariableNames== parser?get_parsed_variable_names(),
+	set_text_color('Black'),
+	write("     Text:\n"),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Position:  "),
+	set_text_color('Violet'),
+	writeln(TP),
+	set_text_color('Black'),
+	write("     Clauses:   "),
+	set_text_color('RoyalBlue'),
+	writeln(Term),
+	-- Table== parser?get_function_call_table(),
+	Mode== {print_text_positions:'no',
+		variable_names:VariableNames,
+		unroll_function_calls:'no',
+		-- function_call_table:Table,
+		print_position_indent:'yes',
+		extra_left_indent:0,
+		tabulator_size:5},
+	report ? print_clauses(Term,Mode).
+--
+report_positive_result('positive',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_positive_result('negative',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False positive!").
+--
+report_negative_result('negative',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_negative_result('positive',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False negative!").
+--
+report_total_results(0):-!,
+	set_text_color('DkGreen'),
+	writeln("All tests are completed with success.").
+report_total_results(NumberOfErrors):-
+	set_text_color('Red'),
+	writeln("One or more tests are completed with failure."),
+	writeln("Number of test failures: ",NumberOfErrors,".").
+--
+alarm(Exception,_,Text):-
+	set_text_color('Black'),
+	write("     Text:\n"),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Error:     "),
+	set_text_color('Orange'),
+	writeln(Exception).
+]
+---------------------------------------------------------------------

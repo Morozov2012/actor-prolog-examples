@@ -1,5 +1,0 @@
-interface 'Report' (specialized 'Text'):
-[
-SOURCE:
-"morozov.my_classes.Report";
-]

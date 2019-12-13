@@ -45,8 +45,8 @@ test1:-
 	?apply_radix(16,16#AB.CDEF#E-170),
 	?apply_radix(10,16#0#),
 	?apply_radix(10,16#0.0#),
-	?apply_radix(10,-16#0#),
-	?apply_radix(10,-16#0.0#).
+	?apply_radix(10,-(16#0#)),
+	?apply_radix(10,-(16#0.0#)).
 --
 test2:-
 	con ? writeln(?apply_radix(10,20,1234567123)),
@@ -70,6 +70,6 @@ test2:-
 	con ? writeln(?apply_radix(16,16#AB.CDEF#E-170)),
 	con ? writeln(?apply_radix(10,16#0#)),
 	con ? writeln(?apply_radix(10,16#0.0#)),
-	con ? writeln(?apply_radix(10,-16#0#)),
-	con ? writeln(?apply_radix(10,-16#0.0#)).
+	con ? writeln(?apply_radix(10,-(16#0#))),
+	con ? writeln(?apply_radix(10,-(16#0.0#))).
 ]

@@ -1,0 +1,12 @@
+package "package_02" ('X2'):
+
+import "package_02_01"('X3':='X2');
+
+-- project: (('X3'))
+
+class 'MyClass2' (specialized 'X2'):
+[
+CLAUSES:
+goal:-
+	writeln("Hello World!").
+]

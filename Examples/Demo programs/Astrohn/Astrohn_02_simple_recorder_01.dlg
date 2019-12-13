@@ -129,7 +129,7 @@ vbox('center')
 	"The file is investigated... Please wait."
 	hbox('center')
 		"Frame Number: "
-		editinteger['ReadOnly'](1010,5,0)
+		editinteger['ReadOnly','AlignCenter'](1010,5,0)
 	end_of_hbox
 	button("Cancel","&Cancel")
 end_of_vbox

@@ -154,7 +154,7 @@ T12	= _{a:T1,b:T2}.
 
 mixed:
 
-T13	= T13.
+T13	= f(T13).
 T14	= T12.
 
 -- Необходимо, чтобы все домены, имена которых
@@ -210,6 +210,14 @@ class 'Test' (specialized 'Console'):
 [
 goal:-!,
 	writeln("Hello world!").
+]
+
+class 'A1' (specialized 'Console'):
+[
+]
+
+class 'MyClass' (specialized 'Console'):
+[
 ]
 
 project: (('Test'))

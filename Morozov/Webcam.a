@@ -57,6 +57,8 @@ get_recent_frame_relative_time(Milliseconds):
 	[external "getRecentFrameRelativeTime"].
 get_recent_frame_rate(FrameRate):
 	[external "getRecentFrameRate"].
+get_camera_frame_rate(FrameRate):
+	[external "getCameraFrameRate"].
 --
 get_image_size_in_pixels(Width,Height):
 	[external "getImageSizeInPixels"].

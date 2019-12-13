@@ -1,0 +1,26 @@
+---------------------------------------------------------------------
+-- (c) 2017 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologScanner' from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+interface 'Main' (specialized 'DemoConsole'):
+--
+constant:
+--
+	input_file_name	: STRING;
+--
+internal:
+--
+	file_operations	: 'File';
+	scanner		: 'ActorPrologScanner';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+scan_text(STRING,STRING)		- (i,i);
+list_tokens(ActorPrologTokens)		- (i);
+]
+---------------------------------------------------------------------

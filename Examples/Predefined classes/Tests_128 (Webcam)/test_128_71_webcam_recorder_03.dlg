@@ -1,0 +1,75 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+draft('off')
+
+dialog 'VideoRecorder' (
+	"Web Camera Recorder",
+	default,default,default,centered,centered,default)
+vbox(justify)
+	hbox(center)
+		vbox(center)
+			edittext['ReadOnly','AlignCenter'](1010,18,1,"")
+			edittext['ReadOnly','AlignCenter'](1020,18,1,"")
+			edittext['ReadOnly','AlignCenter'](1030,18,1,"")
+			edittext['ReadOnly','AlignCenter'](1040,18,1,"")
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			editname['ReadOnly','AlignCenter'](1050,18,"")
+		end_of_vbox
+		custom['KeepProportions'](main_window,70,65,"Control2D")
+		vbox(left)
+			statictext(0000,1,"")
+		end_of_vbox
+	end_of_hbox
+	hbox(justify)
+		listbutton(2011,1012,25,3,[],"")
+		listbutton(2021,2022,15,3,[],"")
+		togglebutton(2030,"Use Recorded Zooming &Commands",'yes')
+		togglebutton(2040,"&Zoom Image",'no')
+		editreal['AlignCenter'](2050,5,2.1)
+		togglebutton(2060,"&Microphone",'yes')
+	end_of_hbox
+	hscroll(3011,3012,50,[0,255],0)
+	hbox(justify)
+	scaling(1.5,1.0)
+		button("Connect","Co&nnect")
+		button("Choose","Ch&oose")
+		ok("Play","&Play")
+		button("Pause","Pau&se")
+		button("Record","&Record")
+		button("AVI","A&VI")
+		button("JPG","&JPG")
+		button("GIF","GI&F")
+		button("Stop","S&top")
+		button("Save","Sa&ve")
+		button(close,"&Quit")
+	end_of_scaling
+	end_of_hbox
+	padding(0,0)
+		statictext(
+			"The project is supported by the Russian "
+			"Foundation for Basic Research, "
+			"grant 16-29-09626-ofi_m. "
+			"WebSite: www.fullvision.ru")
+	end_of_padding
+end_of_vbox
+end_of_dialog
+
+dialog 'FileInspection'(
+	"Please wait",
+	default,default,default,centered,centered,default)
+vbox('center')
+	"The file is investigated... Please wait."
+	hbox('center')
+		"Frame Number: "
+		editinteger['ReadOnly','AlignCenter'](1010,5,0)
+	end_of_hbox
+	button("Cancel","&Cancel")
+end_of_vbox
+end_of_dialog

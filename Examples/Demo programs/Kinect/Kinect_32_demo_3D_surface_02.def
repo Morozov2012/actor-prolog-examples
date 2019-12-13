@@ -13,6 +13,7 @@ constant:
 --
 	frame_type	: KinectFrameType;
 	people_index	: KinectPeopleIndexMode;
+	color_map_name	: ColorMapName;
 --
 internal:
 --

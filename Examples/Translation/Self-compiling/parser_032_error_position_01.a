@@ -1,0 +1,244 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+	parser		= ('MyParser',
+				text_store);
+	test_store	= ('TestStore');
+	text_store	= ('TextInformationStore');
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	text_operations	= ('Text');
+	con		= ('Console');
+--
+[
+goal:-!,
+	test_store ? remember_test_set([
+		title("Clauses"),
+		test(	"p(A,B,@):-\n"
+			"q(*,1,2##,3,$,!),\n"
+			"r([3..14|).",
+			'negative'),
+		test(	"p(A,B,C):-\n"
+			"q(*,1,2,3,/,!),\n"
+			"r([B|).",
+			'negative'),
+		test(	"p(A,B,C):-\n"
+			"q(A,X,B),\n"
+			"r(C).",
+			'negative')
+		]),
+	self << test.
+--
+test:-
+	test_store ? get_test(Test),!,
+	test_store ? get_test_number(N1),
+	test_store ? get_number_of_errors(E1),
+	test_example(Test,N1,N2,E1,E2),
+	test_store ? set_test_number(N2),
+	test_store ? set_number_of_errors(E2),
+	self << test.
+test:-
+	test_store ? get_number_of_errors(NumberOfErrors),
+	report_total_results(NumberOfErrors).
+--
+test_example(title(Text),N,N,E,E):-!,
+	con ? set_text_color('default'),
+	con ? writeln(
+		"===== TESTING ",
+		text_operations?upper(Text),
+		" =====").
+test_example(test(Text,ExpectedResult),N,N+1,E1,E2):-
+	con ? set_text_color('default'),
+	con ? writeln("Test #",N,":"),
+	test_bench ? parse_text(Text),!,
+	report_positive_result(ExpectedResult,E1,E2).
+test_example(test(_,ExpectedResult),N,N+1,E1,E2):-
+	report_negative_result(ExpectedResult,E1,E2).
+--
+parse_text(Text):-
+	text_store ? put(Text),
+	parser ? scan_text(Text),
+	TP== parser?pop_clause(Term),
+	parser ? check_end_of_text(),
+	con ? set_text_color('default'),
+	con ? write("     Text:      "),
+	con ? set_text_color('DkGray'),
+	con ? writeln(Text),
+	con ? set_text_color('default'),
+	con ? write("     Position:  "),
+	con ? set_text_color('Violet'),
+	con ? writeln(TP),
+	con ? set_text_color('default'),
+	con ? write("     Clause:    "),
+	con ? set_text_color('RoyalBlue'),
+	con ? writeln(Term).
+--
+report_positive_result('positive',E,E):-!,
+	con ? set_text_color('DkGreen'),
+	con ? writeln("Test O.K.").
+report_positive_result('negative',E,E+1):-!,
+	con ? set_text_color('Red'),
+	con ? writeln("False positive!").
+--
+report_negative_result('negative',E,E):-!,
+	con ? set_text_color('DkGreen'),
+	con ? writeln("Test O.K.").
+report_negative_result('positive',E,E+1):-!,
+	con ? set_text_color('Red'),
+	con ? writeln("False negative!").
+--
+report_total_results(0):-!,
+	con ? set_text_color('DkGreen'),
+	con ? writeln(
+		"All tests are completed with success.").
+report_total_results(NumberOfErrors):-
+	con ? set_text_color('Red'),
+	con ? writeln(
+		"One or more tests are completed with failure."),
+	con ? writeln(
+		"Number of test failures: ",NumberOfErrors,".").
+--
+alarm(Exception):-!,
+	con ? set_text_color('default'),
+	con ? writeln("===== RUNTIME EXCEPTION IS RECEIVED ====="),
+	con ? set_text_color('default'),
+	con ? write("Error:          "),
+	con ? set_text_color('Orange'),
+	con ? writeln(Exception).
+--
+alarm(Exception,_,Text):-
+	con ? set_text_color('default'),
+	con ? writeln("===== RUNTIME EXCEPTION IS RECEIVED ====="),
+	con ? set_text_color('default'),
+	con ? write("     Text:      "),
+	con ? set_text_color('DkGray'),
+	con ? writeln(Text),
+	con ? set_text_color('default'),
+	con ? write("     Error:     "),
+	con ? set_text_color('Orange'),
+	con ? writeln(Exception).
+]
+---------------------------------------------------------------------
+class 'MyParser' (specialized 'ActorPrologBacktrackableParser'):
+--
+internal:
+--
+	text_store;
+	text_operations			= ('SymbolicInformation');
+	con				= ('Console');
+--
+constant:
+--
+	slot_names				= ['my_slot'];
+	stop_translation_after_first_error	= 'no';
+	raise_runtime_exceptions		= 'no';
+	send_error_messages			= 'yes';
+--
+[
+syntax_error(ErrorType,ErrorName,TextPosition,Etc):-!,
+	con ? set_text_color('default'),
+	con ? writeln("===== ERROR MESSAGE IS RECEIVED ====="),
+	con ? set_text_color('default'),
+	con ? write("Error type:     "),
+	con ? set_text_color('Navy'),
+	con ? writeln(ErrorType),
+	con ? set_text_color('default'),
+	con ? write("ErrorName:      "),
+	con ? set_text_color('Navy'),
+	con ? writeln(ErrorName),
+	con ? set_text_color('default'),
+	con ? write("TextPosition:   "),
+	con ? set_text_color('Navy'),
+	con ? writeln(TextPosition),
+	con ? set_text_color('default'),
+	con ? write("Comments:       "),
+	con ? set_text_color('Navy'),
+	con ? writeln(Etc),
+	text_store ? get(Text),
+	print_error_line(TextPosition,Text).
+--
+/*
+print_error_line(TextPosition,Text):-
+	TextPosition == text_operations?length(Text),!,
+	con ? set_text_color('Red'),
+	con ? writeln(
+		"This bug was revealed in the end of the text.").
+*/
+print_error_line(TextPosition,Text):-
+	text_operations ? extract_line(
+		TextPosition,
+		Text,
+		Line,
+		LineNumber,
+		PositionInLine),!,
+	con ? set_text_color('default'),
+	con ? write("LineNumber:     "),
+	con ? set_text_color('Navy'),
+	con ? writeln(LineNumber),
+	con ? set_text_color('Indigo'),
+	con ? writeln(Line),
+	con ? set_text_color('Red'),
+	print_position(PositionInLine).
+print_error_line(_,_):-
+	con ? set_text_color('Red'),
+	con ? writeln("Text position is incorrect.").
+--
+print_position(P):-
+	P <= 0,!,
+	con ? writeln("^").
+print_position(P):-
+	con ? write("_"),
+	print_position(P-1).
+]
+---------------------------------------------------------------------
+class 'TestStore' (specialized 'Database'):
+[
+remember_test_set([Head|Rest]):-!,
+	append(test(Head)),
+	remember_test_set(Rest).
+remember_test_set([]).
+--
+set_test_number(N):-
+	retract_all(current_test_number(_)),
+	append(current_test_number(N)).
+--
+set_number_of_errors(N):-
+	retract_all(number_of_errors(_)),
+	append(number_of_errors(N)).
+--
+get_test(Test):-
+	Item== ?match(test(_)),!,
+	Item == test(Test),
+	retract_all(Item).
+--
+get_test_number(N):-
+	Item== ?match(current_test_number(_)),
+	Item == current_test_number(N),!.
+get_test_number(1).
+--
+get_number_of_errors(N):-
+	Item== ?match(number_of_errors(_)),
+	Item == number_of_errors(N),!.
+get_number_of_errors(0).
+]
+---------------------------------------------------------------------
+class 'TextInformationStore' (specialized 'Database'):
+[
+put(Text):-
+	retract_all,
+	append(Text).
+--
+get(Text):-
+	find(Text),!.
+get("").
+]
+---------------------------------------------------------------------

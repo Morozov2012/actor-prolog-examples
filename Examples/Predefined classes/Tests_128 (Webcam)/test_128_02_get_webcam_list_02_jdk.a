@@ -10,10 +10,12 @@ PREDICATES:
 
 imperative:
 
-write_list(WebcamNameList)	- (i);
+write_list(WebcamNameList)		- (i);
 --
-test_webcams(WebcamNameList)	- (i);
-test_webcam(WebcamName)		- (i);
+test_webcams(WebcamNameList)		- (i);
+test_webcam(WebcamName)			- (i);
+--
+loop(INTEGER)				- (i);
 
 class 'Main' (specialized 'Canvas2D'):
 --
@@ -55,10 +57,18 @@ test_webcam(Name):-
 	con ? set_color('DkGreen'),
 	con ? writeln(Name),
 	webcam ? start(Name),
+	loop(1),
+	fail.
+test_webcam(_).
+--
+loop(N):-
+	con ? set_color('default'),
+	con ? writeln("\t\tLoop ",N,"..."),
 	webcam ? commit,!,
 	webcam ? get_recent_image(buffer),
 	webcam ? stop,
 	draw_image(buffer,0,0,1,1),
 	show.
-test_webcam(_).
+loop(N):-
+	loop(N+1).
 ]

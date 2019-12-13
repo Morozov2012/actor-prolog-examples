@@ -908,13 +908,12 @@ record_data:-
 	switch_controls.
 --
 export_data(Extension):-
-	writer ? set_extension(Extension),
-	fail.
-export_data(_):-
-	is_connected,!,
-	DestinationFileName== ?create_new_file_name(),
+	is_connected,
 	FT== ?get_frame_type(),
 	get_buffer_image_size_and_frame_rate(FT,W,H,FrameRate),
+	FrameRate > 0,!,
+	tune_up_writer(Extension),
+	DestinationFileName== ?create_new_file_name(),
 	writer ? open(DestinationFileName,{
 		codec_type: 'AVMEDIA_TYPE_VIDEO',
 		destination_image_width: W,
@@ -928,12 +927,18 @@ export_data(_):-
 	put(dlg_ctrl_editname_frame_number,""),
 	buffer ? start,
 	switch_controls.
-export_data(_):-
+export_data(Extension):-
 	is_disconnected,!,
+	tune_up_writer(Extension),
 	buffer ? stop,
 	SourceFileName== buffer?get_full_name(),
 	inspector ? inspect_file(SourceFileName).
 export_data(_).
+--
+tune_up_writer(Extension):-
+	writer ? set_extension(Extension),
+	fail.
+tune_up_writer(_).
 --
 continue_export:-
 	SourceFileName== buffer?get_full_name(),
@@ -955,6 +960,22 @@ continue_export:-
 	buffer ? start,
 	switch_controls.
 --
+get_buffer_image_size_and_frame_rate(
+		"Terahertz Image",Width,Height,FR):-!,
+	buffer ? get_terahertz_image_size_in_pixels(Width,Height),
+	buffer ? get_recent_terahertz_frame_rate(FR).
+get_buffer_image_size_and_frame_rate(_,Width,Height,FR):-
+	buffer ? get_color_image_size_in_pixels(Width,Height),
+	buffer ? get_recent_color_frame_rate(FR).
+--
+get_inspector_image_size_and_frame_rate(
+		"Terahertz Image",Width,Height,FR):-!,
+	inspector ? get_terahertz_image_size_in_pixels(Width,Height),
+	inspector ? get_recent_terahertz_frame_rate(FR).
+get_inspector_image_size_and_frame_rate(_,Width,Height,FR):-
+	inspector ? get_color_image_size_in_pixels(Width,Height),
+	inspector ? get_recent_color_frame_rate(FR).
+-----------------------------------------------------------------------
 export_image_if_necessary(FrameNumber,Canvas2D):-
 	writer ? is_open,
 	Canvas2D ? get_image(image),
@@ -976,22 +997,6 @@ continue_reading_if_necessary:-
 	buffer ? start,
 	fail.
 continue_reading_if_necessary.
---
-get_buffer_image_size_and_frame_rate(
-		"Terahertz Image",Width,Height,FR):-!,
-	buffer ? get_terahertz_image_size_in_pixels(Width,Height),
-	buffer ? get_recent_terahertz_frame_rate(FR).
-get_buffer_image_size_and_frame_rate(_,Width,Height,FR):-
-	buffer ? get_color_image_size_in_pixels(Width,Height),
-	buffer ? get_recent_color_frame_rate(FR).
---
-get_inspector_image_size_and_frame_rate(
-		"Terahertz Image",Width,Height,FR):-!,
-	inspector ? get_terahertz_image_size_in_pixels(Width,Height),
-	inspector ? get_recent_terahertz_frame_rate(FR).
-get_inspector_image_size_and_frame_rate(_,Width,Height,FR):-
-	inspector ? get_color_image_size_in_pixels(Width,Height),
-	inspector ? get_recent_color_frame_rate(FR).
 -----------------------------------------------------------------------
 on_off('yes') = 'on' :-!.
 on_off(_) = 'off'.

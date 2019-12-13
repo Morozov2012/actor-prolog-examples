@@ -9,6 +9,12 @@ package "Morozov/ActorPrologSyntax":
 
 DOMAINS:
 
+--------------------------------------------------------------------
+-- Actor Prolog Tokens                                            --
+--------------------------------------------------------------------
+
+ground:
+
 ActorPrologTokens	= ActorPrologToken*.
 --
 ActorPrologToken =
@@ -58,93 +64,95 @@ ActorPrologToken =
 	real_10(REAL);				-- <real>
 	real_R(	INTEGER,	/* Radix */
 		REAL);		/* Value */	-- <real>
-	string(STRING);				-- <string>
+	string_segment(STRING);			-- <string>
 	binary(BINARY).				-- <binary>
 --
 TextPosition		= INTEGER.
 NameIsInQuotes		= 'no'; 'yes'.
 
 --------------------------------------------------------------------
-
-reference:
+-- Actor Prolog Terms                                             --
+--------------------------------------------------------------------
 
 MetaTerms	= MetaTerm*.
 --
-MetaTerm =	e(MetaTerm,MetaTerm); 'empty_list';	-- List
-		--
-		R_INTEGER;				-- Integer
-		R_REAL;					-- Real
-		radix(R_INTEGER,MetaTerm);		-- Radix
-		--
-		symbol(R_SYMBOL);			-- Symbol
-		R_STRING;				-- String
-		R_BINARY;				-- Binary
-		--
-		structure(R_SYMBOL,MetaTerms);		-- Structure
-		--
-		i(UnderdeterminedSetKey,MetaTerm,MetaTerm);
-		'empty_set';				-- Set
-		--
-		#;					-- #
-		--
-		var(R_INTEGER,VariableRole);		-- Variable
-		slot(R_SYMBOL);				-- Slot
-		--
-		asterisk(MetaTerm);			-- Asterisk
-		p(MetaTerm,R_INTEGER).			-- Position
+MetaTerm =
+	e(MetaTerm,MetaTerm); 'empty_list';	-- List
+	--
+	INTEGER;				-- Integer
+	REAL;					-- Real
+	radix(INTEGER,MetaTerm);		-- Radix
+	--
+	symbol(SYMBOL);				-- Symbol
+	STRING;					-- String
+	BINARY;					-- Binary
+	--
+	structure(SYMBOL,MetaTerms);		-- Structure
+	--
+	i(UnderdeterminedSetKey,MetaTerm,MetaTerm);
+	'empty_set';				-- Set
+	--
+	#;					-- #
+	--
+	var(INTEGER,VariableRole);		-- Variable
+	slot(SYMBOL);				-- Slot
+	--
+	asterisk(MetaTerm);			-- Asterisk
+	p(MetaTerm,INTEGER).			-- Position
 --
-UnderdeterminedSetKey	= R_INTEGER; R_SYMBOL.
+UnderdeterminedSetKey	= INTEGER; SYMBOL.
 --
-VariableRole		=
-			'plain';
-			'rest';
-			'primary_function';
-			'optimized_primary_function';
-			'secondary_function';
-			'optimized_secondary_function';
-			'meta_functor';
-			'meta_predicate'.
---
-R_INTEGER		= INTEGER.
-R_REAL			= REAL.
-R_SYMBOL		= SYMBOL.
-R_STRING		= STRING.
-R_BINARY		= BINARY.
---
-ground:
---
-SymbolList		= SYMBOL*.
---
-mixed:
---
-ActorPrologAtom		= atom(	ActorPrologAtomFunctor,
-				ActorPrologAtomArguments,
-				YesNo/*HasAsterisk*/,
-				YesNo/*IsSimple*/,
-				INTEGER/*Position*/).
---
+VariableRole =
+	'plain';
+	'rest';
+	'primary_function';
+	'optimized_primary_function';
+	'secondary_function';
+	'optimized_secondary_function';
+	'meta_functor';
+	'meta_predicate'.
+
+--------------------------------------------------------------------
+-- Actor Prolog Atoms                                             --
+--------------------------------------------------------------------
+
+ActorPrologAtom =
+	atom(	ActorPrologAtomFunctor,
+		ActorPrologAtomArguments,
+		YesNo,				-- Has asterisk
+		YesNo,				-- Is simple
+		INTEGER).			-- Position
+
 ActorPrologAtomFunctor		= SYMBOL; INTEGER.
 ActorPrologAtomArguments	= MetaTerms; 'metaatom'.
+
+--------------------------------------------------------------------
+-- Actor Prolog Subgoals                                          --
+--------------------------------------------------------------------
+
+ActorPrologSubgoals =
+	ActorPrologSubgoal*;
+	external_procedure(STRING).
 --
-ActorPrologSubgoals	= ActorPrologSubgoal*;
-			  external(STRING).
+ActorPrologSubgoal =
+	subgoal(
+		ActorPrologTargetParameter,
+		ActorPrologSubgoalType,
+		ActorPrologAtom,
+		INTEGER).			-- Position
 --
-ActorPrologSubgoal	= subgoal(
-				ActorPrologTargetParameter,
-				ActorPrologSubgoalType,
-				ActorPrologAtom,
-				INTEGER/*Position*/).
+ActorPrologTargetParameter =
+	SYMBOL;
+	var(INTEGER,VariableRole).
 --
-ActorPrologTargetParameter	= SYMBOL; INTEGER.
---
-ActorPrologSubgoalType	= plain_subgoal(
-				PlainSubgoalVariety);
-			  actor_subgoal(
-				ActorSubgoalVariety);
-			  message(
-				AsyncCallVariety,
-				AsyncCallUrgency,
-				AsyncCallResidence).
+ActorPrologSubgoalType =
+	plain_subgoal(
+		PlainSubgoalVariety);
+	actor_subgoal(
+		ActorSubgoalVariety);
+	message(AsyncCallVariety,
+		AsyncCallUrgency,
+		AsyncCallResidence).
 --
 PlainSubgoalVariety	= 'subroutine'; function(INTEGER).
 ActorSubgoalVariety	= 'consistent'; 'temporary'.
@@ -152,22 +160,339 @@ ActorSubgoalVariety	= 'consistent'; 'temporary'.
 AsyncCallVariety	= 'control'; 'data'.
 AsyncCallUrgency	= 'deferred'; 'quick'.
 AsyncCallResidence	= 'buffered'; 'superseding'.
+
+--------------------------------------------------------------------
+-- Actor Prolog Clauses                                           --
+--------------------------------------------------------------------
+
+ActorPrologClauses	= ActorPrologClause*.
 --
-ActorPrologClause	= clause(
-				AtomType,
-				ActorPrologAtom,
-				ActorPrologSubgoals,
-				INTEGER/*Position*/).
-AtomType		= 'subroutine'; 'function'.
+ActorPrologClause =
+	clause(	ActorPrologAtomType,
+		ActorPrologAtom,
+		ActorPrologSubgoals,
+		ActorPrologFunctionCallTable,
+		INTEGER);			-- Position
+	external_call(
+		ActorPrologAtomType,
+		ActorPrologAtom,
+		INTEGER).			-- Position
+--
+ActorPrologAtomType		= 'subroutine'; 'function'.
 --
 ActorPrologFunctionCallTable =
-		ActorPrologFunctionCallDefinition*.
+	ActorPrologFunctionCallDefinition*.
+--
 ActorPrologFunctionCallDefinition =
-		function_call(
-			INTEGER,	-- Variable
-			ActorPrologSubgoal,
-			YesNo,		-- Is nested call
-			YesNo).		-- Is inside clause heading
+	function_call(
+		INTEGER,	-- Variable
+		ActorPrologSubgoal,
+		YesNo,		-- Is nested call
+		YesNo).		-- Is inside clause heading
+
+--------------------------------------------------------------------
+-- Actor Prolog Domains                                           --
+--------------------------------------------------------------------
+
+ActorPrologDomainDefinitions	= ActorPrologDomainDefinition*.
+--
+ActorPrologDomainDefinition =
+	domain(	STRING,				-- Name
+		ActorPrologDomainDeclarator,
+		ActorPrologDomainAlternatives,
+		INTEGER).			-- Position
+--
+ActorPrologDomainDeclarator =
+	'ground';
+	'reference';
+	'lazy';
+	'mixed';
+	'dummy'.
+--
+ActorPrologDomainAlternatives	= ActorPrologDomainAlternative*.
+--
+ActorPrologDomainAlternative =
+	ActorPrologArgumentDomainName;
+	list(ActorPrologArgumentDomain);
+	structure(
+		SYMBOL,
+		ActorPrologArgumentDomains);
+	set(ActorPrologSetArgumentDomains);
+	'empty_set';
+	'any_set';
+	integer_constant(
+		ActorPrologIntegerConstant);
+	real_constant(
+		ActorPrologRealConstant);
+	symbol_constant(SYMBOL);
+	string_constant(STRING);
+	binary_constant(BINARY);
+	integer_range(
+		ActorPrologIntegerConstant,
+		ActorPrologIntegerConstant);
+	real_range(
+		ActorPrologRealConstant,
+		ActorPrologRealConstant).
+--
+ActorPrologIntegerConstant	= INTEGER; radix(INTEGER,INTEGER).
+ActorPrologRealConstant		= REAL; radix(INTEGER,REAL).
+--
+ActorPrologSetArgumentDomains	= ActorPrologSetArgumentDomain*.
+--
+ActorPrologSetArgumentDomain =
+	pair(	ActorPrologSetArgumentKey,
+		ActorPrologArgumentDomainName,
+		INTEGER).			-- Position
+--
+ActorPrologSetArgumentKey	= INTEGER; SYMBOL.
+--
+ActorPrologArgumentDomains	= ActorPrologArgumentDomain*.
+--
+ActorPrologArgumentDomain =
+	ad(	ActorPrologArgumentDomainName,
+		INTEGER).			-- Position
+--
+ActorPrologArgumentDomainNames	= ActorPrologArgumentDomainName*.
+--
+ActorPrologArgumentDomainName =
+	STRING;
+	world(SYMBOL);
+	array_of_worlds(SYMBOL,SYMBOL);
+	'unknown_value';
+	'any';
+	'an_integer';
+	'a_real';
+	'a_symbol';
+	'a_string';
+	'a_binary';
+	'no_domain'.
+
+--------------------------------------------------------------------
+-- Actor Prolog Predicates                                        --
+--------------------------------------------------------------------
+
+ActorPrologPredicateDeclarations =
+	ActorPrologPredicateDeclaration*.
+--
+ActorPrologPredicateDeclaration =
+	predicate(
+		SYMBOL,			-- Name
+		INTEGER,		-- Arity
+		YesNo,			-- Has asterisk
+		ActorPrologAtomType,
+		ActorPrologPredicateDeterminancy,
+		ActorPrologPredicateArgumentDeclarations,
+		ActorPrologPredicateFlowPatterns,
+		ActorPrologVisibility,
+		INTEGER).			-- Position
+--
+ActorPrologPredicateDeterminancy =
+	'imperative';
+	'deterministic';
+	'nondeterministic'.
+ActorPrologVisibility =
+	'visible';
+	'private';
+	'undefined'.
+--
+ActorPrologPredicateFlowPatterns =
+	ActorPrologPredicateFlowPattern*.
+ActorPrologPredicateFlowPattern =
+	ActorPrologPredicateFlowDirection*.
+ActorPrologPredicateFlowDirection =
+	'in'; 'out'; 'any';
+	list(ActorPrologPredicateFlowDirection).
+--
+ActorPrologPredicateArgumentDeclarations =
+	ActorPrologPredicateArgumentDeclaration*.
+--
+ActorPrologPredicateArgumentDeclaration =
+	item(	ActorPrologArgumentDomainName,
+		INTEGER);			-- Position
+	asterisk(
+		ActorPrologArgumentDomainName,
+		INTEGER).			-- Position
+
+--------------------------------------------------------------------
+-- Actor Prolog Initializers                                      --
+--------------------------------------------------------------------
+
+ActorPrologInitializer =
+	'no_initializer';
+	term(MetaTerm);
+	slot(SYMBOL);
+	'self';
+	ActorPrologConstructor;
+	array_of_worlds(
+		SYMBOL,		-- Class name
+		MetaTerm,	-- Ranges of indices
+		ActorPrologInitializer);
+	resident(
+		ActorPrologInitializer,
+		SYMBOL,		-- Function name
+		MetaTerms).	-- Function arguments
+--
+ActorPrologConstructor =
+	simple_constructor(
+		SYMBOL,		-- Class name
+		ActorPrologConstructorArguments,
+		INTEGER);	-- Position
+	process_constructor(
+		SYMBOL,		-- Class name
+		ActorPrologConstructorArguments,
+		INTEGER).	-- Position
+--
+ActorPrologConstructorArguments	=
+	a(	SYMBOL,
+		ActorPrologPortVariety,
+		ActorPrologInitializer,
+		INTEGER,	-- Position
+		ActorPrologConstructorArguments);
+	'nil'.
+--
+ActorPrologPortVariety =
+	'unrestricted';
+	'constant';
+	'internal';
+	'variable';
+	'suspending';
+	'protecting'.
+
+--------------------------------------------------------------------
+-- Actor Prolog Slot Declarations                                 --
+--------------------------------------------------------------------
+
+ActorPrologSlotDeclarations	= ActorPrologSlotDeclaration*.
+--
+ActorPrologSlotDeclaration =
+	slot(	SYMBOL,
+		ActorPrologPortVariety,
+		ActorPrologArgumentDomainName,
+		ActorPrologVisibility,
+		INTEGER).
+--
+ActorPrologSlotDefinitions	= ActorPrologSlotDefinition*.
+--
+ActorPrologSlotDefinition =
+	slot(	SYMBOL,
+		ActorPrologPortVariety,
+		ActorPrologInitializer,
+		ActorPrologVisibility,
+		INTEGER).
+
+--------------------------------------------------------------------
+-- Actor Prolog Interface                                         --
+--------------------------------------------------------------------
+
+ActorPrologInterface =
+	class_interface(
+		SYMBOL,				-- Class name
+		SymbolList,			-- Ancestor names
+		YesNo,				-- Is meta interface
+		ActorPrologSlotDeclarations,
+		ActorPrologDomainDefinitions,
+		ActorPrologPredicateDeclarations,
+		INTEGER);			-- Position
+	'no_interface'.
+
+--------------------------------------------------------------------
+-- Actor Prolog Class                                             --
+--------------------------------------------------------------------
+
+ActorPrologClass =
+	class_definition(
+		SYMBOL,				-- Class name
+		ActorPrologAncestorName,	-- Ancestor name
+		ActorPrologSlotDefinitions,	-- Slots
+		ActorPrologClauses,		-- Acting clauses
+		ActorPrologClauses,		-- Model clauses
+		MetaTerm,			-- Java class name
+		ActorPrologInterface,		-- Interface
+		BalancedNameTree,		-- Variable names
+		INTEGER).			-- Position
+--
+ActorPrologAncestorName		= SYMBOL; #.
+
+--------------------------------------------------------------------
+-- Actor Prolog Package                                           --
+--------------------------------------------------------------------
+
+ActorPrologPackageParameters =
+	ActorPrologPackageParameter*.
+--
+ActorPrologPackageParameter =
+	domain_parameter(
+		STRING,				-- Domain name
+		INTEGER);			-- Position
+	default_domain_argument(
+		STRING,				-- Domain name
+		STRING,				-- Default value
+		INTEGER);			-- Position
+	class_parameter(
+		SYMBOL,				-- Class name
+		INTEGER);			-- Position
+	default_class_argument(
+		SYMBOL,				-- Class name
+		SYMBOL,				-- Default value
+		INTEGER).			-- Position
+--
+ActorPrologPackagePragmaList	= ActorPrologPackagePragma*.
+--
+ActorPrologPackagePragma =
+	pragma_statement(
+		STRING,				-- Pragma name
+		MetaTerm,			-- Pragma value
+		INTEGER).			-- Position
+--
+ActorPrologPackageImportCommands =
+	ActorPrologPackageImportCommand*.
+--
+ActorPrologPackageImportCommand =
+	import_all_classes_and_domains(
+		STRING,				-- Package name
+		ActorPrologPackageParameters,
+		INTEGER);			-- Position
+	import_domains_only(
+		STRING,				-- Package name
+		ActorPrologPackageParameters,
+		INTEGER);			-- Position
+	import_given_classes_and_domains(
+		STRING,				-- Package name
+		ActorPrologPackageParameters,
+		ActorPrologPackageClassImportList,
+		INTEGER).			-- Position
+--
+ActorPrologPackageClassImportList =
+	ActorPrologPackageClassImportCommand*.
+--
+ActorPrologPackageClassImportCommand =
+	import_class(
+		SYMBOL,				-- Class name
+		INTEGER);			-- Position
+	import_class_as(
+		SYMBOL,				-- Class name
+		SYMBOL,				-- Class nickname
+		INTEGER).			-- Position
+--
+ActorPrologClassesAndInterfaces	= ActorPrologClassOrInterface*.
+--
+ActorPrologClassOrInterface =
+	ActorPrologClass; ActorPrologInterface.
+
+--------------------------------------------------------------------
+-- Auxiliary Domains                                              --
+--------------------------------------------------------------------
+
+SymbolList		= SYMBOL*.
+--
+BalancedNameTree = node(INTEGER,
+			STRING,
+			BalancedNameTree,
+			BalancedNameTree);
+		   leaf_node(
+			INTEGER,
+			STRING);
+		   'nil'.
 --
 ParserErrorType		= 'LexicalScannerError'; 'ParserError'.
 
@@ -181,6 +506,7 @@ constant:
 --
 	keywords		: S_List;
 	keep_text_positions	: YesNo;
+	accept_erroneous_text	: YesNo;
 --
 	stop_translation_after_first_error	: YesNo;
 	raise_runtime_exceptions		: YesNo;
@@ -193,6 +519,8 @@ determ:
 --
 convert_to_tokens(STRING) = ActorPrologTokens		- (i);
 --
+is_predefined_class_name(SYMBOL) = SYMBOL		- (i);
+--
 imperative:
 --
 set_keywords(S_List)					- (i);
@@ -200,6 +528,9 @@ get_keywords() = S_List;
 --
 set_keep_text_positions(YesNo)				- (i);
 get_keep_text_positions() = YesNo;
+--
+set_accept_erroneous_text(YesNo)			- (i);
+get_accept_erroneous_text() = YesNo;
 --
 set_stop_translation_after_first_error(YesNo)		- (i);
 get_stop_translation_after_first_error() = YesNo;
@@ -237,8 +568,9 @@ PREDICATES:
 determ:
 --
 scan_text(STRING)					- (i);
+push_text(STRING)					- (i);
 --
-pop_token(ActorPrologToken) = TextPosition		- (o);
+pop_token(ActorPrologToken) = TextPosition		- (i)(o);
 pop_ground_term(_) = TextPosition			- (o);
 pop_meta_term(MetaTerm) = TextPosition			- (o);
 pop_meta_expression(MetaTerm) = TextPosition		- (o);
@@ -247,17 +579,84 @@ pop_function_call(ActorPrologSubgoal) = TextPosition	- (o);
 pop_binary_relation(ActorPrologAtom) = TextPosition	- (o);
 pop_atom(ActorPrologAtom) = TextPosition		- (o);
 pop_subgoal(ActorPrologSubgoal) = TextPosition		- (o);
+--
+pop_clause(
+	YesNo,	-- Parse the model section
+	ActorPrologClause) = TextPosition		- (i,o);
 pop_clause(ActorPrologClause) = TextPosition		- (o);
+--
+pop_clauses(
+	YesNo,	-- Parse the model section
+	ActorPrologClauses) = TextPosition		- (i,o);
+pop_clauses(ActorPrologClauses) = TextPosition		- (o);
+--
+pop_constructor(ActorPrologConstructor) = TextPosition	- (o);
+pop_initializer(ActorPrologInitializer) = TextPosition	- (o);
+--
+pop_slot_declarations(
+	ActorPrologSlotDeclarations) = TextPosition	- (o);
+pop_slot_definitions(
+	ActorPrologSlotDefinitions,
+	ActorPrologArgumentDomainNames) = TextPosition	- (o,o);
+--
+pop_domain_definition(
+	ActorPrologDomainDefinitions) = TextPosition	- (o);
+pop_domain_definitions(
+	ActorPrologDomainDefinitions) = TextPosition	- (o);
+--
+pop_predicate_declaration(
+	ActorPrologPredicateDeclaration) = TextPosition	- (o);
+--
+pop_predicate_declarations(
+	YesNo,				-- Parse imperatives
+	ActorPrologPredicateDeclarations)
+	= TextPosition					- (i,o);
+pop_predicate_declarations(
+	ActorPrologPredicateDeclarations)
+	= TextPosition					- (o);
+--
+pop_interface(
+	SYMBOL,				-- Class name
+	SymbolList,			-- Ancestor names
+	YesNo,				-- Is meta interface
+	ActorPrologSlotDeclarations,	-- Slots
+	ActorPrologDomainDefinitions,
+	ActorPrologPredicateDeclarations)
+	= TextPosition			- (o,o,o,o,o,o);
+pop_class(
+	SYMBOL,				-- Class name
+	ActorPrologAncestorName,	-- Ancestor name
+	ActorPrologSlotDefinitions,	-- Slots
+	ActorPrologClauses,		-- Acting clauses
+	ActorPrologClauses,		-- Model clauses
+	MetaTerm,			-- Java class name
+	ActorPrologInterface,		-- Interface
+	BalancedNameTree)		-- Variable names
+	= TextPosition			- (o,o,o,o,o,o,o,o);
+--
+pop_package(
+	MetaTerm,			-- Package name
+	ActorPrologPackageParameters,
+	ActorPrologPackagePragmaList,
+	ActorPrologPackageImportCommands,
+	ActorPrologDomainDefinitions,
+	ActorPrologPredicateDeclarations,
+	ActorPrologClassesAndInterfaces,
+	ActorPrologInitializer,		-- Project
+	BalancedNameTree)		-- Project variable names
+	= TextPosition			- (o,o,o,o,o,o,o,o,o);
 --
 check_end_of_text() = TextPosition;
 --
 imperative:
 --
-get_variable_names() = S_List;
-forget_variable_names;
+get_parsed_variable_names() = BalancedNameTree;
+forget_parsed_variable_names;
 --
 get_function_call_table() = ActorPrologFunctionCallTable;
 clear_function_call_table;
+--
+get_parsed_slot_names() = SymbolList;
 --
 imperative:
 --

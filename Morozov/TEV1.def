@@ -28,8 +28,6 @@ default_identifier				: DeviceIdentifier;
 --
 temperature_scale				: TemperatureScale;
 --
-use_recorded_calibration_commands		: YesNo;
---
 eliminate_anomalous_pixels			: YesNo;
 apply_anomalous_voltage_pixel_detector		: YesNo;
 anomalous_voltage_threshold			: Numerical;
@@ -119,9 +117,6 @@ get_default_identifier() = DeviceIdentifier;
 --
 set_temperature_scale(TemperatureScale)			- (i);
 get_temperature_scale() = TemperatureScale;
---
-set_use_recorded_calibration_commands(YesNo)		- (i);
-get_use_recorded_calibration_commands(YesNo)		- (i);
 --
 set_eliminate_anomalous_pixels(YesNo)			- (i);
 get_eliminate_anomalous_pixels() = YesNo;

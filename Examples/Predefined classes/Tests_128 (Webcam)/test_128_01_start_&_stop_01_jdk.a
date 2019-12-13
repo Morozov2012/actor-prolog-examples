@@ -12,13 +12,26 @@ internal:
 --
 	webcam	= ('Webcam');
 	buffer	= ('BufferedImage');
+	con	= ('Console');
 --
 [
-goal:-
+IMPERATIVES:
+--
+loop(INTEGER)		- (i);
+--
+CLAUSES:
+--
+goal:-!,
 	webcam ? start,
+	loop(1).
+--
+loop(N):-
+	con ? writeln("Loop ",N,"..."),
 	webcam ? commit,!,
 	webcam ? get_recent_image(buffer),
 	webcam ? stop,
 	draw_image(buffer,0,0,1,1),
 	show.
+loop(N):-
+	loop(N+1).
 ]

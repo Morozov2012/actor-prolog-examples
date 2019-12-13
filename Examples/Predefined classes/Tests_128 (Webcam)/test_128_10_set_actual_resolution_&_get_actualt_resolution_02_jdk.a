@@ -17,6 +17,10 @@ imperative:
 
 test_view_sizes(ViewResolutions)	- (i);
 test_view_size(STRING,INTEGER,INTEGER)	- (i,i,i);
+loop;
+
+determ:
+
 test_image;
 
 class 'Main' (specialized 'Alpha'):
@@ -73,7 +77,7 @@ test_view_size(Name,Width1,Height1):-
 	con ? writeln("Current webcam view size:"),
 	con ? set_color('DkGreen'),
 	con ? writeln("   Width=",Width2," Height=",Height2),
-	test_image,
+	loop,
 	webcam ? get_recent_frame_rate(FrameRate),
 	con ? set_color('Gray'),
 	con ? write("   Frame rate: "),
@@ -81,8 +85,13 @@ test_view_size(Name,Width1,Height1):-
 	con ? set_color('RoyalBlue'),
 	con ? writeln("O.K.").
 --
+loop:-
+	test_image,!.
+loop:-
+	loop.
+--
 test_image:-
-	webcam ? commit,!,
+	webcam ? commit,
 	webcam ? get_recent_image(buffer),
 	panel ? show,
 	panel ? get_size_in_pixels(WP,HP),
@@ -94,5 +103,4 @@ test_image:-
 	panel ? clear('no'),
 	panel ? draw_image(buffer,X0,Y0,Width,Height),
 	panel ? draw_now.
-test_image.
 ]

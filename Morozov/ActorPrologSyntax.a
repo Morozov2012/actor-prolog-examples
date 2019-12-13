@@ -46,10 +46,12 @@ constant:
 		"suspending",
 		"unrestricted",
 		"variable",
-		"visible"
+		"visible",
+		"external"
 		];
 --
 	keep_text_positions	= 'yes';
+	accept_erroneous_text	= 'no';
 --
 	stop_translation_after_first_error	= 'no';
 	raise_runtime_exceptions		= 'yes';
@@ -71,6 +73,9 @@ CLAUSES:
 convert_to_tokens(Text) = Tokens:
 	[external "convertToTokens"].
 --
+is_predefined_class_name(ClassName) = AncestorName:
+	[external "isPredefinedClassName"].
+--
 set_keywords(NameList):
 	[external "setKeywords"].
 get_keywords() = NameList:
@@ -80,6 +85,11 @@ set_keep_text_positions(YesNo):
 	[external "setKeepTextPositions"].
 get_keep_text_positions() = YesNo:
 	[external "getKeepTextPositions"].
+--
+set_accept_erroneous_text(YesNo):
+	[external "setAcceptErroneousText"].
+get_accept_erroneous_text() = YesNo:
+	[external "getAcceptErroneousText"].
 --
 set_stop_translation_after_first_error(YesNo):
 	[external "setStopTranslationAfterFirstError"].
@@ -123,7 +133,9 @@ CLAUSES:
 
 scan_text(Text):
 	[external "scanText"].
-
+push_text(Text):
+	[external "pushText"].
+--
 pop_token(Token) = TextPosition:
 	[external "popToken"].
 pop_ground_term(GroundTerm) = TextPosition:
@@ -132,31 +144,98 @@ pop_meta_term(MetaTerm) = TextPosition:
 	[external "popMetaTerm"].
 pop_meta_expression(MetaTerm) = TextPosition:
 	[external "popMetaExpression"].
-pop_simple_atom(ActorPrologAtom) = TextPosition:
+pop_simple_atom(Atom) = TextPosition:
 	[external "popSimpleAtom"].
-pop_function_call(ActorPrologFunctionCall) = TextPosition:
+pop_function_call(FunctionCall) = TextPosition:
 	[external "popFunctionCall"].
-pop_binary_relation(ActorPrologSubgoal) = TextPosition:
+pop_binary_relation(Subgoal) = TextPosition:
 	[external "popBinaryRelation"].
-pop_atom(ActorPrologAtom) = TextPosition:
+pop_atom(Atom) = TextPosition:
 	[external "popAtom"].
-pop_subgoal(ActorPrologSubgoal) = TextPosition:
+pop_subgoal(Subgoal) = TextPosition:
 	[external "popSubgoal"].
-pop_clause(ActorPrologClause) = TextPosition:
+--
+pop_clause(ParseModel,Clause) = TextPosition:
 	[external "popClause"].
+pop_clause(Clause) = TextPosition:
+	[external "popClause"].
+--
+pop_clauses(ParseModel,ClauseList) = TextPosition:
+	[external "popClauses"].
+pop_clauses(ClauseList) = TextPosition:
+	[external "popClauses"].
+--
+pop_constructor(Constructor) = TextPosition:
+	[external "popConstructor"].
+pop_initializer(Initializer) = TextPosition:
+	[external "popInitializer"].
+--
+pop_slot_declarations(SlotDeclarations) = TextPosition:
+	[external "popSlotDeclarations"].
+pop_slot_definitions(
+		SlotDefinitions,DomainNames) = TextPosition:
+	[external "popSlotDefinitions"].
+--
+pop_domain_definition(DomainDefinitions) = TextPosition:
+	[external "popDomainDefinition"].
+pop_domain_definitions(DomainDefinitions) = TextPosition:
+	[external "popDomainDefinitions"].
+--
+pop_predicate_declaration(
+		PredicateDeclaration) = TextPosition:
+	[external "popPredicateDeclaration"].
+--
+pop_predicate_declarations(
+		ParseImperatives,
+		PredicateDeclarations) = TextPosition:
+	[external "popPredicateDeclarations"].
+pop_predicate_declarations(
+		PredicateDeclarations) = TextPosition:
+	[external "popPredicateDeclarations"].
+--
+pop_interface(	ClassName,
+		AncestorNames,
+		IsMetaInterface,
+		SlotDeclarations,
+		DomainDefinitions,
+		PredicateDeclarations) = TextPosition:
+	[external "popInterface"].
+pop_class(	ClassName,
+		AncestorName,
+		SlotDefinitions,
+		ActingClauses,
+		ModelClauses,
+		JavaClassName,
+		Interface,
+		VariableNames) = TextPosition:
+	[external "popClass"].
+--
+pop_package(	PackageName,
+		FormalParameters,
+		PragmaList,
+		ImportCommands,
+		DomainDefinitions,
+		PredicateDeclarations,
+		ClassesAndInterfaces,
+		Project,
+		ProjectVariableNames) = TextPosition:
+	[external "popPackage"].
 --
 check_end_of_text() = TextPosition:
 	[external "checkEndOfText"].
 --
-get_variable_names() = NameList:
-	[external "getVariableNames"].
-forget_variable_names:
-	[external "forgetVariableNames"].
+get_parsed_variable_names() = NameList:
+	[external "getParsedVariableNames"].
+forget_parsed_variable_names:
+	[external "forgetParsedVariableNames"].
 --
-get_function_call_table() = ActorPrologFunctionCallTable:
+get_function_call_table() = FunctionCallTable:
 	[external "getFunctionCallTable"].
 clear_function_call_table:
 	[external "clearFunctionCallTable"].
+--
+get_parsed_slot_names() = SymbolList:
+	[external "getParsedSlotNames"].
 --
 set_slot_names(SymbolList):
 	[external "setSlotNames"].

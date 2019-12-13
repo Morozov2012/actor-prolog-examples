@@ -1,0 +1,1616 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+-- package "PrettyPrinter":
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+class 'PrettyPrinter' (specialized 'Alpha'):
+--
+constant:
+--
+	color_text		= 'Black';
+	color_legend		= 'Gray';
+	color_comment		= 'Indigo';
+	color_integer		= 'Blue';
+	color_real		= 'Magenta';
+	color_string		= color3(0,0.5,0);
+	color_binary		= 'Orange';
+	color_round_bracket	= color3(0,0.19921875,0.59765625);
+	color_square_bracket	= color3(0.5,0,0.5);
+	color_brace		= 'Magenta';
+	color_variable		= 'DkGreen';
+	color_subgoal_prefix	= color3(0,0.19921875,0.59765625);
+	color_keyword		= color3(0.5,0.5,0);
+--
+internal:
+--
+	report		= ('DemoConsole');
+	text_operations	= ('Text');
+--
+[
+---------------------------------------------------------------------
+print_package(	PackageName,
+		FormalParameters,
+		PragmaList,
+		ImportCommands,
+		DomainDefinitions,
+		PredicateDeclarations,
+		ClassesAndInterfaces,
+		Project,
+		VariableNames,
+		P,
+		Mode):-
+	print_package_title(PackageName,FormalParameters,P,Mode),
+	print_pragma_list(PragmaList,Mode),
+	print_import_commands(ImportCommands,Mode),
+	print_project_if_necessary(Project,VariableNames,Mode),
+	print_domain_definitions_if_necessary(
+		DomainDefinitions,P,Mode),
+	print_predicate_declarations_if_necessary(
+		PredicateDeclarations,P,Mode),
+	print_units(ClassesAndInterfaces,Mode).
+--
+print_package_title(#,_,_,_):-!.
+print_package_title(PackageName,FormalParameters,P,Mode):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("package "),
+	print_term(PackageName,Mode),
+	print_package_parameters(FormalParameters,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(":").
+--
+print_package_parameters([],_):-!.
+print_package_parameters(FormalParameters,Mode):-
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	print_parameter_list(FormalParameters,Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+--
+print_parameter_list([Parameter],Mode):-!,
+	print_parameter(Parameter,Mode).
+print_parameter_list([Parameter|Rest],Mode):-!,
+	print_parameter(Parameter,Mode),
+	report ? set_text_color(color_text),
+	report ? write(","),
+	print_parameter_list(Rest,Mode).
+print_parameter_list(_,_).
+--
+print_parameter(domain_parameter(Name,P),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write(Name),
+	print_argument_position(P,Mode).
+print_parameter(
+		default_domain_argument(Name1,Name2,P),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write(Name1),
+	report ? set_text_color(color_text),
+	report ? write(":="),
+	report ? set_text_color(color_text),
+	report ? write(Name2),
+	print_argument_position(P,Mode).
+print_parameter(class_parameter(Name,P),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'"),
+	print_argument_position(P,Mode).
+print_parameter(
+		default_class_argument(Name1,Name2,P),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Name1,"'"),
+	report ? set_text_color(color_text),
+	report ? write(":="),
+	report ? set_text_color(color_text),
+	report ? write("'",Name2,"'"),
+	print_argument_position(P,Mode).
+--
+print_pragma_list([Head|Rest],Mode):-!,
+	print_pragma(Head,Mode),
+	print_pragma_list(Rest,Mode).
+print_pragma_list(_,_).
+--
+print_pragma(pragma_statement(Name,Value,P),Mode):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("pragma "),
+	report ? set_text_color(color_variable),
+	report ? write(Name),
+	report ? set_text_color(color_text),
+	report ? write(" = "),
+	print_term(Value,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+--
+print_import_commands([Command|Rest],Mode):-!,
+	print_import_command(Command,Mode),
+	print_import_commands(Rest,Mode).
+print_import_commands(_,_).
+--
+print_import_command(
+		import_all_classes_and_domains(
+			PackageName,
+			Parameters,
+			P),Mode):-!,
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("import "),
+	report ? set_text_color(color_square_bracket),
+	report ? write(".."),
+	report ? set_text_color(color_keyword),
+	report ? write(" from "),
+	report ? set_text_color(color_string),
+	report ? write("\"",PackageName,"\""),
+	print_package_parameters(Parameters,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+print_import_command(
+		import_domains_only(
+			PackageName,
+			Parameters,
+			P),Mode):-!,
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("import "),
+	report ? set_text_color(color_string),
+	report ? write("\"",PackageName,"\""),
+	print_package_parameters(Parameters,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+print_import_command(
+		import_given_classes_and_domains(
+			PackageName,
+			Parameters,
+			ClassImportList,
+			P),Mode):-!,
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("import "),
+	print_class_import_list(ClassImportList,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write(" from "),
+	report ? set_text_color(color_string),
+	report ? write("\"",PackageName,"\""),
+	print_package_parameters(Parameters,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+--
+print_class_import_list([Head],Mode):-!,
+	print_class_import_command(Head,Mode).
+print_class_import_list([Head|Rest],Mode):-!,
+	print_class_import_command(Head,Mode),
+	report ? set_text_color(color_text),
+	report ? write(", "),
+	print_class_import_list(Rest,Mode).
+print_class_import_list(_,_).
+--
+print_class_import_command(import_class(Name,P),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'"),
+	print_argument_position(P,Mode).
+print_class_import_command(import_class_as(Name,Nickname,P),Mode):-
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'"),
+	report ? set_text_color(color_keyword),
+	report ? write(" as "),
+	report ? write("'",Nickname,"'"),
+	print_argument_position(P,Mode).
+--
+print_project_if_necessary(Project,VariableNames,Mode1):-
+	Project == process_constructor(_,_,P),!,
+	update_variable_names(Mode1,VariableNames,Mode2),
+	print_position_indent(P,Mode2),
+	report ? set_text_color(color_keyword),
+	report ? write("project"),
+	report ? set_text_color(color_text),
+	report ? write(": "),
+	print_initializer(Project,Mode2,1),
+	report ? nl.
+print_project_if_necessary(_,_,_).
+--
+print_units([Unit|Rest],Mode):-!,
+	print_unit(Unit,Mode),
+	print_units(Rest,Mode).
+print_units(_,_).
+--
+print_unit(Unit,Mode):-
+	Unit == class_definition(
+		ClassName,
+		AncestorName,
+		SlotDefinitions,
+		ActingClauses,
+		ModelClauses,
+		ClassSource,
+		ClassInterface,
+		VariableNames,
+		P),!,
+	print_interface(
+		ClassInterface,
+		Mode),
+	print_class(
+		ClassName,
+		AncestorName,
+		SlotDefinitions,
+		ActingClauses,
+		ModelClauses,
+		ClassSource,
+		VariableNames,
+		P,
+		Mode).
+print_unit(Unit,Mode):-
+	Unit == class_interface(
+		ClassName,
+		AncestorNames,
+		IsMetaInterface,
+		SlotDeclarations,
+		DomainDefinitions,
+		PredicateDeclarations,
+		P),!,
+	print_interface(
+		ClassName,
+		AncestorNames,
+		IsMetaInterface,
+		SlotDeclarations,
+		DomainDefinitions,
+		PredicateDeclarations,
+		P,
+		Mode).
+print_unit(_,_).
+---------------------------------------------------------------------
+print_class(	ClassName,
+		AncestorName,
+		SlotDefinitions,
+		ActingClauses,
+		ModelClauses,
+		ClassSource,
+		VariableNames,
+		P,
+		Mode1):-
+	update_variable_names(Mode1,VariableNames,Mode2),
+	print_position_indent(P,Mode2),
+	report ? set_text_color(color_keyword),
+	report ? write("class "),
+	report ? set_text_color(color_text),
+	report ? write("'",ClassName,"'"),
+	print_ancestor(AncestorName),
+	report ? set_text_color(color_text),
+	report ? writeln(":"),
+	print_slot_definitions(SlotDefinitions,Mode2),
+	print_position_indent(P,Mode2),
+	report ? set_text_color(color_round_bracket),
+	report ? writeln("["),
+	print_source_if_necessary(ClassSource,P,Mode2),
+	print_clauses_if_necessary("MODEL",ModelClauses,P,Mode2),
+	print_clauses_if_necessary("CLAUSES",ActingClauses,P,Mode2),
+	print_position_indent(P,Mode2),
+	report ? set_text_color(color_round_bracket),
+	report ? writeln("]").
+--
+update_variable_names(Mode1,Names,Mode2):-
+	Mode1 == {variable_names:_|Rest},
+	Mode2=={variable_names:Names|Rest},!.
+update_variable_names(Mode1,Names,Mode2):-
+	Mode2=={variable_names:Names|Mode1},!.
+update_variable_names(_,Names,Mode2):-
+	Mode2=={variable_names:Names}.
+--
+print_ancestor(#):-!.
+print_ancestor(Ancestor):-
+	report ? set_text_color(color_round_bracket),
+	report ? write(" ("),
+	report ? set_text_color(color_keyword),
+	report ? write("specialized "),
+	report ? set_text_color(color_text),
+	report ? write("'",Ancestor,"'"),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+--
+print_source_if_necessary(#,_,_):-!.
+print_source_if_necessary(ClassSource,P,Mode):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("SOURCE"),
+	report ? set_text_color(color_text),
+	report ? writeln(":"),
+	print_position_indent(P,Mode),
+	print_term(ClassSource,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+--
+print_clauses_if_necessary(_,[],_,_):-!.
+print_clauses_if_necessary(Keyword,ClauseList,P,Mode):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write(Keyword),
+	report ? set_text_color(color_text),
+	report ? writeln(":"),
+	print_clauses(ClauseList,Mode).
+---------------------------------------------------------------------
+print_interface(ClassInterface,Mode):-
+	ClassInterface == class_interface(
+		ClassName,
+		AncestorNames,
+		IsMetaInterface,
+		SlotDeclarations,
+		DomainDefinitions,
+		PredicateDeclarations,
+		P),!,
+	print_interface(
+		ClassName,
+		AncestorNames,
+		IsMetaInterface,
+		SlotDeclarations,
+		DomainDefinitions,
+		PredicateDeclarations,
+		P,
+		Mode).
+print_interface(_,_).
+--
+print_interface(ClassName,
+		AncestorNames,
+		IsMetaInterface,
+		SlotDeclarations,
+		DomainDefinitions,
+		PredicateDeclarations,
+		P,
+		Mode):-
+	print_interface_or_metainterface(IsMetaInterface,P,Mode),
+	report ? set_text_color(color_text),
+	report ? write("'",ClassName,"'"),
+	print_ancestors(AncestorNames),
+	report ? set_text_color(color_text),
+	report ? writeln(":"),
+	print_slot_declarations(SlotDeclarations,Mode),
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? writeln("["),
+	print_domain_definitions_if_necessary(
+		DomainDefinitions,P,Mode),
+	print_predicate_declarations_if_necessary(
+		PredicateDeclarations,P,Mode),
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? writeln("]").
+--
+print_interface_or_metainterface('yes',P,Mode):-!,
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("metainterface ").
+print_interface_or_metainterface(_,P,Mode):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("interface ").
+--
+print_ancestors([]):-!.
+print_ancestors(Ancestors):-
+	report ? set_text_color(color_round_bracket),
+	report ? write(" ("),
+	report ? set_text_color(color_keyword),
+	report ? write("specialized "),
+	print_ancestor_list(Ancestors),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+--
+print_ancestor_list([Ancestor]):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Ancestor,"'").
+print_ancestor_list([Ancestor|Rest]):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Ancestor,"'"),
+	report ? set_text_color(color_text),
+	report ? write(", "),
+	print_ancestor_list(Rest).
+print_ancestor_list(_).
+--
+print_domain_definitions_if_necessary([],_,_):-!.
+print_domain_definitions_if_necessary(Definitions,P,Mode):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("DOMAINS"),
+	report ? set_text_color(color_text),
+	report ? writeln(":"),
+	print_domain_definitions(Definitions,Mode).
+--
+print_predicate_declarations_if_necessary([],_,_):-!.
+print_predicate_declarations_if_necessary(Declarations,P,Mode):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("PREDICATES"),
+	report ? set_text_color(color_text),
+	report ? writeln(":"),
+	print_predicate_declarations(Declarations,Mode).
+---------------------------------------------------------------------
+print_predicate_declarations(Declarations,Mode):-
+	print_predicate_declarations(
+		Declarations,
+		'deterministic',
+		'undefined',
+		Mode).
+--
+print_predicate_declarations([Head|Rest],D1,V1,Mode):-!,
+	Head == predicate(_,_,_,_,D2,_,_,V2,P),
+	print_predicate_visibility_if_necessary(
+		V1,V2,V3,Mode,P),
+	print_predicate_determinancy_if_necessary(
+		D1,D2,D3,Mode,P),
+	print_predicate_declaration(Head,Mode),
+	print_predicate_declarations(Rest,D3,V3,Mode).
+print_predicate_declarations(_,_,_,_).
+--
+print_predicate_visibility_if_necessary(V,V,V,_,_):-!.
+print_predicate_visibility_if_necessary(_,V,V,Mode,P):-
+	print_visibility_or_Fail(V,Mode,P),!,
+	report ? set_text_color(color_text),
+	report ? writeln(":").
+print_predicate_visibility_if_necessary(_,V,V,_,_).
+--
+print_visibility_or_Fail('visible',Mode,P):-!,
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("visible").
+print_visibility_or_Fail('private',Mode,P):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("private").
+--
+print_predicate_determinancy_if_necessary(D,D,D,_,_):-!.
+print_predicate_determinancy_if_necessary(_,D,D,Mode,P):-!,
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	print_predicate_determinancy(D),
+	report ? set_text_color(color_text),
+	report ? writeln(":").
+--
+print_predicate_determinancy('imperative'):-!,
+	report ? write("imperative").
+print_predicate_determinancy('deterministic'):-!,
+	report ? write("determ").
+print_predicate_determinancy('nondeterministic'):-
+	report ? write("nondeterm").
+--
+print_predicate_declaration(Declaration,Mode):-
+	Declaration == predicate(
+		'',_,_,IsFunction,_,Arguments,FlowPatterns,_,P),
+	Arguments == [_],!,
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_brace),
+	report ? write("{"),
+	print_predicate_argument_domains(Arguments,IsFunction,Mode),
+	report ? set_text_color(color_brace),
+	report ? write("}"),
+	print_function_result_domain(Arguments,IsFunction,Mode),
+	report ? set_text_color(color_text),
+	report ? write(" - "),
+	print_predicate_flow_patterns(FlowPatterns),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+print_predicate_declaration(Declaration,Mode):-
+	Declaration == predicate(
+		Name,_,_,IsFunction,_,Arguments,FlowPatterns,_,P),
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_text),
+	report ? write(Name),
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	print_predicate_argument_domains(Arguments,IsFunction,Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")"),
+	print_function_result_domain(Arguments,IsFunction,Mode),
+	report ? set_text_color(color_text),
+	report ? write(" - "),
+	print_predicate_flow_patterns(FlowPatterns),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+--
+print_predicate_argument_domains([_|Rest],'function',Mode):-!,
+	print_predicate_argument_domains(Rest,Mode).
+print_predicate_argument_domains(Arguments,_,Mode):-
+	print_predicate_argument_domains(Arguments,Mode).
+--
+print_predicate_argument_domains([Head],Mode):-!,
+	print_predicate_argument_domain(Head,Mode).
+print_predicate_argument_domains([Head|Rest],Mode):-!,
+	print_predicate_argument_domain(Head,Mode),
+	report ? set_text_color(color_text),
+	report ? write(","),
+	print_predicate_argument_domains(Rest,Mode).
+print_predicate_argument_domains(_,_).
+--
+print_predicate_argument_domain(item(Domain,Position),Mode):-!,
+	print_argument_domain(Domain,Mode),
+	print_argument_position(Position,Mode).
+print_predicate_argument_domain(asterisk(Domain,Position),Mode):-
+	print_argument_domain(Domain,Mode),
+	report ? set_text_color(color_text),
+	report ? write("*"),
+	print_argument_position(Position,Mode).
+--
+print_function_result_domain([Domain|_],'function',Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write(" = "),
+	print_predicate_argument_domain(Domain,Mode).
+print_function_result_domain(_,_,_).
+--
+print_predicate_flow_patterns([Head|Rest]):-!,
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	print_predicate_flow_pattern(Head),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")"),
+	print_predicate_flow_patterns(Rest).
+print_predicate_flow_patterns(_).
+--
+print_predicate_flow_pattern([Head]):-!,
+	print_predicate_flow_direction(Head).
+print_predicate_flow_pattern([Head|Rest]):-!,
+	print_predicate_flow_direction(Head),
+	report ? set_text_color(color_text),
+	report ? write(","),
+	print_predicate_flow_pattern(Rest).
+print_predicate_flow_pattern(_).
+--
+print_predicate_flow_direction('in'):-!,
+	report ? set_text_color(color_text),
+	report ? write("i").
+print_predicate_flow_direction('out'):-!,
+	report ? set_text_color(color_text),
+	report ? write("o").
+print_predicate_flow_direction('any'):-!,
+	report ? set_text_color(color_text),
+	report ? write("_").
+print_predicate_flow_direction(list(FlowDirection)):-
+	print_predicate_flow_direction(FlowDirection).
+---------------------------------------------------------------------
+print_domain_definitions(Definitions,Mode):-
+	print_domain_definitions(Definitions,'ground',Mode).
+--
+print_domain_definitions([Head|Rest],DD1,Mode):-!,
+	print_domain_declarator_if_necessary(
+		Head,DD1,DD2,Mode),
+	print_domain_definition(Head,Mode),
+	print_domain_definitions(Rest,DD2,Mode).
+print_domain_definitions(_,_,_).
+--
+print_domain_declarator_if_necessary(Definition,DD,DD,_):-
+	Definition == domain(_,DD,_,_),!.
+print_domain_declarator_if_necessary(Definition,_,DD,Mode):-
+	Definition == domain(_,DD,_,P),
+	print_domain_declarator_or_Fail(DD,Mode,P),!,
+	report ? set_text_color(color_text),
+	report ? writeln(":").
+print_domain_declarator_if_necessary(_,DD,DD,_).
+--
+print_domain_declarator_or_Fail('ground',Mode,P):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("ground").
+print_domain_declarator_or_Fail('reference',Mode,P):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("reference").
+print_domain_declarator_or_Fail('lazy',Mode,P):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("lazy").
+print_domain_declarator_or_Fail('mixed',Mode,P):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	report ? write("mixed").
+--
+print_domain_definition(Definition,Mode):-
+	Definition == domain(Name,_,Alternatives,P),
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_variable),
+	report ? write(Name),
+	report ? set_text_color(color_text),
+	report ? write(" = "),
+	print_domain_alternatives(Alternatives,Mode).
+--
+print_domain_alternatives([Head],Mode):-!,
+	print_domain_alternative(Head,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(".").
+print_domain_alternatives([Head|Rest],Mode):-!,
+	print_domain_alternative(Head,Mode),
+	report ? set_text_color(color_text),
+	report ? write("; "),
+	print_domain_alternatives(Rest,Mode).
+print_domain_alternatives(_,_).
+--
+print_argument_domain(world(Name),_):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'").
+print_argument_domain(Domain,Mode):-
+	print_domain_alternative(Domain,Mode).
+--
+print_domain_alternative(S,_):-
+	string(S),!,
+	report ? set_text_color(color_variable),
+	report ? write(S).
+print_domain_alternative(world(Name),_):-!,
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'"),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+print_domain_alternative(array_of_worlds(Array,Target),_):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Array,"'"),
+	report ? set_text_color(color_keyword),
+	report ? write(" of "),
+	report ? set_text_color(color_text),
+	report ? write("'",Target,"'").
+print_domain_alternative('unknown_value',_):-!,
+	report ? set_text_color(color_text),
+	report ? write("#").
+print_domain_alternative('any',_):-!,
+	report ? set_text_color(color_variable),
+	report ? write("_").
+print_domain_alternative('an_integer',_):-!,
+	report ? set_text_color(color_variable),
+	report ? write("INTEGER").
+print_domain_alternative('a_real',_):-!,
+	report ? set_text_color(color_variable),
+	report ? write("REAL").
+print_domain_alternative('a_symbol',_):-!,
+	report ? set_text_color(color_variable),
+	report ? write("SYMBOL").
+print_domain_alternative('a_string',_):-!,
+	report ? set_text_color(color_variable),
+	report ? write("BINARY").
+print_domain_alternative('a_binary',_):-!,
+	report ? set_text_color(color_variable),
+	report ? write("BINARY").
+print_domain_alternative(list(Domain),Mode):-!,
+	print_domain_argument(Domain,Mode),
+	report ? set_text_color(color_text),
+	report ? write("*").
+print_domain_alternative(structure(Functor,Arguments),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write(Functor),
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	print_domain_arguments(Arguments,Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+print_domain_alternative(set(Pairs),Mode):-
+	extract_main_element(Pairs,MainElement,P,Rest),!,
+        print_domain_alternative(MainElement,Mode),
+        print_argument_position(P,Mode),
+	report ? set_text_color(color_brace),
+	report ? write("{"),
+	print_domain_set_pairs(Rest,Mode),
+	report ? set_text_color(color_brace),
+	report ? write("}").
+print_domain_alternative(set(Pairs),Mode):-!,
+	report ? set_text_color(color_brace),
+	report ? write("{"),
+	print_domain_set_pairs(Pairs,Mode),
+	report ? set_text_color(color_brace),
+	report ? write("}").
+print_domain_alternative('empty_set',_):-!,
+	report ? set_text_color(color_brace),
+	report ? write("{}").
+print_domain_alternative('any_set',_):-!,
+	report ? set_text_color(color_brace),
+	report ? write("{"),
+	report ? set_text_color(color_variable),
+	report ? write("_"),
+	report ? set_text_color(color_brace),
+	report ? write("}").
+print_domain_alternative(integer_constant(Value),_):-!,
+	print_integer_constant(Value).
+print_domain_alternative(real_constant(Value),_):-!,
+	print_real_constant(Value).
+print_domain_alternative(symbol_constant(Name),_):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'").
+print_domain_alternative(string_constant(Value),_):-!,
+	report ? set_text_color(color_string),
+	report ? write("\"",Value,"\"").
+print_domain_alternative(binary_constant(Value),_):-!,
+	report ? set_text_color(color_text),
+	report ? write(Value).
+print_domain_alternative(integer_range(LeftBound,RightBound),_):-!,
+	report ? set_text_color(color_square_bracket),
+	report ? write("["),
+	print_integer_constant(LeftBound),
+	report ? set_text_color(color_square_bracket),
+	report ? write(".."),
+	print_integer_constant(RightBound),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]").
+print_domain_alternative(real_range(LeftBound,RightBound),_):-!,
+	report ? set_text_color(color_square_bracket),
+	report ? write("["),
+	print_real_constant(LeftBound),
+	report ? set_text_color(color_square_bracket),
+	report ? write(".."),
+	print_real_constant(RightBound),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]").
+print_domain_alternative(_,_):-
+	break('unknown_domain_alternative').
+--
+print_domain_arguments([Head],Mode):-!,
+	print_domain_argument(Head,Mode).
+print_domain_arguments([Head|Rest],Mode):-!,
+	print_domain_argument(Head,Mode),
+	report ? set_text_color(color_text),
+	report ? write(","),
+	print_domain_arguments(Rest,Mode).
+print_domain_arguments(_,_).
+--
+print_domain_argument(ad(Domain,Position),Mode):-
+	print_argument_domain(Domain,Mode),
+	print_argument_position(Position,Mode).
+--
+print_argument_position(Position,Mode):-
+	Mode == {print_text_positions:'yes'|_},!,
+	report ? set_color(color_comment),
+	report ? write("/*",Position,"*/").
+print_argument_position(_,_).
+--
+extract_main_element([pair(0,Item,P)|Rest],Item,P,Rest):-!.
+extract_main_element([Head|Rest1],Item,P,[Head|Rest2]):-!,
+	extract_main_element(Rest1,Item,P,Rest2).
+--
+print_domain_set_pairs([Head],Mode):-!,
+	print_domain_set_pair(Head,Mode).
+print_domain_set_pairs([Head|Rest],Mode):-!,
+	print_domain_set_pair(Head,Mode),
+	report ? set_text_color(color_text),
+	report ? write(","),
+	print_domain_set_pairs(Rest,Mode).
+print_domain_set_pairs(_,_).
+--
+print_domain_set_pair(pair(Key,Domain,Position),Mode):-
+	print_set_argument_key(Key),
+	report ? set_text_color(color_text),
+	report ? write(":"),
+	print_argument_domain(Domain,Mode),
+	print_argument_position(Position,Mode).
+--
+print_integer_constant(radix(Radix,N)):-!,
+	report ? set_text_color(color_integer),
+	report ? write(?apply_radix(Radix,N)).
+print_integer_constant(N):-
+	report ? set_text_color(color_integer),
+	report ? write(N).
+--
+print_real_constant(radix(Radix,N)):-!,
+	report ? set_text_color(color_real),
+	report ? write(?apply_radix(Radix,N)).
+print_real_constant(N):-
+	report ? set_text_color(color_real),
+	report ? write(N).
+--
+print_set_argument_key(Key):-
+	integer(Key),!,
+	report ? set_text_color(color_integer),
+	report ? write(Key).
+print_set_argument_key(Key):-
+	report ? set_text_color(color_text),
+	report ? write(Key).
+---------------------------------------------------------------------
+print_slot_declarations(SlotList,Mode):-
+	print_slot_declarations(
+		SlotList,
+		'unrestricted',
+		'undefined',
+		Mode).
+--
+print_slot_declarations([S|Rest],PV1,V1,Mode):-!,
+	S == slot(_,PV2,_,V2,P),
+	print_slot_visibility_if_necessary(
+		V1,V2,V3,Mode,P),
+	print_slot_port_variety_if_necessary(
+		PV1,PV2,PV3,Mode,P),
+	print_slot_declaration(S,Mode),
+	print_slot_declarations(Rest,PV3,V3,Mode).
+print_slot_declarations(_,_,_,_).
+--
+print_slot_declaration(SlotDeclaration,Mode):-
+	SlotDeclaration == slot(Name,_,Domain,_,P),
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_text),
+	report ? write(Name),
+	print_slot_domain_if_necessary(Domain,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+---------------------------------------------------------------------
+print_slot_definitions(SlotList,DomainList,Mode):-
+	print_slot_definitions(
+		SlotList,
+		DomainList,
+		'unrestricted',
+		'undefined',
+		Mode).
+--
+print_slot_definitions(SlotList,Mode):-
+	print_slot_definitions(
+		SlotList,
+		'unrestricted',
+		'undefined',
+		Mode).
+--
+print_slot_definitions([S|Rest1],[D|Rest2],PV1,V1,Mode):-!,
+	S == slot(_,PV2,_,V2,P),
+	print_slot_visibility_if_necessary(
+		V1,V2,V3,Mode,P),
+	print_slot_port_variety_if_necessary(
+		PV1,PV2,PV3,Mode,P),
+	print_slot_definition(S,D,Mode),
+	print_slot_definitions(Rest1,Rest2,PV3,V3,Mode).
+print_slot_definitions(_,_,_,_,_).
+--
+print_slot_definitions([S|Rest],PV1,V1,Mode):-!,
+	S == slot(_,PV2,_,V2,P),
+	print_slot_visibility_if_necessary(
+		V1,V2,V3,Mode,P),
+	print_slot_port_variety_if_necessary(
+		PV1,PV2,PV3,Mode,P),
+	print_slot_definition(S,Mode),
+	print_slot_definitions(Rest,PV3,V3,Mode).
+print_slot_definitions(_,_,_,_).
+--
+print_slot_definition(SlotDefinition,Domain,Mode):-
+	SlotDefinition == slot(Name,_,Initializer,_,P),
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_text),
+	report ? write(Name),
+	print_slot_domain_if_necessary(Domain,Mode),
+	print_slot_initializer_if_necessary(Initializer,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+--
+print_slot_definition(SlotDefinition,Mode):-
+	SlotDefinition == slot(Name,_,Initializer,_,P),
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_text),
+	report ? write(Name),
+	print_slot_initializer_if_necessary(Initializer,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(";").
+--
+print_slot_initializer_if_necessary('no_initializer',_):-!.
+print_slot_initializer_if_necessary(Initializer,Mode):-
+	report ? set_text_color(color_text),
+	report ? write(" = "),
+	print_initializer(Initializer,Mode,1).
+---------------------------------------------------------------------
+print_slot_visibility_if_necessary(V,V,V,_,_):-!.
+print_slot_visibility_if_necessary(_,V,V,Mode,P):-
+	print_visibility_or_Fail(V,Mode,P),!,
+	report ? set_text_color(color_text),
+	report ? writeln(":").
+print_slot_visibility_if_necessary(_,V,V,_,_).
+--
+print_slot_port_variety_if_necessary(PV,PV,PV,_,_):-!.
+print_slot_port_variety_if_necessary(_,PV,PV,Mode,P):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_keyword),
+	print_port_variety(PV),
+	report ? nl.
+--
+print_port_variety('unrestricted'):-!.
+print_port_variety('constant'):-!,
+	report ? set_text_color(color_keyword),
+	report ? write("constant"),
+	report ? set_text_color(color_text),
+	report ? write(":").
+print_port_variety('internal'):-!,
+	report ? set_text_color(color_keyword),
+	report ? write("internal"),
+	report ? set_text_color(color_text),
+	report ? write(":").
+print_port_variety('variable'):-!,
+	report ? set_text_color(color_keyword),
+	report ? write("variable"),
+	report ? set_text_color(color_text),
+	report ? write(":").
+print_port_variety('suspending'):-!,
+	report ? set_text_color(color_keyword),
+	report ? write("suspending"),
+	report ? set_text_color(color_text),
+	report ? write(":").
+print_port_variety('protecting'):-
+	report ? set_text_color(color_keyword),
+	report ? write("protecting"),
+	report ? set_text_color(color_text),
+	report ? write(":").
+--
+print_slot_domain_if_necessary('no_domain',_):-!.
+print_slot_domain_if_necessary(Domain,Mode):-
+	report ? set_text_color(color_text),
+	report ? write(" : "),
+	print_argument_domain(Domain,Mode).
+---------------------------------------------------------------------
+print_initializer('no_initializer',_,_):-!.
+print_initializer(term(T),Mode,_):-!,
+	print_term(T,Mode).
+print_initializer(slot(Name),_,_):-!,
+	report ? set_text_color(color_text),
+	report ? write(Name).
+print_initializer('self',_,_):-!,
+	report ? set_text_color(color_text),
+	report ? write("self").
+print_initializer(
+		array_of_worlds(Name,Ranges,Constructor),
+		Mode,NestingLevel):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'"),
+	report ? set_text_color(color_square_bracket),
+	report ? write("["),
+	print_array_index_ranges(Ranges,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]"),
+	print_array_constructor(Constructor,Mode,NestingLevel).
+print_initializer(
+		simple_constructor(Name,Arguments,_),
+		Mode,NestingLevel):-!,
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'"),
+	print_constructor_arguments(Arguments,Mode,NestingLevel),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+print_initializer(
+		process_constructor(Name,Arguments,_),
+		Mode,NestingLevel):-!,
+	report ? set_text_color(color_round_bracket),
+	report ? write("(("),
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'"),
+	print_constructor_arguments(Arguments,Mode,NestingLevel),
+	report ? set_text_color(color_round_bracket),
+	report ? write("))").
+print_initializer(
+		resident(Target,Name,Arguments),
+		Mode,NestingLevel):-
+	print_initializer(Target,Mode,NestingLevel),
+	report ? set_text_color(color_subgoal_prefix),
+	report ? write("??"),
+	report ? set_text_color(color_text),
+	print_functor(Name),
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	print_terms(Arguments,Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+--
+print_constructor(
+		simple_constructor(Name,Arguments,_),
+		Mode,NestingLevel):-!,
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'"),
+	print_constructor_arguments(Arguments,Mode,NestingLevel),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+print_constructor(
+		process_constructor(Name,Arguments,_),
+		Mode,NestingLevel):-
+	report ? set_text_color(color_round_bracket),
+	report ? write("(("),
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'"),
+	print_constructor_arguments(Arguments,Mode,NestingLevel),
+	report ? set_text_color(color_round_bracket),
+	report ? write("))").
+--
+print_array_index_ranges(e(Range,'empty_list'),Mode):-!,
+	print_array_index_range(Range,Mode).
+print_array_index_ranges(e(Range,Rest),Mode):-!,
+	print_array_index_range(Range,Mode),
+	report ? set_text_color(color_text),
+	report ? write(","),
+	print_array_index_ranges(Rest,Mode).
+print_array_index_ranges(_,_).
+--
+print_array_index_range(
+		e(LeftBound,e(RightBound,'empty_list')),
+		Mode):-!,
+	print_array_index_range_bound(LeftBound,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write(".."),
+	print_array_index_range_bound(RightBound,Mode).
+print_array_index_range(_,_).
+--
+print_array_index_range_bound(Bound,Mode):-
+	print_term(Bound,Mode).
+--
+print_array_constructor('no_initializer',_,_):-!.
+print_array_constructor(Constructor,Mode,NestingLevel):-
+	report ? set_text_color(color_keyword),
+	report ? write(" of "),
+	print_initializer(Constructor,Mode,NestingLevel).
+--
+print_constructor_arguments(Arguments,Mode,NestingLevel):-
+	print_constructor_arguments(
+		Arguments,'unrestricted',Mode,NestingLevel).
+--
+print_constructor_arguments(a(Name,PV2,Value,P,Rest),PV1,Mode,NL):-!,
+	report ? set_text_color(color_text),
+	report ? write(","),
+	print_argument_port_variety_if_necessary(
+		PV1,PV2,PV3,Mode,NL,P),
+	indent_constructor_argument(Mode,NL,P),
+	report ? set_text_color(color_text),
+	report ? write(Name),
+	report ? set_text_color(color_text),
+	report ? write("="),
+	print_initializer(Value,Mode,NL+1),
+	print_text_position(P,Mode),
+	print_constructor_arguments(Rest,PV3,Mode,NL).
+print_constructor_arguments(_,_,_,_).
+--
+indent_constructor_argument(Mode,NL,P):-
+	Mode == {indent_constructor_arguments:'yes'|_},!,
+	report ? nl,
+	print_position_indent(P,Mode),
+	select_tabulator_size(Mode,TabulatorSize),
+	print_tabulators(NL,TabulatorSize).
+indent_constructor_argument(_,_,_).
+--
+print_argument_port_variety_if_necessary(PV,PV,PV,_,_,_):-!.
+print_argument_port_variety_if_necessary(_,PV,PV,Mode,NL,P):-
+	indent_constructor_argument(Mode,NL,P),
+	print_port_variety(PV).
+---------------------------------------------------------------------
+print_clauses([Head|Rest],Mode):-!,
+	print_clause(Head,Mode),
+	print_clauses(Rest,Mode).
+print_clauses(_,_).
+--
+print_clause(clause('function',Title1,[],FCT,P1),Mode1):-
+	Title1 == atom(Name,[Result|Arguments],HA,IS,P2),!,
+	update_function_call_table(Mode1,FCT,Mode2),
+	print_position_indent(P1,Mode2),
+	Title2== atom(Name,Arguments,HA,IS,P2),
+	print_title(Title2,Mode2),
+	report ? set_text_color(color_text),
+	report ? write(" = "),
+	print_term(Result,Mode2),
+	report ? set_text_color(color_text),
+	report ? writeln(" .").
+print_clause(clause(_,Title,[],FCT,P),Mode1):-!,
+	update_function_call_table(Mode1,FCT,Mode2),
+	print_position_indent(P,Mode2),
+	print_title(Title,Mode2),
+	report ? set_text_color(color_text),
+	report ? writeln(".").
+print_clause(clause('function',Title1,Subgoals1,FCT,P1),Mode1):-
+	Title1 == atom(Name,[Result|Arguments],HA,IS,P2),!,
+	update_function_call_table(Mode1,FCT,Mode2),
+	print_position_indent(P1,Mode2),
+	Title2== atom(Name,Arguments,HA,IS,P2),
+	print_title(Title2,Mode2),
+	report ? set_text_color(color_text),
+	report ? write(" = "),
+	print_term(Result,Mode2),
+	report ? set_text_color(color_text),
+	filter_subgoals(Subgoals1,Subgoals2,Mode2),
+	print_clause_body(Subgoals2,P1,Mode2).
+print_clause(clause(_,Title,Subgoals1,FCT,P),Mode1):-!,
+	update_function_call_table(Mode1,FCT,Mode2),
+	print_position_indent(P,Mode2),
+	print_title(Title,Mode2),
+	filter_subgoals(Subgoals1,Subgoals2,Mode2),
+	print_clause_body(Subgoals2,P,Mode2).
+print_clause(external_call('function',Title1,P1),Mode):-
+	Title1 == atom(Name,[Result|Arguments],HA,IS,P2),!,
+	print_position_indent(P1,Mode),
+	Title2== atom(Name,Arguments,HA,IS,P2),
+	report ? set_text_color(color_text),
+	report ? write("?"),
+	print_title(Title2,Mode),
+	report ? set_text_color(color_text),
+	report ? write(" = "),
+	print_term(Result,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(" .").
+print_clause(external_call(_,Title,P),Mode):-
+	print_position_indent(P,Mode),
+	report ? set_text_color(color_text),
+	report ? write("?"),
+	print_title(Title,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(".").
+--
+update_function_call_table(Mode1,FCT,Mode2):-
+	Mode1 == {function_call_table:_|Rest},
+	Mode2=={function_call_table:FCT|Rest},!.
+update_function_call_table(Mode1,FCT,Mode2):-
+	Mode2=={function_call_table:FCT|Mode1},!.
+update_function_call_table(_,FCT,Mode2):-
+	Mode2=={function_call_table:FCT}.
+--
+print_title(Atom,Mode):-
+	print_atom(Atom,Mode,'yes').
+--
+filter_subgoals(Subgoal1,Subgoal2,Mode):-
+	Mode == {unroll_function_calls:'no'|_},!,
+	do_filter_subgoals(Subgoal1,Subgoal2,Mode).
+filter_subgoals(Subgoal,Subgoal,_).
+--
+do_filter_subgoals([S|Rest1],Rest2,Mode):-
+	S == subgoal(_,plain_subgoal(function(_)),_,_),!,
+	do_filter_subgoals(Rest1,Rest2,Mode).
+do_filter_subgoals([S|Rest1],Rest2,Mode):-
+	S == subgoal(
+		'self',
+		plain_subgoal('subroutine'),
+		atom('==',[A1,A2],_,_,_),_),
+	is_secondary_function_variable(A1),
+	is_function_variable(A2),!,
+	do_filter_subgoals(Rest1,Rest2,Mode).
+do_filter_subgoals([S|Rest1],[S|Rest2],Mode):-!,
+	do_filter_subgoals(Rest1,Rest2,Mode).
+do_filter_subgoals(Subgoals,Subgoals,_).
+--
+print_clause_body([],_,_):-!,
+	report ? set_text_color(color_text),
+	report ? writeln(".").
+print_clause_body(Subgoals2,P1,Mode):-
+	report ? set_text_color(color_text),
+	report ? writeln(":-"),
+	print_subgoals(Subgoals2,P1,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(".").
+--
+print_subgoals([],_,_):-!.
+print_subgoals([Subgoal],_,Mode):-!,
+	print_position_and_subgoal(Subgoal,Mode).
+print_subgoals([Subgoal|Rest],P,Mode):-!,
+	print_position_and_subgoal(Subgoal,Mode),
+	report ? set_text_color(color_text),
+	report ? writeln(","),
+	print_subgoals(Rest,P,Mode).
+print_subgoals(external_procedure(Name),P,Mode):-
+	print_position_indent(P,Mode),
+	print_one_tabulator(Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("["),
+	print_external(Name),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]").
+--
+print_position_and_subgoal(Subgoal,Mode):-
+	Subgoal == subgoal(_,
+		plain_subgoal(function(V)),_,P),!,
+	print_position_indent(P,Mode),
+	print_one_tabulator(Mode),
+	print_variable(V,'primary_function',Mode),
+	report ? set_text_color(color_text),
+	report ? write("== "),
+	print_subgoal(Subgoal,Mode).
+print_position_and_subgoal(Subgoal,Mode):-
+	Subgoal == subgoal(_,_,_,P),
+	print_position_indent(P,Mode),
+	print_one_tabulator(Mode),
+	print_subgoal(Subgoal,Mode).
+--
+print_external(""):-!,
+	report ? set_text_color(color_keyword),
+	report ? write("external").
+print_external(Name):-
+	report ? set_text_color(color_keyword),
+	report ? write("external "),
+	report ? set_text_color(color_string),
+	report ? write("\"",Name,"\"").
+--
+print_subgoal(subgoal(
+		'self',
+		plain_subgoal('subroutine'),
+		Atom,_),Mode):-!,
+	print_atom(Atom,Mode,'yes').
+print_subgoal(subgoal(Target,Type,Atom,_),Mode):-
+	print_target(Type,Target,Mode),
+	print_subgoal_prefix(Type),
+	print_atom(Atom,Mode,'no').
+--
+print_function_call(subgoal('self',_,SimpleAtom,P),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write("?"),
+	print_atom(SimpleAtom,Mode,'no'),
+	print_text_position(P,Mode).
+print_function_call(subgoal(TargetParameter,_,SimpleAtom,P),Mode):-
+	SimpleAtom == atom('element',Arguments,'no','yes',_),
+	is_not_array_element_access(TargetParameter,Mode),!,
+	print_target_parameter(TargetParameter,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("["),
+	print_arguments(Arguments,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]"),
+	print_text_position(P,Mode).
+print_function_call(subgoal(TargetParameter,_,SimpleAtom,P),Mode):-
+	print_target_parameter(TargetParameter,Mode),
+	report ? set_text_color(color_text),
+	report ? write("?"),
+	print_atom(SimpleAtom,Mode,'no'),
+	print_text_position(P,Mode).
+--
+print_atom(SimpleAtom,Mode):-
+	print_atom(SimpleAtom,Mode,'no').
+--
+print_atom(atom(Functor,'metaatom',_,_,_),Mode,_):-!,
+	Number== ?cast("INTEGER",Functor),
+	print_variable(Number,'meta_predicate',Mode).
+print_atom(atom('!',[],_,_,_),_,_):-!,
+	report ? set_text_color(color_text),
+	report ? write("!").
+print_atom(atom('copy',Arguments,_,_,_),Mode,_):-!,
+	report ? set_text_color(color_square_bracket),
+	report ? write("["),
+	print_arguments(Arguments,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]").
+print_atom(atom(F,[A1,A2],_,_,_),Mode,'yes'):-
+	is_binary_relation(F),!,
+	report ? set_text_color(color_text),
+	print_term(A1,Mode),
+	report ? set_text_color(color_text),
+	report ? write(" ",F," "),
+	report ? set_text_color(color_text),
+	print_term(A2,Mode).
+print_atom(atom(Functor,Arguments,_,_,_),Mode,_):-
+	integer(Functor),!,
+	Number== ?cast("INTEGER",Functor),
+	print_variable(Number,'meta_functor',Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	print_arguments(Arguments,Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+print_atom(atom(F,Arguments,_,_,_),Mode,_):-
+	report ? set_text_color(color_text),
+	print_functor(F),
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	print_arguments(Arguments,Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+--
+is_binary_relation('=='):-!.
+is_binary_relation(':='):-!.
+is_binary_relation('<'):-!.
+is_binary_relation('>'):-!.
+is_binary_relation('<>'):-!.
+is_binary_relation('<='):-!.
+is_binary_relation('>=').
+--
+print_functor(Name):-
+	S== text_operations?convert_to_string(Name),
+	text_operations ? is_identifier(S),!,
+	report ? write(Name).
+print_functor(Name):-
+	report ? write("'",Name,"'").
+--
+print_arguments([Head],Mode):-!,
+	report ? set_text_color(color_text),
+	print_term(Head,Mode).
+print_arguments([Head|Rest],Mode):-!,
+	report ? set_text_color(color_text),
+	print_term(Head,Mode),
+	report ? write(","),
+	print_arguments(Rest,Mode).
+print_arguments(_,_).
+--
+print_target(message(_,'quick',_),Target,Mode):-!,
+	report ? set_text_color(color_square_bracket),
+	report ? write("["),
+	print_target_parameter(Target,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]").
+print_target(_,Target,Mode):-
+	report ? set_text_color(color_text),
+	print_target_parameter(Target,Mode).
+--
+is_not_array_element_access(TargetParameter,Mode):-
+	is_array_element_access(TargetParameter,Mode),!,
+	fail.
+is_not_array_element_access(_,_).
+--
+is_array_element_access(var(Code,Role),Mode):-
+	is_function_variable_role(Role),
+	Number== ?cast("INTEGER",Code),
+	Mode == {function_call_table:Table|_},
+	retrieve_function_call(Number,Table,Subgoal),
+	Subgoal == subgoal(_,_,SimpleAtom,_),
+	SimpleAtom == atom('element',_,'no','yes',_).
+--
+print_target_parameter(var(Code,Role),Mode):-!,
+	Number== ?cast("INTEGER",Code),
+	print_variable(Number,Role,Mode).
+print_target_parameter(Term,_):-
+	report ? set_text_color(color_text),
+	report ? write(Term).
+--
+print_subgoal_prefix(plain_subgoal(Variety)):-!,
+	report ? set_text_color(color_text),
+	print_plain_subgoal_prefix(Variety).
+print_subgoal_prefix(actor_subgoal(Variety)):-!,
+	report ? set_text_color(color_text),
+	print_actor_subgoal_prefix(Variety).
+print_subgoal_prefix(message(Variety,_,Residence)):-!,
+	report ? set_text_color(color_text),
+	print_message_prefix(Variety,Residence).
+--
+print_plain_subgoal_prefix('subroutine'):-
+	report ? set_text_color(color_subgoal_prefix),
+	report ? write(" ? ").
+print_plain_subgoal_prefix(function(_)):-
+	report ? set_text_color(color_subgoal_prefix),
+	report ? write("?").
+--
+print_actor_subgoal_prefix('consistent'):-
+	report ? set_text_color(color_subgoal_prefix),
+	report ? write(" @ ").
+print_actor_subgoal_prefix('temporary'):-
+	report ? set_text_color(color_subgoal_prefix),
+	report ? write(" & ").
+--
+print_message_prefix(Variety,'buffered'):-
+	report ? set_text_color(color_square_bracket),
+	report ? write(" ["),
+	print_message_variety(Variety),
+	report ? set_text_color(color_square_bracket),
+	report ? write("] ").
+print_message_prefix(Variety,'superseding'):-
+	report ? set_text_color(color_text),
+	report ? write(" "),
+	print_message_variety(Variety),
+	report ? write(" ").
+--
+print_message_variety('control'):-
+	report ? set_text_color(color_subgoal_prefix),
+	report ? write("<-").
+print_message_variety('data'):-
+	report ? set_text_color(color_subgoal_prefix),
+	report ? write("<<").
+---------------------------------------------------------------------
+print_terms([Head],Mode):-!,
+	report ? set_text_color(color_text),
+	print_term(Head,Mode).
+print_terms([Head|Rest],Mode):-!,
+	report ? set_text_color(color_text),
+	print_term(Head,Mode),
+	report ? write(","),
+	print_terms(Rest,Mode).
+print_terms(_,_).
+--
+print_term(e(Head,Rest),Mode):-!,
+	report ? set_text_color(color_square_bracket),
+	report ? write("["),
+	print_list(Head,Rest,Mode).
+print_term('empty_list',_):-!,
+	report ? set_text_color(color_square_bracket),
+	report ? write("[]").
+print_term(N,_):-
+	integer(N),!,
+	report ? set_text_color(color_integer),
+	report ? write(N).
+print_term(radix(Radix,N),_):-
+	integer(N),!,
+	report ? set_text_color(color_integer),
+	report ? write(?apply_radix(Radix,N)).
+print_term(R,_):-
+	real(R),!,
+	report ? set_text_color(color_real),
+	report ? write(R).
+print_term(radix(Radix,N),_):-
+	real(N),!,
+	report ? set_text_color(color_real),
+	report ? write(?apply_radix(Radix,20,N)).
+print_term(symbol(Name),_):-!,
+	report ? set_text_color(color_text),
+	report ? write("'",Name,"'").
+print_term(S,_):-
+	string(S),!,
+	report ? set_text_color(color_string),
+	report ? write("\"",S,"\"").
+print_term(B,_):-
+	binary(B),!,
+	report ? set_text_color(color_binary),
+	report ? write("~",B).
+print_term(structure(Functor,Arguments),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write(Functor),
+	report ? set_text_color(color_round_bracket),
+	report ? write("("),
+	print_terms(Arguments,Mode),
+	report ? set_text_color(color_round_bracket),
+	report ? write(")").
+print_term(i(Key,Value,Rest),Mode):-!,
+	report ? set_text_color(color_brace),
+	report ? write("{"),
+	print_set(Key,Value,Rest,Mode).
+print_term('empty_set',_):-!,
+	report ? set_text_color(color_brace),
+	report ? write("{}").
+print_term(#,_):-!,
+	report ? set_text_color(color_text),
+	report ? write("#").
+print_term(var(Code,Role),Mode):-!,
+	Number== ?cast("INTEGER",Code),
+	print_variable(Number,Role,Mode).
+print_term(slot(Name),_):-!,
+	report ? set_text_color(color_text),
+	report ? write(Name).
+print_term(asterisk(Term),Mode):-!,
+	report ? set_text_color(color_text),
+	print_term(Term,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("*").
+print_term(p(Term,Position),Mode):-!,
+	print_term(Term,Mode),
+	print_text_position(Position,Mode).
+print_term(Term,_):-
+	report ? set_text_color(color_text),
+	report ? write(Term).
+--
+print_list(Head1,e(Head2,Rest),Mode):-!,
+	report ? set_text_color(color_text),
+	print_term(Head1,Mode),
+	report ? write(","),
+	print_list(Head2,Rest,Mode).
+print_list(Head1,p(e(Head2,Rest),P),Mode):-!,
+	report ? set_text_color(color_text),
+	print_term(Head1,Mode),
+	print_text_position(P,Mode),
+	report ? set_text_color(color_text),
+	report ? write(","),
+	print_list(Head2,Rest,Mode).
+print_list(Head1,'empty_list',Mode):-!,
+	report ? set_text_color(color_text),
+	print_term(Head1,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]").
+print_list(Head1,p('empty_list',P),Mode):-!,
+	report ? set_text_color(color_text),
+	print_term(Head1,Mode),
+	print_text_position(P,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]").
+print_list(Head1,Rest,Mode):-
+	report ? set_text_color(color_text),
+	print_term(Head1,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("|"),
+	print_term(Rest,Mode),
+	report ? set_text_color(color_square_bracket),
+	report ? write("]").
+--
+print_set(Key1,Value1,i(Key2,Value2,Rest),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write(Key1,":"),
+	print_term(Value1,Mode),
+	report ? write(","),
+	print_set(Key2,Value2,Rest,Mode).
+print_set(Key1,Value1,p(i(Key2,Value2,Rest),P),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write(Key1,":"),
+	print_term(Value1,Mode),
+	print_text_position(P,Mode),
+	report ? set_text_color(color_text),
+	report ? write(","),
+	print_set(Key2,Value2,Rest,Mode).
+print_set(Key1,Value1,'empty_set',Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write(Key1,":"),
+	print_term(Value1,Mode),
+	report ? set_text_color(color_brace),
+	report ? write("}").
+print_set(Key1,Value1,p('empty_set',P),Mode):-!,
+	report ? set_text_color(color_text),
+	report ? write(Key1,":"),
+	print_term(Value1,Mode),
+	print_text_position(P,Mode),
+	report ? set_text_color(color_brace),
+	report ? write("}").
+print_set(Key1,Value1,Rest,Mode):-
+	report ? set_text_color(color_text),
+	report ? write(Key1,":"),
+	print_term(Value1,Mode),
+	report ? set_text_color(color_brace),
+	report ? write("|"),
+	print_term(Rest,Mode),
+	report ? set_text_color(color_brace),
+	report ? write("}").
+--
+print_variable(0,_,_):-!,
+	report ? set_text_color(color_variable),
+	report ? write("_").
+print_variable(Number,Role,Mode):-
+	is_function_variable_role(Role),
+	Mode == {
+		unroll_function_calls:'no',
+		function_call_table:Table|_},
+	retrieve_function_call(Number,Table,Subgoal),!,
+	print_function_call(Subgoal,Mode).
+print_variable(Number,_,{variable_names:VNL|_}):-
+	retrieve_variable_name(Number,VNL,Name),!,
+	report ? set_text_color(color_variable),
+	report ? write(Name).
+print_variable(Number,_,_):-
+	report ? set_text_color(color_variable),
+	report ? write("__V",Number).
+--
+retrieve_function_call(N,[function_call(N,S,_,_)|_],S):-!.
+retrieve_function_call(N,[_|Rest],Subgoal):-
+	retrieve_function_call(N,Rest,Subgoal).
+--
+retrieve_variable_name(N,node(N,Name,_,_),Name):-!.
+retrieve_variable_name(N1,node(N2,_,Rest,_),Name):-
+	N1 < N2,!,
+	retrieve_variable_name(N1,Rest,Name).
+retrieve_variable_name(N1,node(_,_,_,Rest),Name):-!,
+	retrieve_variable_name(N1,Rest,Name).
+retrieve_variable_name(N,leaf_node(N,Name),Name):-!.
+retrieve_variable_name(_,_,"").
+--
+is_function_variable(var(_,Role)):-!,
+	is_function_variable_role(Role).
+is_function_variable(p(Term,_)):-
+	is_function_variable(Term).
+--
+is_secondary_function_variable(var(_,Role)):-!,
+	is_secondary_function_variable_role(Role).
+is_secondary_function_variable(p(Term,_)):-
+	is_secondary_function_variable(Term).
+--
+is_function_variable_role('primary_function'):-!.
+is_function_variable_role('optimized_primary_function'):-!.
+is_function_variable_role('secondary_function'):-!.
+is_function_variable_role('optimized_secondary_function').
+--
+is_secondary_function_variable_role('secondary_function'):-!.
+is_secondary_function_variable_role('optimized_secondary_function').
+--
+print_text_position(Position,Mode):-
+	Mode == {print_text_positions:'yes'|_},!,
+	report ? set_color(color_comment),
+	report ? write("/*",Position,"*/").
+print_text_position(_,_).
+--
+print_position_indent(P,Mode):-
+	Mode == {print_position_indent:'yes'|_},!,
+	report ? set_text_color(color_legend),
+	-- report ? writef("/* %09d */      ",P),
+	report ? writef("/* %09d */ ",P),
+	print_extra_left_indent(Mode).
+print_position_indent(_,Mode):-
+	print_extra_left_indent(Mode).
+--
+print_extra_left_indent({extra_left_indent:N|_}):-!,
+	print_spaces(N).
+print_extra_left_indent(_).
+--
+print_spaces(N):-
+	N > 0,!,
+	report ? write(" "),
+	print_spaces(N-1).
+print_spaces(_).
+--
+print_one_tabulator(Mode):-
+	select_tabulator_size(Mode,TabulatorSize),
+	print_tabulators(1,TabulatorSize).
+--
+select_tabulator_size(Mode,Size):-
+	Mode == {tabulator_size:Size|_},!.
+select_tabulator_size(_,5).
+--
+print_tabulators(NestingLevel,TabulatorSize):-
+	NestingLevel > 0,!,
+	print_spaces(TabulatorSize),
+	print_tabulators(NestingLevel-1,TabulatorSize).
+print_tabulators(_,_).
+]
+---------------------------------------------------------------------

@@ -15,6 +15,7 @@ test2;
 test3;
 test4;
 test5;
+loop(INTEGER)		- (i);
 
 class 'Main' (specialized 'Canvas2D'):
 --
@@ -30,69 +31,67 @@ goal:-!,
 	test2,
 	test3,
 	test4,
-	test5.
+	test5,
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Done!").
 --
 test1:-
 	con ? set_color('RoyalBlue'),
 	con ? writeln("Test 1"),
-	webcam ? start,
-	webcam ? commit,!,
-	webcam ? get_recent_image(buffer),
-	webcam ? stop,
 	set_title("Test 1"),
-	draw_image(buffer,0,0,1,1),
-	show.
+	webcam ? start,
+	loop(1),
+	fail.
 test1.
 --
 test2:-
 	con ? set_color('RoyalBlue'),
 	con ? writeln("Test 2"),
-	webcam ? start('default'),
-	webcam ? commit,!,
-	webcam ? get_recent_image(buffer),
-	webcam ? stop,
 	set_title("Test 2"),
-	draw_image(buffer,0,0,1,1),
-	show.
+	webcam ? start('default'),
+	loop(1),
+	fail.
 test2.
 --
 test3:-
 	con ? set_color('RoyalBlue'),
 	con ? writeln("Test 3"),
+	set_title("Test 3"),
 	Result== webcam?start('default'),
 	con ? set_color('DkGreen'),
 	con ? writeln("\tWebcam is open: ",Result),
-	webcam ? commit,!,
-	webcam ? get_recent_image(buffer),
-	webcam ? stop,
-	set_title("Test 3"),
-	draw_image(buffer,0,0,1,1),
-	show.
+	loop(1),
+	fail.
 test3.
 --
 test4:-
 	con ? set_color('RoyalBlue'),
 	con ? writeln("Test 4"),
-	webcam ? start('default',1.0),
-	webcam ? commit,!,
-	webcam ? get_recent_image(buffer),
-	webcam ? stop,
 	set_title("Test 4"),
-	draw_image(buffer,0,0,1,1),
-	show.
+	webcam ? start('default',1.0),
+	loop(1),
+	fail.
 test4.
 --
 test5:-
 	con ? set_color('RoyalBlue'),
 	con ? writeln("Test 5"),
+	set_title("Test 5"),
 	Result== webcam?start('default',1.0),
 	con ? set_color('DkGreen'),
 	con ? writeln("\tWebcam is open: ",Result),
+	loop(1),
+	fail.
+test5.
+--
+loop(N):-
+	con ? set_color('default'),
+	con ? writeln("\tLoop ",N,"..."),
 	webcam ? commit,!,
 	webcam ? get_recent_image(buffer),
 	webcam ? stop,
-	set_title("Test 5"),
 	draw_image(buffer,0,0,1,1),
 	show.
-test5.
+loop(N):-
+	loop(N+1).
 ]

@@ -1,0 +1,11 @@
+package "package_01_01":
+
+PREDICATES:
+
+q_01_01_DEF(REAL,'MyClass_1_1')		- (i,o);
+
+interface 'MyClass_1_1' (specialized 'DemoConsole'):
+[
+PREDICATES:
+pDEF(INTEGER)	- (o);
+]

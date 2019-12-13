@@ -1,0 +1,133 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	parser	= ('ActorPrologBacktrackableParser',
+			slot_names=['my_slot'],
+			raise_runtime_exceptions='no');
+--
+[
+goal:-
+	parser ? scan_text(
+		":f(100,[300,500.0,700],'name')"
+		"{x:1,y:2,z:\"String\"}"
+		"my_slot[VarName,'symbol']"
+		":="
+		"{a:3|Tail}"),
+	syntax_analyzer_one.
+--
+syntax_analyzer_one:-
+	TP1== parser?pop_token(Token1),
+	write("Position1: "),
+	set_text_color('Violet'),
+	writeln(TP1),
+	set_text_color('default'),
+	write("Token1:    "),
+	set_text_color('RoyalBlue'),
+	writeln(Token1),
+	set_text_color('default'),
+	nl,
+	--
+	TP2== parser?pop_meta_term(Term2),
+	write("Position2: "),
+	set_text_color('Violet'),
+	writeln(TP2),
+	set_text_color('default'),
+	write("Term2:     "),
+	set_text_color('RoyalBlue'),
+	writeln(Term2),
+	set_text_color('default'),
+	nl,
+	--
+	TP3== parser?pop_meta_term(Term3),!,
+	write("Position3: "),
+	set_text_color('Violet'),
+	writeln(TP3),
+	set_text_color('default'),
+	write("Term3:     "),
+	set_text_color('RoyalBlue'),
+	writeln(Term3),
+	set_text_color('default'),
+	nl,
+	--
+	syntax_analyzer_two.
+syntax_analyzer_one.
+--
+syntax_analyzer_two:-
+	TP4== parser?pop_meta_term(Term4),
+	write("Position4: "),
+	set_text_color('Violet'),
+	writeln(TP4),
+	set_text_color('default'),
+	write("Term4:     "),
+	set_text_color('RoyalBlue'),
+	writeln(Term4),
+	set_text_color('default'),
+	nl,
+	--
+	TP5== parser?pop_meta_term(Term5),!,
+	write("Position5: "),
+	set_text_color('Violet'),
+	writeln(TP5),
+	set_text_color('default'),
+	write("Term5:     "),
+	set_text_color('RoyalBlue'),
+	writeln(Term5),
+	set_text_color('default').
+syntax_analyzer_two:-
+	set_text_color('DkGreen'),
+	writeln("BACKTRACKING"),
+	set_text_color('default'),
+	--
+	TP6== parser?pop_meta_term(Term6),
+	write("Position6: "),
+	set_text_color('Violet'),
+	writeln(TP6),
+	set_text_color('default'),
+	write("Term6:     "),
+	set_text_color('RoyalBlue'),
+	writeln(Term6),
+	set_text_color('default'),
+	nl,
+	--
+	TP7== parser?pop_token('assignment'),
+	write("Position7: "),
+	set_text_color('Violet'),
+	writeln(TP7),
+	set_text_color('default'),
+	write("Token7:    "),
+	set_text_color('RoyalBlue'),
+	writeln('assignment'),
+	set_text_color('default'),
+	nl,
+	--
+	TP8== parser?pop_meta_term(Term8),
+	write("Position8: "),
+	set_text_color('Violet'),
+	writeln(TP8),
+	set_text_color('default'),
+	write("Term8:     "),
+	set_text_color('RoyalBlue'),
+	writeln(Term8),
+	set_text_color('default'),
+	nl,
+	--
+	TP9== parser?pop_meta_term(Term9),!,
+	write("Position9: "),
+	set_text_color('Violet'),
+	writeln(TP9),
+	set_text_color('default'),
+	write("Term9:     "),
+	set_text_color('RoyalBlue'),
+	writeln(Term9),
+	set_text_color('default').
+syntax_analyzer_two.
+]
+---------------------------------------------------------------------

@@ -1,0 +1,42 @@
+-- package "example002":
+
+import .. from "package_01"('GeneralClass1':='MyClass0');
+import "package_02"('X2':='Root0');
+import 'MyClass3' as 'MyClass3' from "package_03";
+
+CLAUSES:
+
+a(X1,Y1,Z1):-
+	b(Z1,Y1,X1).
+
+project: (('MyClass0',n=Number,m=Number))
+
+DOMAINS:
+
+D_0_1	= INTEGER; REAL.
+D_0_2	= D_0_1*; s0(D_0_1); {x:D_0_1}.
+
+class 'MyClass0' (specialized 'MyClass1'):
+s1	= [Item0];
+s2	= f(Item0);
+[
+CLAUSES:
+goal:-
+	writeln("Hello World!").
+p0(X0,Y0,Z0):-
+	q0(Z0,Y0,X0).
+]
+
+CLAUSES:
+
+c(X2,Y2,Z2):-
+	d(Z2,Y2,X2).
+
+class 'Root0':
+[
+]
+
+CLAUSES:
+
+e(X3,Y3,Z3):-
+	f(Z3,Y3,X3).

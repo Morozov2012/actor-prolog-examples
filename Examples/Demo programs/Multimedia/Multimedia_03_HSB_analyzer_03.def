@@ -456,6 +456,7 @@ remember_name(STRING)				- (i);
 determ:
 --
 create_directory_if_necessary(STRING)		- (i);
+create_or_clear_directory(STRING)		- (i);
 --
 imperative:
 --

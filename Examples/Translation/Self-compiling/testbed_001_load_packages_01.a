@@ -1,0 +1,200 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import	'ProgramReader',
+	'ClusterDatabase',
+	'DomainDatabase',
+	'PredicateDatabase',
+	'ClassDatabase',
+	'InterfaceDatabase',
+	'ClassAliases',
+	'DomainAliases',
+	'ProjectDatabase'
+	from "ProgramReader";
+--
+import 'PrettyPrinter' from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+constant:
+--
+	base_directory	= "data";
+	input_file_name	= "example002";
+--
+internal:
+--
+	reader	= ('ProgramReader',
+			domain_database,
+			predicate_database,
+			class_database,
+			interface_database,
+			class_aliases,
+			domain_aliases,
+			project_database,
+			pretty_printer,
+			report=self);
+--
+	domain_database		= ('DomainDatabase');
+	predicate_database	= ('PredicateDatabase');
+	class_database		= ('ClassDatabase');
+	interface_database	= ('InterfaceDatabase');
+	class_aliases		= ('ClassAliases');
+	domain_aliases		= ('DomainAliases');
+	project_database	= ('ProjectDatabase');
+	pretty_printer		= ('PrettyPrinter',
+					report=self,
+					color_text='Black');
+--
+[
+goal:-!,
+	reader ? read_program(base_directory,input_file_name),
+	report_results.
+--
+report_results:-
+	set_text_color('RoyalBlue'),
+	writeln("DOMAIN DEFINITIONS"),
+	print_domain_database,
+	fail.
+report_results:-
+	set_text_color('RoyalBlue'),
+	writeln("DOMAIN ALIASES"),
+	print_domain_aliases,
+	fail.
+report_results:-
+	set_text_color('RoyalBlue'),
+	writeln("PREDICATE DECLARATIONS"),
+	print_predicate_database,
+	fail.
+report_results:-
+	set_text_color('RoyalBlue'),
+	writeln("INTERFACE DATABASE LISTING"),
+	print_interface_database,
+	fail.
+report_results:-
+	set_text_color('RoyalBlue'),
+	writeln("CLASS DATABASE LISTING"),
+	print_class_database,
+	fail.
+report_results:-
+	set_text_color('RoyalBlue'),
+	writeln("CLASS ALIASES"),
+	print_class_aliases,
+	fail.
+report_results:-
+	set_text_color('RoyalBlue'),
+	writeln("PROJECT"),
+	print_program_project,
+	fail.
+report_results.
+---------------------------------------------------------------------
+print_domain_database:-
+	domain_database ? get_any_domain_definition(Definition),
+		Mode== {
+			print_text_positions:'no',
+			print_position_indent:'yes',
+			extra_left_indent:7},
+		pretty_printer ? print_domain_definitions(
+			[Definition],Mode),
+		fail.
+print_domain_database.
+---------------------------------------------------------------------
+print_domain_aliases:-
+	set_text_color('default'),
+	Item== domain_aliases?match(_),
+		Item == map(Key,Value),
+		writeln(Key," -> ",Value),
+		fail.
+print_domain_aliases.
+---------------------------------------------------------------------
+print_predicate_database:-
+	predicate_database ? find(Declaration),
+		Mode== {
+		print_text_positions:'no',
+		print_position_indent:'yes',
+		extra_left_indent:7},
+		pretty_printer ? print_predicate_declaration(
+			Declaration,Mode),
+		fail.
+print_predicate_database.
+---------------------------------------------------------------------
+print_interface_database:-
+	Item== interface_database?match(_),
+		Item == map(_,class_interface(
+			ClassName,
+			Ancestors,
+			IsMetaInterface,
+			SlotDeclarations,
+			DomainDefinitions,
+			PredicateDeclarations,
+			TP)),
+		Mode== {print_text_positions:'no',
+			-- variable_names:VariableNames,
+			print_position_indent:'yes',
+			extra_left_indent:7,
+			indent_constructor_arguments:'yes',
+			tabulator_size:5},
+		pretty_printer ? print_interface(
+			ClassName,
+			Ancestors,
+			IsMetaInterface,
+			SlotDeclarations,
+			DomainDefinitions,
+			PredicateDeclarations,
+			TP,
+			Mode),
+		fail.
+print_interface_database.
+---------------------------------------------------------------------
+print_class_database:-
+	Item== class_database?match(_),
+		Item == map(_,class_definition(
+			ClassName,
+			Ancestor,
+			SlotDefinitions,
+			ActingClauses,
+			ModelClauses,
+			JavaClassName,
+			Interface,
+			VariableNames,
+			TP)),
+		Mode== {print_text_positions:'no',
+			-- variable_names:VariableNames,
+			unroll_function_calls:'no',
+			-- function_call_table:Table,
+			print_position_indent:'yes',
+			extra_left_indent:7,
+			indent_constructor_arguments:'yes',
+			tabulator_size:5},
+		pretty_printer ? print_interface(
+			Interface,
+			Mode),
+		pretty_printer ? print_class(
+			ClassName,
+			Ancestor,
+			SlotDefinitions,
+			ActingClauses,
+			ModelClauses,
+			JavaClassName,
+			VariableNames,
+			TP,
+			Mode),
+		fail.
+print_class_database.
+---------------------------------------------------------------------
+print_class_aliases:-
+	set_text_color('default'),
+	Item== class_aliases?match(_),
+		Item == map(Key,Value),
+		writeln(Key," -> ",Value),
+		fail.
+print_class_aliases.
+---------------------------------------------------------------------
+print_program_project:-
+	set_text_color('default'),
+	Item== project_database?match(_),
+		writeln(Item),
+		fail.
+print_program_project.
+]
+---------------------------------------------------------------------

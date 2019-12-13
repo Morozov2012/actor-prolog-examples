@@ -1,0 +1,920 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Sound";
+import .. from "morozov/FFmpeg";
+-----------------------------------------------------------------------
+project: (('SoundRecorder'))
+-----------------------------------------------------------------------
+class 'SoundRecorder' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer		= ('SoundManager',
+				name=temporary_file_name,
+				sound_recorder=self);
+	--
+	writer		= ('FFmpeg',
+				operating_mode='WRITING',
+				extension=".wav");
+	--
+	microphone_list			= ('MicrophoneList');
+	export_mode			= ('ExportMode');
+	--
+	stop_after_the_first_frame	= ('Switch');
+	data_are_to_be_saved		= ('Switch');
+	suspend_audio_player		= ('Switch');
+	--
+	file_operation_error_handler	= ('FileOperationErrorHandler',
+						world=self);
+	file_operations			= ('File');
+	text_operations			= ('Text');
+	timer_operations		= ('Timer');
+	con				= ('Console');
+--
+constant:
+--
+	temporary_file_name	= "recorder.ap2j";
+	is_top_level_window	= 'yes';
+	exit_on_close		= 'yes';
+	--
+	dlg_ctrl_edittext_description			= 1010;
+	dlg_ctrl_edittext_copyright			= 1020;
+	dlg_ctrl_edittext_registration_date		= 1030;
+	dlg_ctrl_edittext_registration_time		= 1040;
+	dlg_ctrl_editname_frame_number			= 1050;
+	--
+	dlg_ctrl_listbutton_data_line_list		= 2011;
+	dlg_ctrl_listbutton_selected_data_line		= 2012;
+	dlg_ctrl_togglebutton_microphone		= 2060;
+--
+[
+goal:-!,
+	update_microphone_list,
+	switch_controls,
+	-- maximize,
+	show,
+	load_temporary_file_if_possible,
+	update_displaying_mode,
+	switch_controls.
+--
+action("Connect"):-
+	microphone_is_connected,!,
+	buffer ? stop,
+	buffer ? set_operating_mode('PLAYING'),
+	switch_controls.
+action("Connect"):-
+	buffer ? stop,
+	switch_controls,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? set_output_audio_data('yes'),
+	buffer ? start,!,
+	switch_controls.
+action("Choose"):-
+	FileName== con?input_file_name(
+		"Please select data file",
+		"*.ap2j",
+		[
+		"*.ap2j","Audio data",
+		"*.*","All Files"
+		]),!,
+	buffer ? stop,
+	choose_file(FileName).
+action("Play"):-
+	suspend_audio_player ? is_true,!,
+	buffer ? start,
+	switch_controls.
+action("Play"):-!,
+	buffer ? stop,
+	buffer ? set_operating_mode('PLAYING'),
+	start_reading,
+	switch_controls.
+action("Pause"):-!,
+	buffer ? pause,
+	suspend_audio_player ? assign('yes'),
+	switch_controls.
+action("Stop"):-
+	is_recording_or_exporting_mode,!,
+	buffer ? stop,
+	writer ? close,
+	buffer ? set_operating_mode('LISTENING'),
+	export_mode ? assign('NONE'),
+	buffer ? flush_audio_buffer,
+	buffer ? set_output_audio_data('yes'),
+	buffer ? start,
+	switch_controls.
+action("Stop"):-!,
+	buffer ? stop,
+	writer ? close,
+	export_mode ? assign('NONE'),
+	switch_controls.
+action("Record"):-
+	is_recording_mode,!.
+action("Record"):-
+	is_listening_mode,
+	check_whether_data_are_to_be_saved,!,
+	buffer ? set_name(temporary_file_name),
+	update_dialog_title(""),
+	buffer ? set_operating_mode('RECORDING'),
+	buffer ? stop,
+	buffer ? set_output_audio_data('no'),
+	buffer ? start,
+	data_are_to_be_saved ? assign('yes'),
+	switch_controls.
+action("Save"):-
+	check_file_name,
+	TargetFileName== con?input_new_file_name(
+		"Please select a new file name",
+		"*.ap2j",
+		[
+		"*.ap2j","Audio data",
+		"*.*","All files"
+		]),
+	rename_temporary_file(TargetFileName),!,
+	data_are_to_be_saved ? assign('no'),
+	choose_file(TargetFileName).
+action("WAV"):-!,
+	export_data_to_video(".wav").
+action("AVI"):-!,
+	export_data_to_video(".avi").
+action("WMA"):-!,
+	export_data_to_video(".wma").
+--
+created_control(dlg_ctrl_listbutton_selected_data_line):-!,
+	initiate_microphone_if_necessary.
+--
+modified_control(dlg_ctrl_listbutton_selected_data_line):-!,
+	initiate_microphone_if_necessary.
+modified_control(_):-!,
+	update_displaying_mode,
+	switch_controls.
+--
+initiate_microphone_if_necessary:-
+	microphone_is_connected,!,
+	Name== ?cast("STRING",
+		?get(dlg_ctrl_listbutton_selected_data_line)),
+	initiate_microphone(Name).
+initiate_microphone_if_necessary.
+--
+initiate_microphone(Name):-
+	microphone_list ? get_data_line(Name,SelectedDataLine),!,
+	buffer ? stop,
+	writer ? close,
+	export_mode ? assign('NONE'),
+	buffer ? set_default_data_line(SelectedDataLine),
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? flush_audio_buffer,
+	buffer ? set_output_audio_data('yes'),
+	buffer ? start.
+initiate_microphone(Name):-
+	con ? writeln("Sorry, this data line is unknown: ",Name).
+--
+complete_data_transfer:-
+	buffer ? flush_audio_buffer,
+	fail.
+complete_data_transfer:-
+	writer ? is_open,
+	writer ? close,
+	fail.
+complete_data_transfer:-
+	is_recording_mode,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? stop,
+	fail.
+complete_data_transfer:-
+	microphone_is_disconnected,
+	buffer ? set_operating_mode('PLAYING'),
+	buffer ? stop,
+	fail.
+complete_data_transfer:-
+	export_mode ? assign('NONE'),
+	switch_controls.
+-----------------------------------------------------------------------
+load_temporary_file_if_possible:-
+	buffer ? does_exist,!,
+	buffer ? set_operating_mode('READING'),
+	stop_after_the_first_frame ? assign('yes'),
+	start_reading,
+	switch_controls.
+load_temporary_file_if_possible.
+--
+choose_file(FileName):-
+	is_listening_mode,!,
+	buffer ? set_name(FileName),
+	update_dialog_title(FileName),
+	switch_controls.
+choose_file(FileName):-
+	buffer ? set_name(FileName),
+	update_dialog_title(FileName),
+	buffer ? stop,
+	buffer ? set_operating_mode('READING'),
+	stop_after_the_first_frame ? assign('yes'),
+	start_reading,
+	switch_controls.
+--
+update_dialog_title(""):-!,
+	put('title',"Sound Recorder").
+update_dialog_title(FileName):-
+	put('title',"Sound Recorder ["+FileName+"]").
+--
+start_reading:-
+	check_file_name,!,
+	suspend_audio_player ? assign('no'),
+	switch_controls,
+	buffer ? set_output_audio_data('yes'),
+	buffer ? start.
+start_reading.
+--
+check_whether_data_are_to_be_saved:-
+	data_are_to_be_saved ? is_true,!,
+	con ? ask(
+		"Data is not saved!",
+		"Do you want to rewrite the data?").
+check_whether_data_are_to_be_saved.
+-----------------------------------------------------------------------
+export_data_to_video(_):-
+	is_recording_or_exporting_mode,!.
+export_data_to_video(_):-
+	stop_after_the_first_frame ? assign('no'),
+	fail.
+export_data_to_video(Extension):-
+	export_mode ? select_mode(Extension),
+	writer ? set_extension(Extension),
+	fail.
+export_data_to_video(_):-
+	microphone_is_connected,!,
+	DestinationFileName== ?create_new_file_name(),
+	writer ? set_automatic_frame_rate_correction('on'),
+	writer ? open(
+		DestinationFileName,[
+		{
+		codec_type: 'AVMEDIA_TYPE_AUDIO',
+		bit_rate: 64_000,
+		time_base: 1/44100,
+		sample_rate: 44100,
+		channels: 2,
+		sample_fmt: 'AV_SAMPLE_FMT_S16',
+		channel_layout: 'AV_CH_LAYOUT_STEREO',
+		nb_samples: 100000
+		}]),
+	buffer ? stop,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? reset_frame_rate,
+	put(dlg_ctrl_editname_frame_number,""),
+	buffer ? set_output_audio_data('no'),
+	buffer ? start,
+	switch_controls.
+export_data_to_video(_):-
+	microphone_is_disconnected,!,
+	buffer ? stop,
+	SourceFileName== buffer?get_full_name(),
+	Extension== writer?get_extension(),
+	DestinationFileName== file_operations
+		?replace_extension(SourceFileName,Extension),
+	writer ? set_automatic_frame_rate_correction('off'),
+	writer ? open(
+		DestinationFileName,[{
+		codec_type: 'AVMEDIA_TYPE_AUDIO',
+		bit_rate: 64_000,
+		time_base: 1/44100,
+		sample_rate: 44100,
+		channels: 2,
+		sample_fmt: 'AV_SAMPLE_FMT_S16',
+		channel_layout: 'AV_CH_LAYOUT_STEREO',
+		nb_samples: 100000
+		}]),
+	buffer ? set_operating_mode('READING'),
+	buffer ? reset_frame_rate,
+	put(dlg_ctrl_editname_frame_number,""),
+	buffer ? start,
+	buffer ? set_output_audio_data('no'),
+	switch_controls.
+export_data_to_video(_).
+-----------------------------------------------------------------------
+export_audio_data_if_necessary(_,_,_):-
+	is_reading_mode,
+	stop_after_the_first_frame ? is_true,!,
+	buffer ? stop,
+	buffer ? flush_audio_buffer,
+	switch_controls.
+export_audio_data_if_necessary(AudioData,N,Time):-
+	export_mode ? export_is_on,
+	writer ? write_realtime_audio_data(AudioData,Time),
+	flush_writer_if_necessary,
+	put(dlg_ctrl_editname_frame_number,N),
+	fail.
+export_audio_data_if_necessary(_,_,_):-
+	is_reading_mode,
+	continue_data_transfer_if_necessary,
+	fail.
+export_audio_data_if_necessary(_,N,_):-
+	is_recording_mode,
+	put(dlg_ctrl_editname_frame_number,N),
+	fail.
+export_audio_data_if_necessary(_,_,_).
+--
+flush_writer_if_necessary:-
+	is_reading_mode,
+	writer ? flush,
+	fail.
+flush_writer_if_necessary.
+-----------------------------------------------------------------------
+is_listening_mode:-
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'LISTENING'.
+--
+is_playing_mode:-
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'PLAYING'.
+--
+is_reading_mode:-
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'READING'.
+--
+is_recording_or_exporting_mode:-
+	is_recording_mode,!.
+is_recording_or_exporting_mode:-
+	export_mode ? export_is_on.
+--
+is_recording_mode:-
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'RECORDING'.
+-----------------------------------------------------------------------
+update_displaying_mode:-
+	UseMicrophone== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_microphone)),!,
+	buffer ? set_attach_audio_data(UseMicrophone).
+update_displaying_mode.
+--
+switch_controls:-
+	switch_listbutton_DataLineList,
+	switch_button_Connect,
+	switch_button_Choose,
+	switch_button_Play,
+	switch_button_Pause,
+	switch_button_Record,
+	switch_button_Stop,
+	switch_button_Save,
+	switch_button_WAV,
+	switch_button_AVI,
+	switch_button_WMA,
+	switch_button_Microphone,
+	switch_microphone_state,
+	switch_text_area_Description.
+--
+switch_listbutton_DataLineList:-
+	microphone_is_connected,!,
+	enable(dlg_ctrl_listbutton_data_line_list).
+switch_listbutton_DataLineList:-
+	disable(dlg_ctrl_listbutton_data_line_list).
+--
+switch_button_Connect:-
+	is_recording_or_exporting_mode,!,
+	disable("Connect"),
+	set_control_text_color("Connect",'default').
+switch_button_Connect:-
+	is_playing_mode,
+	buffer ? is_active,!,
+	disable("Connect"),
+	set_control_text_color("Connect",'default').
+switch_button_Connect:-
+	microphone_is_connected,!,
+	enable("Connect"),
+	set_control_text("Connect","Disco&nnect"),
+	set_control_text_color("Connect",'Blue').
+switch_button_Connect:-
+	enable("Connect"),
+	set_control_text("Connect","Co&nnect"),
+	set_control_text_color("Connect",'default').
+--
+switch_button_Choose:-
+	is_recording_or_exporting_mode,!,
+	disable("Choose").
+switch_button_Choose:-
+	is_playing_mode,
+	buffer ? is_active,!,
+	disable("Choose").
+switch_button_Choose:-
+	microphone_is_connected,!,
+	disable("Choose").
+switch_button_Choose:-
+	enable("Choose").
+--
+switch_button_Play:-
+	is_recording_or_exporting_mode,!,
+	disable("Play"),
+	set_control_text_color("Play",'default').
+switch_button_Play:-
+	microphone_is_connected,!,
+	disable("Play"),
+	set_control_text_color("Play",'default').
+switch_button_Play:-
+	is_playing_mode,
+	buffer ? is_active,!,
+	enable("Play"),
+	set_control_text_color("Play",'DkGreen').
+switch_button_Play:-
+	buffer ? does_exist,!,
+	enable("Play"),
+	set_control_text_color("Play",'default').
+switch_button_Play:-
+	disable("Play"),
+	set_control_text_color("Play",'default').
+--
+switch_button_Pause:-
+	microphone_is_connected,!,
+	disable("Pause").
+switch_button_Pause:-
+	is_playing_mode,
+	buffer ? is_active,!,
+	enable("Pause").
+switch_button_Pause:-
+	disable("Pause").
+--
+switch_button_Record:-
+	export_mode ? export_is_on,!,
+	disable("Record"),
+	set_control_text_color("Record",'default').
+switch_button_Record:-
+	microphone_is_connected,
+	is_recording_mode,!,
+	enable("Record"),
+	set_control_text_color("Record",'Red').
+switch_button_Record:-
+	microphone_is_connected,
+	is_listening_mode,!,
+	enable("Record"),
+	set_control_text_color("Record",'default').
+switch_button_Record:-
+	disable("Record"),
+	set_control_text_color("Record",'default').
+--
+switch_button_Stop:-
+	is_recording_or_exporting_mode,!,
+	enable("Stop").
+switch_button_Stop:-
+	writer ? is_open,!,
+	enable("Stop").
+switch_button_Stop:-
+	is_listening_mode,!,
+	disable("Stop").
+switch_button_Stop:-
+	buffer ? is_active,!,
+	enable("Stop").
+switch_button_Stop:-
+	disable("Stop").
+--
+switch_button_Save:-
+	is_recording_or_exporting_mode,!,
+	disable("Save").
+switch_button_Save:-
+	buffer ? is_active,!,
+	disable("Save").
+switch_button_Save:-
+	data_are_to_be_saved ? is_true,!,
+	enable("Save").
+switch_button_Save:-
+	file_operations ? does_exist(temporary_file_name),!,
+	enable("Save").
+switch_button_Save:-
+	disable("Save").
+--
+switch_button_WAV:-
+	export_mode ? export_to_WAV,!,
+	enable("WAV"),
+	set_control_text_color("WAV",'Red').
+switch_button_WAV:-
+	is_recording_or_exporting_mode,!,
+	disable("WAV"),
+	set_control_text_color("WAV",'default').
+switch_button_WAV:-
+	microphone_is_connected,!,
+	enable("WAV"),
+	set_control_text_color("WAV",'default').
+switch_button_WAV:-
+	buffer ? is_active,!,
+	disable("WAV"),
+	set_control_text_color("WAV",'default').
+switch_button_WAV:-
+	buffer ? does_exist,!,
+	enable("WAV"),
+	set_control_text_color("WAV",'default').
+switch_button_WAV:-
+	disable("WAV"),
+	set_control_text_color("WAV",'default').
+--
+switch_button_AVI:-
+	export_mode ? export_to_AVI,!,
+	enable("AVI"),
+	set_control_text_color("AVI",'Red').
+switch_button_AVI:-
+	is_recording_or_exporting_mode,!,
+	disable("AVI"),
+	set_control_text_color("AVI",'default').
+switch_button_AVI:-
+	microphone_is_connected,!,
+	enable("AVI"),
+	set_control_text_color("AVI",'default').
+switch_button_AVI:-
+	buffer ? is_active,!,
+	disable("AVI"),
+	set_control_text_color("AVI",'default').
+switch_button_AVI:-
+	buffer ? does_exist,!,
+	enable("AVI"),
+	set_control_text_color("AVI",'default').
+switch_button_AVI:-
+	disable("AVI"),
+	set_control_text_color("AVI",'default').
+--
+switch_button_WMA:-
+	export_mode ? export_to_WMA,!,
+	enable("WMA"),
+	set_control_text_color("WMA",'Red').
+switch_button_WMA:-
+	is_recording_or_exporting_mode,!,
+	disable("WMA"),
+	set_control_text_color("WMA",'default').
+switch_button_WMA:-
+	microphone_is_connected,!,
+	enable("WMA"),
+	set_control_text_color("WMA",'default').
+switch_button_WMA:-
+	buffer ? is_active,!,
+	disable("WMA"),
+	set_control_text_color("WMA",'default').
+switch_button_WMA:-
+	buffer ? does_exist,!,
+	enable("WMA"),
+	set_control_text_color("WMA",'default').
+switch_button_WMA:-
+	disable("WMA"),
+	set_control_text_color("WMA",'default').
+--
+switch_button_Microphone:-
+	buffer ? is_active,
+	is_recording_mode,!,
+	paint_button_Microphone('DkGreen').
+switch_button_Microphone:-
+	buffer ? is_active,
+	export_mode ? export_is_on,!,
+	paint_button_Microphone('DkGreen').
+switch_button_Microphone:-
+	paint_button_Microphone('default').
+--
+paint_button_Microphone(Color):-
+	do_use_microphone,
+	buffer ? microphone_is_active,!,
+	set_control_text_color(
+		dlg_ctrl_togglebutton_microphone,Color).
+paint_button_Microphone(_):-
+	set_control_text_color(
+		dlg_ctrl_togglebutton_microphone,'default').
+--
+switch_microphone_state:-
+	buffer ? microphone_is_available,!,
+	enable(dlg_ctrl_togglebutton_microphone).
+switch_microphone_state:-
+	disable(dlg_ctrl_togglebutton_microphone).
+--
+switch_text_area_Description:-
+	buffer ? get_delivered_description(Description),
+	buffer ? get_delivered_copyright(Copyright),
+	buffer ? get_delivered_registration_date(Date),
+	buffer ? get_delivered_registration_time(Time),
+	put(dlg_ctrl_edittext_description,Description),
+	put(dlg_ctrl_edittext_copyright,Copyright),
+	put(dlg_ctrl_edittext_registration_date,Date),
+	put(dlg_ctrl_edittext_registration_time,Time).
+-----------------------------------------------------------------------
+do_use_microphone:-
+	Mode== ?get(dlg_ctrl_togglebutton_microphone),
+	?val("YesNo",Mode) == 'yes'.
+--
+microphone_is_connected:-
+	microphone_is_connected(buffer?get_operating_mode()).
+--
+microphone_is_connected('LISTENING').
+microphone_is_connected('RECORDING').
+--
+microphone_is_disconnected:-
+	microphone_is_connected,!,
+	fail.
+microphone_is_disconnected.
+--
+update_microphone_list:-
+	List1== buffer?get_microphone_list(),
+	microphone_list ? save_microphone_list(List1,List2),
+	put(dlg_ctrl_listbutton_data_line_list,List2).
+-----------------------------------------------------------------------
+check_file_name:-
+	buffer ? does_exist,!.
+check_file_name:-
+	FileName== buffer?get_name(),
+	con ? error(
+		"Illegal File name",
+		text_operations?format(
+			"The '%s' file does not exist.",FileName)),
+	fail.
+--
+rename_temporary_file(TargetFileName):-
+	file_operation_error_handler ? delete(TargetFileName),
+	buffer ? rename(TargetFileName).
+--
+continue_data_transfer_if_necessary:-
+	buffer ? eof,!.
+continue_data_transfer_if_necessary:-
+	buffer ? set_output_audio_data('no'),
+	buffer ? start,
+	switch_controls.
+--
+does_exist(FileName):-
+	file_operations ? does_exist(FileName).
+--
+delete(FileName):-
+	file_operations ? delete(FileName).
+--
+create_new_file_name() = FileName :-
+	timer_operations ? date(Year,Month,Day),
+	timer_operations ? time(Hour,Minute,Second),
+	FileName== text_operations?format(
+		"%04d-%02d-%02d-%02d-%02d-%02d",
+		Year,Month,Day,
+		Hour,Minute,Second).
+--
+rename(FileName):-
+	file_operations ? rename(FileName).
+]
+-----------------------------------------------------------------------
+class 'SoundManager' (specialized 'Microphone'):
+--
+constant:
+--
+	name;
+	--
+	operating_mode			= 'PLAYING';
+	attach_audio_data		= 'yes';
+	output_audio_data		= 'yes';
+	audio_data_delay_correction	= 'default';
+--
+internal:
+--
+	sound_recorder;
+	--
+	file_operations		= ('File');
+	text_operations		= ('Text');
+	timer_operations	= ('Timer');
+	con			= ('Console');
+--
+constant:
+--
+	slow_motion_coefficient		= -1;
+--
+[
+goal:-!.
+--
+audio_data_obtained:-
+	commit_audio_data,!,
+	get_recent_audio_data_number(N),
+	get_recent_audio_data_time(Time),
+	Binary== ?get_recent_audio_data(),
+	sound_recorder ? export_audio_data_if_necessary(Binary,N,Time).
+--
+data_transfer_completion:-!,
+	sound_recorder ? complete_data_transfer.
+--
+data_transfer_error(ErrorName):-!,
+	sound_recorder ? complete_data_transfer,
+	con ? error("Data Transfer Error",ErrorName).
+--
+buffer_overflow:-!,
+	con ? set_color('White','Red'),
+	con ? writeln("Buffer overflow!"),
+	con ? set_color('default').
+--
+buffer_deallocation:-!,
+	con ? set_color('White','DkGreen'),
+	con ? writeln("Buffer restored."),
+	con ? set_color('default').
+-----------------------------------------------------------------------
+output_description_if_necessary(FrameNumber):-
+	FrameNumber <= 1,!,
+	sound_recorder ? switch_text_area_Description.
+output_description_if_necessary(_).
+]
+-----------------------------------------------------------------------
+class 'MicrophoneList' (specialized 'Database'):
+--
+internal:
+--
+	text_operations		= ('Text');
+	con			= ('Console');
+--
+[
+save_microphone_list(Descriptions,List2a):-
+	retract_all,
+	descriptions_to_list(Descriptions,[],[],List1a,List1b),
+	reverse_list(List1a,[],List2a),
+	reverse_list(List1b,[],List2b),
+	save_list(List2a,List2b).
+--
+descriptions_to_list(
+		[Description|Rest],
+		List1a,List1b,List3a,List3b):-
+	Description == {
+		mixerName:MixerName,
+		mixerVendor:MixerVendor,
+		mixerDescription:MixerDescription,
+		mixerVersion:MixerVersion,
+		dataLine:DataLine,
+		formats:Formats|_},!,
+	formats_to_list(
+		Formats,
+		MixerName,
+		MixerVendor,
+		MixerDescription,
+		MixerVersion,
+		DataLine,
+		List1a,List1b,
+		List2a,List2b),
+	descriptions_to_list(Rest,List2a,List2b,List3a,List3b).
+descriptions_to_list([_|Rest],List1a,List1b,List2a,List2b):-!,
+	descriptions_to_list(Rest,List1a,List1b,List2a,List2b).
+descriptions_to_list(_,ListA,ListB,ListA,ListB).
+--
+formats_to_list([Format|Rest],
+		MixerName,
+		MixerVendor,
+		MixerDescription,
+		MixerVersion,
+		DataLine,
+		List1a,
+		List1b,
+		List2a,
+		List2b):-
+	Format == {
+		channels:ChannelNumber,
+		encoding:Encoding,
+		frameSize:FrameSize,
+		sampleSizeInBits:SampleSize,
+		isBigEndian:IsBigEndian
+		|_},!,
+	form_channels(ChannelNumber,CNS),
+	form_IsBigEndian(IsBigEndian,IBES),
+	Name== text_operations?format("%s %s bit %s %s %s#%d",
+		Encoding,
+		SampleSize,
+		CNS,
+		IBES,
+		MixerName,
+		DataLine),
+	RequestedDataLine== {
+		mixerName:MixerName,
+		mixerVendor:MixerVendor,
+		mixerDescription:MixerDescription,
+		mixerVersion:MixerVersion,
+		dataLine:DataLine,
+		format:{channels:ChannelNumber,
+			encoding:Encoding,
+			frameSize:FrameSize,
+			sampleSizeInBits:SampleSize,
+			isBigEndian:IsBigEndian
+			}},
+	formats_to_list(
+		Rest,
+		MixerName,
+		MixerVendor,
+		MixerDescription,
+		MixerVersion,
+		DataLine,
+		[Name|List1a],
+		[RequestedDataLine|List1b],
+		List2a,
+		List2b).
+formats_to_list([_|Rest],
+		MixerName,
+		MixerVendor,
+		MixerDescription,
+		MixerVersion,
+		DataLine,
+		List1a,
+		List1b,
+		List2a,
+		List2b):-!,
+	formats_to_list(
+		Rest,
+		MixerName,
+		MixerVendor,
+		MixerDescription,
+		MixerVersion,
+		DataLine,
+		List1a,
+		List1b,
+		List2a,
+		List2b).
+formats_to_list(_,_,_,_,_,_,
+		ListA,ListB,
+		ListA,ListB).
+--
+form_channels(1,"mono"):-!.
+form_channels(2,"stereo"):-!.
+form_channels(N,S):-
+	S== ?convert_to_string(N).
+--
+form_IsBigEndian('yes',"big-endian"):-!.
+form_IsBigEndian(_,"little-endian").
+--
+reverse_list([H|List1],List2,List3):-!,
+	reverse_list(List1,[H|List2],List3).
+reverse_list(_,List,List).
+--
+save_list([Name|Rest1],[Description|Rest2]):-!,
+	append(dl(Name,Description)),
+	save_list(Rest1,Rest2).
+save_list(_,_).
+--
+get_data_line(Name,Description):-
+	Item== ?match(dl(Name,_)),!,
+	Item == dl(_,Description).
+]
+-----------------------------------------------------------------------
+class 'ExportMode' (specialized 'Database'):
+--
+internal:
+--
+	text_operations		= ('Text');
+--
+[
+assign(Mode):-
+	retract_all,
+	insert(Mode).
+--
+select_mode(Name):-
+	select_mode(text_operations?lower(Name),Mode),
+	assign(Mode).
+--
+select_mode(".wav",'WAV'):-!.
+select_mode(".avi",'AVI'):-!.
+select_mode(".wma",'WMA'):-!.
+select_mode(Name,_):-
+	break("Unknown export mode: " + Name).
+--
+export_is_on:-
+	export_is_on(?get()),!.
+--
+export_is_on('WAV'):-!.
+export_is_on('AVI'):-!.
+export_is_on('WMA').
+--
+export_is_off:-
+	Mode== ?get(),!,
+	export_is_off(Mode).
+export_is_off.
+--
+export_is_off('NONE').
+--
+export_to_WAV:-
+	?get()=='WAV'.
+--
+export_to_AVI:-
+	?get()=='AVI'.
+--
+export_to_WMA:-
+	?get()=='WMA'.
+--
+get() = Mode :-
+	find(Mode),!.
+]
+-----------------------------------------------------------------------
+class 'Switch' (specialized 'Database'):
+[
+assign(Mode):-
+	retract_all,
+	insert(Mode).
+--
+is_true:-
+	find('yes'),!.
+]
+-----------------------------------------------------------------------
+class 'FileOperationErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler		= self;
+	--
+	con		= ('Console');
+--
+[
+alarm(ExceptionName,Operation,_*):-
+	Text== con?format(
+		"\n\nOperation: %s\n\nError: %s\n\n",
+		Operation,ExceptionName),
+	con ? error("I cannot implement file operation",Text).
+]
+-----------------------------------------------------------------------

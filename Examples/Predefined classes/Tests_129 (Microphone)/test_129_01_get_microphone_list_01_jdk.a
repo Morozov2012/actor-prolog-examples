@@ -1,0 +1,181 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import 'Microphone' from "morozov/Sound";
+
+DOMAINS:
+
+Tabulation	= INTEGER.
+
+PREDICATES:
+
+imperative:
+
+write_microphone_list(
+	MicrophoneDataLineList,INTEGER,Tabulation)	- (i,i,i);
+write_microphone(MicrophoneDataLine,Tabulation)		- (i,i);
+write_audio_formats(AudioFormats,INTEGER,Tabulation)	- (i,i,i);
+write_audio_format(AudioFormat)				- (i);
+tabulation(Tabulation)					- (i);
+--
+test_microphones(MicrophoneDataLineList,INTEGER)	- (i,i);
+test_microphone(MicrophoneDataLine)			- (i);
+--
+test_audio_formats(
+	AudioFormats,MicrophoneDataLine,INTEGER)	- (i,i,i);
+test_audio_format(
+	AudioFormat,MicrophoneDataLine,INTEGER)		- (i,i,i);
+loop(INTEGER,INTEGER)					- (i,i);
+
+class 'Main' (specialized 'Console'):
+--
+internal:
+--
+	microphone	= ('Microphone',
+				output_audio_data='no');
+	timer		= ('Timer');
+--
+[
+goal:-!,
+	show,
+	List== microphone?get_microphone_list(),
+	set_color('RoyalBlue'),
+	writeln("The following microphones are available:"),
+	set_color('DkGreen'),
+	write_microphone_list(List,1,1),
+	set_color('RoyalBlue'),
+	writeln("End of list."),
+	writeln("I will test microphones:"),
+	set_color('default'),
+	test_microphones(List,1),
+	set_color('RoyalBlue'),
+	write("O.K."),
+	set_color('default').
+--
+write_microphone_list([TargetDataLine|Rest],N,T):-!,
+	set_color('RoyalBlue'),
+	writeln("Microphone #",N,":"),
+	write_microphone(TargetDataLine,T),
+	write_microphone_list(Rest,N+1,T).
+write_microphone_list(_,_,_).
+--
+write_microphone({mixerName:Name|_},T):-
+	set_color('DkGreen'),
+	tabulation(T),
+	write("Mixer name: "),
+	set_color('Violet'),
+	writeln(Name),
+	fail.
+write_microphone({mixerVendor:Name|_},T):-
+	set_color('DkGreen'),
+	tabulation(T),
+	write("Mixer vendor: "),
+	set_color('Violet'),
+	writeln(Name),
+	fail.
+write_microphone({mixerDescription:Text|_},T):-
+	set_color('DkGreen'),
+	tabulation(T),
+	write("Mixer description: "),
+	set_color('Violet'),
+	writeln(Text),
+	fail.
+write_microphone({mixerVersion:Text|_},T):-
+	set_color('DkGreen'),
+	tabulation(T),
+	write("Mixer version: "),
+	set_color('Violet'),
+	writeln(Text),
+	fail.
+write_microphone({dataLine:Number|_},T):-
+	set_color('DkGreen'),
+	tabulation(T),
+	write("Data line number: "),
+	set_color('Violet'),
+	writeln(Number),
+	fail.
+write_microphone({formats:List|_},T):-
+	set_color('DkGreen'),
+	tabulation(T),
+	writeln("Audio formats:"),
+	write_audio_formats(List,1,T+1),
+	fail.
+write_microphone({format:Format|_},T):-
+	set_color('DkGreen'),
+	tabulation(T),
+	write("Audio format: "),
+	write_audio_format(Format),
+	fail.
+write_microphone('default',T):-
+	set_color('Violet'),
+	tabulation(T),
+	writeln("default"),
+	fail.
+write_microphone(_,_).
+--
+write_audio_formats([Format|Rest],N,T):-!,
+	set_color('DkGreen'),
+	tabulation(T),
+	write(N,") "),
+	write_audio_format(Format),
+	write_audio_formats(Rest,N+1,T).
+write_audio_formats(_,_,_).
+--
+write_audio_format(Format):-
+	set_color('Violet'),
+	writeln(Format).
+--
+tabulation(T):-
+	T > 0,!,
+	write("\t"),
+	tabulation(T-1).
+tabulation(_).
+--
+test_microphones([Name|Rest],N):-!,
+	set_color('RoyalBlue'),
+	writeln("Microphone #",N,":"),
+	test_microphone(Name),
+	test_microphones(Rest,N+1).
+test_microphones(_,_).
+--
+test_microphone({formats:List|Rest}):-
+	test_audio_formats(List,Rest,1),
+	fail.
+test_microphone(_).
+--
+test_audio_formats([Format|List],Attributes,N):-!,
+	test_audio_format(Format,Attributes,N),
+	test_audio_formats(List,Attributes,N+1).
+test_audio_formats(_,_,_).
+--
+test_audio_format(Format,Attributes,N):-
+	TargetDataLine== {format:Format|Attributes},
+	set_color('RoyalBlue'),
+	write("\tTarget data line #",N,": "),
+	set_color('DkGreen'),
+	writeln(TargetDataLine),
+	microphone ? flush_microphone_buffer,
+	microphone ? start(TargetDataLine),
+	loop(1,100),
+	fail.
+test_audio_format(_,_,_).
+--
+loop(_,_):-
+	set_color('default'),
+	microphone ? commit_audio_data,!,
+	MicrophoneDataLine== microphone?get_actual_data_line(),
+	set_color('RoyalBlue'),
+	writeln("\tActual target data line:"),
+	microphone ? stop,
+	write_microphone(MicrophoneDataLine,2).
+loop(N,Limit):-
+	N <= Limit,!,
+	timer ? sleep(0.1),
+	loop(N+1,Limit).
+loop(_,_):-
+	microphone ? stop,
+	set_color('Red'),
+	writeln("\t\tTest failed!").
+]

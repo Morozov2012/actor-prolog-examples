@@ -1,0 +1,1633 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Java3D";
+import 'MultimediaBuffer' from "morozov/VideoBuffer";
+import .. from "morozov/Kinect";
+import .. from "morozov/Astrohn";
+import .. from "morozov/TEV1";
+import .. from "morozov/Webcam";
+import .. from "morozov/ColorMap";
+-----------------------------------------------------------------------
+project: (('MultichannelViewer'))
+-----------------------------------------------------------------------
+class 'MultichannelViewer' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer		= ('MultimediaControl',
+				name=temporary_file_name,
+				viewer=self);
+	--
+	kinect		= ('KinectCameraControl',
+				operating_window,
+				graphics_window=main_window,
+				astrohn,
+				tev1,
+				webcam,
+				show_skeletons,
+				viewer=self);
+	astrohn		= ('Astrohn');
+	tev1		= ('TEV1');
+	webcam		= ('Webcam');
+	--
+	operating_window = ('Canvas3D',
+				use_pixel_measurements='yes',
+				width=demo_window_width,
+				height=demo_window_height,
+				enable_scene_antialiasing='yes',
+				projection_policy='PARALLEL_PROJECTION',
+				front_clip_distance=0.1,
+				back_clip_distance=30,
+				background_color='Black');
+	--
+	main_window	= ('Canvas2D',
+				background_color='SystemControl');
+	--
+	export		= ('BufferedImage');
+	--
+	directory_name		= ('DirectoryName');
+	show_skeletons		= ('Switch');
+	current_lookup_table	= ('TextStore');
+	file_operations		= ('File');
+	text_operations		= ('Text');
+	timer_operations	= ('Timer');
+	color_maps		= ('ColorMap');
+	report			= ('Console');
+	desktop			= ('DesktopWindow');
+	--
+	batch_mode_control	= ('BatchModeControl',
+					viewer=self);
+--
+constant:
+--
+	export_image_wight	= 224; -- AlexNet: 224*224*3
+	export_image_height	= 224;
+	--
+	demo_window_width	= 224; -- 230; -- 224 + 3 + 3
+	demo_window_height	= 245; -- 224 + 21; 251; -- 224 + 3 + 24
+	--
+	-- acceptable_yaw	= 15.0; -- 35.0;
+	--
+	lookup_table_K2_THz_name	= "LookUpTable_K2_THz.txt";
+	lookup_table_K2_TEV1_name	= "LookUpTable_K2_TEV1.txt";
+	lookup_table_K2_Webcam_name	= "LookUpTable_K2_Webcam.txt";
+	--
+	temporary_file_name	= "viewer.ap2j";
+	is_top_level_window	= 'yes';
+	exit_on_close		= 'yes';
+	--
+	export_encoding_attributes = {
+		format:'default',
+		compressionQuality:0.95,
+		progressiveMode:'on',
+		interlacing:'on',
+		comment:"The Actor Prolog project"
+		};
+	--
+	dlg_ctrl_listbutton_video_data_mode	= 1020;
+	dlg_ctrl_listbutton_kinect_color_map	= 1031;
+	dlg_ctrl_togglebutton_reverse_kinect	= 1032;
+	dlg_ctrl_checkbox_iterate_kinect	= 1033;
+	dlg_ctrl_editinteger_kinect_iterations	= 1034;
+	dlg_ctrl_listbutton_astrohn_color_map	= 1041;
+	dlg_ctrl_togglebutton_reverse_astrohn	= 1042;
+	dlg_ctrl_checkbox_iterate_astrohn	= 1043;
+	dlg_ctrl_editinteger_astrohn_iterations	= 1044;
+	--
+	dlg_ctrl_listbutton_color_substitution	= 1051;
+	dlg_ctrl_statictext_first_channel	= 1071;
+	dlg_ctrl_listbutton_first_substitution	= 1072;
+	dlg_ctrl_statictext_second_channel	= 1081;
+	dlg_ctrl_listbutton_second_substitution	= 1082;
+	dlg_ctrl_statictext_third_channel	= 1091;
+	dlg_ctrl_listbutton_third_substitution	= 1092;
+	--
+	dlg_ctrl_edittext_description		= 3011;
+	dlg_ctrl_edittext_copyright		= 3012;
+	dlg_ctrl_edittext_registration_date	= 3013;
+	dlg_ctrl_edittext_registration_time	= 3014;
+	--
+	dlg_ctrl_togglebutton_show_skeletons	= 3015;
+	--
+	dlg_ctrl_scrollbar_frame_number_range	= 8011;
+	dlg_ctrl_scrollbar_frame_number_value	= 8012;
+	--
+	dlg_ctrl_togglebutton_play		= 9013;
+	dlg_ctrl_togglebutton_export		= 9018;
+--
+[
+goal:-!,
+	set_control_background_color('main_window','Black'),
+	-- set_control_background_color('main_window','White'),
+	maximize,
+	-- show,
+	load_temporary_file_if_possible,
+	update_mode_and_switch_controls.
+-----------------------------------------------------------------------
+action("Choose"):-
+	FileName== report?input_file_name(
+		"Please select data file",
+		"*.ap2j",
+		[
+		"*.ap2j","Video data",
+		"*.*","All Files"
+		]),!,
+	choose_and_play_file(FileName).
+action("Stop"):-!,
+	stop_data_reading_and_writing,
+	switch_controls.
+action("Photo"):-!,
+	FileName== ?create_new_file_name(),
+	take_photo(FileName).
+action("GoHome"):-!,
+	operating_window ? go_home.
+action("BatchMode"):-!,
+	batch_mode_control ? show.
+--
+modified_control(dlg_ctrl_togglebutton_play):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_play)),!,
+	set_Play_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_export):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_export)),!,
+	set_Export_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_scrollbar_frame_number_value):-!,
+	scroll_video.
+modified_control(_):-!,
+	update_mode_and_switch_controls.
+-----------------------------------------------------------------------
+set_Play_mode('yes'):-
+	playing_is_suspended,!,
+	buffer ? start,
+	switch_controls.
+set_Play_mode('yes'):-
+	stop_all_devices,
+	start_reading,
+	switch_controls.
+set_Play_mode('no'):-
+	stop_data_reading_and_writing.
+--
+set_Export_mode('yes'):-
+	buffer ? check_file_name,
+	FN1== buffer?get_name(),
+	file_operations ? extract_extension(FN1,FN2,_),
+	directory_name ? create_directory_if_necessary(FN2),!,
+	set_Export_mode_YES(FN2).
+set_Export_mode('no'):-!,
+	buffer ? stop,
+	switch_controls.
+set_Export_mode(_).
+--
+set_Export_mode_YES(InitialName):-
+	Directory== report?input_directory_name(
+		"Please select output directory",
+		InitialName),
+	directory_name ? create_or_clear_directory(Directory),!,
+	directory_name ? remember_name(Directory),
+	stop_all_devices,
+	buffer ? read_all_frames,
+	stop_all_devices,
+	reset_all_counters,
+	buffer ? start,
+	switch_controls.
+set_Export_mode_YES(InitialName):-
+	file_operations ? delete(InitialName),
+	put(dlg_ctrl_togglebutton_export,'no'),
+	buffer ? stop,
+	switch_controls.
+-----------------------------------------------------------------------
+display_components(_,_):-
+	desktop ? collect_garbage,
+	fail.
+display_components(_,_):-
+	buffer ? has_component("SETTINGS"),
+	report ? set_text_color('default'),
+	BTS== buffer?retrieve_term("base_time_shift"),
+	report ? writeln("base_time_shift: ",BTS," [ms]"),
+	KTS== buffer?retrieve_term("kinect_time_shift"),
+	report ? writeln("kinect_time_shift: ",KTS," [ms]"),
+	ATS== buffer?retrieve_term("astrohn_time_shift"),
+	report ? writeln("astrohn_time_shift: ",ATS," [ms]"),
+	TTS== buffer?retrieve_term("tev1_time_shift"),
+	report ? writeln("tev1_time_shift: ",TTS," [ms]"),
+	WTS== buffer?retrieve_term("webcam_time_shift"),
+	report ? writeln("webcam_time_shift: ",WTS," [ms]"),
+	fail.
+display_components(_,_):-
+	VideoDataSource== ?cast(
+		"STRING",
+		?get(dlg_ctrl_listbutton_video_data_mode)),
+	display_components(VideoDataSource),
+	fail.
+display_components(_,FrameNumber):-
+	buffer ? has_component("KINECT2"),
+	buffer ? retrieve_frame("KINECT2",kinect),
+	VideoDataSource== ?cast(
+		"STRING",
+		?get(dlg_ctrl_listbutton_video_data_mode)),
+	kinect ? display_frame(VideoDataSource,number(FrameNumber)),
+	fail.
+display_components(_,_).
+--
+display_components("Webcam"):-
+	buffer ? has_component("WEBCAM"),
+	buffer ? retrieve_frame("WEBCAM",webcam),
+	fail.
+display_components("Terahertz Camera"):-
+	buffer ? has_component("THZ"),
+	buffer ? retrieve_frame("THZ",astrohn),
+	fail.
+display_components("Thermal Camera"):-
+	buffer ? has_component("TEV1"),
+	buffer ? retrieve_frame("TEV1",tev1),
+	fail.
+display_components(_).
+--
+complete_data_transfer:-
+	stop_data_reading_and_writing,
+	batch_mode_control ? process_next_file,
+	switch_controls.
+-----------------------------------------------------------------------
+export_image(name(ShortName),_):-
+	directory_name ? find(Directory),!,
+	FileName== text_operations?format(
+		"%s/%s.png",Directory,ShortName),
+	main_window ? get_image(export),
+	export ? save(FileName,export_encoding_attributes).
+export_image(number(N),Yaw):-!,
+	-- is_acceptable_angle(Yaw),!,
+	operating_window ? get_image(
+		export,
+		export_image_wight,
+		export_image_height),
+	save_image_if_necessary(N,Yaw),
+	main_window ? suspend_redrawing,
+	main_window ? clear('no'),
+	main_window ? draw_image(export,0,0,1,1),
+	main_window ? draw_now.
+export_image(_,Yaw):-
+	operating_window ? get_image(
+		export,
+		export_image_wight,
+		export_image_height),
+	report ? set_text_color('Red'),
+	report ? writeln("Yaw: ",Yaw),
+	report ? set_text_color('default'),
+	main_window ? suspend_redrawing,
+	main_window ? clear('no'),
+	main_window ? draw_image(export,0,0,1,1),
+	main_window ? draw_now.
+--
+/*
+is_acceptable_angle(Yaw):-
+	?abs(Yaw) <= acceptable_yaw,!.
+is_acceptable_angle(Yaw):-
+	?abs(Yaw+180) <= acceptable_yaw,!.
+is_acceptable_angle(Yaw):-
+	?abs(Yaw-180) <= acceptable_yaw,!.
+is_acceptable_angle(Yaw):-
+	?abs(Yaw+360) <= acceptable_yaw,!.
+is_acceptable_angle(Yaw):-
+	?abs(Yaw-360) <= acceptable_yaw,!.
+*/
+--
+save_image_if_necessary(N,Yaw):-
+	export_frames,
+	directory_name ? find(Directory),!,
+	operating_window ? get_image(
+		export,
+		export_image_wight,
+		export_image_height),
+	file_operations ? extract_path(
+		Directory,_,SubdirectoryName),
+	file_operations ? extract_extension(
+		SubdirectoryName,ShortName,_),
+	FileName== text_operations?format(
+		"%s/%s-%07d-norm.png",Directory,ShortName,N),
+	report ? set_text_color('DkGreen'),
+	report ? writeln(
+		"Yaw: ",Yaw," ",
+		"Export: ",FileName),
+	report ? set_text_color('default'),
+	file_operations ? make_directory(Directory),
+	export ? save(FileName).
+save_image_if_necessary(_,Yaw):-
+	report ? set_text_color('DkGreen'),
+	report ? writeln("Yaw: ",Yaw),
+	report ? set_text_color('default').
+--
+export_frames:-
+	?val("YesNo",?get(dlg_ctrl_togglebutton_export))=='yes'.
+-----------------------------------------------------------------------
+take_photo(FileName):-
+	VideoDataSource== ?cast("STRING",
+		?get(dlg_ctrl_listbutton_video_data_mode)),
+	kinect ? display_frame(VideoDataSource,name(FileName)),
+	fail.
+take_photo(_).
+-----------------------------------------------------------------------
+stop_data_reading_and_writing:-
+	buffer ? stop,
+	put(dlg_ctrl_togglebutton_play,'no'),
+	put(dlg_ctrl_togglebutton_export,'no').
+--
+stop_all_devices:-
+	buffer ? stop,
+	kinect ? stop,
+	astrohn ? stop,
+	tev1 ? stop,
+	webcam ? stop.
+--
+reset_all_counters:-
+	buffer ? reset_all_counters,
+	kinect ? reset_all_counters,
+	astrohn ? reset_all_counters,
+	tev1 ? reset_all_counters,
+	webcam ? reset_all_counters.
+--
+load_temporary_file_if_possible:-
+	buffer ? does_exist,!,
+	buffer ? read_only_the_first_frame,
+	start_reading,
+	switch_controls.
+load_temporary_file_if_possible.
+--
+choose_and_play_file(FileName):-
+	buffer ? stop,
+	stop_data_reading_and_writing,
+	choose_file(FileName),
+	fail.
+choose_and_play_file(_):-
+	buffer ? read_all_frames,
+	put(dlg_ctrl_togglebutton_play,'yes'),
+	set_Play_mode('yes'),
+	fail.
+choose_and_play_file(_):-
+	switch_controls.
+--
+choose_and_export_file(FullName):-
+	stop_data_reading_and_writing,
+	choose_file(FullName),
+	fail.
+choose_and_export_file(FullName):-
+	buffer ? read_all_frames,
+	put(dlg_ctrl_togglebutton_export,'yes'),
+	file_operations ? extract_extension(FullName,Directory,_),
+	export_file(Directory).
+--
+choose_file(FileName):-
+	buffer ? set_name(FileName),
+	update_dialog_title(FileName),
+	switch_video_data_mode.
+--
+export_file(Directory):-
+	directory_name ? create_or_clear_directory(Directory),!,
+	directory_name ? remember_name(Directory),
+	stop_all_devices,
+	buffer ? read_all_frames,
+	stop_all_devices,
+	reset_all_counters,
+	buffer ? start,
+	switch_controls.
+export_file(Directory):-
+	file_operations ? delete(Directory),
+	put(dlg_ctrl_togglebutton_export,'no'),
+	buffer ? stop,
+	fail.
+export_file(_):-
+	switch_controls.
+--
+update_dialog_title(""):-!,
+	put('title',"Multichannel Video Converter").
+update_dialog_title(FileName):-
+	put('title',"Multichannel Video Converter ["+FileName+"]").
+--
+start_reading:-
+	buffer ? check_file_name,!,
+	switch_controls,
+	park_scroll_control,
+	stop_all_devices,
+	reset_all_counters,
+	buffer ? start.
+start_reading.
+--
+park_scroll_control:-
+	Range== ?val("I_List",
+		?get(dlg_ctrl_scrollbar_frame_number_range)),
+	Range == [_,Right],!,
+	put(dlg_ctrl_scrollbar_frame_number_value,Right).
+park_scroll_control.
+--
+set_read_buffer_size(Size):-
+	put(dlg_ctrl_scrollbar_frame_number_range,[1,Size]).
+--
+redraw_recent_frame:-
+	buffer ? frame_obtained.
+--
+scroll_video:-
+	FN== ?cast("INTEGER",
+		?get(dlg_ctrl_scrollbar_frame_number_value)),!,
+	buffer ? request_buffered_frame(FN),!.
+scroll_video.
+-----------------------------------------------------------------------
+update_mode_and_switch_controls:-
+	switch_video_data_mode,
+	update_displaying_mode,
+	switch_controls,
+	redraw_recent_frame.
+--
+switch_video_data_mode:-
+	Mode== ?cast("STRING",
+		?get(dlg_ctrl_listbutton_video_data_mode)),!,
+	switch_video_data_mode(Mode).
+switch_video_data_mode.
+--
+switch_video_data_mode("None"):-!.
+switch_video_data_mode(Mode):-
+	FileName== buffer?get_name(),
+	file_operations ? extract_path(FileName,Path,_),
+	select_lookup_table(Mode,Table),
+	LookupTableName== text_operations?format("%s/%s",Path,Table),
+	file_operations ? does_exist(LookupTableName),!,
+	load_lookup_table_if_necessary(LookupTableName).
+switch_video_data_mode(_).
+--
+select_lookup_table("Terahertz Camera",lookup_table_K2_THz_name):-!.
+select_lookup_table("Thermal Camera",lookup_table_K2_TEV1_name):-!.
+select_lookup_table("Webcam",lookup_table_K2_Webcam_name).
+--
+load_lookup_table_if_necessary(FileName):-
+	current_lookup_table ? get(FileName),!.
+load_lookup_table_if_necessary(FileName):-
+	kinect ? set_lookup_table(FileName),
+	current_lookup_table ? set(FileName).
+--
+update_displaying_mode:-
+	update_color_substitution_mode,
+	update_skeleton_mode,
+	fail.
+update_displaying_mode:-
+	KCM== ?val("STRING",
+		?get(dlg_ctrl_listbutton_kinect_color_map)),
+	RKCM== ?val("YesNoDefault",
+		?get(dlg_ctrl_togglebutton_reverse_kinect)),
+	IKCM== ?val("YesNoDefault",
+		?get(dlg_ctrl_checkbox_iterate_kinect)),
+	KCMI1== ?val("PaletteIterations",
+		?get(dlg_ctrl_editinteger_kinect_iterations)),
+	TCM== ?val("STRING",
+		?get(dlg_ctrl_listbutton_astrohn_color_map)),
+	RACM== ?val("YesNoDefault",
+		?get(dlg_ctrl_togglebutton_reverse_astrohn)),
+	IACM== ?val("YesNoDefault",
+		?get(dlg_ctrl_checkbox_iterate_astrohn)),
+	ACMI1== ?val("PaletteIterations",
+		?get(dlg_ctrl_editinteger_astrohn_iterations)),!,
+	KinectColorMapName== color_maps?string_to_color_map_name(KCM),
+	AstrohnColorMapName== color_maps?string_to_color_map_name(TCM),
+	switch_kinect_CM_iterations(IKCM,KCMI1,KCMI2),
+	switch_astrohn_CM_iterations(IACM,ACMI1,ACMI2),
+	kinect ? set_color_map({
+		name:KinectColorMapName,
+		size:2400,
+		reverse_scale:'no',
+		reverse_colors: RKCM,
+		palette_iterations: KCMI2,
+		reverse_minimal_value:'no',
+		reverse_maximal_value:'no'
+		}),
+	ColorMap2== {
+		name:AstrohnColorMapName,
+		size:2400,
+		reverse_scale:'no',
+		reverse_colors: RACM,
+		palette_iterations: ACMI2,
+		reverse_minimal_value:'no',
+		reverse_maximal_value:'no'
+		},
+	astrohn ? set_main_color_map(ColorMap2),
+	tev1 ? set_main_color_map(ColorMap2).
+update_displaying_mode.
+--
+update_color_substitution_mode:-
+	SM== ?val("STRING",
+		?get(dlg_ctrl_listbutton_color_substitution)),
+	C1T== ?val("STRING",
+		?get(dlg_ctrl_listbutton_first_substitution)),
+	C2T== ?val("STRING",
+		?get(dlg_ctrl_listbutton_second_substitution)),
+	C3T== ?val("STRING",
+		?get(dlg_ctrl_listbutton_third_substitution)),!,
+	ColorChannel1== color_maps?string_to_color_channel(C1T),
+	ColorChannel2== color_maps?string_to_color_channel(C2T),
+	ColorChannel3== color_maps?string_to_color_channel(C3T),
+	switch_color_substitution_channels(SM),
+	form_color_substitution_mode(
+		SM,
+		ColorChannel1,
+		ColorChannel2,
+		ColorChannel3,
+		Mode),
+	kinect ? set_color_substitution_mode(Mode).
+update_color_substitution_mode.
+--
+switch_color_substitution_channels("RGB"):-!,
+	put(dlg_ctrl_statictext_first_channel,"Red:"),
+	put(dlg_ctrl_statictext_second_channel,"Green:"),
+	put(dlg_ctrl_statictext_third_channel,"Blue:").
+switch_color_substitution_channels(_):-
+	put(dlg_ctrl_statictext_first_channel,"Hue:"),
+	put(dlg_ctrl_statictext_second_channel,"Saturation:"),
+	put(dlg_ctrl_statictext_third_channel,"Brightness:").
+--
+form_color_substitution_mode("RGB",C1,C2,C3,Mode):-!,
+	Mode == {red:C1,green:C2,blue:C3}.
+form_color_substitution_mode(_,C1,C2,C3,Mode):-
+	Mode == {hue:C1,saturation:C2,brightness:C3}.
+--
+update_skeleton_mode:-
+	SSM== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_show_skeletons)),!,
+	show_skeletons ? assign(SSM).
+update_skeleton_mode.
+--
+switch_kinect_CM_iterations('yes',KCMI,KCMI):-!,
+	enable(dlg_ctrl_editinteger_kinect_iterations).
+switch_kinect_CM_iterations(_,_,'default'):-
+	disable(dlg_ctrl_editinteger_kinect_iterations).
+--
+switch_astrohn_CM_iterations('yes',KCMI,KCMI):-!,
+	enable(dlg_ctrl_editinteger_astrohn_iterations).
+switch_astrohn_CM_iterations(_,_,'default'):-
+	disable(dlg_ctrl_editinteger_astrohn_iterations).
+-----------------------------------------------------------------------
+switch_controls:-
+	switch_button_Choose,
+	switch_button_Play,
+	switch_button_Stop,
+	switch_button_Export,
+	switch_text_area_Description.
+--
+switch_button_Choose:-
+	buffer_is_exporting,!,
+	disable("Choose").
+switch_button_Choose:-
+	enable("Choose").
+--
+switch_button_Play:-
+	buffer_is_exporting,!,
+	disable(dlg_ctrl_togglebutton_play),
+	set_control_text_color(dlg_ctrl_togglebutton_play,'default').
+switch_button_Play:-
+	buffer ? does_exist,!,
+	enable(dlg_ctrl_togglebutton_play),
+	set_control_text_color(dlg_ctrl_togglebutton_play,'default').
+switch_button_Play:-
+	disable(dlg_ctrl_togglebutton_play),
+	set_control_text_color(dlg_ctrl_togglebutton_play,'default'),
+	put(dlg_ctrl_togglebutton_play,'no').
+--
+switch_button_Stop:-
+	buffer ? is_open,!,
+	enable("Stop"),
+	set_control_text_color("Stop",'default').
+switch_button_Stop:-
+	disable("Stop"),
+	set_control_text_color("Stop",'default').
+--
+switch_button_Export:-
+	buffer ? is_open,!,
+	disable(dlg_ctrl_togglebutton_export),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_export,'default').
+switch_button_Export:-
+	buffer ? does_exist,!,
+	enable(dlg_ctrl_togglebutton_export),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_export,'default').
+switch_button_Export:-
+	disable(dlg_ctrl_togglebutton_export),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_export,'default').
+--
+switch_text_area_Description:-
+	buffer ? get_delivered_description(Description),
+	buffer ? get_delivered_copyright(Copyright),
+	buffer ? get_delivered_registration_date(Date),
+	buffer ? get_delivered_registration_time(Time),
+	put(dlg_ctrl_edittext_description,Description),
+	put(dlg_ctrl_edittext_copyright,Copyright),
+	put(dlg_ctrl_edittext_registration_date,Date),
+	put(dlg_ctrl_edittext_registration_time,Time).
+-----------------------------------------------------------------------
+playing_is_suspended:-
+	buffer ? is_suspended.
+--
+buffer_is_exporting:-
+	buffer ? is_open.
+--
+is_ON(DialogFieldName):-
+	Value== ?val("YesNo",?get(DialogFieldName)),
+	Value == 'yes'.
+--
+create_new_file_name() = FileName :-
+	timer_operations ? date(Year,Month,Day),
+	timer_operations ? time(Hour,Minute,Second),
+	FileName== text_operations?format(
+		"%04d-%02d-%02d-%02d-%02d-%02d",
+		Year,Month,Day,
+		Hour,Minute,Second).
+]
+-----------------------------------------------------------------------
+class 'MultimediaControl' (specialized 'MultimediaBuffer'):
+--
+constant:
+--
+	operating_mode		= 'READING';
+--
+internal:
+--
+	viewer;
+--
+	stop_after_the_first_frame	= ('Switch');
+	file_operation_error_handler	= ('FileOperationErrorHandler',
+						world=self);
+	file_operations			= ('File');
+	text_operations			= ('Text');
+	con				= ('Console');
+--
+constant:
+--
+	read_buffer_size		= 30;
+	slow_motion_coefficient		= -1;
+--
+[
+goal:-!,
+	viewer ? set_read_buffer_size(read_buffer_size).
+--
+frame_obtained:-
+	commit,!,
+	Mode== ?get_operating_mode(),
+	get_recent_frame_number(FrameNumber),
+	viewer ? display_components(Mode,FrameNumber),
+	control_export(Mode).
+--
+data_transfer_completion:-!,
+	viewer ? complete_data_transfer.
+--
+data_transfer_error(ErrorName):-!,
+	viewer ? complete_data_transfer,
+	con ? error("Data Transfer Error",ErrorName).
+--
+buffer_overflow:-!,
+	con ? set_color('White','Red'),
+	con ? writeln("Buffer overflow!"),
+	con ? set_color('default').
+--
+buffer_deallocation:-!,
+	con ? set_color('White','DkGreen'),
+	con ? writeln("Buffer restored."),
+	con ? set_color('default').
+-----------------------------------------------------------------------
+check_file_name:-
+	does_exist,!.
+check_file_name:-
+	FileName== ?get_name(),
+	con ? error(
+		"Illegal File name",
+		text_operations?format(
+			"The '%s' file does not exist.",FileName)),
+	fail.
+--
+rename_temporary_file(TargetFileName):-
+	file_operation_error_handler ? delete(TargetFileName),
+	file_operation_error_handler ? rename(TargetFileName).
+--
+list_directory(Mask) = file_operations?list_directory(Mask).
+--
+make_directory(DirectoryName):-
+	file_operations ? make_directory(DirectoryName).
+-----------------------------------------------------------------------
+read_all_frames:-
+	stop_after_the_first_frame ? assign('no').
+--
+read_only_the_first_frame:-
+	stop_after_the_first_frame ? assign('yes').
+--
+control_export('READING'):-
+	has_component("SETTINGS"),!,
+	continue_reading_if_necessary.
+control_export('READING'):-
+	stop_after_the_first_frame ? is_true,!,
+	stop,
+	viewer ? switch_controls.
+control_export('READING'):-!,
+	continue_reading_if_necessary.
+control_export(_).
+--
+continue_reading_if_necessary:-
+	eof,!.
+continue_reading_if_necessary:-
+	start,
+	viewer ? switch_controls.
+]
+-----------------------------------------------------------------------
+class 'KinectCameraControl' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	name;
+--
+	operating_mode		= 'LISTENING';
+	read_buffer_size	= 25;
+--
+	target_frame_type	= 'POINT_CLOUDS';
+	target_people_index	= 'ADAPTIVELY_EXTRACT_PEOPLE';
+--
+	circumscription_mode = [
+			'TOTAL_RECTANGLES',
+			'SKELETON_RECTANGLES',
+			'TOTAL_PARALLELEPIPEDS',
+			'SKELETON_PARALLELEPIPEDS'
+			-- 'NONE'
+			];
+--
+	skeletons_mode		= 'DETECT_SKELETONS';
+--
+	displaying_mode	= {
+		frame_type:target_frame_type,
+		people_index:target_people_index,
+		circumscription:circumscription_mode,
+		skeletons:skeletons_mode};
+--
+	color_map		= 'OPTICAL';
+	people_colors		= ['Green'];
+	scene_surface_type	= 'CONCAVE'; -- 'CONVEX'
+--
+	main_label		= "Skeletons";
+	cylinder_radius		= 0.02;
+	joint_radius		= 0.03;
+	head_radius		= 0.05;
+	limb_transparency	= 0.1;
+	up_vector		= p(0,1,0);
+--
+internal:
+--
+	operating_window;
+	graphics_window;
+	viewer;
+	astrohn;
+	tev1;
+	webcam;
+	show_skeletons;
+--
+	buffer			= ('BufferedScene');
+	texture			= ('BufferedImage');
+	con			= ('Console');
+--
+[
+goal:-!,
+	viewer ? maximize,
+	create_list_of_nodes(VisualScene),
+	operating_window ? show(VisualScene).
+--
+display_frame("Terahertz Camera",EFN) = FrameTime :-
+	is_committed,
+	astrohn ? is_committed,
+	get_recent_frame_time(FrameTime),
+	-- astrohn ? get_recent_combined_image(texture),
+	astrohn ? get_recent_bordered_image(texture),
+	get_recent_scene(buffer,texture),
+	redraw_scene(Yaw),
+	get_depth_image_size_in_pixels(IW,IH),
+	graphics_window ? refine_width(IW/IH),
+	viewer ? export_image(EFN,Yaw).
+display_frame("Thermal Camera",EFN) = FrameTime :-
+	is_committed,
+	tev1 ? is_committed,
+	get_recent_frame_time(FrameTime),
+	tev1 ? get_recent_image(texture),
+	get_recent_scene(buffer,texture),
+	redraw_scene(Yaw),
+	get_depth_image_size_in_pixels(IW,IH),
+	graphics_window ? refine_width(IW/IH),
+	viewer ? export_image(EFN,Yaw).
+display_frame("Webcam",EFN) = FrameTime :-
+	is_committed,
+	webcam ? is_committed,
+	get_recent_frame_time(FrameTime),
+	webcam ? get_recent_image(texture),
+	get_recent_scene(buffer,texture),
+	redraw_scene(Yaw),
+	get_depth_image_size_in_pixels(IW,IH),
+	graphics_window ? refine_width(IW/IH),
+	viewer ? export_image(EFN,Yaw).
+display_frame("None",EFN) = FrameTime :-
+	is_committed,
+	get_recent_frame_time(FrameTime),
+	get_recent_scene(buffer),
+	redraw_scene(Yaw),
+	get_depth_image_size_in_pixels(IW,IH),
+	graphics_window ? refine_width(IW/IH),
+	viewer ? export_image(EFN,Yaw).
+-----------------------------------------------------------------------
+redraw_scene(Yaw):-
+	get_skeletons(Skeletons),
+	redraw_scene_with_sceletons(Skeletons,Yaw).
+--
+redraw_scene_with_sceletons([Skeleton1|_],Yaw3):-
+	--
+	compute_mid_attributes(Skeleton1,T1,R1),
+	T1 == [Dx,Dy,Dz],
+	R1 == [Rx,Ry,Rz,Ra],
+	--
+	T2== [-(Dx),Dy,-(Dz)],
+	--
+	R2== [Rx,Ry,Rz,?pi()-Ra],
+	Q2== ?create_quaternion(R2),
+	--
+	AxisAndAngle== ?axis_and_angle(Q2),
+	--
+	R3== [Rx,Ry,Rz,Ra-?pi()],
+	Q3== ?create_quaternion(R3),
+	Qi3== ?invert_quaternion(Q3),
+	project_skeleton(Skeleton1,Skeleton3,Q3,Qi3,p(Dx,Dy,Dz)),
+	compute_yaw(Skeleton3,Yaw3),
+	-- Yaw3== -(?pi()/2),
+	compute_height(Skeleton3,Height3,Center3,Z0),
+	--
+	SFigure== ?form_skeleton_figure(Skeleton1),
+	redraw_scene_with_sceleton(
+		SFigure,T2,AxisAndAngle,
+		Yaw3,Height3,Center3,Z0).
+--
+redraw_scene_with_sceleton(
+		SFigure,T2,
+		AxisAndAngle,_/*Yaw3*/,
+		Height3,Center3,Z0):-
+	--
+	-- Background== ?form_background('White'),
+	Background== ?form_background('Black'),
+	Figure1== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: T2
+			}),
+		branches: [?cast("Node",buffer),Background|SFigure]
+		}),
+	Figure2== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			rotation: AxisAndAngle
+			}),
+		branches: [Figure1]
+		}),
+	Figure3== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			-- rotY: -(?pi()/2)-Yaw3
+			}),
+		branches: [Figure2]
+		}),
+	Figure4== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			-- rotX: ?pi()/2,
+			translation: [0,-(Center3),-(Z0)]
+			}),
+		branches: [Figure3]
+		}),
+	Figure5== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			scale: 1/Height3
+			}),
+		branches: [Figure4]
+		}),
+	operating_window ? set_node(
+		main_label,
+		'BranchGroup'({
+			label: main_label,
+			allowDetach: 'yes',
+			compile: 'yes',
+			branches: [Figure5]
+		})).
+--
+form_background(Color) = Node :-
+	Bounds== 'BoundingSphere'({radius:10.0}),
+	Node== 'Background'({color:Color,applicationBounds:Bounds}).
+-----------------------------------------------------------------------
+create_list_of_nodes(Nodes):-
+	Bounds== 'BoundingSphere'({radius:10.0}),
+	create_main_group(MainGroup),
+	Nodes == [
+		MainGroup,
+		'OrbitBehavior'({
+			-- rotationCenter: p(0.0,0.0,2.5),
+			rotationCenter: p(0.0,0.0,0.0),
+			reverseAll: 'yes',
+			stopZoom: 'yes',
+			minRadius: 0.0,
+			schedulingBounds: Bounds
+			})
+		].
+--
+create_main_group(MainGroup):-
+	ActiveGroup== 'BranchGroup'({
+		label: main_label,
+		allowDetach: 'yes',
+		compile: 'yes',
+		branches: []
+		}),
+	create_light_nodes(LightNodes),
+	MainGroup== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			-- translation: [0,0,2.5]
+			scale: 2.0
+			}),
+		allowChildrenRead: 'yes',
+		allowChildrenWrite: 'yes',
+		branches: [ActiveGroup|LightNodes]
+		}).
+--
+create_light_nodes(Nodes):-
+	Bounds== 'BoundingSphere'({radius:50.0}),
+	Attenuation== a(2,1,0),
+	-- Attenuation== a(3,2,0),
+	R== 3,
+	Nodes == [
+		'AmbientLight'({
+			lightOn: 'yes',
+			color: 'Emerald',
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			-- color: 'Orange',
+			color: 'Green',
+			position: p(-(R),R,R),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(-(R),-(R),-(R)),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			-- color: 'Green',
+			color: 'Orange',
+			position: p(-(R),-(R),R),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			-- color: 'Orange',
+			color: 'Green',
+			position: p(R,R,-(R)),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			-- color: 'Orange',
+			color: 'Green',
+			position: p(R,R,R),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			-- color: 'Green',
+			color: 'Orange',
+			position: p(R,-(R),-(R)),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			}),
+		'PointLight'({
+			color: 'Green',
+			position: p(R,-(R),R),
+			attenuation: Attenuation,
+			influencingBounds: Bounds
+			})
+		].
+-----------------------------------------------------------------------
+project_skeleton(S1,S2,Q1,Q2,T):-
+	S1 == {	spine:Spine1,
+		left_arm:LeftArm1,
+		right_arm:RightArm1,
+		left_leg:LeftLeg1,
+		right_leg:RightLeg1
+		|_},
+	project_spine(Spine1,Spine2,Q1,Q2,T),
+	project_arm(LeftArm1,LeftArm2,Q1,Q2,T),
+	project_arm(RightArm1,RightArm2,Q1,Q2,T),
+	project_leg(LeftLeg1,LeftLeg2,Q1,Q2,T),
+	project_leg(RightLeg1,RightLeg2,Q1,Q2,T),
+	S2== {	spine:Spine2,
+		left_arm:LeftArm2,
+		right_arm:RightArm2,
+		left_leg:LeftLeg2,
+		right_leg:RightLeg2},!.
+--
+project_spine(Spine1,Spine2,Q1,Q2,T):-
+	Spine1 == {	shoulder:Shoulder1,
+			mid:Mid1,
+			base:Base1
+			|_},!,
+	project_joint(Shoulder1,Shoulder2,Q1,Q2,T),
+	project_joint(Mid1,Mid2,Q1,Q2,T),
+	project_joint(Base1,Base2,Q1,Q2,T),
+	Spine2== {	shoulder:Shoulder2,
+			mid:Mid2,
+			base:Base2}.
+--
+project_arm(A1,A2,Q1,Q2,T):-
+	A1 == {shoulder:Shoulder1|_},!,
+	project_joint(Shoulder1,Shoulder2,Q1,Q2,T),
+	A2== {shoulder:Shoulder2}.
+--
+project_leg(L1,L2,Q1,Q2,T):-
+	L1 == {knee:Knee1|_},!,
+	project_joint(Knee1,Knee2,Q1,Q2,T),
+	L2== {knee:Knee2}.
+--
+project_joint(J1,J2,Q1,Q2,T):-
+	J1 == {position:{point:p(X1,Y1,Z1)|_}|_},!,
+	T == p(Dx,Dy,Dz),
+	P1== q(X1+Dx,Y1+Dy,Z1+Dz,0),
+	QA== ?hamilton_product(Q1,P1),
+	QB== ?hamilton_product(QA,Q2),
+	QB == q(X2,Y2,Z2,_),
+	J2== {position:{point:p(X2,Y2,Z2)}}.
+-----------------------------------------------------------------------
+compute_mid_attributes(Skeleton,T,R):-
+	Skeleton == {spine:Spine|_},
+	Spine == {mid:Mid,base:Base|_},
+	Mid == {position:{point:p(J1X,J1Y,J1Z)|_}|_},
+	T== [-(J1X),-(J1Y),-(J1Z)],
+	Base == {position:{point:p(J2X,J2Y,J2Z)|_}|_},!,
+	LengthVector== p(J1X-J2X,J2Y-J1Y,J1Z-J2Z),
+	R== ?calc_rotation(LengthVector).
+-- compute_mid_attributes(_,_,_):-
+--	break('no_mid_attributes').
+--
+compute_yaw(Skeleton,Angle):-
+	Skeleton == {
+		left_arm: LeftArm,
+		right_arm: RightArm|_},
+	LeftArm == {shoulder: LeftArmShoulder|_},
+	RightArm == {shoulder: RightArmShoulder|_},
+	LeftArmShoulder ==
+		{position:{point:p(J1X,_,J1Z)|_}|_},
+	RightArmShoulder ==
+		{position:{point:p(J2X,_,J2Z)|_}|_},!,
+	Angle== ?arctan2(J1X-J2X,J1Z-J2Z).
+-- compute_yaw(_,0):-
+--	break('no_yaw_attributes').
+--
+compute_height(Skeleton,Height,Center,Z):-
+	Skeleton == {	spine:Spine,
+			left_leg:LeftLeg,
+			right_leg:RightLeg|_},
+	Spine == {shoulder:Shoulder,mid:Mid|_},
+	Shoulder == {position:{point:p(_,J1Y,_)|_}|_},
+	Mid == {position:{point:p(_,_,Z)|_}|_},
+	LeftLeg == {knee:LeftKnee|_},
+	RightLeg == {knee:RightKnee|_},
+	LeftKnee == {position:{point:p(_,J3Y,_)|_}|_},
+	RightKnee == {position:{point:p(_,J4Y,_)|_}|_},!,
+	KneeY== ?min(J3Y,J4Y),
+	Height== J1Y - KneeY,
+	Center== (J1Y + KneeY) / 2.
+-- compute_height(_,1,0,0):-
+--	break('no_height_attributes').
+-----------------------------------------------------------------------
+form_skeleton_figure(Skeleton1) = [SkeletonFigure] :-
+	show_skeletons ? is_true,
+	SkeletonFigure== ?form_skeleton(Skeleton1),!.
+form_skeleton_figure(_) = [].
+--
+form_skeleton(Skeleton) = Figure :-
+	Skeleton == {
+		head: Head,
+		spine: Spine,
+		left_arm: LeftArm,
+		right_arm: RightArm,
+		left_leg: LeftLeg,
+		right_leg: RightLeg
+		|_},!,
+	HeadSpine== ?form_spine(Head,Spine),
+	SpineLeftArm== ?form_arm(Spine,LeftArm),
+	SpineRightArm== ?form_arm(Spine,RightArm),
+	SpineLeftLeg== ?form_leg(Spine,LeftLeg),
+	SpineRightLeg== ?form_leg(Spine,RightLeg),
+	Figure== 'Group'({
+		branches: [
+			HeadSpine,
+			SpineLeftArm,
+			SpineRightArm,
+			SpineLeftLeg,
+			SpineRightLeg
+		]
+	}).
+--
+form_spine(Head,Spine) = Figure :-
+	Spine == {
+		neck: Neck,
+		shoulder: Shoulder,
+		mid: Mid,
+		base: Base
+		|_},!,
+	HeadNeck== ?form_link(Head,Neck),
+	NeckShoulder== ?form_link(Neck,Shoulder),
+	ShoulderMid== ?form_link(Shoulder,Mid),
+	MidBase== ?form_link(Mid,Base),
+	Joint1== ?form_head(Head),
+	Joint2== ?form_joint(Neck),
+	Joint3== ?form_joint(Shoulder),
+	Joint4== ?form_joint(Mid),
+	Joint5== ?form_joint(Base),
+	Figure== 'Group'({
+		branches: [
+			HeadNeck,
+			NeckShoulder,
+			ShoulderMid,
+			MidBase,
+			Joint1,
+			Joint2,
+			Joint3,
+			Joint4,
+			Joint5
+		]
+	}).
+--
+form_arm(Spine,Arm) = Figure:-
+	Spine == {
+		shoulder: SpineShoulder
+		|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	SpineShoulderArmShoulder== ?form_link(SpineShoulder,ArmShoulder),
+	ArmShoulderElbow== ?form_link(ArmShoulder,Elbow),
+	ElbowWrist== ?form_link(Elbow,Wrist),
+	WristHand== ?form_link(Wrist,Hand),
+	WristHandRest== ?form_hand(Wrist,Hand,Rest),
+	Joint1== ?form_joint(ArmShoulder),
+	Joint2== ?form_joint(Elbow),
+	Joint3== ?form_joint(Wrist),
+	Figure== 'Group'({
+		branches: [
+			SpineShoulderArmShoulder,
+			ArmShoulderElbow,
+			ElbowWrist,
+			WristHand,
+			WristHandRest,
+			Joint1,
+			Joint2,
+			Joint3
+		]
+	}).
+form_arm(Spine,Arm) = Figure :-
+	Spine == {
+		neck: Neck
+		|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	NeckArmShoulder== ?form_link(Neck,ArmShoulder),
+	ArmShoulderElbow== ?form_link(ArmShoulder,Elbow),
+	ElbowWrist== ?form_link(Elbow,Wrist),
+	WristHand== ?form_link(Wrist,Hand),
+	Joint1== ?form_joint(ArmShoulder),
+	Joint2== ?form_joint(Elbow),
+	Joint3== ?form_joint(Wrist),
+	WristHandRest== ?form_hand(Wrist,Hand,Rest),
+	Figure== 'Group'({
+		branches: [
+			NeckArmShoulder,
+			ArmShoulderElbow,
+			ElbowWrist,
+			WristHand,
+			WristHandRest,
+			Joint1,
+			Joint2,
+			Joint3
+		]
+	}).
+--
+form_hand(Wrist,Hand,Rest) = Figure :-
+	Rest == {
+		tip: Tip,
+		thumb: Thumb
+		|_},!,
+	WristThum== ?form_link(Wrist,Thumb),
+	HandTip== ?form_link(Hand,Tip),
+	Figure== 'Group'({
+		branches: [
+			WristThum,
+			HandTip
+		]
+	}).
+--
+form_leg(Spine,Leg) = Figure :-
+	Spine == {
+		base: Base
+		|_},
+	Leg == {
+		hip: Hip,
+		knee: Knee,
+		ankle: Ankle,
+		foot: Foot
+		|_},!,
+	BaseHip== ?form_link(Base,Hip),
+	HipKnee== ?form_link(Hip,Knee),
+	KneeAnkle== ?form_link(Knee,Ankle),
+	AnkleFoot== ?form_link(Ankle,Foot),
+	Joint1== ?form_joint(Hip),
+	Joint2== ?form_joint(Knee),
+	Joint3== ?form_joint(Ankle),
+	Figure== 'Group'({
+		branches: [
+			BaseHip,
+			HipKnee,
+			KneeAnkle,
+			AnkleFoot,
+			Joint1,
+			Joint2,
+			Joint3
+		]
+	}).
+--
+form_link(Joint1,Joint2) = Figure :-
+	Joint1 == {
+		position:{point:p(J1X,J1Y,J1Z)|_}|_},
+	Joint2 == {
+		position:{point:p(J2X,J2Y,J2Z)|_}|_},!,
+	LengthVector== p(J1X-J2X,J2Y-J1Y,J1Z-J2Z),
+	Length== ?length(LengthVector),
+	Cylinder== 'Cylinder'({
+		radius: cylinder_radius,
+		height: Length,
+		generateNormals: 'yes',
+		xdivisions: 100,
+		ydivisions: 1,
+		appearance: 'Appearance'({
+			material: 'Material'({shininess:32})
+			})
+		}),
+	BaseTG== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [0,Length/2,0]
+			}),
+		branches: [
+			Cylinder
+			]
+		}),
+	AxisAngle== ?calc_rotation(LengthVector),
+	Figure== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [-(J1X),J1Y,-(J1Z)],
+			rotation: AxisAngle
+			}),
+		branches: [
+			BaseTG
+			]
+		}).
+--
+form_joint(Joint) = Figure :-
+	Joint == {
+		status:Status,
+		position:{point:p(X,Y,Z)|_}|_},!,
+	select_joint_color(Status,MaterialAttributes),
+	Figure== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [-(X),Y,-(Z)]
+			}),
+		branches: [
+			'Sphere'({
+				radius: joint_radius,
+				generateNormals: 'yes',
+				divisions: 100,
+				appearance: 'Appearance'({
+					material: 'Material'(MaterialAttributes)
+					})
+				})
+			]
+		}).
+--
+form_head(Joint) = Figure :-
+	Joint == {
+		status:Status,
+		position:{point:p(X,Y,Z)|_}|_},!,
+	select_joint_color(Status,MaterialAttributes),
+	Figure== 'TransformGroup'({
+		transform3D: 'Transform3D'({
+			translation: [-(X),Y,-(Z)]
+			}),
+		branches: [
+			'Sphere'({
+				radius: head_radius,
+				generateNormals: 'yes',
+				divisions: 300,
+				appearance: 'Appearance'({
+					material: 'Material'(MaterialAttributes)
+					})
+				})
+			]
+		}).
+--
+select_joint_color('INFERRED',Attributes):-!,
+	Color == 'Blue',
+	Attributes== {
+		ambientColor: Color,
+		emissiveColor: Color
+		}.
+select_joint_color(_,{shininess:32}).
+-----------------------------------------------------------------------
+calc_rotation(LengthVector) = Vector2 :-
+	NormalizedVector== ?normalize_vector(LengthVector),
+	AxisVector== ?cross(up_vector,NormalizedVector),
+	AxisVector == p(X,Y,Z),!,
+	AxisAngle== ?angle(up_vector,LengthVector),
+	Vector1== [X,Y,Z,AxisAngle],
+	Vector2== ?normalize_rotation(Vector1).
+calc_rotation(_) = [].
+--
+normalize_vector(Vector) = ?scale(Vector,Norm) :-!,
+	Norm== 1.0 / ?length(Vector).
+-- normalize_vector(_) = _ :-
+--	break('cannot_normalize_vector').
+--
+cross(p(X1,Y1,Z1),p(X2,Y2,Z2)) = p(X3,Y3,Z3) :-!,
+	X3== Y1*Z2 - Z1*Y2,
+	Y3== X2*Z1 - Z2*X1,
+	Z3== X1*Y2 - Y1*X2.
+-- cross(_,_) = _ :-
+--	break('CannotCross').
+--
+angle(V1,V2) = V3 :-
+	VDot== ?dot(V1,V2) / (?length(V1)*?length(V2)),
+	V3== ?angle(VDot).
+--
+angle(VDot) = Angle :-
+	VDot < -1.0,!,
+	Angle== ?arccos(-1.0).
+angle(VDot) = Angle :-
+	VDot > 1.0,!,
+	Angle== ?arccos(1.0).
+angle(VDot) = Angle :-
+	Angle== ?arccos(VDot).
+--
+dot(p(X1,Y1,Z1),p(X2,Y2,Z2)) = X1*X2 + Y1*Y2 + Z1*Z2.
+--
+scale(p(X,Y,Z),N) = p(X*N,Y*N,Z*N).
+--
+length(p(X,Y,Z)) = Length :-!,
+	Length== ?sqrt(?power(X,2)+?power(Y,2)+?power(Z,2)).
+length(_) = 0.
+-----------------------------------------------------------------------
+create_quaternion(Vector1) = Q :-
+	Vector2== ?normalize_rotation(Vector1),
+	Vector2 == [AxisX,AxisY,AxisZ,Angle],!,
+	SinA== ?sin(Angle/2),
+	CosA== ?cos(Angle/2),
+	X== AxisX * SinA,
+	Y== AxisY * SinA,
+	Z== AxisZ * SinA,
+	W== CosA,
+	Q== ?normalize_quaternion(q(X,Y,Z,W)).
+create_quaternion(_) = _ :-
+	break('is_not_an_axis_and_angle_vector').
+--
+normalize_rotation([X1,Y1,Z1,A]) = [X2,Y2,Z2,A] :-
+	Norm== X1*X1 + Y1*Y1 + Z1*Z1,
+	Norm > 0.0,!,
+	Coefficient== 1/?sqrt(Norm),
+	X2== Coefficient * X1,
+	Y2== Coefficient * Y1,
+	Z2== Coefficient * Z1.
+normalize_rotation(Vector) = Vector.
+--
+normalize_quaternion(q(X1,Y1,Z1,W1)) = q(X2,Y2,Z2,W2) :-
+	Norm== X1*X1 + Y1*Y1 + Z1*Z1 + W1*W1,
+	Norm > 0.0,!,
+	Coefficient== 1/?sqrt(Norm),
+	X2== Coefficient * X1,
+	Y2== Coefficient * Y1,
+	Z2== Coefficient * Z1,
+	W2== Coefficient * W1.
+normalize_quaternion(_) = q(0,0,0,0).
+--
+invert_quaternion(q(X1,Y1,Z1,W1)) = q(X2,Y2,Z2,W2) :-
+	Norm== X1*X1 + Y1*Y1 + Z1*Z1 + W1*W1,
+	X2== -(X1) / Norm,
+	Y2== -(Y1) / Norm,
+	Z2== -(Z1) / Norm,
+	W2== W1 / Norm.
+--
+hamilton_product(q(X1,Y1,Z1,W1),q(X2,Y2,Z2,W2)) = Q3 :-
+	W3== W1*W2 - X1*X2 - Y1*Y2 - Z1*Z2,
+	X3== W1*X2 + X1*W2 + Y1*Z2 - Z1*Y2,
+	Y3== W1*Y2 - X1*Z2 + Y1*W2 + Z1*X2,
+	Z3== W1*Z2 + X1*Y2 - Y1*X2 + Z1*W2,
+	Q3== q(X3,Y3,Z3,W3).
+--
+axis_and_angle(Quaternion1) = AxisAndAngle :-
+	Quaternion2== ?normalize_quaternion(Quaternion1),
+	Quaternion2== q(X,Y,Z,W),
+	CosA== W,
+	Angle== ?arccos(CosA) * 2,
+	SinA== ?sqrt(1.0 - CosA * CosA),
+	AxisAndAngle== ?select_axis_and_angle(X,Y,Z,Angle,SinA).
+--
+select_axis_and_angle(X,Y,Z,Angle,SinA) = [AxisX,AxisY,AxisZ,Angle] :-
+	?abs(SinA) >= 0.0001,!,
+	AxisX== X / SinA,
+	AxisY== Y / SinA,
+	AxisZ== Z / SinA.
+select_axis_and_angle(X,Y,Z,Angle,_) = [X,Y,Z,Angle].
+]
+-----------------------------------------------------------------------
+class 'DirectoryName' (specialized 'Database'):
+--
+internal:
+--
+	file_operation_error_handler	= ('FileOperationErrorHandler',
+						world=self);
+	file_operations			= ('File');
+	text_operations			= ('Text');
+--
+[
+remember_name(Directory):-
+	retract_all,
+	insert(Directory).
+--
+create_directory_if_necessary(Directory):-
+	file_operation_error_handler ? does_exist(Directory),
+	fail.
+create_directory_if_necessary(Directory):-
+	file_operation_error_handler ? make_directory(Directory),!.
+--
+create_or_clear_directory(Directory):-
+	file_operation_error_handler ? does_exist(Directory),
+	Mask== text_operations?format("%s/*.png",Directory),
+	List== file_operation_error_handler?list_directory(Mask),
+	delete_files(List),
+	fail.
+create_or_clear_directory(Directory):-
+	file_operation_error_handler ? make_directory(Directory),!.
+--
+delete_files([FileName|Rest]):-
+	file_operation_error_handler ? delete(FileName),!,
+	delete_files(Rest).
+delete_files([_|Rest]):-!,
+	delete_files(Rest).
+delete_files(_).
+--
+list_directory(Mask) = file_operations?list_directory(Mask).
+--
+make_directory(DirectoryName):-
+	file_operations ? make_directory(DirectoryName).
+]
+-----------------------------------------------------------------------
+class 'Switch' (specialized 'Database'):
+[
+assign(Mode):-
+	retract_all,
+	insert(Mode).
+--
+is_true:-
+	find('yes'),!.
+--
+is_false:-
+	is_true,!,
+	fail.
+is_false.
+]
+-----------------------------------------------------------------------
+class 'TextStore' (specialized 'Database'):
+[
+set(Text):-
+	retract_all,
+	insert(Text).
+--
+get(Text):-
+	find(Text),!.
+]
+-----------------------------------------------------------------------
+class 'FileOperationErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler		= self;
+	--
+	con		= ('Console');
+--
+[
+alarm(ExceptionName,Operation,_*):-
+	Text== con?format(
+		"\n\nOperation: %s\n\nError: %s\n\n",
+		Operation,ExceptionName),
+	con ? error("I cannot implement file operation",Text).
+]
+-----------------------------------------------------------------------
+class 'BatchModeControl' (specialized 'Dialog'):
+--
+internal:
+--
+	viewer;
+--
+	directory_name			= ('TextStore');
+	file_operations			= ('File');
+	con				= ('Console');
+--
+constant:
+--
+	is_top_level_window			= 'yes';
+	exit_on_close				= 'no';
+	--
+	dlg_ctrl_listbox_files_list		= 1111;
+	dlg_ctrl_listbox_files_selection	= 1112;
+	dlg_ctrl_togglebutton_export		= 1120;
+--
+[
+action("Choose"):-
+	get_current_directory(Path1),
+	Path2== con?input_directory_name(
+		"Please select a directory",
+		Path1),!,
+	directory_name ? set(Path2),
+	file_operations ? set_current_directory(Path2),
+	List== file_operations?list_directory("*.ap2j"),
+	put(dlg_ctrl_listbox_files_list,List).
+action("Stop"):-!,
+	stop_exporting.
+action("Clear"):-!,
+	put(dlg_ctrl_listbox_files_list,[]).
+action("Close"):-!,
+	hide.
+--
+modified_control(dlg_ctrl_togglebutton_export):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_export)),!,
+	set_Export_mode(Mode),
+	switch_controls.
+--
+get_current_directory(Path):-
+	directory_name ? get(Path),!.
+get_current_directory("").
+--
+set_Export_mode('yes'):-
+	extract_current_file(FileName),!,
+	viewer ? choose_and_export_file(FileName).
+set_Export_mode('no'):-!,
+	viewer ? stop_data_reading_and_writing,
+	viewer ? switch_controls.
+set_Export_mode(_).
+--
+process_next_file:-
+	is_batch_export_mode,
+	extract_current_file(FileName),!,
+	viewer ? choose_and_export_file(FileName).
+process_next_file:-
+	stop_exporting.
+--
+extract_current_file(FileName):-
+	List1== ?val("S_List",?get(dlg_ctrl_listbox_files_list)),
+	List1 == [FileName|List2],!,
+	put(dlg_ctrl_listbox_files_list,List2).
+--
+stop_exporting:-
+	put(dlg_ctrl_togglebutton_export,'no'),
+	set_Export_mode('no'),
+	viewer ? stop_data_reading_and_writing,
+	viewer ? switch_controls,
+	switch_controls.
+--
+switch_controls:-
+	switch_button_Choose,
+	switch_button_Stop.
+--
+switch_button_Choose:-
+	viewer ? buffer_is_exporting,!,
+	disable("Choose").
+switch_button_Choose:-
+	enable("Choose").
+--
+switch_button_Stop:-
+	is_batch_export_mode,!,
+	enable("Stop"),
+	set_control_text_color("Stop",'default').
+switch_button_Stop:-
+	disable("Stop"),
+	set_control_text_color("Stop",'default').
+--
+is_batch_export_mode:-
+	?val("YesNo",?get(dlg_ctrl_togglebutton_export))=='yes'.
+]
+-----------------------------------------------------------------------

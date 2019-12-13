@@ -17,6 +17,7 @@ constant:
 	frame_type	: KinectFrameType;
 	people_index	: KinectPeopleIndexMode;
 	skeletons	: KinectSkeletonsMode;
+	color_map_name	: ColorMapName;
 --
 internal:
 --

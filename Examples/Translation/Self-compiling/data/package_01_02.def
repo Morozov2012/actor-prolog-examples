@@ -1,0 +1,5 @@
+package "package_01_02":
+
+interface 'MyClass_1_2' (specialized 'DemoConsole'):
+[
+]

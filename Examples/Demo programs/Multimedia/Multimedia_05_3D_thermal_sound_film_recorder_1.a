@@ -1,0 +1,1929 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+-- Please set the following network attributes:
+-- IP address: 192.168.11.1
+-- Mask: 225.225.225.0
+-- Default Gateway: 192.168.11.1
+-- Probably you should switch off the firewall.
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import 'MultimediaBuffer' from "morozov/VideoBuffer";
+import .. from "morozov/Kinect";
+import .. from "morozov/Astrohn";
+import .. from "morozov/TEV1";
+import .. from "morozov/Webcam";
+import .. from "morozov/ColorMap";
+import .. from "morozov/Sound";
+-----------------------------------------------------------------------
+project: (('VideoRecorder'))
+-----------------------------------------------------------------------
+class 'VideoRecorder' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer		= ('MultimediaControl',
+				name=temporary_file_name,
+				video_recorder=self);
+	--
+	kinect		= ('KinectCameraControl',
+				input_device=device(kinect_host,'auto'),
+				graphics_window=window_kinect,
+				video_recorder=self);
+	near_infrared	= ('KinectNearInfraredImageControl',
+				input_device=device(kinect_host,'auto'),
+				graphics_window=window_webcam,
+				video_recorder=self);
+	kinect_host	= ('Kinect',
+				skeleton_release_time=3);
+	astrohn		= ('AstrohnCameraControl',
+				graphics_window=window_astrohn,
+				video_recorder=self);
+	tev1		= ('ThermalCameraControl',
+				graphics_window=window_tev1,
+				video_recorder=self);
+	webcam		= ('WebcamControl',
+				graphics_window=window_webcam,
+				video_recorder=self);
+	microphone	= ('MicrophoneControl',
+				video_recorder=self);
+	timer		= ('WriteTimingControl',
+				video_recorder=self);
+	--
+	window_kinect	= ('Canvas2D',
+				background_color='SystemControl');
+	window_astrohn	= ('Canvas2D',
+				background_color='SystemControl');
+	window_tev1	= ('Canvas2D',
+				background_color='SystemControl');
+	window_webcam	= ('Canvas2D',
+				background_color='SystemControl');
+	--
+	buffered_image	= ('BufferedImage');
+	--
+	kinect_error_handler	= ('CameraErrorHandler',
+					world=kinect,
+					graphics_window=window_kinect);
+	ni_error_handler	= ('CameraErrorHandler',
+					world=near_infrared,
+					graphics_window=window_webcam);
+	astrohn_error_handler	= ('CameraErrorHandler',
+					world=astrohn,
+					graphics_window=window_astrohn);
+	tev1_error_handler	= ('CameraErrorHandler',
+					world=tev1,
+					graphics_window=window_tev1);
+	webcam_error_handler	= ('CameraErrorHandler',
+					world=webcam,
+					graphics_window=window_webcam);
+	--
+	automatic_recorder	= ('AutomaticRecorder',
+					video_recorder=self);
+	--
+	directory_name		= ('DirectoryName');
+	use_NI_but_not_webcam	= ('Switch');
+	data_are_to_be_saved	= ('Switch');
+	file_operations		= ('File');
+	timer_operations	= ('Timer');
+	text_operations		= ('Text');
+	color_maps		= ('ColorMap');
+	con			= ('Console');
+--
+constant:
+--
+	temporary_file_name	= "recorder.ap2j";
+	--
+	is_top_level_window	= 'yes';
+	closing_confirmation	= 'on';
+	--
+	export_encoding_attributes = {
+		format:'default',
+		compressionQuality:0.95,
+		progressiveMode:'on',
+		interlacing:'on',
+		comment:"The Actor Prolog project"
+		};
+	--
+	base_time_shift				= -850; /* -350; */
+	kinect_time_shift			= 0;
+	astrohn_time_shift			= 297;
+	tev1_time_shift				= 138;
+	webcam_time_shift			= 73;
+	--
+	dlg_ctrl_edittext_description		= 1011;
+	dlg_ctrl_edittext_copyright		= 1012;
+	dlg_ctrl_edittext_registration_date	= 1013;
+	dlg_ctrl_edittext_registration_time	= 1014;
+	--
+	dlg_ctrl_edittext_timer_frame_rate	= 1021;
+	dlg_ctrl_listbutton_write_timing	= 1022;
+	dlg_ctrl_edittext_recording_time	= 1023;
+	dlg_ctrl_edittext_recorded_frames	= 1024;
+	--
+	dlg_ctrl_edittext_start_recording_after	= 1025;
+	dlg_ctrl_edittext_maximal_record_length	= 1026;
+	--
+	dlg_ctrl_togglebutton_microphone	= 1027;
+	--
+	dlg_ctrl_checkbox_select_kinect		= 2011;
+	dlg_ctrl_listbutton_kinect_mode		= 2012;
+	dlg_ctrl_listbutton_people_index_mode	= 2013;
+	dlg_ctrl_edittext_kinect_dx		= 4011;
+	dlg_ctrl_edittext_kinect_dy		= 4012;
+	--
+	dlg_ctrl_checkbox_select_astrohn	= 3011;
+	dlg_ctrl_listbutton_astrohn_mode	= 3012;
+	dlg_ctrl_listbutton_astrohn_color_map	= 5011;
+	dlg_ctrl_togglebutton_astrohn_zoom	= 5012;
+	--
+	dlg_ctrl_checkbox_select_tev1		= 6011;
+	dlg_ctrl_listbutton_tev1_color_map	= 6012;
+	dlg_ctrl_togglebutton_tev1_zoom		= 6013;
+	--
+	dlg_ctrl_checkbox_select_webcam		= 7011;
+	dlg_ctrl_togglebutton_webcam_zoom	= 7012;
+	dlg_ctrl_listbutton_webcam_or_NI	= 7013;
+	--
+	dlg_ctrl_scrollbar_frame_number_range	= 8011;
+	dlg_ctrl_scrollbar_frame_number_value	= 8012;
+	--
+	dlg_ctrl_togglebutton_connect		= 9011;
+	dlg_ctrl_togglebutton_play		= 9013;
+	dlg_ctrl_togglebutton_record		= 9015;
+	dlg_ctrl_togglebutton_export		= 9018;
+--
+[
+goal:-!,
+	maximize,
+	-- show,
+	window_kinect ? set_brush('Cyan'),
+	window_kinect ? draw_rectangle(0,0,1,1),
+	window_astrohn ? set_brush('Magenta'),
+	window_astrohn ? draw_rectangle(0,0,1,1),
+	window_tev1 ? set_brush('Green'),
+	window_tev1 ? draw_rectangle(0,0,1,1),
+	window_webcam ? set_brush('Yellow'),
+	window_webcam ? draw_rectangle(0,0,1,1),
+	load_temporary_file_if_possible,
+	update_mode_and_switch_controls.
+-----------------------------------------------------------------------
+action("Choose"):-
+	FileName== con?input_file_name(
+		"Please select data file",
+		"*.ap2j",
+		[
+		"*.ap2j","Video data",
+		"*.*","All Files"
+		]),
+	buffer ? stop,!,
+	choose_and_play_file(FileName),
+	switch_Kinect_controls,
+	switch_controls.
+action("Pause"):-!,
+	buffer ? pause,
+	put(dlg_ctrl_togglebutton_play,'no'),
+	switch_controls.
+action("Stop"):-!,
+	stop_data_reading_and_writing,
+	switch_controls.
+action("Save"):-
+	buffer ? check_file_name,
+	TargetFileName== con?input_new_file_name(
+		"Please select a new file name",
+		"*.ap2j",
+		[
+		"*.ap2j","Multimedia data",
+		"*.*","All files"
+		]),
+	buffer ? rename_temporary_file(TargetFileName),!,
+	data_are_to_be_saved ? assign('no'),
+	choose_file(TargetFileName),
+	switch_controls.
+action("Photo"):-!,
+	FileName== ?create_new_file_name(),
+	take_photo(FileName).
+action("AutomaticRecording"):-
+	D1== ?cast("INTEGER",
+		?get(dlg_ctrl_edittext_start_recording_after)),
+	D2== ?cast("INTEGER",
+		?get(dlg_ctrl_edittext_maximal_record_length)),!,
+	activate_automatic_recording(D1,D2).
+action("CalibrateKinect"):-!,
+	kinect ? get_computed_correction(Dx,Dy),
+	kinect_host ? set_correction(Dx,Dy),
+	switch_controls.
+action("ResetKinectCalibration"):-!,
+	kinect_host ? set_correction('default','default'),
+	switch_controls.
+action("CalibrateThermalCamera"):-!,
+	tev1 ? calibrate,
+	switch_controls.
+action("Quit"):-
+	check_whether_data_are_not_saved,!,
+	hide.
+--
+modified_control(dlg_ctrl_togglebutton_connect):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_connect)),!,
+	set_Connect_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_play):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_play)),!,
+	set_Play_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_record):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_record)),!,
+	set_Record_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_togglebutton_export):-
+	Mode== ?val("YesNo",?get(dlg_ctrl_togglebutton_export)),!,
+	set_Export_mode(Mode),
+	switch_controls.
+modified_control(dlg_ctrl_scrollbar_frame_number_value):-!,
+	scroll_video.
+modified_control(dlg_ctrl_listbutton_webcam_or_NI):-!,
+	update_mode_and_switch_controls,
+	reactivate_webcam_or_NI.
+modified_control(dlg_ctrl_edittext_timer_frame_rate):-!,
+	update_write_timing_period.
+modified_control(dlg_ctrl_edittext_start_recording_after):-!.
+modified_control(dlg_ctrl_edittext_maximal_record_length):-!.
+modified_control(_):-!,
+	update_mode_and_switch_controls.
+--
+window_closing:-
+	check_whether_data_are_not_saved,!,
+	hide.
+window_closing:-!.
+--
+activate_automatic_recording(D1,D2):-
+	check_whether_data_are_to_be_saved,!,
+	data_are_to_be_saved ? assign('no'),
+	automatic_recorder ? open(D1,D2).
+activate_automatic_recording(_,_).
+--
+start_recording:-
+	put(dlg_ctrl_togglebutton_record,'yes'),
+	set_Record_mode('yes'),
+	switch_controls.
+--
+stop_recording:-
+	stop_data_reading_and_writing,
+	switch_controls.
+-----------------------------------------------------------------------
+set_Connect_mode('yes'):-!,
+	set_Connect_mode_ON.
+set_Connect_mode('no'):-
+	stop_all_devices,
+	buffer ? set_operating_mode('PLAYING').
+--
+set_Connect_mode_ON:-
+	stop_all_devices,
+	kinect ? set_operating_mode('LISTENING'),
+	near_infrared ? set_operating_mode('LISTENING'),
+	astrohn ? set_operating_mode('LISTENING'),
+	tev1 ? set_operating_mode('LISTENING'),
+	webcam ? set_operating_mode('LISTENING'),
+	fail.
+set_Connect_mode_ON:-
+	kinect_error_handler ? start,
+	fail.
+set_Connect_mode_ON:-
+	set_Webcam_Connect_mode_ON,
+	fail.
+set_Connect_mode_ON:-
+	astrohn_error_handler ? start,
+	fail.
+set_Connect_mode_ON:-
+	tev1_error_handler ? start,
+	fail.
+set_Connect_mode_ON:-
+	microphone ? start,
+	fail.
+set_Connect_mode_ON:-
+	timer ? activate,
+	fail.
+set_Connect_mode_ON.
+--
+set_Webcam_Connect_mode_ON:-
+	use_NI_but_not_webcam ? is_true,
+	ni_error_handler ? start,
+	fail.
+set_Webcam_Connect_mode_ON:-
+	use_NI_but_not_webcam ? is_false,
+	webcam_error_handler ? start,
+	fail.
+set_Webcam_Connect_mode_ON.
+--
+reactivate_webcam_or_NI:-
+	data_acquisition_is_active,!,
+	near_infrared ? stop,
+	webcam ? stop,
+	set_Webcam_Connect_mode_ON.
+reactivate_webcam_or_NI.
+--
+set_Play_mode('yes'):-
+	playing_is_suspended,!,
+	buffer ? start,
+	switch_controls.
+set_Play_mode('yes'):-
+	stop_all_devices,
+	buffer ? set_operating_mode('PLAYING'),
+	start_reading,
+	switch_controls.
+set_Play_mode('no'):-
+	stop_data_reading_and_writing.
+--
+set_Record_mode('yes'):-
+	data_acquisition_is_active,
+	check_whether_data_are_to_be_saved,!,
+	buffer ? set_name(temporary_file_name),
+	update_dialog_title(""),
+	buffer ? set_operating_mode('RECORDING'),
+	buffer ? stop,
+	reset_all_counters,
+	buffer ? start,
+	data_are_to_be_saved ? assign('yes'),
+	record_device_settings.
+set_Record_mode('no'):-
+	buffer_is_recording,!,
+	buffer ? stop.
+set_Record_mode(_).
+--
+set_Export_mode('yes'):-
+	buffer ? check_file_name,
+	FN1== buffer?get_name(),
+	file_operations ? extract_extension(FN1,FN2,_),
+	directory_name ? create_directory_if_necessary(FN2),!,
+	set_Export_mode_YES(FN2).
+set_Export_mode('no'):-!,
+	buffer ? stop.
+set_Export_mode(_).
+--
+set_Export_mode_YES(InitialName):-
+	Directory== con?input_directory_name(
+		"Please select output directory",
+		InitialName),
+	directory_name ? create_or_clear_directory(Directory),!,
+	directory_name ? remember_name(Directory),
+	stop_all_devices,
+	buffer ? set_operating_mode('READING'),
+	buffer ? read_all_frames,
+	stop_all_devices,
+	reset_all_counters,
+	buffer ? start,
+	switch_controls.
+set_Export_mode_YES(InitialName):-
+	file_operations ? delete(InitialName),
+	put(dlg_ctrl_togglebutton_export,'no'),
+	buffer ? stop,
+	switch_controls.
+-----------------------------------------------------------------------
+accept_sub_frames(Mode,TimeShift):-
+	Mode==?val("STRING",?get(dlg_ctrl_listbutton_write_timing)),!,
+	accept_sub_frames(TimeShift).
+accept_sub_frames(_,_).
+--
+accept_sub_frames(TimeShift):-
+	kinect ? display_frame(
+		'PLAYING',
+		time(TimeShift+base_time_shift+kinect_time_shift)),
+	buffer_is_recording,
+	is_ON(dlg_ctrl_checkbox_select_kinect),
+	buffer ? insert_data_frame("KINECT2",kinect),
+	fail.
+accept_sub_frames(TimeShift):-
+	accept_webcam_sub_frames(TimeShift),
+	fail.
+accept_sub_frames(TimeShift):-
+	astrohn ? display_frame(
+		'PLAYING',
+		time(TimeShift+base_time_shift+astrohn_time_shift)),
+	buffer_is_recording,
+	is_ON(dlg_ctrl_checkbox_select_astrohn),
+	buffer ? insert_data_frame("THZ",astrohn),
+	fail.
+accept_sub_frames(TimeShift):-
+	tev1 ? display_frame(
+		'PLAYING',
+		time(TimeShift+base_time_shift+tev1_time_shift)),
+	buffer_is_recording,
+	is_ON(dlg_ctrl_checkbox_select_tev1),
+	buffer ? insert_data_frame("TEV1",tev1),
+	fail.
+accept_sub_frames(_):-
+	buffer_is_recording,
+	buffer ? frame_is_formed,!,
+	buffer ? record_data_frame,
+	buffer ? get_recent_frame_relative_time(Milliseconds1),
+	buffer ? get_recent_frame_number(FrameNumber),
+	Seconds1== ?trunc(Milliseconds1/1000.0),
+	Minutes== ?trunc(Seconds1/60.0),
+	Seconds2== Seconds1-Minutes*60,
+	Milliseconds2== Milliseconds1-(Minutes*60+Seconds2)*1000,
+	Text== text_operations?format(
+		"%d : %02d . %03d",
+		Minutes,Seconds2,Milliseconds2),
+	put(dlg_ctrl_edittext_recording_time,Text),
+	put(dlg_ctrl_edittext_recorded_frames,FrameNumber).
+accept_sub_frames(_).
+--
+accept_webcam_sub_frames(TimeShift):-
+	use_NI_but_not_webcam ? is_true,
+	near_infrared ? display_frame(
+		'PLAYING',
+		time(TimeShift+base_time_shift+kinect_time_shift)),
+	buffer_is_recording,
+	is_ON(dlg_ctrl_checkbox_select_webcam),
+	buffer ? insert_data_frame("KINECT2-INFRARED",near_infrared),
+	fail.
+accept_webcam_sub_frames(TimeShift):-
+	use_NI_but_not_webcam ? is_false,
+	webcam ? display_frame(
+		'PLAYING',
+		time(TimeShift+base_time_shift+webcam_time_shift)),
+	buffer_is_recording,
+	is_ON(dlg_ctrl_checkbox_select_webcam),
+	buffer ? insert_data_frame("WEBCAM",webcam),
+	fail.
+accept_webcam_sub_frames(_).
+--
+accept_audio_data(TimeShift):-
+	microphone ? accept_audio_data(
+		'PLAYING',
+		time(TimeShift)),
+	buffer_is_recording,
+	is_ON(dlg_ctrl_togglebutton_microphone),
+	buffer ? insert_data_frame("SOUND",microphone),
+	fail.
+accept_audio_data(_):-
+	buffer_is_recording,
+	buffer ? frame_is_formed,!,
+	buffer ? record_data_frame.
+accept_audio_data(_).
+--
+display_components(OperatingMode,FrameNumber):-
+	buffer ? has_component("KINECT2"),
+	buffer ? retrieve_frame("KINECT2",kinect),
+	kinect ? display_frame(OperatingMode,number(FrameNumber)),
+	fail.
+display_components(OperatingMode,FrameNumber):-
+	display_webcam_components(OperatingMode,FrameNumber),
+	fail.
+display_components(OperatingMode,FrameNumber):-
+	buffer ? has_component("THZ"),
+	buffer ? retrieve_frame("THZ",astrohn),
+	astrohn ? display_frame(OperatingMode,number(FrameNumber)),
+	fail.
+display_components(OperatingMode,FrameNumber):-
+	buffer ? has_component("TEV1"),
+	buffer ? retrieve_frame("TEV1",tev1),
+	tev1 ? display_frame(OperatingMode,number(FrameNumber)),
+	fail.
+display_components(_/*OperatingMode*/,_/*FrameNumber*/):-
+	buffer ? has_component("SOUND"),
+	buffer ? retrieve_frame("SOUND",microphone),
+	microphone ? replay_audio_data,
+	fail.
+display_components(_,_):-
+	buffer ? is_control_frame,!,
+	buffer ? start,
+	switch_controls.
+display_components(_,_).
+--
+display_webcam_components(OperatingMode,FrameNumber):-
+	use_NI_but_not_webcam ? is_true,
+	buffer ? has_component("KINECT2-INFRARED"),
+	buffer ? retrieve_frame("KINECT2-INFRARED",near_infrared),
+	near_infrared ? display_frame(OperatingMode,number(FrameNumber)),
+	fail.
+display_webcam_components(OperatingMode,FrameNumber):-
+	use_NI_but_not_webcam ? is_false,
+	buffer ? has_component("WEBCAM"),
+	buffer ? retrieve_frame("WEBCAM",webcam),
+	webcam ? display_frame(OperatingMode,number(FrameNumber)),
+	fail.
+display_webcam_components(_,_).
+--
+complete_data_transfer:-
+	stop_data_reading_and_writing,
+	switch_controls.
+--
+record_device_settings:-
+	is_ON(dlg_ctrl_checkbox_select_kinect),
+	kinect ? commit,
+	buffer ? insert_settings_frame("KINECT2",kinect),
+	fail.
+record_device_settings:-
+	is_ON(dlg_ctrl_checkbox_select_webcam),
+	kinect ? commit,
+	buffer ? insert_settings_frame(
+		"KINECT2-INFRARED",near_infrared),
+	fail.
+record_device_settings:-
+	is_ON(dlg_ctrl_checkbox_select_astrohn),
+	astrohn ? commit,
+	buffer ? insert_settings_frame("THZ",astrohn),
+	fail.
+record_device_settings:-
+	is_ON(dlg_ctrl_checkbox_select_tev1),
+	tev1 ? commit,
+	buffer ? insert_settings_frame("TEV1",tev1),
+	fail.
+record_device_settings:-
+	is_ON(dlg_ctrl_checkbox_select_webcam),
+	webcam ? commit,
+	buffer ? insert_settings_frame("WEBCAM",webcam),
+	fail.
+record_device_settings:-
+	is_ON(dlg_ctrl_togglebutton_microphone),
+	microphone ? commit_audio_data,
+	buffer ? insert_settings_frame("SOUND",microphone),
+	fail.
+record_device_settings:-
+	buffer ? insert_term("base_time_shift",base_time_shift),
+	buffer ? insert_term("kinect_time_shift",kinect_time_shift),
+	buffer ? insert_term("astrohn_time_shift",astrohn_time_shift),
+	buffer ? insert_term("tev1_time_shift",tev1_time_shift),
+	buffer ? insert_term("webcam_time_shift",webcam_time_shift),
+	buffer ? insert_label("SETTINGS"),
+	fail.
+record_device_settings:-
+	buffer ? frame_is_formed,!,
+	buffer ? record_control_frame.
+record_device_settings.
+--
+export_frame_if_necessary('READING',name(ShortName),Suffix,Image):-
+	directory_name ? find(Directory),
+	FileName== text_operations?format(
+		"%s/%s%s.png",Directory,ShortName,Suffix),
+	Image ? save(FileName,export_encoding_attributes),!.
+export_frame_if_necessary('READING',number(FrameNumber),Suffix,Image):-
+	directory_name ? find(Directory),
+	FileName== text_operations?format(
+		"%s/%07d%s.png",Directory,FrameNumber,Suffix),
+	Image ? save(FileName,export_encoding_attributes),!.
+export_frame_if_necessary(_,_,_,_).
+--
+take_photo(_):-
+	directory_name ? remember_name(
+		directory_name?get_current_directory()),
+	fail.
+take_photo(FileName):-
+	kinect ? display_frame('READING',name(FileName)),
+	fail.
+take_photo(FileName):-
+	take_webcam_photo(FileName),
+	fail.
+take_photo(FileName):-
+	astrohn ? display_frame('READING',name(FileName)),
+	fail.
+take_photo(FileName):-
+	tev1 ? display_frame('READING',name(FileName)),
+	fail.
+take_photo(_).
+--
+take_webcam_photo(FileName):-
+	use_NI_but_not_webcam ? is_true,
+	near_infrared ? display_frame('READING',name(FileName)),
+	fail.
+take_webcam_photo(FileName):-
+	use_NI_but_not_webcam ? is_false,
+	webcam ? display_frame('READING',name(FileName)),
+	fail.
+take_webcam_photo(_).
+-----------------------------------------------------------------------
+stop_data_reading_and_writing:-
+	buffer ? stop,
+	put(dlg_ctrl_togglebutton_play,'no'),
+	put(dlg_ctrl_togglebutton_record,'no'),
+	put(dlg_ctrl_togglebutton_export,'no').
+--
+stop_all_devices:-
+	buffer ? stop,
+	-- kinect ? stop,
+	-- near_infrared ? stop,
+	kinect_host ? stop,
+	astrohn ? stop,
+	tev1 ? stop,
+	webcam ? stop,
+	microphone ? stop,
+	timer ? suspend.
+--
+reset_all_counters:-
+	buffer ? reset_all_counters,
+	kinect ? reset_all_counters,
+	near_infrared ? reset_all_counters,
+	astrohn ? reset_all_counters,
+	tev1 ? reset_all_counters,
+	webcam ? reset_all_counters.
+--
+load_temporary_file_if_possible:-
+	buffer ? does_exist,!,
+	buffer ? set_operating_mode('READING'),
+	buffer ? read_only_the_first_frame,
+	start_reading,
+	switch_controls.
+load_temporary_file_if_possible.
+--
+choose_and_play_file(FileName):-
+	stop_data_reading_and_writing,
+	choose_file(FileName),
+	fail.
+choose_and_play_file(_):-
+	data_acquisition_is_active,!.
+choose_and_play_file(_):-
+	buffer ? read_only_the_first_frame,
+	buffer ? set_operating_mode('READING'),
+	start_reading.
+--
+choose_file(FileName):-
+	buffer ? set_name(FileName),
+	update_dialog_title(FileName).
+--
+update_dialog_title(""):-!,
+	put('title',"Multimedia Recorder").
+update_dialog_title(FileName):-
+	put('title',"Multimedia Recorder ["+FileName+"]").
+--
+start_reading:-
+	buffer ? check_file_name,!,
+	switch_controls,
+	park_scroll_control,
+	stop_all_devices,
+	reset_all_counters,
+	buffer ? start.
+start_reading.
+--
+check_whether_data_are_to_be_saved:-
+	data_are_to_be_saved ? is_true,!,
+	con ? ask(
+		"Data are not saved!",
+		"Do you want to rewrite the data?").
+check_whether_data_are_to_be_saved.
+--
+check_whether_data_are_not_saved:-
+	data_are_to_be_saved ? is_true,!,
+	con ? ask(
+		"Data are not saved!",
+		"Do you want to discard the data and exit?").
+check_whether_data_are_not_saved.
+--
+park_scroll_control:-
+	Range== ?val("I_List",
+		?get(dlg_ctrl_scrollbar_frame_number_range)),
+	Range == [_,Right],!,
+	put(dlg_ctrl_scrollbar_frame_number_value,Right).
+park_scroll_control.
+--
+set_read_buffer_size(Size):-
+	put(dlg_ctrl_scrollbar_frame_number_range,[1,Size]).
+--
+redraw_recent_frame:-
+	buffer ? frame_obtained.
+--
+scroll_video:-
+	FN== ?cast("INTEGER",
+			?get(dlg_ctrl_scrollbar_frame_number_value)),!,
+	buffer ? request_buffered_frame(FN),!.
+scroll_video.
+-----------------------------------------------------------------------
+get_frame_type() =
+	?cast("STRING",?get(dlg_ctrl_listbutton_astrohn_mode)).
+--
+update_mode_and_switch_controls:-
+	switch_webcam_or_NI,
+	update_acquisition_mode,
+	update_write_timing_period,
+	update_displaying_mode,
+	switch_controls,
+	redraw_recent_frame.
+--
+switch_webcam_or_NI:-
+	Mode== ?cast("STRING",?get(dlg_ctrl_listbutton_webcam_or_NI)),
+	Mode == "Web Camera",!,
+	use_NI_but_not_webcam ? assign('no').
+switch_webcam_or_NI:-
+	use_NI_but_not_webcam ? assign('yes').
+--
+update_acquisition_mode:-
+	TextFT== ?cast("STRING",?get(dlg_ctrl_listbutton_kinect_mode)),
+	FrameType== kinect?string_to_frame_type(TextFT),!,
+	kinect ? set_input_device(device(kinect_host,[FrameType])).
+update_acquisition_mode.
+--
+update_write_timing_period:-
+	FrameRate== ?val("REAL",
+		?get(dlg_ctrl_edittext_timer_frame_rate)),
+	FrameRate > 0,!,
+	timer ? set_period(1/FrameRate).
+update_write_timing_period.
+--
+update_displaying_mode:-
+	TFT== ?val("STRING",
+		?get(dlg_ctrl_listbutton_kinect_mode)),
+	TPIM== ?val("STRING",
+		?get(dlg_ctrl_listbutton_people_index_mode)),
+	TACM== ?val("STRING",
+		?get(dlg_ctrl_listbutton_astrohn_color_map)),
+	ZA== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_astrohn_zoom)),
+	TTCM== ?val("STRING",
+		?get(dlg_ctrl_listbutton_tev1_color_map)),
+	ZT== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_tev1_zoom)),
+	ZW== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_webcam_zoom)),
+	UseMicrophone== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_microphone)),!,
+	AstrohnColorMap== color_maps?string_to_color_map_name(TACM),
+	ThermalColorMap== color_maps?string_to_color_map_name(TTCM),
+	kinect ? update_displaying_mode(TFT,TPIM),
+	-- near_infrared ? update_displaying_mode(TPIM),
+	astrohn ? set_main_color_map(AstrohnColorMap),
+	astrohn ? set_zoom_image(ZA),
+	tev1 ? set_main_color_map(ThermalColorMap),
+	tev1 ? set_zoom_image(ZT),
+	-- near_infrared ? set_zoom_image(ZW),
+	webcam ? set_zoom_image(ZW),
+	microphone ? set_attach_audio_data(UseMicrophone).
+update_displaying_mode.
+-----------------------------------------------------------------------
+switch_controls:-
+	switch_button_Connect,
+	switch_button_Choose,
+	switch_button_Play,
+	switch_button_Pause,
+	switch_button_Record,
+	switch_button_Stop,
+	switch_button_Save,
+	switch_button_Export,
+	switch_button_Microphone,
+	switch_microphone_state,
+	switch_Kinect_frame_type,
+	switch_text_area_Correction,
+	switch_text_area_Description,
+	switch_auxiliary_controls.
+--
+switch_button_Connect:-
+	buffer_is_exporting,!,
+	disable(dlg_ctrl_togglebutton_connect),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_connect,'default').
+switch_button_Connect:-
+	data_acquisition_is_active,!,
+	enable(dlg_ctrl_togglebutton_connect),
+	set_control_text(dlg_ctrl_togglebutton_connect,"Disco&nnect"),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_connect,'Blue').
+switch_button_Connect:-
+	enable(dlg_ctrl_togglebutton_connect),
+	set_control_text(dlg_ctrl_togglebutton_connect,"Co&nnect"),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_connect,'default').
+--
+switch_button_Choose:-
+	buffer_is_exporting,!,
+	disable("Choose").
+switch_button_Choose:-
+	data_acquisition_is_active,!,
+	disable("Choose").
+switch_button_Choose:-
+	enable("Choose").
+--
+switch_button_Play:-
+	data_acquisition_is_active,!,
+	disable(dlg_ctrl_togglebutton_play),
+	set_control_text_color(dlg_ctrl_togglebutton_play,'default').
+switch_button_Play:-
+	buffer_is_playing,!,
+	enable(dlg_ctrl_togglebutton_play),
+	set_control_text_color(dlg_ctrl_togglebutton_play,'DkGreen').
+switch_button_Play:-
+	buffer_is_exporting,!,
+	disable(dlg_ctrl_togglebutton_play),
+	set_control_text_color(dlg_ctrl_togglebutton_play,'default').
+switch_button_Play:-
+	buffer ? does_exist,!,
+	enable(dlg_ctrl_togglebutton_play),
+	set_control_text_color(dlg_ctrl_togglebutton_play,'default').
+switch_button_Play:-
+	disable(dlg_ctrl_togglebutton_play),
+	set_control_text_color(dlg_ctrl_togglebutton_play,'default'),
+	put(dlg_ctrl_togglebutton_play,'no').
+--
+switch_button_Pause:-
+	buffer_is_playing,!,
+	enable("Pause"),
+	set_control_text_color("Pause",'default').
+switch_button_Pause:-
+	disable("Pause"),
+	set_control_text_color("Pause",'default').
+--
+switch_button_Record:-
+	buffer_is_recording,!,
+	enable(dlg_ctrl_togglebutton_record), -- disable
+	disable("AutomaticRecording"),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_record,'Red').
+switch_button_Record:-
+	data_acquisition_is_active,!,
+	enable(dlg_ctrl_togglebutton_record),
+	enable("AutomaticRecording"),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_record,'default').
+switch_button_Record:-
+	disable(dlg_ctrl_togglebutton_record),
+	disable("AutomaticRecording"),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_record,'default').
+--
+switch_button_Stop:-
+	buffer ? is_open,!,
+	enable("Stop"),
+	set_control_text_color("Stop",'default').
+switch_button_Stop:-
+	disable("Stop"),
+	set_control_text_color("Stop",'default').
+--
+switch_button_Save:-
+	buffer ? is_open,!,
+	disable("Save"),
+	set_control_text_color("Save",'default').
+switch_button_Save:-
+	file_operations ? does_exist(temporary_file_name),!,
+	enable("Save"),
+	set_control_text_color("Save",'default').
+switch_button_Save:-
+	disable("Save"),
+	set_control_text_color("Save",'default').
+--
+switch_button_Export:-
+	data_acquisition_is_active,!,
+	disable(dlg_ctrl_togglebutton_export),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_export,'default').
+switch_button_Export:-
+	buffer ? is_open,!,
+	disable(dlg_ctrl_togglebutton_export),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_export,'default').
+switch_button_Export:-
+	buffer ? does_exist,!,
+	enable(dlg_ctrl_togglebutton_export),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_export,'default').
+switch_button_Export:-
+	disable(dlg_ctrl_togglebutton_export),
+	set_control_text_color(
+		dlg_ctrl_togglebutton_export,'default').
+--
+switch_button_Microphone:-
+	buffer ? is_active,
+	buffer_is_recording,!,
+	paint_button_Microphone('DkGreen').
+switch_button_Microphone:-
+	buffer ? is_active,
+	is_ON(dlg_ctrl_togglebutton_export),!,
+	paint_button_Microphone('DkGreen').
+switch_button_Microphone:-
+	paint_button_Microphone('default').
+--
+paint_button_Microphone(Color):-
+	do_use_microphone,
+	microphone ? microphone_is_active,!,
+	set_control_text_color(dlg_ctrl_togglebutton_microphone,Color).
+paint_button_Microphone(_):-
+	set_control_text_color(dlg_ctrl_togglebutton_microphone,'default').
+--
+switch_microphone_state:-
+	microphone ? microphone_is_available,!,
+	enable(dlg_ctrl_togglebutton_microphone).
+switch_microphone_state:-
+	disable(dlg_ctrl_togglebutton_microphone).
+--
+switch_Kinect_controls:-
+	data_acquisition_is_active,!.
+switch_Kinect_controls:-
+	switch_Kinect_frame_type,
+	fail.
+switch_Kinect_controls:-
+	kinect ? get_delivered_people_index_mode(PeopleIndexMode),
+	TextPIM== kinect?people_index_to_string(PeopleIndexMode),
+	put(dlg_ctrl_listbutton_people_index_mode,TextPIM),
+	update_displaying_mode,
+	fail.
+switch_Kinect_controls.
+--
+switch_Kinect_frame_type:-
+	data_acquisition_is_active,!.
+switch_Kinect_frame_type:-
+	kinect ? get_delivered_frame_type(FrameType),
+	TextFT== kinect?frame_type_to_string(FrameType),
+	put(dlg_ctrl_listbutton_kinect_mode,TextFT),
+	update_displaying_mode,
+	fail.
+switch_Kinect_frame_type.
+--
+switch_text_area_Correction:-
+	data_acquisition_is_active,!,
+	kinect_host ? get_correction_in_pixels(Dx,Dy),
+	TextX== text_operations?format("dX: %s",Dx),
+	TextY== text_operations?format("dY: %s",Dy),
+	put(dlg_ctrl_edittext_kinect_dx,TextX),
+	put(dlg_ctrl_edittext_kinect_dy,TextY).
+switch_text_area_Correction:-
+	kinect ? get_delivered_correction(Dx,Dy),
+	TextX== text_operations?format("dX: %s",Dx),
+	TextY== text_operations?format("dY: %s",Dy),
+	put(dlg_ctrl_edittext_kinect_dx,TextX),
+	put(dlg_ctrl_edittext_kinect_dy,TextY).
+--
+switch_text_area_Description:-
+	buffer ? get_delivered_description(Description),
+	buffer ? get_delivered_copyright(Copyright),
+	buffer ? get_delivered_registration_date(Date),
+	buffer ? get_delivered_registration_time(Time),
+	put(dlg_ctrl_edittext_description,Description),
+	put(dlg_ctrl_edittext_copyright,Copyright),
+	put(dlg_ctrl_edittext_registration_date,Date),
+	put(dlg_ctrl_edittext_registration_time,Time).
+--
+switch_auxiliary_controls:-
+	data_acquisition_is_active,!,
+	disable(dlg_ctrl_scrollbar_frame_number_range).
+switch_auxiliary_controls:-
+	enable(dlg_ctrl_scrollbar_frame_number_range).
+-----------------------------------------------------------------------
+data_acquisition_is_active:-
+	is_ON(dlg_ctrl_togglebutton_connect).
+--
+buffer_is_playing:-
+	buffer ? is_active,
+	buffer?get_operating_mode() == 'PLAYING'.
+--
+playing_is_suspended:-
+	buffer ? is_suspended,
+	buffer?get_operating_mode() == 'PLAYING'.
+--
+buffer_is_recording:-
+	buffer ? is_active,
+	buffer?get_operating_mode() == 'RECORDING'.
+--
+buffer_is_exporting:-
+	buffer ? is_open,
+	buffer?get_operating_mode() == 'READING'.
+--
+do_use_microphone:-
+	is_ON(dlg_ctrl_togglebutton_microphone).
+--
+is_ON(DialogFieldName):-
+	Value== ?val("YesNo",?get(DialogFieldName)),
+	Value == 'yes'.
+--
+create_new_file_name() = FileName :-
+	timer_operations ? date(Year,Month,Day),
+	timer_operations ? time(Hour,Minute,Second),
+	FileName== text_operations?format(
+		"%04d-%02d-%02d-%02d-%02d-%02d",
+		Year,Month,Day,
+		Hour,Minute,Second).
+]
+-----------------------------------------------------------------------
+class 'MultimediaControl' (specialized 'MultimediaBuffer'):
+--
+constant:
+--
+	operating_mode		= 'PLAYING';
+--
+internal:
+--
+	video_recorder;
+--
+	stop_after_the_first_frame	= ('Switch');
+	file_operation_error_handler	= ('FileOperationErrorHandler',
+						world=self);
+	file_operations			= ('File');
+	text_operations			= ('Text');
+	con				= ('Console');
+--
+constant:
+--
+	read_buffer_size		= 100;
+	slow_motion_coefficient		= -1;
+--
+[
+goal:-!,
+	video_recorder ? set_read_buffer_size(read_buffer_size).
+--
+frame_obtained:-
+	commit,!,
+	Mode== ?get_operating_mode(),
+	get_recent_frame_number(FrameNumber),
+	video_recorder ? display_components(Mode,FrameNumber),
+	control_export(Mode).
+--
+data_transfer_completion:-!,
+	video_recorder ? complete_data_transfer.
+--
+data_transfer_error(ErrorName):-!,
+	video_recorder ? complete_data_transfer,
+	con ? error("Data Transfer Error",ErrorName).
+--
+buffer_overflow:-!,
+	con ? set_color('White','Red'),
+	con ? writeln("Buffer overflow!"),
+	con ? set_color('default').
+--
+buffer_deallocation:-!,
+	con ? set_color('White','DkGreen'),
+	con ? writeln("Buffer restored."),
+	con ? set_color('default').
+-----------------------------------------------------------------------
+check_file_name:-
+	does_exist,!.
+check_file_name:-
+	FileName== ?get_name(),
+	con ? error(
+		"Illegal File name",
+		text_operations?format(
+			"The '%s' file does not exist.",FileName)),
+	fail.
+--
+rename_temporary_file(TargetFileName):-
+	file_operation_error_handler ? delete(TargetFileName),
+	file_operation_error_handler ? rename(TargetFileName).
+--
+list_directory(Mask) = file_operations?list_directory(Mask).
+--
+make_directory(DirectoryName):-
+	file_operations ? make_directory(DirectoryName).
+-----------------------------------------------------------------------
+read_all_frames:-
+	stop_after_the_first_frame ? assign('no').
+--
+read_only_the_first_frame:-
+	stop_after_the_first_frame ? assign('yes').
+--
+control_export('READING'):-
+	has_component("SETTINGS"),!,
+	continue_reading_if_necessary.
+control_export('READING'):-
+	stop_after_the_first_frame ? is_true,!,
+	stop,
+	-- video_recorder ? stop_data_transfer,
+	video_recorder ? switch_controls.
+control_export('READING'):-!,
+	continue_reading_if_necessary.
+control_export(_).
+--
+continue_reading_if_necessary:-
+	eof,!.
+continue_reading_if_necessary:-
+	start,
+	video_recorder ? switch_controls.
+]
+-----------------------------------------------------------------------
+class 'KinectNearInfraredImageControl'
+(specialized 'KinectCameraControl'):
+--
+constant:
+--
+	-- target_frame_type	= 'INFRARED';
+	target_frame_type	= 'LONG_EXPOSURE_INFRARED';
+	--
+	target_people_index	= 'NONE';
+	--
+	circumscription_mode;
+	skeletons_mode		= 'NONE';
+	--
+	file_name_suffix	= "-NI";
+	copyright_color		= 'RoyalBlue';
+--
+[
+frame_obtained:-!.
+--
+update_displaying_mode(TextPIM):-
+	PeopleIndex== ?string_to_people_index(TextPIM),!,
+	Mode== {frame_type:target_frame_type,
+		people_index:PeopleIndex,
+		circumscription:circumscription_mode,
+		skeletons:skeletons_mode},
+	set_displaying_mode(Mode).
+update_displaying_mode(_).
+]
+-----------------------------------------------------------------------
+class 'KinectCameraControl' (specialized 'KinectBuffer'):
+--
+constant:
+--
+	name;
+--
+	operating_mode		= 'LISTENING';
+	read_buffer_size	= 100;
+--
+	target_frame_type	= 'POINT_CLOUDS';
+	target_people_index	= 'ADAPTIVELY_EXTRACT_PEOPLE';
+--
+	circumscription_mode = [
+			'TOTAL_RECTANGLES',
+			'SKELETON_RECTANGLES',
+			'TOTAL_PARALLELEPIPEDS',
+			'SKELETON_PARALLELEPIPEDS'
+			-- 'NONE'
+			];
+--
+	skeletons_mode		= 'DETECT_SKELETONS';
+--
+	displaying_mode	= {
+		frame_type:target_frame_type,
+		people_index:target_people_index,
+		circumscription:circumscription_mode,
+		skeletons:skeletons_mode};
+--
+	color_map	= {	'name':color_map_name,
+				size:2400,
+				reverse_scale:'yes',
+				reverse_minimal_value:'yes',
+				reverse_maximal_value:'no',
+				tincturing_coefficient:2
+				};
+--
+	color_map_name		= 'OCEAN';
+	people_colors		= ['Green'];
+--
+	file_name_suffix	= "-3D";
+	copyright_color		= 'White';
+	ellipse_radius		= 10;
+--
+internal:
+--
+	graphics_window;
+	video_recorder;
+--
+	time_reporter		= ('TimeReporter',
+					graphics_window);
+	image			= ('BufferedImage');
+	timer			= ('Timer');
+	con			= ('Console');
+--
+[
+frame_obtained:-!,
+	FT== timer?milliseconds(),
+	video_recorder ? accept_sub_frames("Kinect",FT).
+--
+display_frame(_,time(TimeShift)) = _ :-
+	retrieve_timed_frame(TimeShift),
+	fail.
+display_frame(EM,EFN) = FrameTime :-
+	is_committed,
+	get_recent_frame_number(FrameNumber),
+	get_recent_frame_time(FrameTime),
+	get_recent_frame_rate(FrameRate),
+	get_recent_image(image),
+	DisplayingMode== ?get_displaying_mode(),
+	DisplayingMode == {
+		frame_type:FrameType,
+		people_index:PeopleIndexMode|_},
+	get_image_size_in_pixels(FrameType,IW,IH),
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
+	graphics_window ? draw_image(image,0,0,1,1),
+	draw_skeletons_if_necessary(PeopleIndexMode,FrameType,IW,IH),
+	time_reporter ? report_time(FrameNumber,FrameTime,FrameRate),
+	time_reporter ? report_copyright(12,copyright_color),
+	resize_main_window(IW,IH),
+	graphics_window ? draw_now,
+	video_recorder ? export_frame_if_necessary(
+		EM,EFN,file_name_suffix,image).
+--
+get_image_size_in_pixels('COLOR',IW,IH):-!,
+	get_color_image_size_in_pixels(IW,IH).
+get_image_size_in_pixels(_,IW,IH):-
+	get_depth_image_size_in_pixels(IW,IH).
+--
+resize_main_window(IW,IH):-
+	IW > 0,
+	IH > 0,!,
+	graphics_window ? refine_width(IW/IH).
+resize_main_window(_,_).
+--
+draw_skeletons_if_necessary('NONE',_,_,_):-!.
+draw_skeletons_if_necessary(_,FrameType,IW,IH):-
+	get_skeletons(Skeletons),
+	draw_skeletons(IW,IH,Skeletons,FrameType).
+-----------------------------------------------------------------------
+update_displaying_mode(TextFT,TextPIM):-
+	FrameType== ?string_to_frame_type(TextFT),
+	PeopleIndex== ?string_to_people_index(TextPIM),!,
+	Mode== {frame_type:FrameType,
+		people_index:PeopleIndex,
+		circumscription:circumscription_mode,
+		skeletons:skeletons_mode},
+	set_displaying_mode(Mode).
+update_displaying_mode(_,_).
+--
+string_to_frame_type("Depth Maps")= 'DEPTH_MAPS'.
+string_to_frame_type("Colored Depth Maps")= 'COLORED_DEPTH_MAPS'.
+string_to_frame_type("Infrared")= 'INFRARED'.
+string_to_frame_type(
+	"Long Exposure Infrared")= 'LONG_EXPOSURE_INFRARED'.
+string_to_frame_type("Mapped Color")= 'MAPPED_COLOR'.
+string_to_frame_type("Point Clouds")= 'POINT_CLOUDS'.
+string_to_frame_type("Color")= 'COLOR'.
+string_to_frame_type("Device Tuning")= 'DEVICE_TUNING'.
+string_to_frame_type("None")= 'NONE'.
+--
+frame_type_to_string('DEPTH_MAPS') = "Depth Maps".
+frame_type_to_string('COLORED_DEPTH_MAPS') = "Colored Depth Maps".
+frame_type_to_string('INFRARED') = "Infrared".
+frame_type_to_string(
+	'LONG_EXPOSURE_INFRARED') = "Long Exposure Infrared".
+frame_type_to_string('MAPPED_COLOR') = "Mapped Color".
+frame_type_to_string('POINT_CLOUDS') = "Point Clouds".
+frame_type_to_string('COLOR') = "Color".
+frame_type_to_string('DEVICE_TUNING') = "Device Tuning".
+frame_type_to_string('NONE') = "None".
+--
+string_to_people_index("Tincture")= 'TINCTURE_PEOPLE'.
+string_to_people_index("Paint")= 'PAINT_PEOPLE'.
+string_to_people_index("Extract")= 'EXTRACT_PEOPLE'.
+string_to_people_index(
+	"Adaptively Extract")= 'ADAPTIVELY_EXTRACT_PEOPLE'.
+string_to_people_index("Project")= 'PROJECT_PEOPLE'.
+string_to_people_index("None")= 'NONE'.
+--
+people_index_to_string('TINCTURE_PEOPLE') = "Tincture".
+people_index_to_string('PAINT_PEOPLE') = "Paint".
+people_index_to_string('EXTRACT_PEOPLE') = "Extract".
+people_index_to_string(
+	'ADAPTIVELY_EXTRACT_PEOPLE') = "Adaptively Extract".
+people_index_to_string('PROJECT_PEOPLE') = "Project".
+people_index_to_string('NONE') = "None".
+-----------------------------------------------------------------------
+draw_skeletons(IW,IH,[Skeleton|Rest],FrameType):-!,
+	draw_skeleton(IW,IH,Skeleton,FrameType),
+	--draw_parallelepipeds(IW,IH,Skeleton,FrameType),
+	--draw_rectangles(IW,IH,Skeleton,FrameType),
+	draw_skeletons(IW,IH,Rest,FrameType).
+draw_skeletons(_,_,_,_).
+--
+draw_skeleton(IW,IH,Skeleton,FrameType):-
+	Skeleton == {
+		head: Head,
+		spine: Spine,
+		left_arm: LeftArm,
+		right_arm: RightArm,
+		left_leg: LeftLeg,
+		right_leg: RightLeg
+		|_},
+	draw_spine(IW,IH,Head,Spine,FrameType),
+	draw_arm(IW,IH,Spine,LeftArm,FrameType),
+	draw_arm(IW,IH,Spine,RightArm,FrameType),
+	draw_leg(IW,IH,Spine,LeftLeg,FrameType),
+	draw_leg(IW,IH,Spine,RightLeg,FrameType),
+	fail.
+draw_skeleton(_,_,_,_).
+--
+draw_spine(IW,IH,Head,Spine,FrameType):-
+	Spine == {
+		neck: Neck,
+		shoulder: Shoulder,
+		mid: Mid,
+		base: Base
+		|_},!,
+	draw_link(IW,IH,Head,Neck,FrameType),
+	draw_link(IW,IH,Neck,Shoulder,FrameType),
+	draw_link(IW,IH,Shoulder,Mid,FrameType),
+	draw_link(IW,IH,Mid,Base,FrameType).
+draw_spine(_,_,_,_,_).
+--
+draw_arm(IW,IH,Spine,Arm,FrameType):-
+	Spine == {shoulder:SpineShoulder|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	draw_link(IW,IH,SpineShoulder,ArmShoulder,FrameType),
+	draw_link(IW,IH,ArmShoulder,Elbow,FrameType),
+	draw_link(IW,IH,Elbow,Wrist,FrameType),
+	draw_link(IW,IH,Wrist,Hand,FrameType),
+	draw_hand(IW,IH,Wrist,Hand,Rest,FrameType).
+draw_arm(IW,IH,Spine,Arm,FrameType):-
+	Spine == {neck:Neck|_},
+	Arm == {
+		shoulder: ArmShoulder,
+		elbow: Elbow,
+		wrist: Wrist,
+		hand: Hand
+		|Rest},!,
+	draw_link(IW,IH,Neck,ArmShoulder,FrameType),
+	draw_link(IW,IH,ArmShoulder,Elbow,FrameType),
+	draw_link(IW,IH,Elbow,Wrist,FrameType),
+	draw_link(IW,IH,Wrist,Hand,FrameType),
+	draw_hand(IW,IH,Wrist,Hand,Rest,FrameType).
+draw_arm(_,_,_,_,_).
+--
+draw_hand(IW,IH,Wrist,Hand,Rest,FrameType):-
+	Rest == {tip:Tip,thumb:Thumb|_},!,
+	draw_link(IW,IH,Wrist,Thumb,FrameType),
+	draw_link(IW,IH,Hand,Tip,FrameType).
+draw_hand(_,_,_,_,_,_).
+--
+draw_leg(IW,IH,Spine,Leg,FrameType):-
+	Spine == {base:Base|_},
+	Leg == {
+		hip: Hip,
+		knee: Knee,
+		ankle: Ankle,
+		foot: Foot
+		|_},!,
+	draw_link(IW,IH,Base,Hip,FrameType),
+	draw_link(IW,IH,Hip,Knee,FrameType),
+	draw_link(IW,IH,Knee,Ankle,FrameType),
+	draw_link(IW,IH,Ankle,Foot,FrameType).
+draw_leg(_,_,_,_,_).
+--
+draw_link(IW,IH,Joint1,Joint2,FrameType):-
+	FrameType == 'COLOR',
+	Joint1 == {
+		status:Status1,
+		position:{mapping2:p(Joint1X1,Joint1Y1)|_}|_},
+	Joint2 == {
+		status:Status2,
+		position:{mapping2:p(Joint2X1,Joint2Y1)|_}|_},!,
+	select_line_width(Status1,Status2,LineWidth),
+	graphics_window ? set_pen(
+		{color:'DkGreen',lineWidth:LineWidth}),
+	Joint1X2== Joint1X1 / IW,
+	Joint1Y2== Joint1Y1 / IH,
+	Joint2X2== Joint2X1 / IW,
+	Joint2Y2== Joint2Y1 / IH,
+	graphics_window ? draw_line(
+		Joint1X2,Joint1Y2,Joint2X2,Joint2Y2),
+	draw_joint(IW,IH,Joint1,FrameType),
+	draw_joint(IW,IH,Joint2,FrameType).
+draw_link(IW,IH,Joint1,Joint2,_):-
+	Joint1 == {
+		status:Status1,
+		position:{mapping1:p(Joint1X1,Joint1Y1)|_}|_},
+	Joint2 == {
+		status:Status2,
+		position:{mapping1:p(Joint2X1,Joint2Y1)|_}|_},!,
+	select_line_width(Status1,Status2,LineWidth),
+	graphics_window ? set_pen(
+		{color:'DkGreen',lineWidth:LineWidth}),
+	Joint1X2== Joint1X1 / IW,
+	Joint1Y2== Joint1Y1 / IH,
+	Joint2X2== Joint2X1 / IW,
+	Joint2Y2== Joint2Y1 / IH,
+	graphics_window ? draw_line(
+		Joint1X2,Joint1Y2,Joint2X2,Joint2Y2).
+draw_link(_,_,_,_,_).
+--
+select_line_width('TRACKED','TRACKED',3):-!.
+select_line_width(_,_,1).
+--
+select_line_width('TRACKED','TRACKED','TRACKED',3):-!.
+select_line_width(_,_,_,1).
+--
+draw_joint(IW,IH,Joint,'COLOR'):-
+	Joint == {position:{mapping2:p(X1,Y1)|_}|_},!,
+	graphics_window ? set_brush('Orange'),
+	graphics_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
+	X2== (X1 - ellipse_radius) / IW,
+	Y2== (Y1 - ellipse_radius) / IH,
+	W2== ellipse_radius*2 / IW,
+	H2== ellipse_radius*2 / IH,
+	graphics_window ? draw_ellipse(X2,Y2,W2,H2).
+draw_joint(IW,IH,Joint,_):-
+	Joint == {position:{mapping1:p(X1,Y1)|_}|_},!,
+	graphics_window ? set_brush('Orange'),
+	graphics_window ? set_font({size:21,weight:'WEIGHT_BOLD'}),
+	graphics_window ? set_text_alignment('CENTER','CENTER'),
+	X2== (X1 - ellipse_radius) / IW,
+	Y2== (Y1 - ellipse_radius) / IH,
+	W2== ellipse_radius*2 / IW,
+	H2== ellipse_radius*2 / IH,
+	graphics_window ? draw_ellipse(X2,Y2,W2,H2).
+draw_joint(_,_,_,_).
+]
+-----------------------------------------------------------------------
+class 'AstrohnCameraControl' (specialized 'Astrohn'):
+--
+constant:
+--
+	name;
+--
+	operating_mode		= 'LISTENING';
+	read_buffer_size	= 100;
+--
+internal:
+--
+	graphics_window;
+	video_recorder;
+--
+	time_reporter		= ('TimeReporter',
+					graphics_window);
+	image			= ('BufferedImage');
+	timer			= ('Timer');
+	con			= ('Console');
+--
+[
+frame_obtained:-!,
+	FT== timer?milliseconds(),
+	video_recorder ? accept_sub_frames("Terahertz Camera",FT).
+--
+display_frame(_,time(TimeShift)) = _ :-
+	retrieve_timed_frame(TimeShift),
+	fail.
+display_frame(EM,EFN) = FT :-
+	is_committed,
+	FrameType== ?cast("STRING",video_recorder?get_frame_type()),
+	get_image(FrameType,IW,IH,FN,FT,FrameRate,FontSize),
+	-- FN > 0,
+	resize_main_window(IW,IH),
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
+	graphics_window ? draw_image(image,0,0,1,1),
+	graphics_window ? set_rendering_mode({
+		colorRendering:'QUALITY',
+		antialiasing:'on',
+		textAntialiasing:'on'
+		}),
+	time_reporter ? report_time(FN,FT,FrameRate,FontSize),
+	time_reporter ? report_copyright(FontSize),
+	resize_main_window(IW,IH),
+	graphics_window ? draw_now,
+	video_recorder ? export_frame_if_necessary(EM,EFN,"-THz",image).
+--
+get_image("Terahertz Image",IW,IH,Number,Time,FrameRate,8):-!,
+	get_recent_terahertz_image(image),
+	get_terahertz_image_size_in_pixels(IW,IH),
+	get_recent_terahertz_frame_number(Number),
+	get_recent_terahertz_frame_time(Time),
+	get_recent_terahertz_frame_rate(FrameRate).
+get_image("Color Image",IW,IH,Number,Time,FrameRate,12):-!,
+	get_recent_color_image(image),
+	get_color_image_size_in_pixels(IW,IH),
+	get_recent_color_frame_number(Number),
+	get_recent_color_frame_time(Time),
+	get_recent_color_frame_rate(FrameRate).
+get_image(_,IW,IH,Number,Time,FrameRate,12):-
+	get_recent_combined_image(image),
+	get_color_image_size_in_pixels(IW,IH),
+	get_recent_terahertz_frame_number(Number),
+	get_recent_terahertz_frame_time(Time),
+	get_recent_terahertz_frame_rate(FrameRate).
+--
+resize_main_window(IW,IH):-
+	IW > 0,
+	IH > 0,!,
+	graphics_window ? refine_width(IW/IH).
+resize_main_window(_,_).
+]
+-----------------------------------------------------------------------
+class 'ThermalCameraControl' (specialized 'TEV1'):
+--
+constant:
+--
+	name;
+--
+	operating_mode			= 'LISTENING';
+	read_buffer_size		= 100;
+	output_debug_information	= 2;
+--
+internal:
+--
+	graphics_window;
+	video_recorder;
+--
+	time_reporter		= ('TimeReporter',
+					graphics_window);
+	image			= ('BufferedImage');
+	timer			= ('Timer');
+	con			= ('Console');
+--
+[
+frame_obtained:-!,
+	FT== timer?milliseconds(),
+	video_recorder ? accept_sub_frames("Thermal Camera",FT).
+--
+display_frame(_,time(TimeShift)) = _ :-
+	retrieve_timed_frame(TimeShift),
+	fail.
+display_frame(EM,EFN) = FrameTime :-
+	is_committed,
+	get_recent_frame_number(FrameNumber),
+	get_recent_frame_time(FrameTime),
+	get_recent_frame_rate(FrameRate),
+	get_recent_image(image),
+	get_image_size_in_pixels(IW,IH),
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
+	graphics_window ? draw_image(image,0,0,1,1),
+	time_reporter ? report_time(FrameNumber,FrameTime,FrameRate),
+	time_reporter ? report_copyright(12),
+	resize_main_window(IW,IH),
+	graphics_window ? draw_now,
+	video_recorder ? export_frame_if_necessary(EM,EFN,"-T",image).
+--
+resize_main_window(IW,IH):-
+	IW > 0,
+	IH > 0,!,
+	graphics_window ? refine_width(IW/IH).
+resize_main_window(_,_).
+]
+-----------------------------------------------------------------------
+class 'WebcamControl' (specialized 'Webcam'):
+--
+constant:
+--
+	name;
+--
+	operating_mode		= 'LISTENING';
+	read_buffer_size	= 100;
+--
+internal:
+--
+	graphics_window;
+	video_recorder;
+--
+	time_reporter		= ('TimeReporter',
+					graphics_window);
+	image			= ('BufferedImage');
+	timer			= ('Timer');
+--
+[
+frame_obtained:-!,
+	FT== timer?milliseconds(),
+	video_recorder ? accept_sub_frames("Web Camera",FT).
+--
+display_frame(_,time(TimeShift)) = _ :-
+	retrieve_timed_frame(TimeShift),
+	fail.
+display_frame(EM,EFN) = FrameTime :-
+	is_committed,
+	get_recent_frame_number(FrameNumber),
+	get_recent_frame_time(FrameTime),
+	get_recent_frame_rate(FrameRate),
+	get_recent_image(image),
+	get_image_size_in_pixels(IW,IH),
+	graphics_window ? suspend_redrawing,
+	graphics_window ? clear,
+	graphics_window ? draw_image(image,0,0,1,1),
+	time_reporter ? report_time(FrameNumber,FrameTime,FrameRate),
+	time_reporter ? report_copyright(12),
+	resize_main_window(IW,IH),
+	graphics_window ? draw_now,
+	video_recorder ? export_frame_if_necessary(EM,EFN,"-W",image).
+--
+resize_main_window(IW,IH):-
+	IW > 0,
+	IH > 0,!,
+	graphics_window ? refine_width(IW/IH).
+resize_main_window(_,_).
+]
+-----------------------------------------------------------------------
+class 'MicrophoneControl' (specialized 'Microphone'):
+--
+constant:
+--
+	name;
+--
+	operating_mode		= 'LISTENING';
+	output_audio_data	= 'no';
+--
+internal:
+--
+	video_recorder;
+--
+	timer			= ('Timer');
+	con			= ('Console');
+--
+[
+audio_data_obtained:-!,
+	FT== timer?milliseconds(),
+	video_recorder ? accept_audio_data(FT).
+--
+accept_audio_data(_,_) = _ :-
+	commit_audio_data,
+	fail.
+accept_audio_data(_,_).
+--
+replay_audio_data:-
+	audio_data_is_committed,!,
+	replay_committed_audio_data.
+replay_audio_data.
+]
+-----------------------------------------------------------------------
+class 'WriteTimingControl' (specialized 'Timer'):
+--
+internal:
+--
+	video_recorder;
+--
+	con			= ('Console');
+--
+[
+tick:-!,
+	FT== ?milliseconds(),
+	video_recorder ? accept_sub_frames("Internal Clock",FT).
+]
+-----------------------------------------------------------------------
+class 'TimeReporter' (specialized 'Text'):
+--
+internal:
+--
+	graphics_window;
+--
+	timer_operations	= ('Timer');
+--
+[
+report_time(_,_,_):-
+	graphics_window ? set_rendering_mode({
+		colorRendering:'QUALITY',
+		antialiasing:'on',
+		textAntialiasing:'on'
+		}),
+	fail.
+report_time(FrameNumber,FrameTime,FrameRate):-
+	report_time(FrameNumber,FrameTime,FrameRate,14).
+--
+report_time(_,_,_,FontSize):-
+	graphics_window ? set_brush('Green'),
+	graphics_window ? set_font({size:FontSize}),
+	fail.
+report_time(FrameNumber,FrameTime,_,_):-
+	FrameNumber >= 0,
+	Time== timer_operations?convert_to_time(FrameTime),
+	Time == time(Hours,Minutes,Seconds,Milliseconds),
+	graphics_window ? set_text_alignment('LEFT','TOP'),
+	graphics_window ? draw_text(
+		0.02, 0.02,
+		?format("T: %02d:%02d:%02d.%03d; F: %d",
+			Hours,Minutes,Seconds,Milliseconds,
+			FrameNumber)),
+	fail.
+report_time(_,_,FrameRate,_):-
+	FrameRate >= 0,
+	graphics_window ? set_text_alignment('RIGHT','TOP'),
+	graphics_window ? draw_text(
+		0.95, 0.02,
+		?format("FR: %2.1f",FrameRate)),
+	fail.
+report_time(_,_,_,_).
+--
+report_copyright(FontSize):-
+	report_copyright(FontSize,'White').
+--
+report_copyright(FontSize,Color):-
+	graphics_window ? set_font({
+		name:'SANS_SERIF',
+		weight:'WEIGHT_REGULAR',
+		width:'WIDTH_EXTENDED',
+		posture:'POSTURE_REGULAR',
+		size:FontSize,
+		tracking:'TRACKING_LOOSE',
+		kerning:'on',
+		foreground:Color
+		}),
+	graphics_window ? set_text_alignment('LEFT','BOTTOM'),
+	graphics_window ? draw_text(0.02,0.98,"www.fullvision.ru").
+]
+-----------------------------------------------------------------------
+class 'DirectoryName' (specialized 'Database'):
+--
+internal:
+--
+	file_operation_error_handler	= ('FileOperationErrorHandler',
+						world=self);
+	file_operations			= ('File');
+	text_operations			= ('Text');
+--
+[
+remember_name(Directory):-
+	retract_all,
+	insert(Directory).
+--
+create_directory_if_necessary(Directory):-
+	file_operation_error_handler ? does_exist(Directory),
+	fail.
+create_directory_if_necessary(Directory):-
+	file_operation_error_handler ? make_directory(Directory),!.
+--
+create_or_clear_directory(Directory):-
+	file_operation_error_handler ? does_exist(Directory),
+	Mask== text_operations?format("%s/*.png",Directory),
+	List== file_operation_error_handler?list_directory(Mask),
+	delete_files(List),
+	fail.
+create_or_clear_directory(Directory):-
+	file_operation_error_handler ? make_directory(Directory),!.
+--
+delete_files([FileName|Rest]):-
+	file_operation_error_handler ? delete(FileName),!,
+	delete_files(Rest).
+delete_files([_|Rest]):-!,
+	delete_files(Rest).
+delete_files(_).
+--
+list_directory(Mask) = file_operations?list_directory(Mask).
+--
+make_directory(DirectoryName):-
+	file_operations ? make_directory(DirectoryName).
+]
+-----------------------------------------------------------------------
+class 'Switch' (specialized 'Database'):
+[
+assign(Mode):-
+	retract_all,
+	insert(Mode).
+--
+is_true:-
+	find('yes'),!.
+--
+is_false:-
+	is_true,!,
+	fail.
+is_false.
+]
+-----------------------------------------------------------------------
+class 'CameraErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler		= self;
+	--
+	graphics_window;
+	--
+	text_operations	= ('Text');
+	con		= ('Console');
+--
+[
+alarm(ExceptionName,_,_*):-
+	ForegroundColor== 'Red',
+	FontSize== 12,
+	graphics_window ? set_brush(ForegroundColor),
+	graphics_window ? set_font({size:FontSize}),
+	graphics_window ? set_rendering_mode({
+		colorRendering:'QUALITY',
+		antialiasing:'on',
+		textAntialiasing:'on'
+		}),
+	graphics_window ? set_text_alignment('CENTER','BOTTOM'),
+	graphics_window ? draw_text(
+		0.5,0.45,"I cannot access the camera:"),
+	graphics_window ? set_text_alignment('CENTER','TOP'),
+	graphics_window ? draw_text(
+		0.5,0.55,text_operations?format("%s",ExceptionName)).
+]
+-----------------------------------------------------------------------
+class 'FileOperationErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler		= self;
+	--
+	con		= ('Console');
+--
+[
+alarm(ExceptionName,Operation,_*):-
+	Text== con?format(
+		"\n\nOperation: %s\n\nError: %s\n\n",
+		Operation,ExceptionName),
+	con ? error("I cannot implement file operation",Text).
+]
+-----------------------------------------------------------------------
+class 'AutomaticRecorder' (specialized 'Dialog'):
+--
+internal:
+--
+	video_recorder;
+	window_time	= ('Canvas2D',
+				enable_scene_antialiasing='yes',
+				background_color='SystemControl');
+--
+	starter		= ('Starter',
+				target=self);
+	interrupter	= ('Interrupter',
+				target=self);
+	con		= ('Console');
+--
+constant:
+--
+	is_modal		= 'no';
+	is_top_level_window	= 'yes';
+	is_always_on_top	= 'yes';
+	exit_on_close		= 'no';
+--
+[
+open(Delay,Limit):-!,
+	show,
+	-- maximize,
+	starter ? set_delay(Delay),
+	interrupter ? set_delay(Limit),
+	starter ? activate.
+--
+action("Cancel"):-!,
+	hide.
+--
+window_closed:-!,
+	starter ? suspend,
+	stop_recording.
+--
+start_recording:-
+	starter ? suspend,
+	video_recorder ? start_recording,
+	interrupter ? activate.
+--
+stop_recording:-
+	interrupter ? suspend,
+	video_recorder ? stop_recording,
+	hide.
+--
+output_number(N,Color):-
+	window_time ? suspend_redrawing,
+	window_time ? clear,
+	window_time ? set_brush(Color),
+	window_time ? set_font({size:72}),
+	window_time ? set_text_alignment('CENTER','CENTER'),
+	window_time ? draw_text(0.5,0.5,?convert_to_string(N)),
+	window_time ? draw_now.
+]
+-----------------------------------------------------------------------
+class 'Starter' (specialized 'Timer'):
+--
+internal:
+--
+	target;
+	--
+	counter		= ('Counter');
+	con		= ('Console');
+--
+[
+goal:-!,
+	set_period(1.0,0.0).
+--
+set_delay(Delay):-
+	counter ? set(Delay).
+--
+tick:-
+	counter ? get_and_decrease(N),
+	target ? output_number(N,'Blue'),
+	N <= 0,!,
+	target ? start_recording.
+tick:-!.
+--
+alarm(ExceptionName):-!,
+	con ? writeln(ExceptionName).
+]
+-----------------------------------------------------------------------
+class 'Interrupter' (specialized 'Timer'):
+--
+internal:
+--
+	target;
+	--
+	counter		= ('Counter');
+	con		= ('Console');
+--
+[
+goal:-!,
+	set_period(1.0,0.0).
+--
+set_delay(Delay):-
+	counter ? set(Delay).
+--
+tick:-
+	counter ? get_and_decrease(N),
+	target ? output_number(N,'Red'),
+	N <= 0,!,
+	target ? stop_recording.
+tick:-!.
+--
+alarm(ExceptionName):-!,
+	con ? writeln(ExceptionName).
+]
+-----------------------------------------------------------------------
+class 'Counter' (specialized 'Database'):
+[
+set(Value):-
+	retract_all,
+	insert(Value).
+--
+get(Value):-
+	find(Value),!.
+get(0).
+--
+get_and_decrease(Value):-
+	retract(Value),!,
+	insert(Value-1).
+get_and_decrease(0).
+]
+-----------------------------------------------------------------------

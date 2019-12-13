@@ -15,12 +15,17 @@ PREDICATES:
 imperative:
 
 test1(N)				- (i);
+loop;
+
+determ:
+
 test_image;
+
+imperative:
+
 test2;
---
 test_view_sizes(ViewSizeList)		- (i);
 test_view_sizes(INTEGER,INTEGER)	- (i,i);
---
 write_tabulation(N)			- (i);
 
 class 'Main' (specialized 'Alpha'):
@@ -56,7 +61,7 @@ test1(T):-
 	con ? set_color('DkGreen'),
 	write_tabulation(T),
 	con ? writeln(" Width=",Width," Height=",Height),
-	test_image,
+	loop,
 	webcam ? get_recent_frame_rate(FrameRate),
 	con ? set_color('Gray'),
 	write_tabulation(T),
@@ -66,8 +71,13 @@ test1(T):-
 	write_tabulation(T),
 	con ? writeln("O.K.").
 --
+loop:-
+	test_image,!.
+loop:-
+	loop.
+--
 test_image:-
-	webcam ? commit,!,
+	webcam ? commit,
 	webcam ? get_recent_image(buffer),
 	panel ? show,
 	panel ? get_size_in_pixels(WP,HP),
@@ -79,7 +89,6 @@ test_image:-
 	panel ? clear('no'),
 	panel ? draw_image(buffer,X0,Y0,Width,Height),
 	panel ? draw_now.
-test_image.
 --
 test2:-
 	con ? set_color('RoyalBlue'),

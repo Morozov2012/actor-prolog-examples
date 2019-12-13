@@ -49,7 +49,7 @@ CLAUSES:
 goal:-!,
 	update_webcam_list,
 	watch_webcam_list('yes'),
-	panel ? show,
+	panel ? show.
 	-- start.
 --
 webcam_added(_):-!,
@@ -141,7 +141,6 @@ imperative:
 initiate_webcam;
 --
 update_resolution;
-update_resolution(ViewSize)		- (i);
 --
 set_image('BufferedImage')		- (i);
 --
@@ -170,13 +169,6 @@ update_resolution:-
 	ViewSize== ?val("STRING",?get(2020)),!,
 	webcam ? update_resolution(ViewSize).
 update_resolution.
---
-update_resolution(size(Width,Height)):-
-	webcam ? is_active,!,
-	webcam ? set_actual_resolution(Width,Height),
-	webcam ? set_default_resolution(Width,Height).
-update_resolution(size(Width,Height)):-
-	webcam ? set_default_resolution(Width,Height).
 --
 set_image(Image):-
 	Image ? get_size_in_pixels(WI,HI),!,

@@ -1,9 +1,46 @@
 --------------------------------------------------------------------
 -- Predefined Classes of Actor Prolog                             --
--- (c) 2012 IRE RAS Alexei A. Morozov                             --
+-- (c) 2012-2019 IRE RAS Alexei A. Morozov                        --
 --------------------------------------------------------------------
 
 package "Morozov/Sound":
+
+import 'DataAcquisitionBuffer' from "Morozov/VideoBuffer";
+
+--------------------------------------------------------------------
+-- The 'Microphone' class is specialized                          --
+-- class 'DataAcquisitionBuffer'.                                 --
+--------------------------------------------------------------------
+
+class 'Microphone' (specialized 'DataAcquisitionBuffer'):
+--
+default_data_line		= 'default';
+--
+-- The implementation of the 'DataAcquisitionBuffer' interface:
+--
+operating_mode			= 'LISTENING';
+attach_audio_data		= 'yes';
+
+[
+SOURCE:
+	"morozov.built_in.Microphone";
+
+CLAUSES:
+
+start(MicrophoneDataLine):
+	[external "start"].
+--
+get_actual_data_line() = MicrophoneDataLine:
+	[external "getActualDataLine"].
+--
+get_microphone_list = MicrophoneDataLineList:
+	[external "getMicrophoneList"].
+--
+set_default_data_line(MicrophoneDataLine):
+	[external "setDefaultDataLine"].
+get_default_data_line() = MicrophoneDataLine:
+	[external "getDefaultDataLine"].
+]
 
 --------------------------------------------------------------------
 -- The 'Clip' class is specialized class 'DataAbstraction'.       --

@@ -1,0 +1,73 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologScanner' from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+TestSet		= Test*.
+--
+Test		= title(STRING);
+		  test(	STRING,
+			_,
+			ExpectedResult).
+--
+ExpectedResult	= 'positive'; 'negative'.
+--
+---------------------------------------------------------------------
+interface 'Main'
+(specialized 'DemoConsole','TestProcedures'):
+--
+internal:
+--
+	scanner		: 'ActorPrologScanner';
+	--
+	test_bench	: 'TestProcedures';
+[
+PREDICATES:
+--
+imperative:
+--
+test_loop(	TestSet,
+		INTEGER,
+		INTEGER,
+		INTEGER)		- (i,i,i,o);
+--
+test_example(	Test,
+		INTEGER,
+		INTEGER,
+		INTEGER,
+		INTEGER)		- (i,i,o,i,o);
+--
+report_positive_result(
+		ExpectedResult,
+		INTEGER,
+		INTEGER)		- (i,i,o);
+report_negative_result(
+		ExpectedResult,
+		INTEGER,
+		INTEGER)		- (i,i,o);
+--
+report_total_results(INTEGER)			- (i);
+--
+determ:
+--
+alarm(	ExceptionName,
+	SYMBOL,
+	STRING,
+	_)				- (i,i,i,i);
+]
+---------------------------------------------------------------------
+interface 'TestProcedures':
+[
+PREDICATES:
+--
+determ:
+--
+scan_text(STRING,_)				- (i,i);
+]
+---------------------------------------------------------------------

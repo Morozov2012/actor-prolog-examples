@@ -1,0 +1,1230 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Java2D";
+import .. from "morozov/Webcam";
+import .. from "morozov/FFmpeg";
+-----------------------------------------------------------------------
+project: (('VideoRecorder'))
+-----------------------------------------------------------------------
+class 'VideoRecorder' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer		= ('VideoManager',
+				name=temporary_file_name,
+				main_window,
+				video_recorder=self);
+	main_window	= ('Canvas2D',
+				background_color='SystemControl');
+	--
+	writer		= ('FFmpeg',
+				operating_mode='WRITING',
+				extension=".avi");
+	inspector	= ('VideoFileInspector',
+				viewer=self);
+	--
+	webcam_error_handler	= ('WebCameraErrorHandler',
+					world=buffer);
+	--
+	export_mode			= ('ExportMode');
+	directory_name			= ('DirectoryName');
+	image				= ('BufferedImage');
+	--
+	data_are_to_be_saved		= ('Switch');
+	stop_after_the_first_frame	= ('Switch');
+	suspend_video_player		= ('Switch');
+	--
+	file_operation_error_handler	= ('FileOperationErrorHandler',
+						world=self);
+	file_operations			= ('File');
+	text_operations			= ('Text');
+	timer_operations		= ('Timer');
+	con				= ('Console');
+--
+constant:
+--
+	temporary_file_name	= "recorder.ap2j";
+	is_top_level_window	= 'yes';
+	exit_on_close		= 'yes';
+	--
+	dlg_ctrl_edittext_description			= 1010;
+	dlg_ctrl_edittext_copyright			= 1020;
+	dlg_ctrl_edittext_registration_date		= 1030;
+	dlg_ctrl_edittext_registration_time		= 1040;
+	dlg_ctrl_editname_record_length			= 1050;
+	--
+	dlg_ctrl_listbutton_webcam_list			= 2011;
+	dlg_ctrl_listbutton_selected_webcam		= 2012;
+	dlg_ctrl_listbutton_resolution_list		= 2021;
+	dlg_ctrl_listbutton_selected_resolution		= 2022;
+	dlg_ctrl_togglebutton_use_commands		= 2030;
+	dlg_ctrl_togglebutton_zoom_image		= 2040;
+	dlg_ctrl_editreal_zooming_coefficient		= 2050;
+	dlg_ctrl_togglebutton_microphone		= 2060;
+	--
+	dlg_ctrl_scrollbar_frame_number_range		= 3011;
+	dlg_ctrl_scrollbar_frame_number_value		= 3012;
+--
+[
+goal:-!,
+	update_webcam_list,
+	buffer ? watch_webcam_list('yes'),
+	switch_controls,
+	-- maximize,
+	show,
+	load_temporary_file_if_possible,
+	update_displaying_mode,
+	switch_controls.
+--
+action("Connect"):-
+	buffer ? is_active,
+	webcam_is_connected,!,
+	buffer ? stop,
+	buffer ? set_operating_mode('PLAYING'),
+	switch_controls.
+action("Connect"):-
+	buffer ? stop,
+	switch_controls,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? set_output_audio_data('yes'),
+	webcam_error_handler ? start,!,
+	update_webcam_resolutions,
+	switch_controls.
+action("Choose"):-
+	FileName== con?input_file_name(
+		"Please select data file",
+		"*.ap2j",
+		[
+		"*.ap2j","Video data",
+		"*.*","All Files"
+		]),
+	buffer ? stop,!,
+	choose_file(FileName).
+action("Play"):-
+	suspend_video_player ? is_true,!,
+	buffer ? start,
+	switch_controls.
+action("Play"):-!,
+	buffer ? stop,
+	buffer ? set_operating_mode('PLAYING'),
+	start_reading,
+	switch_controls.
+action("Pause"):-!,
+	buffer ? pause,
+	suspend_video_player ? assign('yes'),
+	switch_controls.
+action("Stop"):-
+	buffer ? is_active,
+	is_recording_or_exporting_mode,!,
+	buffer ? stop,
+	writer ? close,
+	buffer ? set_operating_mode('LISTENING'),
+	export_mode ? assign('NONE'),
+	buffer ? flush_audio_buffer,
+	buffer ? set_output_audio_data('yes'),
+	buffer ? start,
+	switch_controls.
+action("Stop"):-!,
+	buffer ? stop,
+	writer ? close,
+	export_mode ? assign('NONE'),
+	switch_controls.
+action("Record"):-
+	is_recording_mode,!.
+action("Record"):-
+	buffer ? is_active,
+	is_listening_mode,
+	check_whether_data_are_to_be_saved,!,
+	buffer ? set_name(temporary_file_name),
+	update_dialog_title(""),
+	buffer ? set_operating_mode('RECORDING'),
+	buffer ? stop,
+	buffer ? set_output_audio_data('no'),
+	buffer ? start,
+	data_are_to_be_saved ? assign('yes'),
+	switch_controls.
+action("Save"):-
+	check_file_name,
+	TargetFileName== con?input_new_file_name(
+		"Please select a new file name",
+		"*.ap2j",
+		[
+		"*.ap2j","Video data",
+		"*.*","All files"
+		]),
+	rename_temporary_file(TargetFileName),!,
+	data_are_to_be_saved ? assign('no'),
+	choose_file(TargetFileName).
+action("JPG"):-!,
+	export_data_to_frames.
+action("AVI"):-!,
+	export_data_to_video(".avi").
+action("GIF"):-!,
+	export_data_to_video(".gif").
+--
+created_control(dlg_ctrl_listbutton_selected_webcam):-!,
+	initiate_webcam.
+created_control(dlg_ctrl_listbutton_selected_resolution):-!,
+	update_resolution.
+--
+modified_control(dlg_ctrl_listbutton_selected_webcam):-!,
+	initiate_webcam.
+modified_control(dlg_ctrl_listbutton_selected_resolution):-!,
+	update_resolution.
+modified_control(dlg_ctrl_scrollbar_frame_number_value):-!,
+	scroll_video.
+modified_control(_):-!,
+	update_displaying_mode,
+	switch_controls,
+	redraw_recent_frame.
+--
+initiate_webcam:-
+	SelectedWebcam==
+		?cast("WebcamName",
+			?get(dlg_ctrl_listbutton_selected_webcam)),
+	buffer ? stop,
+	buffer ? set_default_name(SelectedWebcam),
+	buffer ? set_output_audio_data('yes'),
+	buffer ? start,
+	update_webcam_resolutions.
+--
+complete_data_transfer:-
+	writer ? is_open,
+	writer ? close,
+	fail.
+complete_data_transfer:-
+	is_recording_mode,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? stop,
+	fail.
+complete_data_transfer:-
+	webcam_is_disconnected,
+	buffer ? set_operating_mode('PLAYING'),
+	buffer ? stop,
+	fail.
+complete_data_transfer:-
+	buffer ? flush_audio_buffer,
+	fail.
+complete_data_transfer:-
+	export_mode ? assign('NONE'),
+	switch_controls.
+-----------------------------------------------------------------------
+load_temporary_file_if_possible:-
+	buffer ? does_exist,!,
+	buffer ? set_operating_mode('READING'),
+	read_only_the_first_frame,
+	start_reading,
+	switch_controls.
+load_temporary_file_if_possible.
+--
+choose_file(FileName):-
+	is_listening_mode,
+	buffer ? is_active,!,
+	buffer ? set_name(FileName),
+	update_dialog_title(FileName),
+	switch_controls.
+choose_file(FileName):-
+	buffer ? set_name(FileName),
+	update_dialog_title(FileName),
+	buffer ? stop,
+	buffer ? set_operating_mode('READING'),
+	read_only_the_first_frame,
+	start_reading,
+	switch_controls.
+--
+update_dialog_title(""):-!,
+	put('title',"Webcam Recorder").
+update_dialog_title(FileName):-
+	put('title',"Webcam Recorder ["+FileName+"]").
+--
+start_reading:-
+	check_file_name,!,
+	suspend_video_player ? assign('no'),
+	switch_controls,
+	park_scroll_control,
+	buffer ? set_output_audio_data('yes'),
+	buffer ? start.
+start_reading.
+--
+check_whether_data_are_to_be_saved:-
+	data_are_to_be_saved ? is_true,!,
+	con ? ask(
+		"Data are not saved!",
+		"Do you want to rewrite the data?").
+check_whether_data_are_to_be_saved.
+-----------------------------------------------------------------------
+export_data_to_frames:-
+	is_recording_or_exporting_mode,!.
+export_data_to_frames:-
+	check_file_name,
+	input_directory_name(Directory),
+	create_or_clear_directory(Directory),!,
+	export_mode ? assign('JPG'),
+	set_output_directory(Directory),
+	buffer ? set_operating_mode('READING'),
+	read_all_frames,
+	buffer ? set_output_audio_data('no'),
+	buffer ? start,
+	switch_controls.
+export_data_to_frames.
+--
+export_data_to_video(_):-
+	is_recording_or_exporting_mode,!.
+export_data_to_video(Extension):-
+	webcam_is_connected,
+	buffer ? get_recent_frame_rate(FrameRate1),
+	FrameRate1 > 0,!,
+	tune_up_writer(Extension),
+	DestinationFileName== ?create_new_file_name(),
+	buffer ? get_image_size_in_pixels(Width,Height),
+	writer ? set_automatic_frame_rate_correction('on'),
+	-- writer ? set_audio_data_delay_correction(0),
+	writer ? open(
+		DestinationFileName,[
+		{
+		codec_type: 'AVMEDIA_TYPE_VIDEO',
+		destination_image_width: Width,
+		destination_image_height: Height,
+		time_base: 1/FrameRate1
+		},{
+		codec_type: 'AVMEDIA_TYPE_AUDIO',
+		bit_rate: 64_000,
+		time_base: 1/44100,
+		sample_rate: 44100,
+		channels: 2,
+		sample_fmt: 'AV_SAMPLE_FMT_S16',
+		channel_layout: 'AV_CH_LAYOUT_STEREO',
+		nb_samples: 100000
+		}]),
+	buffer ? stop,
+	buffer ? set_operating_mode('LISTENING'),
+	buffer ? reset_frame_rate,
+	put(dlg_ctrl_editname_record_length,""),
+	buffer ? set_output_audio_data('no'),
+	buffer ? start,
+	switch_controls.
+export_data_to_video(Extension):-
+	webcam_is_disconnected,!,
+	tune_up_writer(Extension),
+	buffer ? stop,
+	SourceFileName== buffer?get_full_name(),
+	inspector ? inspect_file(SourceFileName).
+export_data_to_video(_).
+--
+tune_up_writer(Extension):-
+	export_mode ? select_mode(Extension),
+	writer ? set_extension(Extension),
+	fail.
+tune_up_writer(_).
+--
+continue_export:-
+	buffer ? stop,
+	--
+	SourceFileName== buffer?get_full_name(),
+	Extension== writer?get_extension(),
+	DestinationFileName== file_operations
+		?replace_extension(SourceFileName,Extension),
+	inspector ? get_image_size_in_pixels(Width,Height),
+	inspector ? get_recent_frame_rate(FrameRate),
+	writer ? set_automatic_frame_rate_correction('off'),
+	-- writer ? set_audio_data_delay_correction(0),
+	--
+	writer ? open(
+		DestinationFileName,[
+		{
+		codec_type: 'AVMEDIA_TYPE_VIDEO',
+		destination_image_width: Width,
+		destination_image_height: Height,
+		time_base: 1/FrameRate,
+		bit_rate: 5_000_000
+		},{
+		codec_type: 'AVMEDIA_TYPE_AUDIO',
+		bit_rate: 64_000,
+		time_base: 1/44100,
+		sample_rate: 44100,
+		channels: 2,
+		sample_fmt: 'AV_SAMPLE_FMT_S16',
+		channel_layout: 'AV_CH_LAYOUT_STEREO',
+		nb_samples: 100000
+		}]),
+	buffer ? set_operating_mode('READING'),
+	buffer ? reset_frame_rate,
+	put(dlg_ctrl_editname_record_length,""),
+	buffer ? start,
+	buffer ? set_output_audio_data('no'),
+	switch_controls.
+-----------------------------------------------------------------------
+export_image_if_necessary(FrameNumber,_,_):-
+	export_mode ? export_to_frames,!,
+	save_frame_if_necessary(FrameNumber).
+export_image_if_necessary(_,FrameTime,RelativeTime):-
+	export_mode ? export_to_video,!,
+	export_image_to_video_file(FrameTime,RelativeTime).
+export_image_if_necessary(_,_,RelativeTime):-
+	is_recording_mode,!,
+	TimeInSeconds== RelativeTime / 1000.0,
+	TS== text_operations?format("%3.2f",TimeInSeconds),
+	put(dlg_ctrl_editname_record_length,TS).
+export_image_if_necessary(_,_,_):-
+	is_reading_mode,!,
+	switch_controls.
+export_image_if_necessary(_,_,_).
+--
+save_frame_if_necessary(_):-
+	stop_after_the_first_frame ? is_true,!,
+	buffer ? stop,
+	switch_controls.
+save_frame_if_necessary(FrameNumber):-
+	directory_name ? find(Directory),
+	FileName== text_operations?format(
+		"%s/%08d.jpg",Directory,FrameNumber),
+	save_current_frame(FileName),!,
+	continue_data_transfer_if_necessary.
+save_frame_if_necessary(_):-!,
+	buffer ? stop,
+	switch_controls.
+save_frame_if_necessary(_).
+--
+save_current_frame(FileName):-
+	file_operation_error_handler ? save(
+		FileName,{
+			format:'default',
+			compressionQuality:0.95,
+			progressiveMode:'on',
+			interlacing:'on',
+			comment:"The Actor Prolog project"
+		}).
+--
+save(FileName,ImageAttributes):-
+	main_window ? save(FileName,ImageAttributes).
+--
+export_image_to_video_file(FrameTime,RelativeTime):-
+	writer ? is_open,
+	main_window ? get_image(image),
+	writer ? write_realtime_image(image,FrameTime),
+	flush_writer_if_necessary,
+	TimeInSeconds== RelativeTime / 1000.0,
+	TS== text_operations?format("%3.2f",TimeInSeconds),
+	put(dlg_ctrl_editname_record_length,TS),
+	fail.
+export_image_to_video_file(_,_):-
+	is_reading_mode,
+	continue_data_transfer_if_necessary,
+	fail.
+export_image_to_video_file(_,_).
+-----------------------------------------------------------------------
+export_audio_data_if_necessary(AudioData,Time):-
+	export_mode ? export_to_video_with_sound,
+	writer ? write_realtime_audio_data(AudioData,Time),
+	flush_writer_if_necessary,
+	fail.
+export_audio_data_if_necessary(_,_):-
+	is_reading_mode,
+	continue_data_transfer_if_necessary,
+	fail.
+export_audio_data_if_necessary(_,_).
+--
+flush_writer_if_necessary:-
+	is_reading_mode,
+	writer ? flush,
+	fail.
+flush_writer_if_necessary.
+-----------------------------------------------------------------------
+park_scroll_control:-
+	Range== ?val("I_List",
+		?get(dlg_ctrl_scrollbar_frame_number_range)),
+	Range == [_,Right],!,
+	put(dlg_ctrl_scrollbar_frame_number_value,Right).
+park_scroll_control.
+--
+set_read_buffer_size(Size):-
+	put(dlg_ctrl_scrollbar_frame_number_range,[1,Size]).
+--
+redraw_recent_frame:-
+	buffer ? frame_obtained.
+--
+scroll_video:-
+	buffer ? request_buffered_frame(
+		?cast("INTEGER",
+		?get(dlg_ctrl_scrollbar_frame_number_value))),!.
+scroll_video.
+--
+read_all_frames:-
+	stop_after_the_first_frame ? assign('no').
+--
+read_only_the_first_frame:-
+	stop_after_the_first_frame ? assign('yes').
+--
+is_listening_mode:-
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'LISTENING'.
+--
+is_playing_mode:-
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'PLAYING'.
+--
+is_reading_mode:-
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'READING'.
+--
+is_recording_or_exporting_mode:-
+	is_recording_mode,!.
+is_recording_or_exporting_mode:-
+	export_mode ? export_is_on.
+--
+is_recording_mode:-
+	Mode== ?val("DataAcquisitionBufferOperatingMode",
+		buffer?get_operating_mode()),
+	Mode == 'RECORDING'.
+-----------------------------------------------------------------------
+update_displaying_mode:-
+	DoNotControlZoom== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_use_commands)),
+	ZoomImage== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_zoom_image)),
+	ZoomingCoefficient== ?val("Numerical",
+		?get(dlg_ctrl_editreal_zooming_coefficient)),
+	UseMicrophone== ?val("YesNo",
+		?get(dlg_ctrl_togglebutton_microphone)),!,
+	buffer ? set_use_recorded_zooming_commands(DoNotControlZoom),
+	buffer ? set_zoom_image(ZoomImage),
+	buffer ? set_zooming_coefficient(ZoomingCoefficient),
+	buffer ? set_attach_audio_data(UseMicrophone).
+update_displaying_mode.
+--
+switch_controls:-
+	switch_listbutton_WebcamList,
+	switch_listbutton_ResolutionList,
+	switch_button_UseRecordedZoomingCommands,
+	switch_button_ZoomImage,
+	switch_text_area_ZoomingCoefficient,
+	switch_button_Connect,
+	switch_button_Choose,
+	switch_button_Play,
+	switch_button_Pause,
+	switch_button_Record,
+	switch_button_Stop,
+	switch_button_Save,
+	switch_button_AVI,
+	switch_button_JPG,
+	switch_button_GIF,
+	switch_button_Microphone,
+	switch_microphone_state,
+	switch_text_area_Description,
+	switch_auxiliary_controls.
+--
+switch_listbutton_WebcamList:-
+	webcam_is_connected,!,
+	enable(dlg_ctrl_listbutton_webcam_list).
+switch_listbutton_WebcamList:-
+	disable(dlg_ctrl_listbutton_webcam_list).
+--
+switch_listbutton_ResolutionList:-
+	webcam_is_connected,!,
+	enable(dlg_ctrl_listbutton_resolution_list).
+switch_listbutton_ResolutionList:-
+	disable(dlg_ctrl_listbutton_resolution_list).
+--
+switch_button_UseRecordedZoomingCommands:-
+	webcam_is_connected,!,
+	disable(dlg_ctrl_togglebutton_use_commands).
+switch_button_UseRecordedZoomingCommands:-
+	enable(dlg_ctrl_togglebutton_use_commands).
+--
+switch_button_ZoomImage:-
+	webcam_is_connected,!,
+	enable(dlg_ctrl_togglebutton_zoom_image).
+switch_button_ZoomImage:-
+	do_use_zooming_commands,!,
+	disable(dlg_ctrl_togglebutton_zoom_image).
+switch_button_ZoomImage:-
+	enable(dlg_ctrl_togglebutton_zoom_image).
+--
+switch_text_area_ZoomingCoefficient:-
+	webcam_is_connected,!,
+	enable(dlg_ctrl_editreal_zooming_coefficient).
+switch_text_area_ZoomingCoefficient:-
+	do_use_zooming_commands,!,
+	disable(dlg_ctrl_editreal_zooming_coefficient).
+switch_text_area_ZoomingCoefficient:-
+	enable(dlg_ctrl_editreal_zooming_coefficient).
+--
+switch_button_Connect:-
+	is_recording_or_exporting_mode,!,
+	disable("Connect"),
+	set_control_text_color("Connect",'default').
+switch_button_Connect:-
+	buffer ? is_active,
+	is_playing_mode,!,
+	disable("Connect"),
+	set_control_text_color("Connect",'default').
+switch_button_Connect:-
+	buffer ? is_active,
+	webcam_is_connected,!,
+	enable("Connect"),
+	set_control_text("Connect","Disco&nnect"),
+	set_control_text_color("Connect",'Blue').
+switch_button_Connect:-
+	enable("Connect"),
+	set_control_text("Connect","Co&nnect"),
+	set_control_text_color("Connect",'default').
+--
+switch_button_Choose:-
+	is_recording_or_exporting_mode,!,
+	disable("Choose").
+switch_button_Choose:-
+	buffer ? is_active,
+	is_playing_mode,!,
+	disable("Choose").
+switch_button_Choose:-
+	webcam_is_connected,!,
+	disable("Choose").
+switch_button_Choose:-
+	enable("Choose").
+--
+switch_button_Play:-
+	is_recording_or_exporting_mode,!,
+	disable("Play"),
+	set_control_text_color("Play",'default').
+switch_button_Play:-
+	webcam_is_connected,!,
+	disable("Play"),
+	set_control_text_color("Play",'default').
+switch_button_Play:-
+	buffer ? is_active,
+	is_playing_mode,!,
+	enable("Play"),
+	set_control_text_color("Play",'DkGreen').
+switch_button_Play:-
+	buffer ? does_exist,!,
+	enable("Play"),
+	set_control_text_color("Play",'default').
+switch_button_Play:-
+	disable("Play"),
+	set_control_text_color("Play",'default').
+--
+switch_button_Pause:-
+	webcam_is_connected,!,
+	disable("Pause").
+switch_button_Pause:-
+	buffer ? is_active,
+	is_playing_mode,!,
+	enable("Pause").
+switch_button_Pause:-
+	disable("Pause").
+--
+switch_button_Record:-
+	export_mode ? export_is_on,!,
+	disable("Record"),
+	set_control_text_color("Record",'default').
+switch_button_Record:-
+	webcam_is_connected,
+	is_recording_mode,!,
+	enable("Record"),
+	set_control_text_color("Record",'Red').
+switch_button_Record:-
+	webcam_is_connected,
+	is_listening_mode,!,
+	enable("Record"),
+	set_control_text_color("Record",'default').
+switch_button_Record:-
+	disable("Record"),
+	set_control_text_color("Record",'default').
+--
+switch_button_Stop:-
+	buffer ? is_active,
+	writer ? is_open,!,
+	enable("Stop").
+switch_button_Stop:-
+	buffer ? is_active,
+	is_listening_mode,!,
+	disable("Stop").
+switch_button_Stop:-
+	buffer ? is_active,!,
+	enable("Stop").
+switch_button_Stop:-
+	disable("Stop").
+--
+switch_button_Save:-
+	is_recording_or_exporting_mode,!,
+	disable("Save").
+switch_button_Save:-
+	buffer ? is_active,
+	is_playing_mode,!,
+	disable("Save").
+switch_button_Save:-
+	data_are_to_be_saved ? is_true,!,
+	enable("Save").
+switch_button_Save:-
+	file_operations ? does_exist(temporary_file_name),!,
+	enable("Save").
+switch_button_Save:-
+	disable("Save").
+--
+switch_button_AVI:-
+	export_mode ? export_to_AVI,!,
+	enable("AVI"),
+	set_control_text_color("AVI",'Red').
+switch_button_AVI:-
+	is_recording_or_exporting_mode,!,
+	disable("AVI"),
+	set_control_text_color("AVI",'default').
+switch_button_AVI:-
+	webcam_is_connected,!,
+	enable("AVI"),
+	set_control_text_color("AVI",'default').
+switch_button_AVI:-
+	buffer ? is_active,!,
+	disable("AVI"),
+	set_control_text_color("AVI",'default').
+switch_button_AVI:-
+	buffer ? does_exist,!,
+	enable("AVI"),
+	set_control_text_color("AVI",'default').
+switch_button_AVI:-
+	disable("AVI"),
+	set_control_text_color("AVI",'default').
+--
+switch_button_JPG:-
+	export_mode ? export_to_JPG,!,
+	enable("JPG"),
+	set_control_text_color("JPG",'Red').
+switch_button_JPG:-
+	is_recording_or_exporting_mode,!,
+	disable("JPG"),
+	set_control_text_color("JPG",'default').
+switch_button_JPG:-
+	webcam_is_connected,!,
+	disable("JPG"),
+	set_control_text_color("JPG",'default').
+switch_button_JPG:-
+	buffer ? is_active,!,
+	disable("JPG"),
+	set_control_text_color("JPG",'default').
+switch_button_JPG:-
+	buffer ? does_exist,!,
+	enable("JPG"),
+	set_control_text_color("JPG",'default').
+switch_button_JPG:-
+	disable("JPG"),
+	set_control_text_color("JPG",'default').
+--
+switch_button_GIF:-
+	export_mode ? export_to_GIF,!,
+	enable("GIF"),
+	set_control_text_color("GIF",'Red').
+switch_button_GIF:-
+	is_recording_or_exporting_mode,!,
+	disable("GIF"),
+	set_control_text_color("GIF",'default').
+switch_button_GIF:-
+	webcam_is_connected,!,
+	enable("GIF"),
+	set_control_text_color("GIF",'default').
+switch_button_GIF:-
+	buffer ? is_active,!,
+	disable("GIF"),
+	set_control_text_color("GIF",'default').
+switch_button_GIF:-
+	buffer ? does_exist,!,
+	enable("GIF"),
+	set_control_text_color("GIF",'default').
+switch_button_GIF:-
+	disable("GIF"),
+	set_control_text_color("GIF",'default').
+--
+switch_button_Microphone:-
+	buffer ? is_active,
+	is_recording_mode,!,
+	paint_button_Microphone('DkGreen').
+switch_button_Microphone:-
+	buffer ? is_active,
+	export_mode ? export_to_video_with_sound,!,
+	paint_button_Microphone('DkGreen').
+switch_button_Microphone:-
+	paint_button_Microphone('default').
+--
+paint_button_Microphone(Color):-
+	do_use_microphone,
+	buffer ? microphone_is_active,!,
+	set_control_text_color(
+		dlg_ctrl_togglebutton_microphone,Color).
+paint_button_Microphone(_):-
+	set_control_text_color(
+		dlg_ctrl_togglebutton_microphone,'default').
+--
+switch_microphone_state:-
+	buffer ? microphone_is_available,!,
+	enable(dlg_ctrl_togglebutton_microphone).
+switch_microphone_state:-
+	disable(dlg_ctrl_togglebutton_microphone).
+--
+switch_text_area_Description:-
+	buffer ? get_delivered_description(Description),
+	buffer ? get_delivered_copyright(Copyright),
+	buffer ? get_delivered_registration_date(Date),
+	buffer ? get_delivered_registration_time(Time),
+	put(dlg_ctrl_edittext_description,Description),
+	put(dlg_ctrl_edittext_copyright,Copyright),
+	put(dlg_ctrl_edittext_registration_date,Date),
+	put(dlg_ctrl_edittext_registration_time,Time).
+--
+switch_auxiliary_controls:-
+	buffer ? is_active,
+	webcam_is_connected,!,
+	disable(dlg_ctrl_scrollbar_frame_number_range).
+switch_auxiliary_controls:-
+	enable(dlg_ctrl_scrollbar_frame_number_range).
+-----------------------------------------------------------------------
+do_use_microphone:-
+	Mode== ?get(dlg_ctrl_togglebutton_microphone),
+	?val("YesNo",Mode) == 'yes'.
+--
+do_use_zooming_commands:-
+	Mode== ?get(dlg_ctrl_togglebutton_use_commands),
+	?val("YesNo",Mode)== 'yes'.
+--
+webcam_is_connected:-
+	webcam_is_connected(buffer?get_operating_mode()).
+--
+webcam_is_connected('LISTENING').
+webcam_is_connected('RECORDING').
+--
+webcam_is_disconnected:-
+	webcam_is_connected,!,
+	fail.
+webcam_is_disconnected.
+--
+update_webcam_list:-
+	List== buffer?get_webcam_list(),
+	put(dlg_ctrl_listbutton_webcam_list,List),
+	update_webcam_resolutions.
+--
+update_webcam_resolutions:-
+	buffer ? is_active,!,
+	List1== buffer?get_view_sizes(),
+	resolutions_to_strings(List1,List2),
+	put(dlg_ctrl_listbutton_resolution_list,List2),
+	update_resolution.
+update_webcam_resolutions.
+--
+resolutions_to_strings([size(W,H)|Rest1],[R|Rest2]):-!,
+	resolution_to_string(W,H,R),
+	resolutions_to_strings(Rest1,Rest2).
+resolutions_to_strings(_,[]).
+--
+resolution_to_string(Width,Height,Name):-
+	resolution_string(Width,Height,Name),!.
+resolution_to_string(Width,Height,Name):-
+	Name== text_operations?format("%d x %d",Width,Height).
+--
+string_to_resolution(Name,Width,Height):-
+	resolution_string(Width,Height,Name),!.
+string_to_resolution(Name,Width,Height):-
+	[WT,HT]== text_operations?extract_tokens(Name),
+	Width== text_operations?convert_to_integer(WT),
+	Height== text_operations?convert_to_integer(HT).
+--
+resolution_string( 352, 288, "CIF (352x288)").
+resolution_string(1280, 720, "HD720 (1280x720)"):-!.
+resolution_string(1280, 720, "HD720P (1280x720)").
+resolution_string( 480, 400, "HVGA (480x400)").
+resolution_string( 768, 576, "PAL (768x576)").
+resolution_string( 176, 144, "QQVGA (176x144)").
+resolution_string( 320, 240, "QVGA (320x240)").
+resolution_string(2048,1536, "QXGA (2048x1536)").
+resolution_string( 800,600,  "SVGA (800x600)").
+resolution_string(1280,1024, "SXGA (1280x1024)").
+resolution_string(1600,1200, "UXGA (1600x1200)").
+resolution_string( 640, 480, "VGA (640x480)").
+resolution_string(1280, 768, "WXGA (1280x768)").
+resolution_string(1024, 768, "XGA (1024x768)").
+--
+update_resolution:-
+	ViewSize== ?val("STRING",
+		?get(dlg_ctrl_listbutton_selected_resolution)),!,
+	update_resolution(ViewSize).
+update_resolution.
+--
+update_resolution(Name):-
+	buffer ? is_active,
+	string_to_resolution(Name,Width,Height),!,
+	buffer ? set_actual_resolution(Width,Height),
+	buffer ? set_default_resolution(Width,Height),
+	buffer ? reset_frame_rate.
+update_resolution(_).
+-----------------------------------------------------------------------
+check_file_name:-
+	buffer ? does_exist,!.
+check_file_name:-
+	FileName== buffer?get_name(),
+	con ? error(
+		"Illegal File name",
+		text_operations?format(
+			"The '%s' file does not exist.",FileName)),
+	fail.
+--
+set_output_directory(Directory):-
+	directory_name ? retract_all,
+	directory_name ? insert(Directory).
+--
+input_directory_name(Directory):-
+	FN1== buffer?get_name(),
+	file_operations ? extract_extension(FN1,FN2,_),
+	input_directory_name(FN2,Directory).
+--
+input_directory_name(InitialName,Directory):-
+	create_directory_if_necessary(InitialName),
+	Directory== con?input_directory_name(
+		"Please select output directory",
+		InitialName),
+	create_or_clear_directory(Directory),!.
+input_directory_name(InitialName,_):-
+	file_operation_error_handler ? delete(InitialName),
+	fail.
+--
+create_directory_if_necessary(Directory):-
+	file_operation_error_handler ? does_exist(Directory),
+	fail.
+create_directory_if_necessary(Directory):-
+	file_operation_error_handler ? make_directory(Directory),!.
+--
+create_or_clear_directory(Directory):-
+	file_operation_error_handler ? does_exist(Directory),
+	Mask== text_operations?format("%s/*.jpg",Directory),
+	List== file_operation_error_handler?list_directory(Mask),
+	delete_files(List),
+	fail.
+create_or_clear_directory(Directory):-
+	file_operation_error_handler ? make_directory(Directory),!.
+--
+delete_files([FileName|Rest]):-
+	file_operation_error_handler ? delete(FileName),!,
+	delete_files(Rest).
+delete_files([_|Rest]):-!,
+	delete_files(Rest).
+delete_files(_).
+--
+rename_temporary_file(TargetFileName):-
+	file_operation_error_handler ? delete(TargetFileName),
+	buffer ? rename(TargetFileName).
+--
+continue_data_transfer_if_necessary:-
+	buffer ? eof,!.
+continue_data_transfer_if_necessary:-
+	buffer ? set_output_audio_data('no'),
+	buffer ? start,
+	switch_controls.
+--
+does_exist(FileName):-
+	file_operations ? does_exist(FileName).
+--
+list_directory(Mask) = file_operations?list_directory(Mask).
+--
+delete(FileName):-
+	file_operations ? delete(FileName).
+--
+make_directory(DirectoryName):-
+	file_operations ? make_directory(DirectoryName).
+--
+create_new_file_name() = FileName :-
+	timer_operations ? date(Year,Month,Day),
+	timer_operations ? time(Hour,Minute,Second),
+	FileName== text_operations?format(
+		"%04d-%02d-%02d-%02d-%02d-%02d",
+		Year,Month,Day,
+		Hour,Minute,Second).
+--
+rename(FileName):-
+	file_operations ? rename(FileName).
+]
+-----------------------------------------------------------------------
+class 'VideoManager' (specialized 'Webcam'):
+--
+constant:
+--
+	name;
+	--
+	operating_mode			= 'PLAYING';
+	attach_audio_data		= 'yes';
+	output_audio_data		= 'yes';
+	audio_data_delay_correction	= 'default';
+--
+internal:
+--
+	main_window;
+	--
+	image			= ('BufferedImage');
+	--
+	video_recorder;
+	--
+	file_operations		= ('File');
+	text_operations		= ('Text');
+	timer_operations	= ('Timer');
+	con			= ('Console');
+--
+constant:
+--
+	read_buffer_size		= 100;
+	slow_motion_coefficient		= -1;
+--
+[
+goal:-!,
+	video_recorder ? set_read_buffer_size(read_buffer_size).
+--
+frame_obtained:-
+	commit,!,
+	get_recent_frame_number(FrameNumber),
+	get_recent_frame_time(FrameTime),
+	get_recent_frame_relative_time(RelativeTime),
+	get_recent_frame_rate(FrameRate),
+	get_recent_image(image),
+	get_image_size_in_pixels(IW,IH),
+	get_actual_resolution(PixelsW,PixelsH),
+	main_window ? suspend_redrawing,
+	main_window ? clear,
+	main_window ? draw_image(image,0,0,1,1),
+	report_time(FrameNumber,FrameTime,PixelsW,PixelsH,FrameRate),
+	main_window ? refine_width(IW/IH),
+	main_window ? draw_now,
+	video_recorder ? export_image_if_necessary(
+		FrameNumber,FrameTime,RelativeTime),
+	output_description_if_necessary(FrameNumber).
+--
+audio_data_obtained:-
+	commit_audio_data,!,
+	get_recent_audio_data_time(FrameTime),
+	Binary== ?get_recent_audio_data(),
+	video_recorder ?
+		export_audio_data_if_necessary(Binary,FrameTime).
+--
+webcam_added(_):-!,
+	video_recorder ? update_webcam_list.
+--
+webcam_removed(_):-!,
+	video_recorder ? update_webcam_list.
+--
+data_transfer_completion:-!,
+	video_recorder ? complete_data_transfer.
+--
+data_transfer_error(ErrorName):-!,
+	video_recorder ? complete_data_transfer,
+	con ? error("Data Transfer Error",ErrorName).
+--
+buffer_overflow:-!,
+	con ? set_color('White','Red'),
+	con ? writeln("Buffer overflow!"),
+	con ? set_color('default').
+--
+buffer_deallocation:-!,
+	con ? set_color('White','DkGreen'),
+	con ? writeln("Buffer restored."),
+	con ? set_color('default').
+-----------------------------------------------------------------------
+report_time(_,_,_,_,_):-
+	main_window ? set_brush('Green'),
+	main_window ? set_font({size:18}),
+	fail.
+report_time(FrameNumber,FrameTime,_,_,_):-
+	FrameNumber >= 0,
+	Time== timer_operations?convert_to_time(FrameTime),
+	Time == time(Hours,Minutes,Seconds,Milliseconds),
+	main_window ? set_text_alignment('LEFT','TOP'),
+	main_window ? draw_text(
+		0.02, 0.02,
+		text_operations?format(
+			"Time: %02d:%02d:%02d.%03d; Frame: %d",
+			Hours,Minutes,Seconds,Milliseconds,
+			FrameNumber)),
+	fail.
+report_time(_,_,PixelsW,PixelsH,FrameRate):-
+	FrameRate > 0,
+	main_window ? set_text_alignment('RIGHT','TOP'),
+	main_window ? draw_text(
+		0.95, 0.02,
+		text_operations?format(
+			"%dx%d Frame Rate: %2.1f",
+			PixelsW,PixelsH,FrameRate)),
+	fail.
+report_time(_,_,_,_,_).
+-----------------------------------------------------------------------
+output_description_if_necessary(FrameNumber):-
+	FrameNumber <= 1,!,
+	video_recorder ? switch_text_area_Description.
+output_description_if_necessary(_).
+]
+-----------------------------------------------------------------------
+class 'DirectoryName' (specialized 'Database'):
+[
+]
+-----------------------------------------------------------------------
+class 'ExportMode' (specialized 'Database'):
+--
+internal:
+--
+	text_operations		= ('Text');
+--
+[
+assign(Mode):-
+	retract_all,
+	insert(Mode).
+--
+select_mode(Name):-
+	select_mode(text_operations?lower(Name),Mode),
+	assign(Mode).
+--
+select_mode(".jpg",'JPG'):-!.
+select_mode(".jpeg",'JPG'):-!.
+select_mode(".avi",'AVI'):-!.
+select_mode(".gif",'GIF'):-!.
+select_mode(Name,_):-
+	break("Unknown export mode: " + Name).
+--
+export_is_on:-
+	export_is_on(?get()),!.
+--
+export_is_on('JPG'):-!.
+export_is_on('AVI'):-!.
+export_is_on('GIF').
+--
+export_is_off:-
+	Mode== ?get(),!,
+	export_is_off(Mode).
+export_is_off.
+--
+export_is_off('NONE').
+--
+export_to_frames:-
+	export_to_frames(?get()),!.
+--
+export_to_frames('JPG').
+--
+export_to_video:-
+	export_to_video(?get()),!.
+--
+export_to_video('AVI'):-!.
+export_to_video('GIF').
+--
+export_to_JPG:-
+	?get()=='JPG'.
+--
+export_to_AVI:-
+	?get()=='AVI'.
+--
+export_to_GIF:-
+	?get()=='GIF'.
+--
+export_to_video_with_sound:-
+	export_to_video_with_sound(?get()),!.
+--
+export_to_video_with_sound('AVI').
+--
+get() = Mode :-
+	find(Mode),!.
+]
+-----------------------------------------------------------------------
+class 'VideoFileInspector' (specialized 'Webcam'):
+--
+internal:
+--
+	viewer;
+--
+	dialog	= ('FileInspection',
+			inspector= self);
+--
+constant:
+--
+	operating_mode			= 'READING';
+	output_audio_data		= 'no';
+	read_buffer_size		= 0;
+	output_debug_information	= 1;
+--
+[
+inspect_file(FileName):-
+	set_name(FileName),
+	dialog ? show,
+	reset_frame_rate,
+	start.
+--
+frame_obtained:-
+	commit,!,
+	get_recent_frame_number(FrameNumber),
+	dialog ? put(1010,FrameNumber),
+	start.
+--
+audio_data_obtained:-
+	commit_audio_data,!,
+	start.
+--
+data_transfer_completion:-
+	dialog ? is_visible,!,
+	dialog ? hide,
+	viewer ? continue_export.
+data_transfer_completion:-!.
+--
+cancel_inspection:-
+	dialog ? hide,
+	stop.
+]
+-----------------------------------------------------------------------
+class 'FileInspection' (specialized 'Dialog'):
+--
+internal:
+--
+	inspector;
+--
+constant:
+--
+	is_top_level_window	= 'yes';
+--
+[
+action("Cancel"):-!,
+	inspector ? cancel_inspection.
+]
+-----------------------------------------------------------------------
+class 'Switch' (specialized 'Database'):
+[
+assign(Mode):-
+	retract_all,
+	insert(Mode).
+--
+is_true:-
+	find('yes'),!.
+]
+-----------------------------------------------------------------------
+class 'WebCameraErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler		= self;
+	--
+	con		= ('Console');
+--
+[
+alarm(ExceptionName,_,_*):-
+	con ? error("I cannot access webcam:",ExceptionName).
+]
+-----------------------------------------------------------------------
+class 'FileOperationErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler		= self;
+	--
+	con		= ('Console');
+--
+[
+alarm(ExceptionName,Operation,_*):-
+	Text== con?format(
+		"\n\nOperation: %s\n\nError: %s\n\n",
+		Operation,ExceptionName),
+	con ? error("I cannot implement file operation",Text).
+]
+-----------------------------------------------------------------------

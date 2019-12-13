@@ -35,8 +35,21 @@ constant:
 		people_index,
 		skeletons};
 --
-	color_map	= 'OPTICAL';
-	-- color_map	= 'NONE';
+	color_map_name		= 'OPTICAL';
+	-- color_map_name	= 'NONE';
+	-- color_map_name	= 'PURPLE';
+	-- color_map_name	= 'REPTILOID';
+	-- color_map_name	= 'OCEAN';
+	-- color_map_name	= 'PRISM';
+	-- color_map_name	= 'GRAY';
+	-- color_map_name	= 'BLACKHOT';
+--
+	color_map	= {	'name':color_map_name,
+				size:2400,
+				reverse_scale:'no',
+				reverse_minimal_value:'no',
+				reverse_maximal_value:'no'
+				};
 --
 internal:
 --

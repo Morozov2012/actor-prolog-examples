@@ -154,6 +154,8 @@ constant:
 --
 operating_mode				= 'LISTENING';
 --
+attach_audio_data			= 'no';
+--
 connection_attempt_period		= 'default';
 maximal_errors_quantity			= 100;
 --
@@ -163,13 +165,25 @@ SOURCE:
 
 CLAUSES:
 --
+flush_microphone_buffer:
+	[external "flushMicrophoneBuffer"].
+--
+microphone_is_available:
+	[external "microphoneIsAvailable"].
+microphone_is_active:
+	[external "microphoneIsActive"].
+recent_data_acquisition_error(ExceptionName):
+	[external "recentDataAcquisitionError"].
+--
 set_operating_mode(DataAcquisitionBufferOperatingMode):
 	[external "setOperatingMode"].
 get_operating_mode() = DataAcquisitionBufferOperatingMode:
 	[external "getOperatingMode"].
 --
-recent_data_acquisition_error(ExceptionName):
-	[external "recentDataAcquisitionError"].
+set_attach_audio_data(YesNo):
+	[external "setAttachAudioData"].
+get_attach_audio_data() = YesNo:
+	[external "getAttachAudioData"].
 --
 set_connection_attempt_period(ActionPeriod):
 	[external "setConnectionAttemptPeriod"].
@@ -273,6 +287,9 @@ registration_time			= 'default';
 write_buffer_size			= 50;
 read_buffer_size			= 0;
 --
+output_audio_data			= 'yes';
+audio_data_delay_correction		= 'default';
+--
 slow_motion_coefficient			= 1;
 maximal_frame_delay			= 'default';
 --
@@ -307,6 +324,7 @@ SOURCE:
 MODEL:
 
 ?frame_obtained().
+?audio_data_obtained().
 ?data_transfer_completion().
 ?buffer_overflow().
 ?buffer_deallocation().
@@ -329,14 +347,39 @@ is_suspended:
 	[external "isSuspended"].
 is_committed:
 	[external "isCommitted"].
+audio_data_is_committed:
+	[external "audioDataIsCommitted"].
 contains_new_frame:
 	[external "containsNewFrame"].
+contains_new_audio_data:
+	[external "containsNewAudioData"].
 --
 eof:
 	[external "eof"].
 --
 commit:
 	[external "commit"].
+commit_audio_data:
+	[external "commitAudioData"].
+--
+get_recent_audio_data() = BINARY:
+	[external "getRecentAudioData"].
+replay_committed_audio_data:
+	[external "replayCommittedAudioData"].
+replay_audio_data(BINARY):
+	[external "replayAudioData"].
+--
+get_recent_audio_data_number(Number):
+	[external "getRecentAudioDataNumber"].
+get_recent_audio_data_time(Milliseconds):
+	[external "getRecentAudioDataTime"].
+get_recent_audio_data_relative_time(Milliseconds):
+	[external "getRecentAudioDataRelativeTime"].
+get_recent_audio_data_rate(FrameRate):
+	[external "getRecentAudioDataRate"].
+--
+flush_audio_buffer:
+	[external "flushAudioBuffer"].
 --
 request_buffered_frame(NumberOfFrameInTheBuffer):
 	[external "requestBufferedFrame"].
@@ -392,6 +435,16 @@ set_read_buffer_size(Size):
 	[external "setReadBufferSize"].
 get_read_buffer_size() = Size:
 	[external "getReadBufferSize"].
+--
+set_output_audio_data(YesNo):
+	[external "setOutputAudioData"].
+get_output_audio_data() = YesNo:
+	[external "getOutputAudioData"].
+--
+set_audio_data_delay_correction(Delay):
+	[external "setAudioDataDelayCorrection"].
+get_audio_data_delay_correction() = Delay:
+	[external "getAudioDataDelayCorrection"].
 --
 set_slow_motion_coefficient(Coefficient):
 	[external "setSlowMotionCoefficient"].
@@ -503,6 +556,8 @@ get_accept_only_uniform_resource_identifiers() = YesNo:
 --
 frame_obtained:
 	[external "frameObtained"].
+audio_data_obtained:
+	[external "audioDataObtained"].
 data_transfer_completion:
 	[external "dataTransferCompletion"].
 buffer_overflow:

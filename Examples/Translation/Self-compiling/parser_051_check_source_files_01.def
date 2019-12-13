@@ -1,0 +1,166 @@
+-----------------------------------------------------------------------
+-- (c) 2018 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+NameList	= SYMBOL*.
+--
+---------------------------------------------------------------------
+interface 'Main' (specialized 'Console'):
+--
+internal:
+--
+	input		: 'File';
+	store		: 'FileNameStore';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+explore_directory(STRING)			- (i);
+explore_subdirectories(STRING,S_List)		- (i,i);
+--
+determ:
+--
+is_source_file(STRING)				- (i);
+]
+---------------------------------------------------------------------
+interface 'FileNameStore' (specialized 'Database','TestProcedures'):
+--
+internal:
+--
+	bagof		: 'MyBag';
+	file		: 'File';
+	text_store	: 'TextInformationStore';
+	test_bench	: 'TestProcedures';
+	parser		: 'ActorPrologBacktrackableParser';
+	report		: 'PrettyPrinter';
+	text_operations	: 'Text';
+	con		: 'Console';
+--
+constant:
+--
+	print_comments	: YesNo;
+--
+[
+DOMAINS:
+--
+Target	= file_name(
+		STRING,		-- Path
+		STRING);	-- File name
+	  {directory:
+	  	STRING};
+	  directory(
+	  	INTEGER,
+	  	S_List,
+	  	STRING);
+	  parents(
+	  	STRING,		-- Class/Enum Name
+	  	S_List,		-- Parents
+	  	STRING);	-- Serial Version
+	  is_serializable(
+	  	STRING).
+--
+PREDICATES:
+--
+imperative:
+--
+save_file_name(STRING,STRING)			- (i,i);
+--
+list_files;
+list_directories;
+analyse_files;
+analyse_files(S_List)				- (i);
+analyse_file(STRING)				- (i);
+print_file_name(STRING)				- (i);
+--
+nondeterm:
+--
+get_file_name() = STRING;
+--
+determ:
+--
+parse_text(STRING,STRING)			- (i,i);
+--
+determ:
+--
+alarm(ExceptionName,SYMBOL,STRING,STRING)	- (i,i,i,i);
+]
+---------------------------------------------------------------------
+interface 'MyBag' (specialized 'FindAll'):
+[
+PREDICATES:
+--
+imperative:
+--
+get_file_name() = S_List;
+]
+---------------------------------------------------------------------
+interface 'MyParser' (specialized 'ActorPrologBacktrackableParser'):
+--
+internal:
+--
+	text_store	: 'TextInformationStore';
+	error_counter	: 'Counter';
+	text_operations	: 'SymbolicInformation';
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+print_error_line(INTEGER,STRING)		- (i,i);
+split_line(INTEGER,STRING,STRING)		- (i,i,o);
+replace_tabulators
+	(STRING,STRING,INTEGER,INTEGER)		- (i,o,i,o);
+print_position(INTEGER)				- (i);
+]
+---------------------------------------------------------------------
+interface 'TextInformationStore' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	= file_content(STRING,STRING).
+--
+PREDICATES:
+--
+imperative:
+--
+put(STRING,STRING)				- (i,i);
+get(STRING,STRING)				- (o,o);
+]
+---------------------------------------------------------------------
+interface 'Counter' (specialized 'Database'):
+[
+DOMAINS:
+--
+Target	= INTEGER.
+--
+PREDICATES:
+--
+imperative:
+--
+put(INTEGER)					- (i);
+get(INTEGER)					- (o);
+increment_and_get(INTEGER)			- (o);
+]
+---------------------------------------------------------------------
+interface 'TestProcedures':
+[
+PREDICATES:
+--
+determ:
+--
+parse_text(STRING,STRING)			- (i,i);
+]
+---------------------------------------------------------------------

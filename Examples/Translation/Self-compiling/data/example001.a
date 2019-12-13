@@ -1,0 +1,4 @@
+CLAUSES:
+
+goal:-
+	writeln("Hello World!").

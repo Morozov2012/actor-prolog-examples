@@ -22,9 +22,11 @@ constant:
 internal:
 --
 	window	= ('Canvas2D',
+		x=15,
 		background_color='SystemControl');
 	image	= ('BufferedImage');
-	con	= ('Console');
+	con	= ('Console',
+		width=15);
 --
 [
 goal:-!,
@@ -57,9 +59,15 @@ frame_obtained:-
 	window ? draw_now.
 frame_obtained:-!.
 --
+data_transfer_completion:-
+	flush_audio_buffer,
+	fail.
 data_transfer_completion:-!,
 	con ? writeln("End of file!").
 --
+data_transfer_error(_):-
+	flush_audio_buffer,
+	fail.
 data_transfer_error(ErrorCode):-!,
 	con ? writeln("Error: ",ErrorCode).
 ]

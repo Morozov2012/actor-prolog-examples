@@ -1,0 +1,74 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+TestSet		= Test*.
+--
+Test		= title(STRING);
+		  test(STRING,ExpectedResult).
+--
+ExpectedResult	= 'positive'; 'negative'.
+--
+---------------------------------------------------------------------
+interface 'Main'
+(specialized 'DemoConsole','TestProcedures'):
+--
+internal:
+--
+	parser		: 'ActorPrologBacktrackableParser';
+	test_bench	: 'TestProcedures';
+	report		: 'PrettyPrinter';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test_loop(	TestSet,
+		INTEGER,
+		INTEGER,
+		INTEGER)		- (i,i,i,o);
+--
+test_example(	Test,
+		INTEGER,
+		INTEGER,
+		INTEGER,
+		INTEGER)		- (i,i,o,i,o);
+--
+print_meta_term(_)			- (i);
+--
+report_positive_result(
+		ExpectedResult,
+		INTEGER,
+		INTEGER)		- (i,i,o);
+report_negative_result(
+		ExpectedResult,
+		INTEGER,
+		INTEGER)		- (i,i,o);
+--
+report_total_results(INTEGER)			- (i);
+--
+determ:
+--
+alarm(ExceptionName,SYMBOL,STRING)	- (i,i,i);
+]
+---------------------------------------------------------------------
+interface 'TestProcedures':
+[
+PREDICATES:
+--
+determ:
+--
+parse_text(STRING)		- (i);
+]
+---------------------------------------------------------------------

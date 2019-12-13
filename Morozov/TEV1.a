@@ -23,8 +23,6 @@ default_identifier				= 'default';
 --
 temperature_scale				= 'CELSIUS';
 --
-use_recorded_calibration_commands		= 'yes';
---
 eliminate_anomalous_pixels			= 'yes';
 apply_anomalous_voltage_pixel_detector		= 'yes';
 anomalous_voltage_threshold			= 10.0;
@@ -142,11 +140,6 @@ set_temperature_scale(TemperatureScale):
 	[external "setTemperatureScale"].
 get_temperature_scale() = TemperatureScale:
 	[external "getTemperatureScale"].
---
-set_use_recorded_calibration_commands(YesNo):
-	[external "setUseRecordedCalibrationCommands"].
-get_use_recorded_calibration_commands(YesNo):
-	[external "getUseRecordedCalibrationCommands"].
 --
 set_eliminate_anomalous_pixels(YesNo):
 	[external "setEliminateAnomalousPixels"].

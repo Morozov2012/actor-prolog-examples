@@ -1686,7 +1686,13 @@ FFmpegSubtitleTextFormat =
 			'FF_SUB_TEXT_FMT_ASS_WITH_TIMINGS';
 			INTEGER.
 --
-FFmpegCodecOptions	= {_}; FFmpegCodecOption*.
+FFmpegCodecOptionGroups	= FFmpegCodecOptions*;
+			  FFmpegCodecOptionSet.
+--
+FFmpegCodecOptions	= FFmpegCodecOptionSet;
+			  FFmpegCodecOptionList.
+FFmpegCodecOptionSet	= {_}.
+FFmpegCodecOptionList	= FFmpegCodecOption*.
 FFmpegCodecOption	= option(STRING/*Name*/,STRING/*Value*/).
 
 --------------------------------------------------------------------
@@ -1696,6 +1702,8 @@ FFmpegCodecOption	= option(STRING/*Name*/,STRING/*Value*/).
 interface 'FFmpeg' (specialized 'ReadWriteBuffer'):
 
 operating_mode			: FFmpegOperatingMode;
+--
+automatic_frame_rate_correction		: OnOff;
 
 [
 PREDICATES:
@@ -1712,18 +1720,21 @@ open(	FileName,
 open(	FileName,
 	STRING/*FormatName*/,
 	FFmpegStreams,
-	FFmpegCodecOptions)			- (i,i,i,i);
+	FFmpegCodecOptionGroups)		- (i,i,i,i);
 --
 seek_frame_number(INTEGER)				- (i);
-seek_frame_time(REAL)					- (i);
+seek_frame_time(INTEGER)				- (i);
 --
 get_video_sequence_size(INTEGER)			- (o);
 --
 close;
 --
 get_recent_frame_number(FrameNumber)			- (o);
-get_recent_frame_time(REAL)				- (o);
+get_recent_frame_time(INTEGER)				- (o);
+get_recent_frame_relative_time(INTEGER)			- (o);
 get_recent_frame_rate(REAL)				- (o);
+--
+get_recent_frame_PTS(INTEGER)				- (o);
 get_average_frame_rate(REAL)				- (o);
 --
 get_recent_image('BufferedImage')			- (i);
@@ -1731,6 +1742,11 @@ get_recent_image('BufferedImage')			- (i);
 get_image_size_in_pixels(INTEGER,INTEGER)		- (o,o);
 --
 write_image('BufferedImage')				- (i);
+write_realtime_image('BufferedImage',INTEGER)		- (i,i);
+write_audio_data(BINARY)				- (i);
+write_realtime_audio_data(BINARY,INTEGER)		- (i,i);
+--
+flush;
 --
 imperative:
 --
@@ -1741,4 +1757,7 @@ imperative:
 --
 set_operating_mode(FFmpegOperatingMode)			- (i);
 get_operating_mode() = FFmpegOperatingMode;
+--
+set_automatic_frame_rate_correction(OnOff)		- (i);
+get_automatic_frame_rate_correction() = OnOff;
 ]

@@ -62,4 +62,3 @@ test3(T):-
 	writeln("\t",?cast("B3",T)),
 	set_color('DkGreen'),
 	writeln("\tTest O.K.").
-]

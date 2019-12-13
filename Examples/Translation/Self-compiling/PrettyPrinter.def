@@ -1,0 +1,556 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+-- package "PrettyPrinter":
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+PrettyPrinterMode	= {
+	print_text_positions: YesNo,
+	variable_names: BalancedNameTree,
+	unroll_function_calls: YesNo,
+	function_call_table: ActorPrologFunctionCallTable,
+	print_position_indent: YesNo,
+	extra_left_indent: INTEGER,
+	indent_constructor_arguments: YesNo,
+	tabulator_size: INTEGER
+	}.
+--
+---------------------------------------------------------------------
+interface 'PrettyPrinter' (specialized 'Alpha'):
+--
+constant:
+--
+	color_text		: Color;
+	color_legend		: Color;
+	color_comment		: Color;
+	color_integer		: Color;
+	color_real		: Color;
+	color_string		: Color;
+	color_binary		: Color;
+	color_round_bracket	: Color;
+	color_square_bracket	: Color;
+	color_brace		: Color;
+	color_variable		: Color;
+	color_subgoal_prefix	: Color;
+	color_keyword		: Color;
+--
+internal:
+--
+	report		: 'Report';
+	text_operations	: 'Text';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+---------------------------------------------------------------------
+print_package(
+	MetaTerm,			-- Package name
+	ActorPrologPackageParameters,
+	ActorPrologPackagePragmaList,
+	ActorPrologPackageImportCommands,
+	ActorPrologDomainDefinitions,
+	ActorPrologPredicateDeclarations,
+	ActorPrologClassesAndInterfaces,
+	ActorPrologInitializer,		-- Project
+	BalancedNameTree,		-- Project variable names
+	INTEGER,			-- Text position
+	PrettyPrinterMode)		- (i,i,i,i,i,i,i,i,i,i,i);
+--
+print_package_title(
+	MetaTerm,			-- Package name
+	ActorPrologPackageParameters,
+	INTEGER,			-- Text position
+	PrettyPrinterMode)		- (i,i,i,i);
+--
+print_package_parameters(
+	ActorPrologPackageParameters,
+	PrettyPrinterMode)		- (i,i);
+print_parameter_list(
+	ActorPrologPackageParameters,
+	PrettyPrinterMode)		- (i,i);
+print_parameter(
+	ActorPrologPackageParameter,
+	PrettyPrinterMode)		- (i,i);
+--
+print_pragma_list(
+	ActorPrologPackagePragmaList,
+	PrettyPrinterMode)		- (i,i);
+print_pragma(
+	ActorPrologPackagePragma,
+	PrettyPrinterMode)		- (i,i);
+--
+print_import_commands(
+	ActorPrologPackageImportCommands,
+	PrettyPrinterMode)		- (i,i);
+print_import_command(
+	ActorPrologPackageImportCommand,
+	PrettyPrinterMode)		- (i,i);
+--
+print_class_import_list(
+	ActorPrologPackageClassImportList,
+	PrettyPrinterMode)		- (i,i);
+print_class_import_command(
+	ActorPrologPackageClassImportCommand,
+	PrettyPrinterMode)		- (i,i);
+--
+print_project_if_necessary(
+	ActorPrologInitializer,		-- Project
+	BalancedNameTree,		-- Project variable names
+	PrettyPrinterMode)		- (i,i,i);
+--
+print_units(
+	ActorPrologClassesAndInterfaces,
+	PrettyPrinterMode)		- (i,i);
+print_unit(
+	ActorPrologClassOrInterface,
+	PrettyPrinterMode)		- (i,i);
+---------------------------------------------------------------------
+print_class(
+	SYMBOL,				-- Class name
+	ActorPrologAncestorName,	-- Ancestor name
+	ActorPrologSlotDefinitions,	-- Slots
+	ActorPrologClauses,		-- Acting clauses
+	ActorPrologClauses,		-- Model clauses
+	MetaTerm,			-- Java class name
+	BalancedNameTree,		-- Variable names
+	INTEGER,			-- Text position
+	PrettyPrinterMode)		- (i,i,i,i,i,i,i,i,i);
+--
+update_variable_names(
+	PrettyPrinterMode,
+	BalancedNameTree,
+	PrettyPrinterMode)		- (i,i,o);
+--
+print_ancestor(ActorPrologAncestorName)		- (i);
+--
+print_source_if_necessary(
+	MetaTerm,			-- Java class name
+	INTEGER,			-- Text position
+	PrettyPrinterMode)		- (i,i,i);
+--
+print_clauses_if_necessary(
+	STRING,				-- Section name
+	ActorPrologClauses,		-- Clauses
+	INTEGER,			-- Text position
+	PrettyPrinterMode)		- (i,i,i,i);
+---------------------------------------------------------------------
+print_interface(
+	ActorPrologInterface,
+	PrettyPrinterMode)		- (i,i);
+print_interface(
+	SYMBOL,				-- Class name
+	SymbolList,			-- Ancestor names
+	YesNo,				-- Is meta interface
+	ActorPrologSlotDeclarations,	-- Slots
+	ActorPrologDomainDefinitions,
+	ActorPrologPredicateDeclarations,
+	INTEGER,			-- Text position
+	PrettyPrinterMode)		- (i,i,i,i,i,i,i,i);
+--
+print_interface_or_metainterface(
+	YesNo,
+	INTEGER,
+	PrettyPrinterMode)			- (i,i,i);
+--
+print_ancestors(SymbolList)				- (i);
+print_ancestor_list(SymbolList)				- (i);
+--
+print_domain_definitions_if_necessary(
+	ActorPrologDomainDefinitions,
+	INTEGER,
+	PrettyPrinterMode)			- (i,i,i);
+print_predicate_declarations_if_necessary(
+	ActorPrologPredicateDeclarations,
+	INTEGER,
+	PrettyPrinterMode)			- (i,i,i);
+---------------------------------------------------------------------
+print_predicate_declarations(
+	ActorPrologPredicateDeclarations,
+	PrettyPrinterMode)			- (i,i);
+print_predicate_declarations(
+	ActorPrologPredicateDeclarations,
+	ActorPrologPredicateDeterminancy,
+	ActorPrologVisibility,
+	PrettyPrinterMode)			- (i,i,i,i);
+--
+print_predicate_visibility_if_necessary(
+	ActorPrologVisibility,
+	ActorPrologVisibility,
+	ActorPrologVisibility,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,o,i,i);
+--
+determ:
+--
+print_visibility_or_Fail(
+	ActorPrologVisibility,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,i);
+--
+imperative:
+--
+print_predicate_determinancy_if_necessary(
+	ActorPrologPredicateDeterminancy,
+	ActorPrologPredicateDeterminancy,
+	ActorPrologPredicateDeterminancy,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,o,i,i);
+print_predicate_determinancy(
+	ActorPrologPredicateDeterminancy)	- (i);
+--
+print_predicate_declaration(
+	ActorPrologPredicateDeclaration,
+	PrettyPrinterMode)			- (i,i);
+--
+print_predicate_argument_domains(
+	ActorPrologPredicateArgumentDeclarations,
+	ActorPrologAtomType,
+	PrettyPrinterMode)			- (i,i,i);
+print_predicate_argument_domains(
+	ActorPrologPredicateArgumentDeclarations,
+	PrettyPrinterMode)			- (i,i);
+print_predicate_argument_domain(
+	ActorPrologPredicateArgumentDeclaration,
+	PrettyPrinterMode)			- (i,i);
+--
+print_function_result_domain(
+	ActorPrologPredicateArgumentDeclarations,
+	ActorPrologAtomType,
+	PrettyPrinterMode)			- (i,i,i);
+--
+print_predicate_flow_patterns(
+	ActorPrologPredicateFlowPatterns)	- (i);
+print_predicate_flow_pattern(
+	ActorPrologPredicateFlowPattern)	- (i);
+print_predicate_flow_direction(
+	ActorPrologPredicateFlowDirection)	- (i);
+---------------------------------------------------------------------
+print_domain_definitions(
+	ActorPrologDomainDefinitions,
+	PrettyPrinterMode)			- (i,i);
+print_domain_definitions(
+	ActorPrologDomainDefinitions,
+	ActorPrologDomainDeclarator,
+	PrettyPrinterMode)			- (i,i,i);
+--
+print_domain_declarator_if_necessary(
+	ActorPrologDomainDefinition,
+	ActorPrologDomainDeclarator,
+	ActorPrologDomainDeclarator,
+	PrettyPrinterMode)			- (i,i,o,i);
+--
+determ:
+--
+print_domain_declarator_or_Fail(
+	ActorPrologDomainDeclarator,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,i);
+--
+imperative:
+--
+print_domain_definition(
+	ActorPrologDomainDefinition,
+	PrettyPrinterMode)			- (i,i);
+--
+print_domain_alternatives(
+	ActorPrologDomainAlternatives,
+	PrettyPrinterMode)			- (i,i);
+--
+print_argument_domain(
+	ActorPrologDomainAlternative,
+	PrettyPrinterMode)			- (i,i);
+print_domain_alternative(
+	ActorPrologDomainAlternative,
+	PrettyPrinterMode)			- (i,i);
+--
+print_domain_arguments(
+	ActorPrologArgumentDomains,
+	PrettyPrinterMode)			- (i,i);
+print_domain_argument(
+	ActorPrologArgumentDomain,
+	PrettyPrinterMode)			- (i,i);
+print_argument_position(
+	INTEGER,
+	PrettyPrinterMode)			- (i,i);
+--
+determ:
+--
+extract_main_element(
+	ActorPrologSetArgumentDomains,
+	ActorPrologDomainAlternative,
+	INTEGER,
+	ActorPrologSetArgumentDomains)		- (i,o,o,o);
+--
+imperative:
+--
+print_domain_set_pairs(
+	ActorPrologSetArgumentDomains,
+	PrettyPrinterMode)			- (i,i);
+print_domain_set_pair(
+	ActorPrologSetArgumentDomain,
+	PrettyPrinterMode)			- (i,i);
+--
+print_integer_constant(ActorPrologIntegerConstant)	- (i);
+print_real_constant(ActorPrologRealConstant)		- (i);
+print_set_argument_key(ActorPrologSetArgumentKey)	- (i);
+---------------------------------------------------------------------
+print_slot_declarations(
+	ActorPrologSlotDeclarations,
+	PrettyPrinterMode)			- (i,i);
+print_slot_declarations(
+	ActorPrologSlotDeclarations,
+	ActorPrologPortVariety,
+	ActorPrologVisibility,
+	PrettyPrinterMode)			- (i,i,i,i);
+print_slot_declaration(
+	ActorPrologSlotDeclaration,
+	PrettyPrinterMode)			- (i,i);
+---------------------------------------------------------------------
+print_slot_definitions(
+	ActorPrologSlotDefinitions,
+	ActorPrologArgumentDomainNames,
+	PrettyPrinterMode)			- (i,i,i);
+print_slot_definitions(
+	ActorPrologSlotDefinitions,
+	PrettyPrinterMode)			- (i,i);
+--
+print_slot_definitions(
+	ActorPrologSlotDefinitions,
+	ActorPrologArgumentDomainNames,
+	ActorPrologPortVariety,
+	ActorPrologVisibility,
+	PrettyPrinterMode)			- (i,i,i,i,i);
+print_slot_definitions(
+	ActorPrologSlotDefinitions,
+	ActorPrologPortVariety,
+	ActorPrologVisibility,
+	PrettyPrinterMode)			- (i,i,i,i);
+--
+print_slot_definition(
+	ActorPrologSlotDefinition,
+	ActorPrologArgumentDomainName,
+	PrettyPrinterMode)			- (i,i,i);
+print_slot_definition(
+	ActorPrologSlotDefinition,
+	PrettyPrinterMode)			- (i,i);
+--
+print_slot_initializer_if_necessary(
+	ActorPrologInitializer,
+	PrettyPrinterMode)			- (i,i);
+---------------------------------------------------------------------
+print_slot_visibility_if_necessary(
+	ActorPrologVisibility,
+	ActorPrologVisibility,
+	ActorPrologVisibility,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,o,i,i);
+print_slot_port_variety_if_necessary(
+	ActorPrologPortVariety,
+	ActorPrologPortVariety,
+	ActorPrologPortVariety,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,o,i,i);
+--
+print_port_variety(ActorPrologPortVariety)		- (i);
+--
+print_slot_domain_if_necessary(
+	ActorPrologArgumentDomainName,
+	PrettyPrinterMode)			- (i,i);
+---------------------------------------------------------------------
+print_initializer(
+	ActorPrologInitializer,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,i);
+print_constructor(
+	ActorPrologConstructor,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,i);
+--
+print_array_index_ranges(
+	MetaTerm,
+	PrettyPrinterMode)			- (i,i);
+print_array_index_range(
+	MetaTerm,
+	PrettyPrinterMode)			- (i,i);
+print_array_index_range_bound(
+	MetaTerm,
+	PrettyPrinterMode)			- (i,i);
+--
+print_array_constructor(
+	ActorPrologInitializer,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,i);
+--
+print_constructor_arguments(
+	ActorPrologConstructorArguments,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,i);
+print_constructor_arguments(
+	ActorPrologConstructorArguments,
+	ActorPrologPortVariety,
+	PrettyPrinterMode,
+	INTEGER)				- (i,i,i,i);
+--
+indent_constructor_argument(
+	PrettyPrinterMode,
+	INTEGER,
+	INTEGER)				- (i,i,i);
+--
+print_argument_port_variety_if_necessary(
+	ActorPrologPortVariety,
+	ActorPrologPortVariety,
+	ActorPrologPortVariety,
+	PrettyPrinterMode,
+	INTEGER,
+	INTEGER)				- (i,i,o,i,i,i);
+---------------------------------------------------------------------
+print_clauses(ActorPrologClauses,PrettyPrinterMode)	- (i,i);
+print_clause(ActorPrologClause,PrettyPrinterMode)	- (i,i);
+--
+update_function_call_table(
+	PrettyPrinterMode,
+	ActorPrologFunctionCallTable,
+	PrettyPrinterMode)			- (i,i,o);
+--
+print_title(ActorPrologAtom,PrettyPrinterMode)		- (i,i);
+--
+filter_subgoals(
+	ActorPrologSubgoals,
+	ActorPrologSubgoals,
+	PrettyPrinterMode)			- (i,o,i);
+do_filter_subgoals(
+	ActorPrologSubgoals,
+	ActorPrologSubgoals,
+	PrettyPrinterMode)			- (i,o,i);
+--
+print_clause_body(
+	ActorPrologSubgoals,
+	INTEGER,
+	PrettyPrinterMode)			- (i,i,i);
+print_subgoals(
+	ActorPrologSubgoals,
+	INTEGER,
+	PrettyPrinterMode)			- (i,i,i);
+--
+print_external(STRING)					- (i);
+--
+print_position_and_subgoal(
+	ActorPrologSubgoal,
+	PrettyPrinterMode)			- (i,i);
+--
+print_subgoal(ActorPrologSubgoal,PrettyPrinterMode)	- (i,i);
+--
+print_function_call(
+	ActorPrologSubgoal,
+	PrettyPrinterMode)
+	- (i,i);
+--
+print_atom(
+	ActorPrologAtom,
+	PrettyPrinterMode)
+	- (i,i);
+print_atom(
+	ActorPrologAtom,
+	PrettyPrinterMode,
+	YesNo)			-- Unroll binary relations
+	- (i,i,i);
+--
+determ:
+--
+is_binary_relation(ActorPrologAtomFunctor)		- (i);
+--
+imperative:
+--
+print_functor(ActorPrologAtomFunctor)			- (i);
+--
+print_arguments(
+	ActorPrologAtomArguments,
+	PrettyPrinterMode)			- (i,i);
+print_target(
+	ActorPrologSubgoalType,
+	ActorPrologTargetParameter,
+	PrettyPrinterMode)			- (i,i,i);
+--
+determ:
+--
+is_not_array_element_access(
+	ActorPrologTargetParameter,
+	PrettyPrinterMode)			- (i,i);
+is_array_element_access(
+	ActorPrologTargetParameter,
+	PrettyPrinterMode)			- (i,i);
+--
+imperative:
+--
+print_target_parameter(
+	ActorPrologTargetParameter,
+	PrettyPrinterMode)			- (i,i);
+--
+print_subgoal_prefix(ActorPrologSubgoalType)		- (i);
+print_plain_subgoal_prefix(PlainSubgoalVariety)		- (i);
+print_actor_subgoal_prefix(ActorSubgoalVariety)		- (i);
+--
+print_message_prefix(
+	AsyncCallVariety,
+	AsyncCallResidence)			- (i,i);
+--
+print_message_variety(AsyncCallVariety)			- (i);
+---------------------------------------------------------------------
+print_terms(MetaTerms,PrettyPrinterMode)		- (i,i);
+print_term(MetaTerm,PrettyPrinterMode)			- (i,i);
+--
+print_list(MetaTerm,MetaTerm,PrettyPrinterMode)		- (i,i,i);
+--
+print_set(
+	UnderdeterminedSetKey,
+	MetaTerm,
+	MetaTerm,
+	PrettyPrinterMode)			- (i,i,i,i);
+print_variable(
+	INTEGER,
+	VariableRole,
+	PrettyPrinterMode)			- (i,i,i);
+--
+determ:
+--
+retrieve_function_call(
+	INTEGER,
+	ActorPrologFunctionCallTable,
+	ActorPrologSubgoal)			- (i,i,o);
+--
+retrieve_variable_name(INTEGER,BalancedNameTree,STRING)	- (i,i,o);
+is_function_variable(MetaTerm)				- (i);
+is_secondary_function_variable(MetaTerm)		- (i);
+is_function_variable_role(VariableRole)			- (i);
+is_secondary_function_variable_role(VariableRole)	- (i);
+--
+imperative:
+--
+print_text_position(INTEGER,PrettyPrinterMode)		- (i,i);
+print_text_position(INTEGER,PrettyPrinterMode)		- (i,i);
+--
+print_position_indent(INTEGER,PrettyPrinterMode)	- (i,i);
+print_extra_left_indent(PrettyPrinterMode)		- (i);
+print_spaces(INTEGER)					- (i);
+print_one_tabulator(PrettyPrinterMode)			- (i);
+select_tabulator_size(PrettyPrinterMode,INTEGER)	- (i,o);
+print_tabulators(INTEGER,INTEGER)			- (i,i);
+--
+PREDICATES:
+--
+imperative:
+--
+apply_radix(INTEGER,_) = STRING				- (i,i);
+apply_radix(INTEGER,INTEGER,_) = STRING			- (i,i,i);
+]
+---------------------------------------------------------------------

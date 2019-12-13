@@ -1,0 +1,31 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+interface 'Main':
+--
+internal:
+--
+	parser		: 'MyParser';
+	con		: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+test;
+]
+---------------------------------------------------------------------
+interface 'MyParser' (specialized 'ActorPrologBacktrackableParser'):
+--
+internal:
+--
+	con		: 'Console';
+--
+[
+]
+---------------------------------------------------------------------

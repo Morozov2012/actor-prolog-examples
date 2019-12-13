@@ -1,0 +1,273 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+import .. from "morozov/Sound";
+import .. from "morozov/FFmpeg";
+-----------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+ExportMode	= 'WAV'; 'AVI'; 'WMA'; 'NONE'.
+--
+-----------------------------------------------------------------------
+interface 'SoundRecorder' (specialized 'Dialog'):
+--
+internal:
+--
+	buffer				: 'SoundManager';
+	writer				: 'FFmpeg';
+	microphone_list			: 'MicrophoneList';
+	export_mode			: 'ExportMode';
+	stop_after_the_first_frame	: 'Switch';
+	data_are_to_be_saved		: 'Switch';
+	suspend_audio_player		: 'Switch';
+	file_operation_error_handler	: 'FileOperationErrorHandler';
+	file_operations			: 'File';
+	text_operations			: 'Text';
+	timer_operations		: 'Timer';
+	con				: 'Console';
+--
+constant:
+--
+	temporary_file_name	: FileName;
+	--
+	dlg_ctrl_edittext_description		: DialogFieldName;
+	dlg_ctrl_edittext_copyright		: DialogFieldName;
+	dlg_ctrl_edittext_registration_date	: DialogFieldName;
+	dlg_ctrl_edittext_registration_time	: DialogFieldName;
+	dlg_ctrl_editname_frame_number		: DialogFieldName;
+	--
+	dlg_ctrl_listbutton_data_line_list	: DialogFieldName;
+	dlg_ctrl_listbutton_selected_data_line	: DialogFieldName;
+	dlg_ctrl_togglebutton_microphone	: DialogFieldName;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+initiate_microphone_if_necessary;
+initiate_microphone(STRING)				- (i);
+complete_data_transfer;
+--
+load_temporary_file_if_possible;
+choose_file(STRING)					- (i);
+update_dialog_title(STRING)				- (i);
+start_reading;
+--
+determ:
+--
+check_whether_data_are_to_be_saved;
+--
+imperative:
+--
+export_data_to_video(STRING)				- (i);
+export_audio_data_if_necessary(BINARY,INTEGER,INTEGER)	- (i,i,i);
+flush_writer_if_necessary;
+--
+determ:
+--
+is_listening_mode;
+is_playing_mode;
+is_reading_mode;
+is_recording_or_exporting_mode;
+is_recording_mode;
+--
+imperative:
+--
+update_displaying_mode;
+--
+switch_controls;
+switch_listbutton_DataLineList;
+switch_button_Connect;
+switch_button_Choose;
+switch_button_Play;
+switch_button_Pause;
+switch_button_Record;
+switch_button_Stop;
+switch_button_Save;
+switch_button_WAV;
+switch_button_AVI;
+switch_button_WMA;
+switch_button_Microphone;
+paint_button_Microphone(Color)				- (i);
+switch_microphone_state;
+switch_text_area_Description;
+--
+determ:
+--
+do_use_microphone;
+microphone_is_connected;
+microphone_is_connected(
+	DataAcquisitionBufferOperatingMode)		- (i);
+microphone_is_disconnected;
+--
+imperative:
+--
+update_microphone_list;
+--
+determ:
+--
+check_file_name;
+rename_temporary_file(STRING)				- (i);
+--
+imperative:
+--
+continue_data_transfer_if_necessary;
+--
+determ:
+--
+does_exist(FileName)					- (i);
+does_exist(STRING)					- (i);
+--
+imperative:
+--
+delete(FileName)					- (i);
+delete(STRING)						- (i);
+create_new_file_name() = STRING;
+rename(FileName)					- (i);
+rename(STRING)						- (i);
+]
+-----------------------------------------------------------------------
+interface 'SoundManager' (specialized 'Microphone'):
+--
+internal:
+--
+	sound_recorder			: 'SoundRecorder';
+	file_operations			: 'File';
+	text_operations			: 'Text';
+	timer_operations		: 'Timer';
+	con				: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+output_description_if_necessary(FrameNumber)	- (i);
+]
+-----------------------------------------------------------------------
+interface 'MicrophoneList' (specialized 'Database'):
+--
+internal:
+--
+	text_operations		: 'Text';
+	con			: 'Console';
+--
+[
+DOMAINS:
+--
+ground:
+--
+Target		= dl(STRING,MicrophoneDataLine).
+--
+PREDICATES:
+--
+imperative:
+--
+save_microphone_list(MicrophoneDataLineList,S_List)	- (i,o);
+--
+descriptions_to_list(
+	MicrophoneDataLineList,
+	S_List,
+	MicrophoneDataLineList,
+	S_List,
+	MicrophoneDataLineList)			- (i,i,i,o,o);
+formats_to_list(
+	AudioFormats,
+	STRING,
+	STRING,
+	STRING,
+	STRING,
+	INTEGER,
+	S_List,
+	MicrophoneDataLineList,
+	S_List,
+	MicrophoneDataLineList)			- (i,i,i,i,i,i,i,i,o,o);
+--
+form_channels(INTEGER,STRING)				- (i,o);
+form_IsBigEndian(YesNo,STRING)				- (i,o);
+--
+reverse_list(S_List,S_List,S_List)		- (i,i,o);
+reverse_list(
+	MicrophoneDataLineList,
+	MicrophoneDataLineList,
+	MicrophoneDataLineList)			- (i,i,o);
+--
+save_list(S_List,MicrophoneDataLineList)		- (i,i);
+--
+determ:
+--
+get_data_line(STRING,MicrophoneDataLine)		- (i,o);
+]
+-----------------------------------------------------------------------
+interface 'ExportMode' (specialized 'Database'):
+--
+internal:
+--
+	text_operations		: 'Text';
+--
+[
+DOMAINS:
+--
+Target	= ExportMode.
+--
+PREDICATES:
+--
+imperative:
+--
+assign(ExportMode)					- (i);
+--
+select_mode(STRING)					- (i);
+select_mode(STRING,ExportMode)				- (i,o);
+--
+determ:
+--
+export_is_on;
+export_is_on(ExportMode)				- (i);
+--
+export_is_off;
+export_is_off(ExportMode)				- (i);
+--
+export_to_WAV;
+export_to_AVI;
+export_to_WMA;
+--
+get() = ExportMode;
+]
+-----------------------------------------------------------------------
+interface 'Switch' (specialized 'Database'):
+[
+DOMAINS:
+Target	= YesNo.
+PREDICATES:
+imperative:
+assign(YesNo)			- (i);
+determ:
+is_true;
+]
+-----------------------------------------------------------------------
+interface 'FileOperationErrorHandler' (specialized 'Trap'):
+--
+internal:
+--
+	world;
+	handler;
+	con		: 'Console';
+--
+[
+PREDICATES:
+determ:
+does_exist(FileName)					- (i);
+does_exist(STRING)					- (i);
+delete(FileName)					- (i);
+delete(STRING)						- (i);
+rename(FileName)					- (i);
+rename(STRING)						- (i);
+imperative:
+alarm(ExceptionName,SYMBOL,_*)				- (i,i,i);
+]
+-----------------------------------------------------------------------

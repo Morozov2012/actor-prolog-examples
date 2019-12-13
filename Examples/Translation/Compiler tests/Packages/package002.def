@@ -1,0 +1,8 @@
+-- package	"Examples/Translation/Compiler tests/Packages/"
+--		"package002":
+
+interface 'X' (specialized 'DemoConsole'):
+[
+IMPERATIVES:
+p(INTEGER)		- (i);
+]

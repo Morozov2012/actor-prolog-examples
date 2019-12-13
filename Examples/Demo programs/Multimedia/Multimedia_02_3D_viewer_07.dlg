@@ -1,0 +1,267 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+-- padding(1.5,0.7)
+draft('off')
+
+dialog 'MultichannelViewer' (
+	"Multichannel Viewer",
+	default,default,default,centered,centered,default)
+vbox(justify)
+	hbox(center)
+		vbox(center)
+			statictext(0000,1,"Video data:")
+			listbutton(0,1020,15,4,
+				[
+				"Terahertz Camera",
+				"Thermal Camera",
+				"Webcam",
+				"None"
+				],
+				"Terahertz Camera"
+				)
+			statictext(0000,1,"Kinect color map:")
+			hbox(justify)
+				listbutton(0,1031,10,7,
+					[
+					"Aqua",
+					"Autumn",
+					"Blackhot",
+					"Blaze",
+					"BlueRed",
+					"Bone",
+					"Bright Rainbow",
+					"Cool",
+					"Copper",
+					"Gray",
+					"Green",
+					"Hot",
+					"HSV",
+					"Iron",
+					"Jet",
+					"LightJet",
+					"Medical",
+					"Ocean",
+					"Parula",
+					"Pink",
+					"Prism",
+					"Purple",
+					"Red",
+					"Reptiloid",
+					"Soft Rainbow",
+					"Spring",
+					"Summer",
+					"Winter",
+					"Optical",
+					"None"
+					],
+					"Optical"
+					-- "Blackhot"
+					-- "Purple"
+					-- "Green"
+					)
+				togglebutton(1032,"R")
+			end_of_hbox
+			hbox(justify)
+				checkbox(1033,"Isoline mode:",'no')
+				editinteger['AlignCenter'](1034,5,50)
+			end_of_hbox
+			statictext(0000,1,"Texture color map:")
+			hbox(justify)
+				listbutton(0,1041,10,7,
+					[
+					"Aqua",
+					"Autumn",
+					"Blackhot",
+					"Blaze",
+					"BlueRed",
+					"Bone",
+					"Bright Rainbow",
+					"Cool",
+					"Copper",
+					"Gray",
+					"Green",
+					"Hot",
+					"HSV",
+					"Iron",
+					"Jet",
+					"LightJet",
+					"Medical",
+					"Ocean",
+					"Parula",
+					"Pink",
+					"Prism",
+					"Purple",
+					"Red",
+					"Reptiloid",
+					"Soft Rainbow",
+					"Spring",
+					"Summer",
+					"Winter",
+					"Optical",
+					"None"
+					],
+					-- "Blackhot"
+					"Purple"
+					-- "Green"
+					)
+				togglebutton(1042,"R")
+			end_of_hbox
+			hbox(justify)
+				checkbox(1043,"Isoline mode:",'no')
+				editinteger['AlignCenter'](1044,5,50)
+			end_of_hbox
+			statictext(0000,1,"Color substitution:")
+			listbutton(0,1051,7,2,
+					[
+					"RGB",
+					"HSB"
+					],
+					"RGB"
+					)
+			grid
+			row(justify)
+			column(justify)
+				statictext(1071,1,"Red: ")
+			end_of_column
+			column(justify)
+				listbutton(0,1072,8,13,
+						[
+						"Red1",
+						"Green1",
+						"Blue1",
+						"Red2",
+						"Green2",
+						"Blue2",
+						"Hue1",
+						"Saturation1",
+						"Brightness1",
+						"Hue2",
+						"Saturation2",
+						"Brightness2",
+						"Zero",
+						"Full",
+						"Half",
+						"default"
+						],
+						"default"
+						)
+			end_of_column
+			end_of_row
+			row(justify)
+			column(justify)
+				statictext(1081,1,"Green: ")
+			end_of_column
+			column(justify)
+				listbutton(0,1082,8,13,
+						[
+						"Red1",
+						"Green1",
+						"Blue1",
+						"Red2",
+						"Green2",
+						"Blue2",
+						"Hue1",
+						"Saturation1",
+						"Brightness1",
+						"Hue2",
+						"Saturation2",
+						"Brightness2",
+						"Zero",
+						"Full",
+						"Half",
+						"default"
+						],
+						"default"
+						)
+			end_of_column
+			end_of_row
+			row(justify)
+			column(justify)
+				statictext(1091,1,"Blue: ")
+			end_of_column
+			column(justify)
+				listbutton(0,1092,8,13,
+						[
+						"Red1",
+						"Green1",
+						"Blue1",
+						"Red2",
+						"Green2",
+						"Blue2",
+						"Hue1",
+						"Saturation1",
+						"Brightness1",
+						"Hue2",
+						"Saturation2",
+						"Brightness2",
+						"Zero",
+						"Full",
+						"Half",
+						"default"
+						],
+						"default"
+						)
+			end_of_column
+			end_of_row
+			end_of_grid
+		end_of_vbox
+		grid
+		row
+		column
+			custom['KeepProportions'](main_window,45,30,"Control3D")
+		end_of_column
+		column
+			vscroll(5011,5012,45,[0,500],250)
+		end_of_column
+		end_of_row
+		row
+		column
+			hscroll(7011,7012,30,[0,500],250)
+		end_of_column
+		end_of_row
+		end_of_grid
+		vbox(center)
+			padding(1.5,0.3)
+			edittext['ReadOnly','AlignCenter'](3011,18,1,"")
+			edittext['ReadOnly','AlignCenter'](3012,18,1,"")
+			edittext['ReadOnly','AlignCenter'](3013,18,1,"")
+			edittext['ReadOnly','AlignCenter'](3014,18,1,"")
+			end_of_padding
+			scaling(1.5,2.0)
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			button("Photo","P&hoto")
+			end_of_scaling
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			togglebutton(3015,"Show S&keletons",'no')
+			statictext(0000,1,"")
+			statictext(0000,1,"")
+			button("GoHome","Go &Home")
+		end_of_vbox
+	end_of_hbox
+	hscroll(8011,8012,50,[0,255],0)
+	hbox(justify)
+	scaling(2.7,1.0)
+		button("Choose","Ch&oose")
+		togglebutton(9013,"&Play")
+		button("Pause","Pau&se")
+		button("Stop","S&top")
+		togglebutton(9018,"E&xport",'no')
+		button(close,"&Quit")
+	end_of_scaling
+	end_of_hbox
+	padding(0,0)
+		statictext(
+			"The project is supported by the Russian "
+			"Foundation for Basic Research, "
+			"grant 16-29-09626-ofi_m. "
+			"WebSite: www.fullvision.ru")
+	end_of_padding
+end_of_vbox
+end_of_dialog

@@ -28,8 +28,18 @@ constant:
 		frame_type,
 		people_index};
 --
-	-- color_map		= 'OPTICAL';
-	color_map		= 'NONE';
+	-- color_map_name	= 'OPTICAL';
+	color_map_name		= 'NONE';
+	-- color_map_name	= 'PURPLE';
+	-- color_map_name	= 'REPTILOID';
+	-- color_map_name	= 'OCEAN';
+--
+	color_map	= {	'name':color_map_name,
+				size:2400,
+				reverse_scale:'no',
+				reverse_minimal_value:'no',
+				reverse_maximal_value:'no'
+				};
 --
 	scene_surface_type	= 'CONCAVE'; -- 'CONVEX'
 --

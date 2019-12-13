@@ -1,0 +1,130 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	parser		= ('ActorPrologBacktrackableParser',
+				slot_names=['my_slot']);
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	report		= ('PrettyPrinter',
+				report=self,
+				color_text='Black');
+--
+[
+goal:-!,
+	test_loop([
+		title("Binary Relations"),
+		test("1+2>2+3",'positive'),
+		test("1+2=2+3",'negative'),
+		test("A+B*C<A-B/D",'positive'),
+		test("A-B*C<-A-B/D",'negative'),
+		test("A+B/C>A*B+D",'positive'),
+		test("A*B/C<=A-B+D",'positive'),
+		test("A+B/C<<A+B-D",'negative'),
+		test("A/B*C>=A-B+D",'positive'),
+		test("A+B*C<>A/B*D",'positive'),
+		test("A/B-C==A-B/D",'positive'),
+		test("A+B:=A-B+D",'positive'),
+		test("[1,2,3]+B*C<A-B/D",'positive')
+		],1,0,NumberOfErrors),
+	report_total_results(NumberOfErrors).
+--
+test_loop([Test|Rest],N1,E1,E3):-
+	test_example(Test,N1,N2,E1,E2),
+	test_loop(Rest,N2,E2,E3).
+test_loop([],_,NumberOfErrors,NumberOfErrors).
+--
+test_example(title(Text),N,N,E,E):-!,
+	set_text_color('Black'),
+	writeln("===== TESTING ",
+		?upper(Text),
+		" =====").
+test_example(test(Text,ExpectedResult),N,N+1,E1,E2):-
+	set_text_color('Black'),
+	writeln("Test #",N,":"),
+	test_bench ? parse_text(Text),!,
+	report_positive_result(ExpectedResult,E1,E2).
+test_example(test(_,ExpectedResult),N,N+1,E1,E2):-
+	report_negative_result(ExpectedResult,E1,E2).
+--
+parse_text(Text):-
+	parser ? forget_parsed_variable_names,
+	parser ? clear_function_call_table,
+	parser ? scan_text(Text),
+	TP== parser?pop_binary_relation(Term),
+	parser ? check_end_of_text(),
+	VariableNames== parser?get_parsed_variable_names(),
+	set_text_color('Black'),
+	write("\tText:        "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("\tPosition:    "),
+	set_text_color('Violet'),
+	writeln(TP),
+	set_text_color('Black'),
+	write("\tAtom:        "),
+	set_text_color('RoyalBlue'),
+	writeln(Term),
+	set_text_color('Black'),
+	write("\tPretty atom: "),
+	Mode1== {
+		print_text_positions:'yes',
+		variable_names:VariableNames,
+		unroll_function_calls:'yes'},
+	report ? print_atom(Term,Mode1),
+	nl,
+	set_text_color('Black'),
+	write("\tPretty atom: "),
+	Table== parser?get_function_call_table(),
+	Mode2== {
+		print_text_positions:'no',
+		variable_names:VariableNames,
+		unroll_function_calls:'no',
+		function_call_table:Table},
+	report ? print_atom(Term,Mode2),
+	nl.
+--
+report_positive_result('positive',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_positive_result('negative',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False positive!").
+--
+report_negative_result('negative',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_negative_result('positive',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False negative!").
+--
+report_total_results(0):-!,
+	set_text_color('DkGreen'),
+	writeln("All tests are completed with success.").
+report_total_results(NumberOfErrors):-
+	set_text_color('Red'),
+	writeln("One or more tests are completed with failure."),
+	writeln("Number of test failures: ",NumberOfErrors,".").
+--
+alarm(Exception,_,Text):-
+	set_text_color('Black'),
+	write("\tText:        "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("\tError:       "),
+	set_text_color('Orange'),
+	writeln(Exception).
+]
+---------------------------------------------------------------------

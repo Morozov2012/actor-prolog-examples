@@ -45,8 +45,8 @@ test1:-
 	?normalize_number(16#AB.CDEF#E-170),
 	?normalize_number(16#0#),
 	?normalize_number(16#0.0#),
-	?normalize_number(-16#0#),
-	?normalize_number(-16#0.0#).
+	?normalize_number(-(16#0#)),
+	?normalize_number(-(16#0.0#)).
 --
 test2:-
 	con ? writeln(?normalize_number(20,1234567123)),
@@ -69,6 +69,6 @@ test2:-
 	con ? writeln(?normalize_number(16#AB.CDEF#E-170)),
 	con ? writeln(?normalize_number(16#0#)),
 	con ? writeln(?normalize_number(16#0.0#)),
-	con ? writeln(?normalize_number(-16#0#)),
-	con ? writeln(?normalize_number(-16#0.0#)).
+	con ? writeln(?normalize_number(-(16#0#))),
+	con ? writeln(?normalize_number(-(16#0.0#))).
 ]

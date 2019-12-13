@@ -1,0 +1,203 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	parser		= ('ActorPrologBacktrackableParser');
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	report		= ('PrettyPrinter',
+				report=self,
+				color_text='Black');
+--
+[
+goal:-!,
+	test_loop([
+		title("Domains"),
+		test("D1=INTEGER.",'positive'),
+		test("D1:INTEGER.",'negative'),
+		test("D1,D2=REAL.",'positive'),
+		test("D1,D2,D3=STRING.",'positive'),
+		test("D1,'f2',D3=INTEGER.",'negative'),
+		test("D1,D2,D1=INTEGER.",'negative'),
+		test("D1=INTEGER;REAL.",'positive'),
+		test("D1=STRING;SYMBOL;BINARY.",'positive'),
+		test("D1=INTEGER,REAL.",'negative'),
+		test("D1=INTEGER;REAL,",'negative'),
+		test("D1=.",'negative'),
+		test("D1=INTEGER;!.",'negative'),
+		test("_=D1.",'negative'),
+		test("INTEGER=D1.",'negative'),
+		test("REAL=D1.",'negative'),
+		test("STRING=D1.",'negative'),
+		test("SYMBOL=D1.",'negative'),
+		test("BINARY=D1.",'negative'),
+		test("D1='symbol'.",'positive'),
+		test("D1=functor(INTEGER).",'positive'),
+		test("D1=functor(A,B).",'positive'),
+		test("D1=functor(A,B,C).",'positive'),
+		test("D1=functor('ClassX').",'positive'),
+		test("D1=functor('ArrayX'of'ClassY').",'positive'),
+		test("D1=functor(A).",'positive'),
+		test("D1=functor(_).",'positive'),
+		test("D1=functor(#).",'positive'),
+		test("D1=functor(A;B).",'negative'),
+		test("D1=functor(A,B].",'negative'),
+		test("D1=functor(A,!,C,D,E,F).",'negative'),
+		test("D1='ArrayX'of'ClassY'.",'positive'),
+		test("D1=MyDomain.",'positive'),
+		test("D1=f(A,_,C,D,E).",'positive'),
+		test("D1=_.",'negative'),
+		test("D1=A;_;C;D;E.",'negative'),
+		test("D1=D2{}.",'positive'),
+		test("D1=D2{x:D3,100:D5}.",'positive'),
+		test("D1=D2*.",'positive'),
+		test("D1={}.",'positive'),
+		test("D1={1:A,2:B,3:C}.",'positive'),
+		test("D1={'x':A,'y':B,'z':C}.",'positive'),
+		test("D1={'x':A,'y':B;'z':C}.",'negative'),
+		test("D1={'x':A,'y':B;'z':C|}.",'negative'),
+		test("D1={'x':A,'y':B;'x':C}.",'negative'),
+		test("D1=A{'x':A,'y':B;0:C}.",'negative'),
+		test("D1={'x'=A}.",'negative'),
+		test("D1={_}.",'positive'),
+		test("D1=#.",'positive'),
+		test("D1=100.",'positive'),
+		test("D1=-100.",'positive'),
+		test("D1=16#ABCDEF#.",'positive'),
+		test("D1=3.14.",'positive'),
+		test("D1=-3.14.",'positive'),
+		test("D1=16#ABCD.EF#.",'positive'),
+		test("D1=\"TEXT\".",'positive'),
+		test("D1=\"TE\"\"XT\".",'positive'),
+		test("D1=\"TE\"\"X\"/*/\"T\".",'positive'),
+		test("D1=~AB_CD_EF.",'positive'),
+		test("D1=~AB~CD_EF.",'positive'),
+		test("D1=~AB/*/~CD/**/~EF.",'positive'),
+		test("D1=('ClassA').",'positive'),
+		test("D1=[1..24].",'positive'),
+		test("D1=[-100..-1].",'positive'),
+		test("D1=[-1.0..10.0].",'positive'),
+		test("D1=[-100.0..-1.0].",'positive'),
+		test("D1=[16#A#..16#F#].",'positive'),
+		test("D1=[16#0.0#..16#FF.0#].",'positive'),
+		test("D1=[1-24].",'negative'),
+		test("D1=[1..24.0].",'negative'),
+		test("D1=[1.0..24].",'negative'),
+		test("D1=[1..24).",'negative'),
+		test("D1=BINARY;X;BINARY;Y;Z.",'negative'),
+		test("D1=INTEGER;X;INTEGER;Y;Z.",'negative'),
+		test("D1={_};X;{_};Y;Z.",'negative'),
+		test("D1=REAL;X;REAL;Y;Z.",'negative'),
+		test("D1='A'of'B';X;'A'of'B';Y;Z.",'negative'),
+		test("D1=STRING;X;STRING;Y;Z.",'negative'),
+		test("D1=SYMBOL;X;SYMBOL;Y;Z.",'negative'),
+		test("D1=~AB;X;~AB;Y;Z.",'negative'),
+		test("D1={};X;{};Y;Z.",'negative'),
+		test("D1=100;X;100;Y;Z.",'negative'),
+		test("D1=[1..5];X;[1..5];Y;Z.",'negative'),
+		test("D1=A*;X;A*;Y;Z.",'negative'),
+		test("D1={};X;{};Y;Z.",'negative'),
+		test("D1=A;B;A;C;D;E.",'negative'),
+		test("D1=3.14;B;3.14;C;D;E.",'negative'),
+		test("D1=[1.0..5.0];B;[1.0..5.0];C;D;E.",'negative'),
+		test("D1={x:D2,y:D3};B;{y:D3,x:D2};C;D;E.",'negative'),
+		test("D1=\"ABC\";X;\"ABC\";Y;Z.",'negative'),
+		test("D1=f(A,B,C);X;f(A,B,C);Y;Z.",'negative'),
+		test("D1='abc';X;'abc';Y;Z.",'negative'),
+		test("D1=#;B;#;C;D;E.",'negative'),
+		test("D1=('A');B;('A');C;D;E.",'negative'),
+		test("D1=A*;X;B*;Y;Z.",'negative'),
+		test("D1=f(A);X;f(B);Y;Z.",'negative'),
+		test("D1={x:D2,y:D3};B;{y:D5};C;D;E.",'negative'),
+		test("D1=D3{x:D2};B;{0:D5};C;D;E.",'negative')
+		],1,0,NumberOfErrors),
+	report_total_results(NumberOfErrors).
+--
+test_loop([Test|Rest],N1,E1,E3):-
+	test_example(Test,N1,N2,E1,E2),
+	test_loop(Rest,N2,E2,E3).
+test_loop([],_,NumberOfErrors,NumberOfErrors).
+--
+test_example(title(Text),N,N,E,E):-!,
+	set_text_color('Black'),
+	writeln("===== TESTING ",
+		?upper(Text),
+		" =====").
+test_example(test(Text,ExpectedResult),N,N+1,E1,E2):-
+	set_text_color('Black'),
+	writeln("Test #",N,":"),
+	test_bench ? parse_text(Text),!,
+	report_positive_result(ExpectedResult,E1,E2).
+test_example(test(_,ExpectedResult),N,N+1,E1,E2):-
+	report_negative_result(ExpectedResult,E1,E2).
+--
+parse_text(Text):-
+	parser ? scan_text(Text),
+	TP== parser?pop_domain_definition(Definitions),
+	parser ? check_end_of_text(),
+	set_text_color('Black'),
+	write("     Text:      "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Position:  "),
+	set_text_color('Violet'),
+	writeln(TP),
+	set_text_color('Black'),
+	write("     Domains:   "),
+	set_text_color('RoyalBlue'),
+	writeln(Definitions),
+	Mode1== {
+		print_text_positions:'yes',
+		print_position_indent:'yes',
+		extra_left_indent:0},
+	report ? print_domain_definitions(Definitions,Mode1),
+	Mode2== {
+		print_text_positions:'no',
+		print_position_indent:'yes',
+		extra_left_indent:0},
+	report ? print_domain_definitions(Definitions,Mode2).
+--
+report_positive_result('positive',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_positive_result('negative',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False positive!").
+--
+report_negative_result('negative',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_negative_result('positive',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False negative!").
+--
+report_total_results(0):-!,
+	set_text_color('DkGreen'),
+	writeln("All tests are completed with success.").
+report_total_results(NumberOfErrors):-
+	set_text_color('Red'),
+	writeln("One or more tests are completed with failure."),
+	writeln("Number of test failures: ",NumberOfErrors,".").
+--
+alarm(Exception,_,Text):-
+	set_text_color('Black'),
+	write("     Text:      "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Error:     "),
+	set_text_color('Orange'),
+	writeln(Exception).
+]
+---------------------------------------------------------------------

@@ -1,0 +1,86 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+class 'Main':
+--
+internal:
+--
+	parser		= ('MyParser');
+	con		= ('Console');
+--
+[
+goal:-!,
+	self << test.
+--
+test:-
+	Text== "p(*,1,2,3,/,!):-q.",
+	con ? set_text_color('default'),
+	con ? writeln("Start the test."),
+	parser ? scan_text(Text),
+	TP== parser?pop_clause(Clause),!,
+	con ? set_text_color('Black'),
+	con ? write("     Text:      "),
+	con ? set_text_color('DkGray'),
+	con ? writeln(Text),
+	con ? set_text_color('Black'),
+	con ? write("     Position:  "),
+	con ? set_text_color('Violet'),
+	con ? writeln(TP),
+	con ? set_text_color('Black'),
+	con ? write("     Clause:    "),
+	con ? set_text_color('Navy'),
+	con ? writeln(Clause),
+	con ? set_text_color('Red'),
+	con ? writeln("Translation succeed.").
+test:-
+	con ? set_text_color('DkGreen'),
+	con ? writeln("Translation failed.").
+--
+alarm(Exception):-!,
+	con ? set_text_color('default'),
+	con ? writeln("===== RUNTIME EXCEPTION IS RECEIVED ====="),
+	con ? set_text_color('default'),
+	con ? write("Error:          "),
+	con ? set_text_color('Orange'),
+	con ? writeln(Exception).
+]
+---------------------------------------------------------------------
+class 'MyParser' (specialized 'ActorPrologBacktrackableParser'):
+--
+internal:
+--
+	con					= ('Console');
+--
+constant:
+--
+	slot_names				= ['my_slot'];
+	stop_translation_after_first_error	= 'no';
+	raise_runtime_exceptions		= 'no';
+	send_error_messages			= 'yes';
+--
+[
+syntax_error(ErrorType,ErrorName,TextPosition,Etc):-!,
+	con ? set_text_color('default'),
+	con ? writeln("===== ERROR MESSAGE IS RECEIVED ====="),
+	con ? set_text_color('default'),
+	con ? write("Error type:     "),
+	con ? set_text_color('Navy'),
+	con ? writeln(ErrorType),
+	con ? set_text_color('default'),
+	con ? write("ErrorName:      "),
+	con ? set_text_color('Navy'),
+	con ? writeln(ErrorName),
+	con ? set_text_color('default'),
+	con ? write("TextPosition:   "),
+	con ? set_text_color('Navy'),
+	con ? writeln(TextPosition),
+	con ? set_text_color('default'),
+	con ? write("Comments:       "),
+	con ? set_text_color('Navy'),
+	con ? writeln(Etc).
+]
+---------------------------------------------------------------------

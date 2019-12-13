@@ -1,0 +1,51 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+mesh(80,25)
+dialog_font('helvetica',12)
+draft('off')
+
+dialog 'SoundRecorder' (
+	"Sound Recorder",
+	default,default,default,centered,centered,default)
+vbox(justify)
+	vbox(left)
+		edittext['ReadOnly','AlignLeft',fill='HORIZONTAL'](1010,55,1,"")
+		edittext['ReadOnly','AlignLeft',fill='HORIZONTAL'](1020,55,1,"")
+		edittext['ReadOnly','AlignLeft',fill='HORIZONTAL'](1030,55,1,"")
+		edittext['ReadOnly','AlignLeft',fill='HORIZONTAL'](1040,55,1,"")
+		editname['ReadOnly','AlignLeft',fill='HORIZONTAL'](1050,55,"")
+	end_of_vbox
+	hbox(justify)
+		listbutton[fill='HORIZONTAL'](2011,2012,50,3,[],"")
+		togglebutton[fill='HORIZONTAL'](2060,"&Microphone",'yes')
+	end_of_hbox
+	hbox(justify)
+	scaling(1.5,1.0)
+		button[fill='HORIZONTAL']("Connect","Co&nnect")
+		button[fill='HORIZONTAL']("Choose","Ch&oose")
+		ok[fill='HORIZONTAL']("Play","&Play")
+		button[fill='HORIZONTAL']("Pause","Pa&use")
+		button[fill='HORIZONTAL']("Record","&Record")
+		button[fill='HORIZONTAL']("Stop","S&top")
+	end_of_scaling
+	end_of_hbox
+	hbox(justify)
+	scaling(2.5,1.0)
+		button[fill='HORIZONTAL']("Save","Sav&e")
+		button[fill='HORIZONTAL']("WAV","&WAV")
+		button[fill='HORIZONTAL']("AVI","A&VI")
+		button[fill='HORIZONTAL']("WMA","WM&A")
+		button[fill='HORIZONTAL'](close,"&Quit")
+	end_of_scaling
+	end_of_hbox
+	padding(0,0)
+		statictext(
+			"The project is supported by RFBR, "
+			"grant 16-29-09626-ofi_m. "
+			"WebSite: www.fullvision.ru")
+	end_of_padding
+end_of_vbox
+end_of_dialog

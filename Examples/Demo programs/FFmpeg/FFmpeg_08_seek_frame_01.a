@@ -1,0 +1,52 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2017 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+class 'Main' (specialized 'FFmpeg'):
+--
+constant:
+--
+	name		= "Test01.avi";
+	-- name		= "data/red.avi";
+	-- name		= "data/vid.3gp";
+--
+	operating_mode	= 'PLAYING';
+--
+internal:
+--
+	window	= ('Canvas2D',
+		background_color='SystemControl');
+	image	= ('BufferedImage');
+	con	= ('Console');
+--
+[
+goal:-!,
+	window ? show,
+	open,
+	seek_frame_time(3000),
+	start.
+--
+frame_obtained:-
+	commit,!,
+	con ? writeln("New frame!"),
+	-- get_recent_frame_number(FrameNumber),
+	get_recent_image(image),
+	-- get_image_size_in_pixels(IW,IH),
+	window ? suspend_redrawing,
+	window ? clear,
+	window ? draw_image(image,0,0,1,1),
+	window ? draw_now.
+frame_obtained:-!.
+--
+data_transfer_completion:-!,
+	con ? writeln("End of file!").
+--
+data_transfer_error(ErrorCode):-!,
+	con ? writeln("Error: ",ErrorCode).
+]
+-----------------------------------------------------------------------

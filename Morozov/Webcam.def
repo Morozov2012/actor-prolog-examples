@@ -60,6 +60,8 @@ get_recent_frame_time(INTEGER)			- (o);
 get_recent_frame_relative_time(INTEGER)		- (o);
 get_recent_frame_rate(REAL)			- (o);
 --
+get_camera_frame_rate(REAL)			- (o);
+--
 get_image_size_in_pixels(INTEGER,INTEGER)	- (o,o);
 get_actual_name() = STRING;
 --

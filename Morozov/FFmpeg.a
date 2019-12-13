@@ -19,6 +19,8 @@ constant:
 --
 operating_mode			= 'PLAYING';
 --
+automatic_frame_rate_correction		= 'off';
+--
 -- The implementation of the 'ReadWriteBuffer' interface:
 --
 write_buffer_size		= 100;
@@ -47,7 +49,7 @@ open(FileName,FormatName,Streams,CodecOptions):
 --
 seek_frame_number(Number):
 	[external "seekFrameNumber"].
-seek_frame_time(Time):
+seek_frame_time(TimeInMilliseconds):
 	[external "seekFrameTime"].
 --
 get_video_sequence_size(Size):
@@ -61,13 +63,15 @@ is_open:
 --
 get_recent_frame_number(Number):
 	[external "getRecentFrameNumber"].
---
 get_recent_frame_time(Milliseconds):
 	[external "getRecentFrameTime"].
---
+get_recent_frame_relative_time(Milliseconds):
+	[external "getRecentFrameRelativeTime"].
 get_recent_frame_rate(FrameRate):
 	[external "getRecentFrameRate"].
 --
+get_recent_frame_PTS(Number):
+	[external "getRecentFramePTS"].
 get_average_frame_rate(FrameRate):
 	[external "getAverageFrameRate"].
 --
@@ -79,6 +83,16 @@ get_image_size_in_pixels(Width,Height):
 --
 write_image(BufferedImage):
 	[external "writeImage"].
+write_realtime_image(BufferedImage,Time):
+	[external "writeRealtimeImage"].
+--
+write_audio_data(AudioData):
+	[external "writeAudioData"].
+write_realtime_audio_data(AudioData,Time):
+	[external "writeRealtimeAudioData"].
+--
+flush:
+	[external "flush"].
 --
 list_input_formats() = FFmpegInputFormats:
 	[external "listInputFormats"].
@@ -89,4 +103,9 @@ set_operating_mode(FFmpegOperatingMode):
 	[external "setOperatingMode"].
 get_operating_mode() = FFmpegOperatingMode:
 	[external "getOperatingMode"].
+--
+set_automatic_frame_rate_correction(OnOff):
+	[external "setAutomaticFrameRateCorrection"].
+get_automatic_frame_rate_correction() = OnOff:
+	[external "getAutomaticFrameRateCorrection"].
 ]

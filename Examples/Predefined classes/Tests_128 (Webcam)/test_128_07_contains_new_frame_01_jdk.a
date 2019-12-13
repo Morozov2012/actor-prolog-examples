@@ -39,6 +39,8 @@ goal:-!,
 --
 tick:-
 	check_webcam,
+	fail.
+tick:-
 	webcam ? commit,!,
 	webcam ? get_recent_image(buffer),
 	panel ? get_size_in_pixels(WP,HP),

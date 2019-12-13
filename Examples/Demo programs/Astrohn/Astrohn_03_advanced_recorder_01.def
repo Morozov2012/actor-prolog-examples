@@ -155,6 +155,7 @@ switch_save_button;
 --
 record_data;
 export_data(STRING)					- (i);
+tune_up_writer(STRING)					- (i);
 continue_export;
 export_image_if_necessary(FrameNumber,'Canvas2D')	- (i,i);
 continue_reading_if_necessary;

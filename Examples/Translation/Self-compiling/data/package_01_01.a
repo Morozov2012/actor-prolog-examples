@@ -1,0 +1,10 @@
+package "package_01_01":
+
+class 'MyClass_1_1' (specialized 'DemoConsole'):
+[
+--PREDICATES:
+--pA(INTEGER)	- (o);
+CLAUSES:
+goal:-
+	writeln("Hello World!").
+]

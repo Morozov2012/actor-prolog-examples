@@ -1,0 +1,270 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	parser		= ('ActorPrologBacktrackableParser',
+				slot_names=[
+					'w1','w2','w3',
+					'w4','w5','w6',
+					'w7','w8']);
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	report		= ('PrettyPrinter',
+				report=self,
+				color_text='Black');
+--
+[
+goal:-!,
+	test_loop([
+		title("Initializers"),
+		test("100",'positive'),
+		test("3.14",'positive'),
+		test("(A+B)",'negative'),
+		test("f(A,B,C)",'positive'),
+		test("f(A,?g(B),C)",'negative'),
+		test("{x:A,y:B,z:C}",'positive'),
+		test("{x:A,y:B,z:C|Rest}",'positive'),
+		test("{x:A,y:B,z:C|w2}",'negative'),
+		test("P{x:A,y:B,z:C}",'positive'),
+		test("_{x:A,y:B,z:C}",'positive'),
+		test("P{}",'positive'),
+		test("_{}",'positive'),
+		test("[A,B,C|Rest]",'positive'),
+		test("[A,B,C|w2]",'positive'),
+		test("('MyClass',x=1,y=2,z=3)",'positive'),
+		test(	"('MyClass',"
+				"constant:"
+				"x=1,"
+				"y=2,"
+				"variable:"
+				"z=V,"
+				"internal:"
+				"w=w3,"
+				"variable:"
+				"suspending:"
+				"v=w4,"
+				"protecting:"
+				"u=w5"
+			")",
+			'positive'),
+		test("('MyClass')",'positive'),
+		test("(MyClass)",'negative'),
+		test("((('MyClass')))",'negative'),
+		test("(('MyClass',x=1,'y'=2,z=3))",'positive'),
+		test(	"(('ClassA',"
+			"constant:"
+			"x=1,"
+			"w=('ClassB',"
+			"a=100,"
+			"internal:"
+			"b=('ClassC',"
+			"i=R,"
+			"variable:"
+			"j=X,"
+			"k=Q),"
+			"c=300),"
+			"y=2,"
+			"z=3))",
+			'positive'),
+		test(	"(('ClassA',"
+			"constant:"
+			"x=1,"
+			"w=(('ClassB',"
+			"a=100,"
+			"internal:"
+			"b=(('ClassC',"
+			"i=R,"
+			"variable:"
+			"j=X,"
+			"k=Q))??h(A,B,C),"
+			"c=300))??g(X,Y,Z),"
+			"y=2,"
+			"z=3))??f(1,2,3)",
+			'positive'),
+		test(	"(('ClassA',"
+			"constant:"
+			"x=1,"
+			"w=('ClassB',"
+			"a=100,"
+			"internal:"
+			"b=(('ClassC',"
+			"i=R,"
+			"variable:"
+			"j=X,"
+			"k=Q))??h(A,B,C),"
+			"c=300)??g(X,Y,Z),"
+			"y=2,"
+			"z=3))??f(1,2,3)",
+			'negative'),
+		test("(('MyClass',w2,y=2,w3))",'positive'),
+		test("(('MyClass',w2,y=2,'w3'))",'negative'),
+		test("(('MyClass'))",'positive'),
+		test("(('MyClass'x=1,y=2,z=3))",'negative'),
+		test("(('MyClass',x=1,y=2,z=3)",'negative'),
+		test("('MyClass',x=1,y=2,z=3))",'negative'),
+		test("(('MyClass',,x=1,y=2,z=3))",'negative'),
+		test("(('MyClass';x=1,y=2,z=3))",'negative'),
+		test("(('MyClass',x=1,,y=2,z=3))",'negative'),
+		test("(('MyClass',x=1,constant:,y=2,z=3))",'negative'),
+		test("(('MyClass',))",'negative'),
+		test("(('MyClass'constant:x=1,y=2,z=3))",'negative'),
+		test("(('MyClass',x=1,y=2,z=3,constant:))",'negative'),
+		test("(('MyClass',x=1,y=2constant:,z=3))",'negative'),
+		test("(('MyClass',x=1,y=2;z=3))",'negative'),
+		test("(('MyClass'))??f(A,B,C)",'positive'),
+		test("w1",'positive'),
+		test("self",'positive'),
+		test("X",'positive'),
+		test("_",'positive'),
+		test("self??f(A,B,C)",'positive'),
+		test("??f(A,B,C)",'positive'),
+		test("w1??f(A,B,C)",'positive'),
+		test("Q1??f(A,B,C)",'positive'),
+		test("w1??{x:A,y:B,z:C}",'positive'),
+		test("w1??{x:A,y:B,z:C|Rest}",'positive'),
+		test("w1??{x:A,y:B,z:C|w2}",'negative'),
+		test("w1??P{x:A,y:B,z:C}",'positive'),
+		test("w1??_{x:A,y:B,z:C}",'positive'),
+		test("w1??P{}",'positive'),
+		test("w1??_{}",'positive'),
+		test("w1??f(A,B,C*)",'negative'),
+		test("w1??P(A,B,C)",'negative'),
+		test("w1??P",'negative'),
+		test("'Array'[]",'positive'),
+		test("'Array'[1..3,1,2,3,4,5]",'positive'),
+		test("'Array'[-1..3,2..3]",'positive'),
+		test("'Array'[1..3,..,1..,..3]",'positive'),
+		test("'Array'[..]",'positive'),
+		test("'Array'[-10..]",'positive'),
+		test("'Array'[1..3,w1..3,-10..w2,w1..w2]",'positive'),
+		test("'Array'[1..3]",'positive'),
+		test("'Array'['none'..,..'none','none'..'none']",'positive'),
+		test("'Array'[1,]",'negative'),
+		test("'Array'[1..5,]",'negative'),
+		test("'Array'[1,,1..3]",'negative'),
+		test("'Array'[,1..3]",'negative'),
+		test("w1[]",'negative'),
+		test("'Array'[1..3] of ('Class')",'positive'),
+		test(	"'Array'[1..3] of "
+			"('Class',x=1,y=2,z=3)",
+			'positive'),
+		test("'Array'[1..3] of (('Class'))",'positive'),
+		test(	"'Array'[1..3] of "
+			"(('Class',x=1,y=2,z=3))",
+			'positive'),
+		test(	"'Array'[1..3] of "
+			"(('ClassA',x=(('ClassB')),y=2,z=3))",
+			'positive'),
+		test(	"'Array'[1..3] of "
+			"(('ClassA',x=('ClassB'),y=2,z=3))",
+			'negative'),
+		test(	"'Array'[1..3] of "
+			"('Class',x='Array'[1..5],y=2,z=3)",
+			'negative'),
+		test(	"'Array'[1..3] of "
+			"(('Class',x='Array'[1..5],y=2,z=3))",
+			'negative'),
+		test("'Array'[1..3] of ('C')??f()",'negative')
+		],1,0,NumberOfErrors),
+	report_total_results(NumberOfErrors).
+--
+test_loop([Test|Rest],N1,E1,E3):-
+	test_example(Test,N1,N2,E1,E2),
+	test_loop(Rest,N2,E2,E3).
+test_loop([],_,NumberOfErrors,NumberOfErrors).
+--
+test_example(title(Text),N,N,E,E):-!,
+	set_text_color('Black'),
+	writeln("===== TESTING ",
+		?upper(Text),
+		" =====").
+test_example(test(Text,ExpectedResult),N,N+1,E1,E2):-
+	set_text_color('Black'),
+	writeln("Test #",N,":"),
+	test_bench ? parse_text(Text),!,
+	report_positive_result(ExpectedResult,E1,E2).
+test_example(test(_,ExpectedResult),N,N+1,E1,E2):-
+	report_negative_result(ExpectedResult,E1,E2).
+--
+parse_text(Text):-
+	parser ? forget_parsed_variable_names,
+	-- parser ? clear_function_call_table,
+	parser ? scan_text(Text),
+	TP== parser?pop_initializer(Term),
+	parser ? check_end_of_text(),
+	VariableNames== parser?get_parsed_variable_names(),
+	set_text_color('Black'),
+	write("     Text:        "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Position:    "),
+	set_text_color('Violet'),
+	writeln(TP),
+	set_text_color('Black'),
+	write("     Initializer: "),
+	set_text_color('RoyalBlue'),
+	writeln(Term),
+	Mode1== {
+		print_text_positions:'yes',
+		variable_names:VariableNames,
+		print_position_indent:'no',
+		extra_left_indent:18,
+		indent_constructor_arguments:'no'},
+	write("                  "),
+	report ? print_initializer(Term,Mode1,1),
+	nl,
+	Mode2== {
+		print_text_positions:'no',
+		variable_names:VariableNames,
+		print_position_indent:'no',
+		extra_left_indent:18,
+		indent_constructor_arguments:'yes',
+		tabulator_size:5},
+	write("                  "),
+	report ? print_initializer(Term,Mode2,1),
+	nl.
+--
+report_positive_result('positive',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_positive_result('negative',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False positive!").
+--
+report_negative_result('negative',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_negative_result('positive',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False negative!").
+--
+report_total_results(0):-!,
+	set_text_color('DkGreen'),
+	writeln("All tests are completed with success.").
+report_total_results(NumberOfErrors):-
+	set_text_color('Red'),
+	writeln("One or more tests are completed with failure."),
+	writeln("Number of test failures: ",NumberOfErrors,".").
+--
+alarm(Exception,_,Text):-
+	set_text_color('Black'),
+	write("     Text:        "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Error:       "),
+	set_text_color('Orange'),
+	writeln(Exception).
+]
+---------------------------------------------------------------------

@@ -1,0 +1,34 @@
+---------------------------------------------------------------------
+-- (c) 2017 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologScanner' from "morozov/ActorPrologSyntax";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+constant:
+--
+	input_file_name	= "data/example001.a";
+--
+internal:
+--
+	file_operations	= ('File');
+	scanner		= ('ActorPrologScanner');
+--
+[
+goal:-
+	Text== file_operations?get_string(input_file_name),
+	scan_text(Text,input_file_name).
+--
+scan_text(Text,FileName):-
+	TL1== scanner ? convert_to_tokens(Text),!,
+	writeln(FileName),
+	list_tokens(TL1).
+scan_text(_,_).
+--
+list_tokens([Head|Rest]):-
+	writeln(Head),
+	list_tokens(Rest).
+list_tokens([]).
+]
+---------------------------------------------------------------------

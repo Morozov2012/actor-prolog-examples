@@ -1,0 +1,32 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+PREDICATES:
+
+imperative:
+
+test1;
+test2;
+
+class 'Main' (specialized 'Alpha'):
+--
+internal:
+--
+con	= ('Console');
+--
+[
+goal:-!,
+	test1,
+	test2,
+	con ? writeln("O.K.").
+--
+test1:-
+	S1== ?convert_to_symbol("Text string"),
+	con ? writeln(S1),
+	con ? writeln(structure(S1)).
+--
+test2:-
+	?convert_to_symbol("Text string").
+]

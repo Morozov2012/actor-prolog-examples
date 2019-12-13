@@ -1,0 +1,51 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import	'ProgramReader',
+	'ClusterDatabase',
+	'DomainDatabase',
+	'PredicateDatabase',
+	'ClassDatabase',
+	'InterfaceDatabase',
+	'ClassAliases',
+	'DomainAliases',
+	'ProjectDatabase'
+	from "ProgramReader";
+--
+import 'PrettyPrinter' from "PrettyPrinter";
+---------------------------------------------------------------------
+interface 'Main' (specialized 'DemoConsole'):
+--
+constant:
+--
+	base_directory	: STRING;
+	input_file_name	: STRING;
+--
+internal:
+--
+	reader			: 'ProgramReader';
+	domain_database		: 'DomainDatabase';
+	predicate_database	: 'PredicateDatabase';
+	class_database		: 'ClassDatabase';
+	interface_database	: 'InterfaceDatabase';
+	class_aliases		: 'ClassAliases';
+	domain_aliases		: 'DomainAliases';
+	project_database	: 'ProjectDatabase';
+	pretty_printer		: 'PrettyPrinter';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+report_results;
+print_domain_database;
+print_domain_aliases;
+print_predicate_database;
+print_interface_database;
+print_class_database;
+print_class_aliases;
+print_program_project;
+]
+---------------------------------------------------------------------

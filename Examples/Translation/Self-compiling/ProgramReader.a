@@ -1,0 +1,1296 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+-- package "ProgramReader":
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'ProgramReader' (specialized 'Alpha'):
+--
+internal:
+--
+	import_queue		= ('ImportQueueDatabase');
+	clustering_queue	= ('ClusteringQueueDatabase');
+	file_operations		= ('File');
+	parser			= ('ActorPrologBacktrackableParser');
+	error_trap		= ('Trap',
+					world=self,
+					handler=self);
+	package_database	= ('PackageDatabase');
+	cluster_database	= ('ClusterDatabase');
+	stored_DEF_files	= ('Stored_DEF_Files');
+	domain_database		= ('DomainDatabase');
+	predicate_database	= ('PredicateDatabase');
+	class_database		= ('ClassDatabase');
+	interface_database	= ('InterfaceDatabase');
+	class_aliases		= ('ClassAliases');
+	domain_aliases		= ('DomainAliases');
+	project_database	= ('ProjectDatabase');
+	pretty_printer		= ('PrettyPrinter',
+					report,
+					color_text='Black');
+	report			= ('Console');
+	text_operations		= ('Text');
+--
+[
+read_program(BaseDirectory,MainFileName):-
+	import_queue ? append(MainFileName),
+	ClusterNumber== cluster_database?get_new_cluster_number(),
+	cluster_database?append(
+		cluster(ClusterNumber,MainFileName,[])),
+	clustering_queue ? append(ClusterNumber),
+	load_and_cluster_packages(BaseDirectory).
+--
+load_and_cluster_packages(BaseDirectory):-
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln("PACKAGE LOADING"),
+	import_queue ? find(PackageName),
+		report ? set_text_color('RoyalBlue'),
+		report ? writeln("Package loading: ",PackageName),
+		load_package(PackageName,BaseDirectory,'DEF'),
+		load_package(PackageName,BaseDirectory,'A'),
+		fail.
+load_and_cluster_packages(_):-
+	clustering_queue ? find(ClusterNumber),
+		cluster_database?get_cluster_package(
+			ClusterNumber,PackageName,Parameters),
+		report ? set_text_color('RoyalBlue'),
+		report ? writeln("Package clustering: ",
+			PackageName," ",Parameters),
+		cluster_package(
+			ClusterNumber,
+			PackageName),
+		cluster_project(
+			ClusterNumber,
+			PackageName),
+		fail.
+load_and_cluster_packages(_).
+---------------------------------------------------------------------
+load_package(PackageName,BaseDirectory,Extension):-
+	form_file_name(PackageName,BaseDirectory,Extension,FileName),
+	-- report ? set_text_color('RoyalBlue'),
+	-- report ? writeln(
+	--	"Check whether this file does exist: ",FileName),
+	file_operations ? does_exist(FileName),!,
+	-- report ? set_text_color('DkGreen'),
+	-- report ? writeln("The file does exist: ",FileName),
+	load_and_parse_text(
+		FileName,BaseDirectory,PackageName,Extension).
+load_package(PackageName,_,Extension):-
+	report ? set_text_color('Red'),
+	report ? writeln("The file does not exist: ",
+		PackageName," ",
+		Extension,"!").
+--
+form_file_name(Package,BaseDirectory,'A',File):-!,
+	File==	BaseDirectory + "/" +
+		file_operations?replace_extension(Package,".a").
+form_file_name(Package,BaseDirectory,'DEF',File):-!,
+	File==	BaseDirectory + "/" +
+		file_operations?replace_extension(Package,".def").
+form_file_name(Package,_,_,Package).
+--
+load_and_parse_text(FileName,BaseDirectory,PackageName,Extension):-
+	Text== file_operations?get_string(FileName),
+	error_trap ? parse_text(
+		Text,BaseDirectory,PackageName,Extension),!.
+load_and_parse_text(_,_,_,_).
+--
+parse_text(Text,BaseDirectory,ActualPackageName,FileExtension):-
+	parser ? forget_parsed_variable_names,
+	parser ? clear_function_call_table,
+	parser ? scan_text(Text),
+	TP== parser?pop_package(
+		TitlePackageName,
+		FormalParameters,
+		PragmaList,
+		ImportCommands,
+		DomainDefinitions,
+		PredicateDeclarations,
+		ClassesAndInterfaces,
+		Project,
+		ProjectVariableNames),
+	parser ? check_end_of_text(),
+	check_package_title(
+		ActualPackageName,
+		TitlePackageName,
+		TP),
+	save_package_project(
+		ActualPackageName,
+		TitlePackageName,
+		FileExtension,
+		Project,
+		ProjectVariableNames),
+	package_database ? append(
+		program_package(
+			ActualPackageName,
+			TitlePackageName,
+			FileExtension,
+			FormalParameters,
+			PragmaList,
+			ImportCommands,
+			DomainDefinitions,
+			PredicateDeclarations,
+			ClassesAndInterfaces,
+			TP)),
+	request_package_import(ImportCommands,BaseDirectory).
+	/*
+	VariableNames== parser?get_parsed_variable_names(),
+	report ? set_text_color('Black'),
+	report ? write("     Text:\n"),
+	report ? set_text_color('Gray'),
+	report ? writeln(Text),
+	report ? set_text_color('Black'),
+	report ? write("     Position:               "),
+	report ? set_text_color('Violet'),
+	report ? writeln(TP),
+	report ? set_text_color('Black'),
+	report ? write("     Package name:           "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(TitlePackageName),
+	report ? set_text_color('Black'),
+	report ? write("     Formal parameters:      "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(FormalParameters),
+	report ? set_text_color('Black'),
+	report ? write("     Pragma list:            "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(PragmaList),
+	report ? set_text_color('Black'),
+	report ? write("     Import commands:        "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(ImportCommands),
+	report ? set_text_color('Black'),
+	report ? write("     Domain definitions:     "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(DomainDefinitions),
+	report ? set_text_color('Black'),
+	report ? write("     Predicate declarations: "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(PredicateDeclarations),
+	report ? set_text_color('Black'),
+	report ? write("     Classes and interfaces: "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(ClassesAndInterfaces),
+	report ? set_text_color('Black'),
+	report ? write("     Project:                "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(Project),
+	Table== parser?get_function_call_table(),
+	Mode== {print_text_positions:'no',
+		variable_names:VariableNames,
+		unroll_function_calls:'no',
+		function_call_table:Table,
+		print_position_indent:'yes',
+		extra_left_indent:13,
+		indent_constructor_arguments:'yes',
+		tabulator_size:5},
+	pretty_printer ? print_package(
+		TitlePackageName,
+		FormalParameters,
+		PragmaList,
+		ImportCommands,
+		DomainDefinitions,
+		PredicateDeclarations,
+		ClassesAndInterfaces,
+		Project,
+		TP,
+		Mode).
+	*/
+--
+check_package_title(_,#,_):-!.
+check_package_title(ActualName,p(TitleName,_),_):-
+	ActualName == ?cast("STRING",TitleName),!.
+check_package_title(ActualName,p(TitleName,_),_/*TP*/):-!,
+	break(text_operations?format(
+		"The '%s' title does not "
+		"correspond to the '%s' file name.",
+		TitleName,
+		ActualName)).
+check_package_title(ActualName,TitleName,_/*TP*/):-
+	break(text_operations?format(
+		"The '%s' title does not "
+		"correspond to the '%s' file name.",
+		TitleName,
+		ActualName)).
+--
+save_package_project(_,_,_,'no_initializer',_):-!.
+save_package_project(_,_,_,_,_):-
+	package_database ? match(program_project(_,_,_,_,_)),!,
+	break('project_is_already_defined').
+save_package_project(
+		ActualName,TitleName,FileExtension,
+		Project,VariableNames):-
+	package_database ? append(program_project(
+		ActualName,
+		TitleName,
+		FileExtension,
+		Project,
+		VariableNames)).
+--
+save_program_project(_,_,_,'no_initializer',_):-!.
+save_program_project(_,_,_,_,_):-
+	project_database ? match(_),!,
+	break('project_is_already_defined').
+save_program_project(
+		ActualName,TitleName,FileExtension,
+		Project,VariableNames):-
+	project_database ? append(program_project(
+		ActualName,
+		TitleName,
+		FileExtension,
+		Project,
+		VariableNames)).
+--
+request_package_import([ImportCommand|Rest],BaseDirectory):-!,
+	request_import_of_package(ImportCommand,BaseDirectory),
+	request_package_import(Rest,BaseDirectory).
+request_package_import(_,_).
+--
+request_import_of_package(C,BaseDirectory):-
+	C == import_all_classes_and_domains(Name,_,_),!,
+	request_package_import_by_name(Name,BaseDirectory).
+request_import_of_package(C,BaseDirectory):-
+	C == import_domains_only(Name,_,_),!,
+	request_package_import_by_name(Name,BaseDirectory).
+request_import_of_package(C,BaseDirectory):-
+	C == import_given_classes_and_domains(Name,_,_,_),!,
+	request_package_import_by_name(Name,BaseDirectory).
+request_import_of_package(_,_).
+--
+request_package_import_by_name(Name,_):-
+	import_queue?find(Name),!.
+request_package_import_by_name(Name,BaseDirectory):-
+	check_whether_DEF_file_does_exist(BaseDirectory,Name),
+	import_queue?append(Name).
+--
+check_whether_DEF_file_does_exist(BaseDirectory,PackageName):-
+	form_file_name(PackageName,BaseDirectory,'DEF',FileName),
+	file_operations ? does_exist(FileName),!.
+check_whether_DEF_file_does_exist(_,PackageName):-
+	break(text_operations?format(
+		"The '%s' package has no DEF file.",
+		PackageName)).
+---------------------------------------------------------------------
+-- cluster_package(_,_):-
+--	Item== package_database?match(_),
+--		writeln(">>>",Item),
+--		fail.
+cluster_package(CN,PackageName):-
+	Item== package_database?match(
+		program_package(
+			PackageName,
+			_/*p(PackageName,_)*/,
+			'A',
+			_/*FormalParameters*/,
+			_/*PragmaList*/,
+			_/*ImportCommands*/,
+			_/*DomainDefinitions*/,
+			_/*PredicateDeclarations*/,
+			_/*ClassesAndInterfaces*/,
+			_/*TP*/)),
+	-- writeln(Item),
+	Item == program_package(
+			_,
+			_,
+			_,
+			FormalParametersA,
+			_/*PragmaList*/,
+			ImportCommands,
+			DomainDefinitions,
+			PredicateDeclarations,
+			ClassesAndInterfaces,
+			_/*TP*/),!,
+	check_formal_parameters(
+		PackageName,FormalParametersA),
+	import_DEF_files(ImportCommands,CN),
+	rename_and_save_domains(DomainDefinitions,CN,CN,'A'),
+	rename_and_save_predicates(PredicateDeclarations,CN,'A'),
+	rename_and_save_units(ClassesAndInterfaces,CN,CN,'A').
+cluster_package(_,_).
+--
+check_formal_parameters(PackageName,FormalParametersA):-
+	Item== package_database?match(
+		program_package(
+			PackageName,
+			_/*p(PackageName,_)*/,
+			'DEF',
+			_/*FormalParameters*/,
+			_/*PragmaList*/,
+			_/*ImportCommands*/,
+			_/*DomainDefinitions*/,
+			_/*PredicateDeclarations*/,
+			_/*ClassesAndInterfaces*/,
+			_/*TP*/)),
+	Item == program_package(
+			_,
+			_,
+			_,
+			FormalParametersDEF,
+			_/*PragmaList*/,
+			_/*ImportCommands*/,
+			_/*DomainDefinitions*/,
+			_/*PredicateDeclarations*/,
+			_/*ClassesAndInterfaces*/,
+			TP),!,
+	check_package_parameters(
+		FormalParametersA,
+		FormalParametersDEF,
+		PackageName,
+		TP).
+check_formal_parameters(_,_).
+--
+check_package_parameters([A|Rest1],B1,PackageName,TP):-!,
+	extract_formal_parameter(A,B1,B2,PackageName),
+	check_package_parameters(Rest1,B2,PackageName,TP).
+check_package_parameters(_,[],_,_):-!.
+check_package_parameters(_,[B|_],PackageName,_/*TP*/):-
+	get_formal_parameter_name(B,ParameterName),
+	break(text_operations?format(
+		"The '%s' formal parameter is "
+		"not defined in the A file of "
+		"the '%s' package.",
+		ParameterName,
+		PackageName)).
+--
+extract_formal_parameter(A,[B|Rest],Rest,_):-
+	A == class_parameter(C,_),
+	B == class_parameter(C,_),!.
+extract_formal_parameter(A,[B|Rest],Rest,_):-
+	A == default_class_argument(C,D,_),
+	B == default_class_argument(C,D,_),!.
+extract_formal_parameter(A,[B|Rest],Rest,_):-
+	A == domain_parameter(C,_),
+	B == domain_parameter(C,_),!.
+extract_formal_parameter(A,[B|Rest],Rest,_):-
+	A == default_domain_argument(C,D,_),
+	B == default_domain_argument(C,D,_),!.
+extract_formal_parameter(A,[B|Rest1],[B|Rest2],PackageName):-!,
+	extract_formal_parameter(A,Rest1,Rest2,PackageName).
+extract_formal_parameter(A,Rest,Rest,PackageName):-
+	get_formal_parameter_name(A,ParameterName),
+	break(text_operations?format(
+		"The '%s' formal parameter is "
+		"not defined in the DEF file of "
+		"the '%s' package.",
+		ParameterName,
+		PackageName)).
+--
+get_formal_parameter_name(class_parameter(C,_),Name):-!,
+	Name== ?convert_to_string(C).
+get_formal_parameter_name(default_class_argument(C,_,_),Name):-!,
+	Name== ?convert_to_string(C).
+get_formal_parameter_name(domain_parameter(Name,_),Name):-!.
+get_formal_parameter_name(default_domain_argument(Name,_,_),Name).
+---------------------------------------------------------------------
+cluster_project(CN,PackageName):-
+	Item== package_database?match(
+		program_project(
+			PackageName,
+			_/*p(PackageName,_)*/,
+			_/*'A'*/,
+			_,
+			_)),
+	-- writeln(Item),
+	Item == program_project(
+			_,
+			TitleName,
+			FileExtension,
+			Initializer1,
+			VariableNames),!,
+	rename_initializer(Initializer1,Initializer2,CN),
+	save_program_project(
+		PackageName,
+		TitleName,
+		FileExtension,
+		Initializer2,
+		VariableNames).
+cluster_project(_,_).
+--
+rename_initializer(Initializer1,Initializer2,CN):-
+	Initializer1 == simple_constructor(
+		ClassName1,
+		Arguments1,
+		TP),!,
+	rename_unit(ClassName1,CN,ClassName2),
+	rename_constructor_arguments(Arguments1,Arguments2,CN),
+	Initializer2== simple_constructor(
+		ClassName2,
+		Arguments2,
+		TP).
+rename_initializer(Initializer1,Initializer2,CN):-
+	Initializer1 == process_constructor(
+		ClassName1,
+		Arguments1,
+		TP),!,
+	rename_unit(ClassName1,CN,ClassName2),
+	rename_constructor_arguments(Arguments1,Arguments2,CN),
+	Initializer2== process_constructor(
+		ClassName2,
+		Arguments2,
+		TP).
+rename_initializer(Initializer1,Initializer2,CN):-
+	Initializer1 == array_of_worlds(
+		ClassName1,
+		RangesOfIndices,
+		Prototype1),!,
+	rename_unit(ClassName1,CN,ClassName2),
+	rename_initializer(Prototype1,Prototype2,CN),
+	Initializer2== array_of_worlds(
+		ClassName2,
+		RangesOfIndices,
+		Prototype2).
+rename_initializer(Initializer1,Initializer2,CN):-
+	Initializer1 == resident(
+		Target1,
+		FunctionName,
+		FunctionArguments),!,
+	rename_initializer(Target1,Target2,CN),
+	Initializer2== resident(
+		Target2,
+		FunctionName,
+		FunctionArguments).
+rename_initializer(Initializer,Initializer,_).
+--
+rename_constructor_arguments(
+		a(	Name,
+			PortVariety,
+			Initializer1,
+			TP,
+			Rest1),
+		a(	Name,
+			PortVariety,
+			Initializer2,
+			TP,
+			Rest2),
+		CN):-!,
+	rename_initializer(Initializer1,Initializer2,CN),
+	rename_constructor_arguments(Rest1,Rest2,CN).
+rename_constructor_arguments(_,'nil',_).
+---------------------------------------------------------------------
+import_DEF_files([ImportCommand|Rest],CN0):-!,
+	import_DEF_file(ImportCommand,CN0),
+	import_DEF_files(Rest,CN0).
+import_DEF_files(_,_).
+--
+import_DEF_file(C,CN0):-
+	C == import_all_classes_and_domains(PN,Parameters1,_),!,
+	rename_parameters(Parameters1,Parameters2,CN0),
+	sort_parameters(Parameters2,Parameters3,[]),
+	CN1== ?register_cluster(PN,Parameters3),
+	import_all_classes_and_domains(CN1,Parameters3,CN0).
+import_DEF_file(C,CN0):-
+	C == import_domains_only(PN,Parameters1,_),!,
+	rename_parameters(Parameters1,Parameters2,CN0),
+	sort_parameters(Parameters2,Parameters3,[]),
+	CN1== ?register_cluster(PN,Parameters3),
+	import_domains_only(CN1,Parameters3,CN0).
+import_DEF_file(C,CN0):-
+	C == import_given_classes_and_domains(PN,Parameters1,_,_),!,
+	rename_parameters(Parameters1,Parameters2,CN0),
+	sort_parameters(Parameters2,Parameters3,[]),
+	CN1== ?register_cluster(PN,Parameters3),
+	import_given_classes_and_domains(CN1,Parameters3,CN0).
+import_DEF_file(_,_).
+--
+rename_parameters([H1|R1],[H2|R2],CN0):-!,
+	rename_parameter(H1,H2,CN0),
+	rename_parameters(R1,R2,CN0).
+rename_parameters(_,[],_).
+--
+rename_parameter(
+		class_parameter(A1,TP),
+		default_class_argument(A1,A2,TP),
+		ClusterNumber):-!,
+	rename_unit(A1,ClusterNumber,A2).
+rename_parameter(
+		default_class_argument(A,B1,TP),
+		default_class_argument(A,B2,TP),
+		ClusterNumber):-!,
+	rename_unit(B1,ClusterNumber,B2).
+rename_parameter(
+		domain_parameter(A1,TP),
+		default_domain_argument(A1,A2,TP),
+		ClusterNumber):-!,
+	rename_domain(A1,ClusterNumber,A2).
+rename_parameter(
+		default_domain_argument(A,B1,TP),
+		default_domain_argument(A,B2,TP),
+		ClusterNumber):-!,
+	rename_domain(B1,ClusterNumber,B2).
+rename_parameter(PackageParameter,PackageParameter,_).
+--
+sort_parameters([X|L],R,R0):-!,
+	partition_parameters(L,X,L1,L2),
+	sort_parameters(L2,R1,R0),
+	sort_parameters(L1,R,[X|R1]).
+sort_parameters(_,R,R).
+--
+partition_parameters([X|L],Y,[X|L1],L2):-
+	-- X <= Y,!,
+	is_less_or_equal_parameter(X,Y),!,
+	partition_parameters(L,Y,L1,L2).
+partition_parameters([X|L],Y,L1,[X|L2]):-!,
+	partition_parameters(L,Y,L1,L2).
+partition_parameters(_,_,[],[]).
+--
+is_less_or_equal_parameter(
+		default_class_argument(N1,_,_),
+		default_class_argument(N2,_,_)):-!,
+	N1 <= N2.
+is_less_or_equal_parameter(
+		class_parameter(N1,_),
+		class_parameter(N2,_)):-!,
+	N1 <= N2.
+is_less_or_equal_parameter(
+		default_domain_argument(N1,_,_),
+		default_domain_argument(N2,_,_)):-!,
+	N1 <= N2.
+is_less_or_equal_parameter(
+		domain_parameter(N1,_),
+		domain_parameter(N2,_)):-!,
+	N1 <= N2.
+is_less_or_equal_parameter(_,domain_parameter(_,_)):-!.
+is_less_or_equal_parameter(_,default_domain_argument(_,_,_)):-!.
+is_less_or_equal_parameter(_,class_parameter(_,_)):-!.
+is_less_or_equal_parameter(_,default_class_argument(_,_,_)).
+--
+register_cluster(Name,Parameters) = ClusterNumber:-
+	Item== cluster_database?match(cluster(_,Name,Parameters)),
+	Item== cluster(ClusterNumber,_,_),!.
+register_cluster(Name,Parameters) = ClusterNumber:-
+	ClusterNumber== cluster_database?get_new_cluster_number(),
+	cluster_database ? append(
+		cluster(ClusterNumber,Name,Parameters)),
+	clustering_queue ? append(ClusterNumber).
+--
+import_all_classes_and_domains(ClusterNumber,ActualParameters,CN0):-
+	cluster_database?get_cluster_package(
+		ClusterNumber,PackageName,_/*Parameters*/),
+	-- writeln("DEF>>>",PackageName),
+	Item== package_database?match(
+		program_package(
+			PackageName,
+			_/*p(PackageName,_)*/,
+			'DEF',
+			_/*FormalParameters*/,
+			_/*PragmaList*/,
+			_/*ImportCommands*/,
+			_/*DomainDefinitions*/,
+			_/*PredicateDeclarations*/,
+			_/*ClassesAndInterfaces*/,
+			_/*TP*/)),
+	-- writeln(Item),
+	Item == program_package(
+			_,
+			_,
+			_,
+			FormalParameters,
+			_/*PragmaList*/,
+			ImportCommands,
+			DomainDefinitions,
+			PredicateDeclarations,
+			ClassesAndInterfaces,
+			_/*TP*/),!,
+	accept_package_parameters(
+		ClusterNumber,
+		ActualParameters,
+		FormalParameters),
+	import_DEF_files(ImportCommands,ClusterNumber),
+	rename_and_save_domains(
+		DomainDefinitions,ClusterNumber,CN0,'DEF'),
+	rename_and_save_predicates(
+		PredicateDeclarations,ClusterNumber,'DEF'),
+	rename_and_save_units(
+		ClassesAndInterfaces,ClusterNumber,CN0,'DEF'),
+	stored_DEF_files ? append(ClusterNumber).
+import_all_classes_and_domains(_,_,_):-
+	break('unknown_DEF_file').
+--
+import_domains_only(ClusterNumber,ActualParameters,CN0):-
+	cluster_database?get_cluster_package(
+		ClusterNumber,PackageName,_/*Parameters*/),
+	Item== package_database?match(
+		program_package(
+			PackageName,
+			_/*p(PackageName,_)*/,
+			'DEF',
+			_/*FormalParameters*/,
+			_/*PragmaList*/,
+			_/*ImportCommands*/,
+			_/*DomainDefinitions*/,
+			_/*PredicateDeclarations*/,
+			_/*ClassesAndInterfaces*/,
+			_/*TP*/)),
+	-- writeln(Item),
+	Item == program_package(
+			_,
+			_,
+			_,
+			FormalParameters,
+			_/*PragmaList*/,
+			ImportCommands,
+			DomainDefinitions,
+			PredicateDeclarations,
+			ClassesAndInterfaces,
+			_/*TP*/),!,
+	accept_package_parameters(
+		ClusterNumber,
+		ActualParameters,
+		FormalParameters),
+	import_DEF_files(ImportCommands,ClusterNumber),
+	rename_and_save_domains(
+		DomainDefinitions,ClusterNumber,CN0,'DEF'),
+	rename_and_save_predicates(
+		PredicateDeclarations,ClusterNumber,'DEF'),
+	rename_and_save_units(
+		ClassesAndInterfaces,ClusterNumber,CN0,'DEF'),
+	stored_DEF_files ? append(ClusterNumber).
+import_domains_only(_,_,_):-
+	break('unknown_DEF_file').
+--
+import_given_classes_and_domains(
+		ClusterNumber,ActualParameters,CN0):-
+	cluster_database?get_cluster_package(
+		ClusterNumber,PackageName,_/*Parameters*/),
+	Item== package_database?match(
+		program_package(
+			PackageName,
+			_/*p(PackageName,_)*/,
+			'DEF',
+			_/*FormalParameters*/,
+			_/*PragmaList*/,
+			_/*ImportCommands*/,
+			_/*DomainDefinitions*/,
+			_/*PredicateDeclarations*/,
+			_/*ClassesAndInterfaces*/,
+			_/*TP*/)),
+	-- writeln(Item),
+	Item == program_package(
+			_,
+			_,
+			_,
+			FormalParameters,
+			_/*PragmaList*/,
+			ImportCommands,
+			DomainDefinitions,
+			PredicateDeclarations,
+			ClassesAndInterfaces,
+			_/*TP*/),!,
+	accept_package_parameters(
+		ClusterNumber,
+		ActualParameters,
+		FormalParameters),
+	import_DEF_files(ImportCommands,ClusterNumber),
+	rename_and_save_domains(
+		DomainDefinitions,ClusterNumber,CN0,'DEF'),
+	rename_and_save_predicates(
+		PredicateDeclarations,ClusterNumber,'DEF'),
+	rename_and_save_units(
+		ClassesAndInterfaces,ClusterNumber,CN0,'DEF'),
+	stored_DEF_files ? append(ClusterNumber).
+import_given_classes_and_domains(_,_,_):-
+	break('unknown_DEF_file').
+---------------------------------------------------------------------
+accept_package_parameters(CN1,_,_):-
+	stored_DEF_files ? find(CN1),!.
+accept_package_parameters(CN1,APL,FPL):-
+	accept_actual_parameters(CN1,APL,FPL).
+--
+accept_actual_parameters(CN1,[AP|Rest1],FPL1):-!,
+	accept_actual_parameter(CN1,AP,FPL1,FPL2),
+	accept_actual_parameters(CN1,Rest1,FPL2).
+accept_actual_parameters(CN1,_,FPL):-
+	set_default_parameters(FPL,CN1).
+--
+accept_actual_parameter(CN1,AP,FPL1,FPL2):-
+	AP == default_class_argument(A,B,TP),!,
+	extract_class_parameter(A,FPL1,FPL2,TP),
+	class_aliases ? put(c(A,CN1),B).
+accept_actual_parameter(CN1,AP,FPL1,FPL2):-
+	AP == default_domain_argument(A,B,TP),!,
+	extract_domain_parameter(A,FPL1,FPL2,TP),
+	domain_aliases ? put(d(A,CN1),B).
+accept_actual_parameter(_,_,FPL,FPL).
+--
+extract_class_parameter(A,[P|Rest],Rest,_):-
+	P == class_parameter(A,_),!.
+extract_class_parameter(A,[P|Rest],Rest,_):-
+	P == default_class_argument(A,_,_),!.
+extract_class_parameter(A,[P|Rest1],[P|Rest2],TP):-!,
+	extract_class_parameter(A,Rest1,Rest2,TP).
+extract_class_parameter(A,_,_,_/*TP*/):-
+	break(text_operations?format(
+		"The '%s' parameter "
+		"is not defined in the package.",
+		A)).
+--
+extract_domain_parameter(A,[P|Rest],Rest,_):-
+	P == domain_parameter(A,_),!.
+extract_domain_parameter(A,[P|Rest],Rest,_):-
+	P == default_domain_argument(A,_,_),!.
+extract_domain_parameter(A,[P|Rest1],[P|Rest2],TP):-!,
+	extract_domain_parameter(A,Rest1,Rest2,TP).
+extract_domain_parameter(A,_,_,_/*TP*/):-
+	break(text_operations?format(
+		"The '%s' parameter "
+		"is not defined in the package.",
+		A)).
+--
+set_default_parameters([P|Rest],CN1):-!,
+	set_default_parameter(P,CN1),
+	set_default_parameters(Rest,CN1).
+set_default_parameters(_,_).
+--
+set_default_parameter(default_class_argument(A,B1,_),CN1):-!,
+	rename_unit(B1,CN1,B2),
+	class_aliases ? put(c(A,CN1),B2).
+set_default_parameter(default_domain_argument(A,B1,_),CN1):-!,
+	rename_domain(B1,CN1,B2),
+	domain_aliases ? put(d(A,CN1),B2).
+set_default_parameter(class_parameter(A,_),_):-!,
+	break(text_operations?format(
+		"The '%s' parameter "
+		"is not send to the package.",
+		A)).
+set_default_parameter(domain_parameter(A,_),_):-!,
+	break(text_operations?format(
+		"The '%s' parameter "
+		"is not send to the package.",
+		A)).
+set_default_parameter(_,_).
+---------------------------------------------------------------------
+rename_and_save_domains([D|_],CN1,CN0,FileExtension):-
+	rename_and_save_domain(D,CN1,CN0,FileExtension),
+	fail.
+rename_and_save_domains([_|Rest],CN1,CN0,FileExtension):-!,
+	rename_and_save_domains(Rest,CN1,CN0,FileExtension).
+rename_and_save_domains(_,_,_,_).
+--
+rename_and_save_domain(D1,CN1,CN0,FileExtension):-
+	D1 == domain(
+		DomainName1,
+		Declarator,
+		Alternatives1,
+		TP),
+	rename_domain(DomainName1,CN1,DomainName2),
+	rename_alternatives(
+		Alternatives1,
+		Alternatives2,
+		CN1),
+	D2== domain(
+		DomainName2,
+		Declarator,
+		Alternatives2,
+		TP),
+	store_domain(DomainName2,D2,FileExtension,CN1),
+	store_domain_aliase_if_necessary(
+		DomainName1,CN1,CN0,DomainName2).
+--
+rename_alternatives([A1|Rest1],[A2|Rest2],CN1):-!,
+	rename_alternative(A1,A2,CN1),
+	rename_alternatives(Rest1,Rest2,CN1).
+rename_alternatives(_,[],_).
+--
+rename_alternative(D1,D2,CN1):-
+	string(D1),!,
+	rename_domain(?cast("STRING",D1),CN1,D2).
+rename_alternative(world(C1),world(C2),CN1):-!,
+	rename_unit(C1,CN1,C2).
+rename_alternative(A1,A2,CN1):-
+	A1 == array_of_worlds(C11,C21),!,
+	rename_unit(C11,CN1,C12),
+	rename_unit(C21,CN1,C22),
+	A2==array_of_worlds(C12,C22).
+rename_alternative(A1,A2,CN1):-
+	A1 == list(D1),!,
+	rename_argument_domain(D1,D2,CN1),
+	A2== list(D2).
+rename_alternative(A1,A2,CN1):-
+	A1 == structure(Functor,DL1),!,
+	rename_argument_domains(DL1,DL2,CN1),
+	A2== structure(Functor,DL2).
+rename_alternative(A1,A2,CN1):-
+	A1 == set(DL1),!,
+	rename_set_argument_domains(DL1,DL2,CN1),
+	A2== set(DL2).
+rename_alternative(A,A,_).
+--
+rename_argument_domain_name(D1,D2,CN1):-
+	string(D1),!,
+	rename_domain(?cast("STRING",D1),CN1,D2).
+rename_argument_domain_name(world(C1),world(C2),CN1):-!,
+	rename_unit(C1,CN1,C2).
+rename_argument_domain_name(A1,A2,CN1):-
+	A1 == array_of_worlds(C11,C21),!,
+	rename_unit(C11,CN1,C12),
+	rename_unit(C21,CN1,C22),
+	A2==array_of_worlds(C12,C22).
+rename_argument_domain_name(D,D,_).
+--
+rename_argument_domains([D1|R1],[D2|R2],CN1):-!,
+	rename_argument_domain(D1,D2,CN1),
+	rename_argument_domains(R1,R2,CN1).
+rename_argument_domains(_,[],_).
+--
+rename_argument_domain(ad(D1,TP),ad(D2,TP),CN1):-
+	rename_argument_domain_name(D1,D2,CN1).
+--
+rename_set_argument_domains([D1|R1],[D2|R2],CN1):-!,
+	rename_set_argument_domain(D1,D2,CN1),
+	rename_set_argument_domains(R1,R2,CN1).
+rename_set_argument_domains(_,[],_).
+--
+rename_set_argument_domain(pair(Key,D1,TP),pair(Key,D2,TP),CN1):-
+	rename_argument_domain_name(D1,D2,CN1).
+---------------------------------------------------------------------
+store_domain(_,_,'DEF',ClusterNumber):-
+	stored_DEF_files ? find(ClusterNumber),!.
+store_domain(DomainName,D2,_,_):-
+	store_domain(DomainName,D2).
+--
+store_domain(DomainName,_):-
+	domain_database ? contains_key(DomainName),!,
+	break(text_operations?format(
+		"The '%s' domain is already defined.",
+		DomainName)).
+store_domain(DomainName,DomainDefinition):-
+	domain_database ? put(DomainName,DomainDefinition).
+--
+store_domain_aliase_if_necessary(_,CN,CN,_):-!.
+store_domain_aliase_if_necessary(DomainName1,_,CN0,DomainName2):-
+	domain_aliases ? put(d(DomainName1,CN0),DomainName2).
+---------------------------------------------------------------------
+rename_and_save_predicates([P|_],CN1,FileExtension):-
+	rename_and_save_predicate(P,CN1,FileExtension),
+	fail.
+rename_and_save_predicates([_|Rest],CN1,FileExtension):-!,
+	rename_and_save_predicates(Rest,CN1,FileExtension).
+rename_and_save_predicates(_,_,_).
+--
+rename_and_save_predicate(P1,CN1,FileExtension):-
+	P1 == predicate(
+		PredicateName,
+		Arity,
+		HasAsterisk,
+		AtomType,
+		Determinancy,
+		ArgumentDeclarations1,
+		FlowPatterns,
+		Visibility,
+		TP),
+	rename_predicate_arguments(
+		ArgumentDeclarations1,
+		ArgumentDeclarations2,
+		CN1),
+	P2== predicate(
+		PredicateName,
+		Arity,
+		HasAsterisk,
+		AtomType,
+		Determinancy,
+		ArgumentDeclarations2,
+		FlowPatterns,
+		Visibility,
+		TP),
+	store_predicate(P2,FileExtension,CN1).
+--
+rename_predicate_arguments([A1|Rest1],[A2|Rest2],CN1):-!,
+	rename_predicate_argument(A1,A2,CN1),
+	rename_predicate_arguments(Rest1,Rest2,CN1).
+rename_predicate_arguments(_,[],_).
+--
+rename_predicate_argument(item(D1,TP),item(D2,TP),CN1):-
+	rename_argument_domain_name(D1,D2,CN1).
+rename_predicate_argument(asterisk(D1,TP),asterisk(D2,TP),CN1):-
+	rename_argument_domain_name(D1,D2,CN1).
+---------------------------------------------------------------------
+store_predicate(_,'DEF',ClusterNumber):-
+	stored_DEF_files ? find(ClusterNumber),!.
+store_predicate(PredicateDeclaration,_,_):-
+	predicate_database ? append(PredicateDeclaration).
+---------------------------------------------------------------------
+rename_and_save_units([Unit|_],CN1,CN0,FileExtension):-
+	rename_and_save_unit(Unit,CN1,CN0,FileExtension),
+	fail.
+rename_and_save_units([_|Rest],CN1,CN0,FileExtension):-!,
+	rename_and_save_units(Rest,CN1,CN0,FileExtension).
+rename_and_save_units(_,_,_,_).
+--
+rename_and_save_unit(Unit1,CN1,CN0,FileExtension):-
+	Unit1 == class_definition(
+		ClassName1,
+		AncestorName1,
+		SlotDefinitions1,
+		ActingClauses,
+		ModelClauses,
+		JavaClassName,
+		Interface1,
+		VariableNames,
+		TP),!,
+	rename_and_save_interface(
+		Interface1,Interface2,CN1,CN0,FileExtension),
+	rename_unit(ClassName1,CN1,ClassName2),
+	rename_ancestor_if_necessary(
+		AncestorName1,CN1,AncestorName2),
+	rename_slot_definitions(
+		SlotDefinitions1,
+		SlotDefinitions2,
+		CN1),
+	Unit2== class_definition(
+		ClassName2,
+		AncestorName2,
+		SlotDefinitions2,
+		ActingClauses,
+		ModelClauses,
+		JavaClassName,
+		Interface2,
+		VariableNames,
+		TP),
+	store_class(ClassName2,Unit2,FileExtension,CN1),
+	store_class_aliase_if_necessary(
+		ClassName1,CN1,CN0,ClassName2).
+rename_and_save_unit(Unit1,CN1,CN0,FileExtension):-
+	rename_and_save_interface(
+		?cast("ActorPrologInterface",Unit1),
+		_,CN1,CN0,FileExtension).
+--
+rename_and_save_interface(Unit1,Unit2,CN1,CN0,FileExtension):-
+	Unit1 == class_interface(
+		ClassName1,
+		AncestorNames1,
+		IsMetaInterface,
+		SlotDeclarations,
+		DomainDefinitions,
+		PredicateDeclarations,
+		TP),!,
+	rename_unit(ClassName1,CN1,ClassName2),
+	rename_ancestors(AncestorNames1,CN1,AncestorNames2),
+	Unit2== class_interface(
+		ClassName2,
+		AncestorNames2,
+		IsMetaInterface,
+		SlotDeclarations,
+		DomainDefinitions,
+		PredicateDeclarations,
+		TP),
+	store_interface(ClassName2,Unit2,FileExtension,CN1),
+	store_class_aliase_if_necessary(
+		ClassName1,CN1,CN0,ClassName2).
+rename_and_save_interface(Unit,Unit,_,_,_).
+---------------------------------------------------------------------
+rename_slot_definitions([SD1|Rest1],[SD2|Rest2],CN):-!,
+	rename_slot_definition(SD1,SD2,CN),
+	rename_slot_definitions(Rest1,Rest2,CN).
+rename_slot_definitions(_,[],_).
+--
+rename_slot_definition(SD1,SD2,CN):-
+	SD1 == slot(
+		Name,
+		PortVariety,
+		Initializer1,
+		Visibility,
+		TP),!,
+	rename_initializer(Initializer1,Initializer2,CN),
+	SD2== slot(
+		Name,
+		PortVariety,
+		Initializer2,
+		Visibility,
+		TP).
+---------------------------------------------------------------------
+rename_domain(DomainName,_,DomainName):-
+	is_built_in_domain(DomainName),!.
+rename_domain(DomainName1,CN,DomainName2):-
+	DomainName2== domain_aliases?get(d(DomainName1,CN)),!.
+rename_domain(DomainName1,CN,DomainName2):-
+	DomainName2== text_operations?format("%d:%s",CN,DomainName1).
+--
+is_built_in_domain("INTEGER").
+is_built_in_domain("REAL").
+is_built_in_domain("SYMBOL").
+is_built_in_domain("STRING").
+is_built_in_domain("BINARY").
+--
+rename_unit(ClassName,_,ClassName):-
+	parser ? is_predefined_class_name(ClassName),!.
+rename_unit(ClassName1,CN,ClassName2):-
+	ClassName2== class_aliases?get(c(ClassName1,CN)),!.
+rename_unit(ClassName1,CN,ClassName2):-
+	ClassName2== ?convert_to_symbol(
+		text_operations?format("%d:%s",CN,ClassName1)).
+--
+rename_ancestor_if_necessary(#,_,#):-!.
+rename_ancestor_if_necessary(ClassName1,CN,ClassName2):-
+	S1== ?cast("SYMBOL",ClassName1),
+	rename_ancestor(S1,CN,ClassName2).
+--
+rename_ancestor(ClassName,_,ClassName):-
+	parser ? is_predefined_class_name(ClassName),!.
+rename_ancestor(ClassName1,CN,ClassName2):-
+	ClassName2== class_aliases?get(c(ClassName1,CN)),!.
+rename_ancestor(ClassName1,CN,ClassName2):-
+	ClassName2== ?convert_to_symbol(
+		text_operations?format("%d:%s",CN,ClassName1)).
+--
+rename_ancestors([ClassName1|Rest1],CN,[ClassName2|Rest2]):-!,
+	rename_unit(ClassName1,CN,ClassName2),
+	rename_ancestors(Rest1,CN,Rest2).
+rename_ancestors(_,_,[]).
+---------------------------------------------------------------------
+store_class(_,_,'DEF',ClusterNumber):-
+	stored_DEF_files ? find(ClusterNumber),!.
+store_class(ClassName,Unit,_,_):-
+	create_dummy_interface_if_necessary(ClassName,Unit),
+	store_class(ClassName,Unit).
+--
+store_class(ClassName,_):-
+	class_database ? contains_key(ClassName),!,
+	break(text_operations?format(
+		"The '%s' class is already defined.",
+		ClassName)).
+store_class(ClassName,Unit):-
+	class_database ? put(ClassName,Unit).
+--
+create_dummy_interface_if_necessary(ClassName,_):-
+	interface_database ? contains_key(ClassName),!.
+create_dummy_interface_if_necessary(ClassName,Unit):-
+	Unit == class_definition(
+		ClassName,
+		AncestorName,
+		SlotDefinitions,
+		_/*ActingClauses*/,
+		_/*ModelClauses*/,
+		_/*JavaClassName*/,
+		'no_interface',
+		_/*VariableNames*/,
+		TP),!,
+	create_ancestor_list(AncestorName,AncestorNames),
+	create_dummy_slot_declarations(
+		SlotDefinitions,SlotDeclarations),
+	Interface== class_interface(
+		ClassName,
+		AncestorNames,
+		'no',
+		SlotDeclarations,
+		[],
+		[],
+		TP),
+	store_interface(ClassName,Interface).
+create_dummy_interface_if_necessary(_,_).
+--
+create_ancestor_list(#,[]):-!.
+create_ancestor_list(Name,Names):-
+	Names== [?cast("SYMBOL",Name)].
+--
+create_dummy_slot_declarations([H1|R1],[H2|R2]):-!,
+	create_dummy_slot_declaration(H1,H2),
+	create_dummy_slot_declarations(R1,R2).
+create_dummy_slot_declarations(_,[]).
+--
+create_dummy_slot_declaration(Definition,Declaration):-
+	Definition == slot(
+		Name,PortVariety,_,Visibility,TP),
+	Declaration== slot(
+		Name,PortVariety,'no_domain',Visibility,TP).
+--
+store_interface(_,_,'DEF',ClusterNumber):-
+	stored_DEF_files ? find(ClusterNumber),!.
+store_interface(ClassName,Unit,_,_):-
+	store_interface(ClassName,Unit).
+--
+store_interface(_,'no_interface'):-!.
+store_interface(ClassName,_):-
+	interface_database ? contains_key(ClassName),!,
+	break(text_operations?format(
+		"The '%s' interface is already defined.",
+		ClassName)).
+store_interface(ClassName,Unit):-
+	interface_database ? put(ClassName,Unit).
+--
+store_class_aliase_if_necessary(_,CN,CN,_):-!.
+store_class_aliase_if_necessary(ClassName1,_,CN0,ClassName2):-
+	class_aliases ? put(c(ClassName1,CN0),ClassName2).
+---------------------------------------------------------------------
+print_stored_DEF_files:-
+	report ? set_text_color('default'),
+	Item== stored_DEF_files?match(_),
+		report ? writeln(Item),
+		fail.
+print_stored_DEF_files.
+---------------------------------------------------------------------
+print_packages:-
+	Item== package_database ? match(_),
+	Item == program_package(
+			_/*ActualPackageName*/,
+			TitlePackageName,
+			_/*FileExtension*/,
+			FormalParameters,
+			PragmaList,
+			ImportCommands,
+			DomainDefinitions,
+			PredicateDeclarations,
+			ClassesAndInterfaces,
+			TP),
+	-- VariableNames== parser?get_parsed_variable_names(),
+	-- report ? set_text_color('Black'),
+	-- report ? write("     Text:\n"),
+	-- report ? set_text_color('Gray'),
+	-- report ? writeln(Text),
+	report ? set_text_color('Black'),
+	report ? write("     Position:               "),
+	report ? set_text_color('Violet'),
+	report ? writeln(TP),
+	report ? set_text_color('Black'),
+	report ? write("     Package name:           "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(TitlePackageName),
+	report ? set_text_color('Black'),
+	report ? write("     Formal parameters:      "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(FormalParameters),
+	report ? set_text_color('Black'),
+	report ? write("     Pragma list:            "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(PragmaList),
+	report ? set_text_color('Black'),
+	report ? write("     Import commands:        "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(ImportCommands),
+	report ? set_text_color('Black'),
+	report ? write("     Domain definitions:     "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(DomainDefinitions),
+	report ? set_text_color('Black'),
+	report ? write("     Predicate declarations: "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(PredicateDeclarations),
+	report ? set_text_color('Black'),
+	report ? write("     Classes and interfaces: "),
+	report ? set_text_color('RoyalBlue'),
+	report ? writeln(ClassesAndInterfaces),
+	report ? set_text_color('Black'),
+	-- report ? write("     Project:                "),
+	-- report ? set_text_color('RoyalBlue'),
+	-- report ? writeln(Project),
+	-- Table== parser?get_function_call_table(),
+	Mode== {print_text_positions:'no',
+		-- variable_names:VariableNames,
+		unroll_function_calls:'no',
+		-- function_call_table:Table,
+		print_position_indent:'yes',
+		extra_left_indent:13,
+		indent_constructor_arguments:'yes',
+		tabulator_size:5},
+	pretty_printer ? print_package(
+		TitlePackageName,
+		FormalParameters,
+		PragmaList,
+		ImportCommands,
+		DomainDefinitions,
+		PredicateDeclarations,
+		ClassesAndInterfaces,
+		'no_initializer', -- Project,
+		'nil',
+		TP,
+		Mode),
+	fail.
+print_packages.
+---------------------------------------------------------------------
+alarm(Exception,_,Text,Directory,PackageName,Extension):-
+	report ? set_text_color('Black'),
+	report ? write("     Text:\n"),
+	report ? set_text_color('DkGray'),
+	report ? writeln(Text),
+	report ? set_text_color('Black'),
+	report ? write("     Directory:              "),
+	report ? set_text_color('DkGray'),
+	report ? writeln(Directory),
+	report ? set_text_color('Black'),
+	report ? write("     PackageName:            "),
+	report ? set_text_color('DkGray'),
+	report ? writeln(PackageName),
+	report ? set_text_color('Black'),
+	report ? write("     Extension:              "),
+	report ? set_text_color('DkGray'),
+	report ? writeln(Extension),
+	report ? set_text_color('Black'),
+	report ? write("     Error:                  "),
+	report ? set_text_color('Orange'),
+	report ? writeln(Exception),
+	fail.
+]
+---------------------------------------------------------------------
+class 'PackageDatabase' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------------
+class 'ImportQueueDatabase' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------------
+class 'ClusteringQueueDatabase' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------------
+class 'ClusterDatabase' (specialized 'Database'):
+[
+get_new_cluster_number() = ClusterNumber :-
+	Item== ?match(recent_cluster(_)),
+	Item == recent_cluster(N),!,
+	ClusterNumber== N + 1,
+	retract_all(Item),
+	insert(recent_cluster(ClusterNumber)).
+get_new_cluster_number() = ClusterNumber :-
+	ClusterNumber== 1,
+	insert(recent_cluster(ClusterNumber)).
+--
+get_cluster_package(ClusterNumber,Name,Parameters):-
+	Item== ?match(cluster(ClusterNumber,_,_)),
+	Item== cluster(_,Name,Parameters),!.
+get_cluster_package(_,_,_):-
+	break('unregistered_package').
+]
+---------------------------------------------------------------------
+class 'Stored_DEF_Files' (specialized 'HashSet'):
+[
+]
+---------------------------------------------------------------------
+class 'DomainDatabase' (specialized 'HashMap'):
+[
+get_any_domain_definition(Domain):-
+	Item== ?match(_),
+		Item == map(_,Value),
+		convert_value(Value,Domain).
+--
+convert_value(Value,Value).
+]
+---------------------------------------------------------------------
+class 'PredicateDatabase' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------------
+class 'ClassDatabase' (specialized 'HashMap'):
+[
+]
+---------------------------------------------------------------------
+class 'InterfaceDatabase' (specialized 'HashMap'):
+[
+]
+---------------------------------------------------------------------
+class 'ClassAliases' (specialized 'HashMap'):
+[
+]
+---------------------------------------------------------------------
+class 'DomainAliases' (specialized 'HashMap'):
+[
+]
+---------------------------------------------------------------------
+class 'ProjectDatabase' (specialized 'Database'):
+[
+]
+---------------------------------------------------------------------

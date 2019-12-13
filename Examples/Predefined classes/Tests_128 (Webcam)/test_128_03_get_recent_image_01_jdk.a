@@ -11,6 +11,9 @@ PREDICATES:
 imperative:
 
 loop(INTEGER)		- (i);
+
+determ:
+
 test_webcam;
 
 class 'Main' (specialized 'Canvas2D'):
@@ -24,17 +27,19 @@ internal:
 goal:-!,
 	show,
 	webcam ? start,
-	loop(300),
+	loop(1000),
 	webcam ? stop.
 --
 loop(N):-
-	N > 0,!,
-	test_webcam,
+	N <= 0,!.
+loop(N):-
+	test_webcam,!,
 	loop(N-1).
-loop(_).
+loop(N):-
+	loop(N).
 --
 test_webcam:-
-	webcam ? commit,!,
+	webcam ? commit,
 	webcam ? get_recent_image(buffer),
 	get_size_in_pixels(WP,HP),
 	buffer ? get_size_in_pixels(WI,HI),
@@ -45,5 +50,4 @@ test_webcam:-
 	clear('no'),
 	draw_image(buffer,X0,Y0,Width,Height),
 	draw_now.
-test_webcam.
 ]

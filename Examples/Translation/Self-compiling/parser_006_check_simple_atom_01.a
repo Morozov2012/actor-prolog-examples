@@ -1,0 +1,190 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	parser		= ('ActorPrologBacktrackableParser',
+				slot_names=['my_slot']);
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	report		= ('PrettyPrinter',
+				report=self,
+				color_text='Black');
+--
+[
+goal:-!,
+	test_loop([
+		title("Simple Atoms"),
+		test("p",'positive'),
+		test("?p",'negative'),
+		test("p()",'positive'),
+		test("?p()",'negative'),
+		test("p(",'negative'),
+		test("p(1,2,3)",'positive'),
+		test("p(1,2,3",'negative'),
+		test("?p(1,2,3)",'negative'),
+		test("{1,2,3}",'positive'),
+		test("{1,2,3",'negative'),
+		test("{1,2,3|Rest}",'positive'),
+		test("{1,2,|Rest}",'negative'),
+		test("{}",'positive'),
+		test("{",'negative'),
+		test("f{x:1,y:2,z:3}",'positive'),
+		test("f{x:1,0:'f',z:3}",'negative'),
+		test("my_slot{x:1,y:2,z:3}",'positive'),
+		test("my_slot{x:1,0:'f',z:3}",'negative'),
+		test("1000{x:1,y:2,z:3}",'positive'),
+		test("-1000{x:1,y:2,z:3}",'negative'),
+		test("1000{x:1,0:5000,z:3}",'negative'),
+		test("3.14{x:1,y:2,z:3}",'positive'),
+		test("-3.14{x:1,y:2,z:3}",'negative'),
+		test("3.14{x:1,0:5000,z:3}",'negative'),
+		test("\"text\"{x:1,y:2,z:3}",'positive'),
+		test("\"te\"/**/\"x\"\"t\"{x:1,y:2,z:3}",'positive'),
+		test("\"text{x:1,y:2,z:3}",'negative'),
+		test("\"text\"",'negative'),
+		test("\"te\"/**/\"x\"\"t\"",'negative'),
+		test("~ABCD{x:1,y:2,z:3}",'positive'),
+		test("~AB~CD{x:1,y:2,z:3}",'positive'),
+		test("~AB/*/~CD{x:1,y:2,z:3}",'positive'),
+		test("~{x:1,y:2,z:3}",'negative'),
+		test("~{}",'negative'),
+		test("P{x:1,y:2,z:3|Rest}",'positive'),
+		test("#{x:1,y:2,z:3}",'positive'),
+		test("##{x:1,y:2,z:3}",'negative'),
+		test("f(1,2,Rest*)",'positive'),
+		test("f(A,B,100*)",'negative'),
+		test("f(1,2,_*)",'positive'),
+		test("f(A,B,_*)",'positive'),
+		test("f(A,B,[C|Rest]*)",'negative'),
+		test("f(A,B,g(C*))",'negative'),
+		test("f(A,B,C{}*)",'negative'),
+		test("F(A,B,F*)",'negative'),
+		test("f(1,2,g(Tail)*)",'negative'),
+		test("f(1,2,g(Tail*))",'negative'),
+		test("f(1,2,[Tail]*)",'negative'),
+		test("f(1,2,[Tail*])",'negative'),
+		test("f(1,2,{z:Tail}*)",'negative'),
+		test("f(1,2,{z:Tail*})",'negative'),
+		test("f(1,2,3*)",'negative'),
+		test("f(1,2,*)",'negative'),
+		test("P(1,2,3)",'positive'),
+		test("P",'positive'),
+		test("P()",'positive'),
+		test("P(Rest*)",'positive'),
+		test("_",'positive'),
+		test("_(1,2,3)",'positive'),
+		test("P(1,2,Rest*)",'positive'),
+		test("_(1,2,Rest*)",'positive'),
+		test("P(1,2,_*)",'positive'),
+		------------------------------
+		title("Binary Relations"),
+		-----
+		test("1<=2",'negative'),
+		test("3.14>0",'negative'),
+		test("\"text\"<=\"z\"",'negative'),
+		test("~ABCD>~01AB",'negative'),
+		test("#==#",'negative'),
+		test("[1,2,3]+B*C<A-B/D",'negative'),
+		test("[1,2,3]>=[3,2,1|Tail]",'negative')
+		],1,0,NumberOfErrors),
+	report_total_results(NumberOfErrors).
+--
+test_loop([Test|Rest],N1,E1,E3):-
+	test_example(Test,N1,N2,E1,E2),
+	test_loop(Rest,N2,E2,E3).
+test_loop([],_,NumberOfErrors,NumberOfErrors).
+--
+test_example(title(Text),N,N,E,E):-!,
+	set_text_color('Black'),
+	writeln("===== TESTING ",
+		?upper(Text),
+		" =====").
+test_example(test(Text,ExpectedResult),N,N+1,E1,E2):-
+	set_text_color('Black'),
+	writeln("Test #",N,":"),
+	test_bench ? parse_text(Text),!,
+	report_positive_result(ExpectedResult,E1,E2).
+test_example(test(_,ExpectedResult),N,N+1,E1,E2):-
+	report_negative_result(ExpectedResult,E1,E2).
+--
+parse_text(Text):-
+	parser ? forget_parsed_variable_names,
+	parser ? clear_function_call_table,
+	parser ? scan_text(Text),
+	TP== parser?pop_simple_atom(Term),
+	parser ? check_end_of_text(),
+	VariableNames== parser?get_parsed_variable_names(),
+	set_text_color('Black'),
+	write("\tText:        "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("\tPosition:    "),
+	set_text_color('Violet'),
+	writeln(TP),
+	set_text_color('Black'),
+	write("\tAtom:        "),
+	set_text_color('RoyalBlue'),
+	writeln(Term),
+	set_text_color('Black'),
+	write("\tPretty atom: "),
+	Mode1== {
+		print_text_positions:'yes',
+		variable_names:VariableNames,
+		unroll_function_calls:'yes'},
+	report ? print_atom(Term,Mode1),
+	nl,
+	set_text_color('Black'),
+	write("\tPretty atom: "),
+	Table== parser?get_function_call_table(),
+	Mode2== {
+		print_text_positions:'no',
+		variable_names:VariableNames,
+		unroll_function_calls:'no',
+		function_call_table:Table},
+	report ? print_atom(Term,Mode2),
+	nl.
+--
+report_positive_result('positive',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_positive_result('negative',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False positive!").
+--
+report_negative_result('negative',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_negative_result('positive',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False negative!").
+--
+report_total_results(0):-!,
+	set_text_color('DkGreen'),
+	writeln("All tests are completed with success.").
+report_total_results(NumberOfErrors):-
+	set_text_color('Red'),
+	writeln("One or more tests are completed with failure."),
+	writeln("Number of test failures: ",NumberOfErrors,".").
+--
+alarm(Exception,_,Text):-
+	set_text_color('Black'),
+	write("\tText:        "),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("\tError:       "),
+	set_text_color('Orange'),
+	writeln(Exception).
+]
+---------------------------------------------------------------------

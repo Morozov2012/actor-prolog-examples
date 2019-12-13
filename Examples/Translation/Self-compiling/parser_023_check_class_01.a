@@ -1,0 +1,624 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+class 'Main' (specialized 'DemoConsole'):
+--
+internal:
+--
+	parser		= ('ActorPrologBacktrackableParser',
+				slot_names=[
+					'w1','w2','w3',
+					'w4','w5','w6',
+					'w7','w8']);
+	test_bench	= ('Trap',
+				world=self,
+				handler=self);
+	report		= ('PrettyPrinter',
+				report=self,
+				color_text='Black');
+--
+[
+goal:-!,
+	test_loop([
+		title("Clases"),
+		test(	"class 'ClassA':\n"
+			"[\n"
+			"]",
+			'positive'),
+		test(	"class 'ClassA':\n"
+			"s01:INTEGER=100;\n"
+			"s02:REAL=3.14;\n"
+			"[\n"
+			"p(A,B,C):-q(A),r(B,C).\n"
+			"q(100).\n"
+			"r(700,_).\n"
+			"]",
+			'positive'),
+		test(	"class 'ClassA':\n"
+			"s01:INTEGER;\n"
+			"s02:REAL;\n"
+			"[\n"
+			"DOMAINS:\n"
+			"D1=SYMBOL.\n"
+			"D2=STRING.\n"
+			"D3=BINARY.\n"
+			"SOURCE:\n"
+			"\"JavaClassName1\";\n"
+			"]",
+			'positive'),
+		test(	"class 'A' (specialized 'B'):\n"
+			"s01:INTEGER;\n"
+			"s02:REAL;\n"
+			"[\n"
+			"PREDICATES:\n"
+			"p(A,B,C)-(i,o,i);\n"
+			"q(X,Y,Z)-(i,i,i);\n"
+			"DOMAINS:\n"
+			"D1=SYMBOL.\n"
+			"D2=STRING.\n"
+			"D3=BINARY.\n"
+			"SOURCE:\n"
+			"\"Java\"/*/\"Class\"\"Name2\";\n"
+			"]",
+			'positive'),
+		test(	"class 'A' (specialized 'B',):\n"
+			"[\n"
+			"]",
+			'negative'),
+		test(	"class 'A' (specialized 'B''C'):\n"
+			"[\n"
+			"]",
+			'negative'),
+		test(	"class 'A' (specialized):\n"
+			"[\n"
+			"]",
+			'negative'),
+		test(	"class 'A' ():\n"
+			"[\n"
+			"]",
+			'negative'),
+		test(	"class 'A' (specialized 'B')\n"
+			"[\n"
+			"]",
+			'negative'),
+		test(	"class 'A' (specialized 'B':\n"
+			"[\n"
+			"]",
+			'negative'),
+		test(	"class 'ClassA':\n"
+			"[\n"
+			"IMPERATIVES:\n"
+			"imperative:\n"
+			"p(A,B,C);\n"
+			"]",
+			'negative'),
+		test(	"class 'ClassA':\n"
+			"s01:INTEGER;\n"
+			"s02:REAL;\n"
+			"w01:'MyWorld1';\n"
+			"w02:'MyWorld2';\n"
+			"[\n"
+			"PREDICATES:\n"
+			"p(A,B,C)-(i,o,i);\n"
+			"q(X,Y,Z)-(i,i,i);\n"
+			"r;\n"
+			"s(A,B,C);\n"
+			"DOMAINS:\n"
+			"D1=SYMBOL.\n"
+			"D2=STRING.\n"
+			"D3=BINARY.\n"
+			"SOURCE:\n"
+			"\"JavaClassName1\";\n"
+			"CLAUSES:\n"
+			"p:-q,r.\n"
+			"p:-X==?f(),q(X),r.\n"
+			"p:-?f()==X,q(X),r.\n"
+			"p:-q,?f()==?g(),r.\n"
+			"A<=B:-q(A),r(B).\n"
+			"?f(A)>=?h(B):-q(A),r(B).\n"
+			"q(A):-q(A,B),r(B).\n"
+			"q(A):-?q(A,B),?r(B).\n"
+			"q(A,B,C*):-q(A,B),r(C*).\n"
+			"q(A,B,_*):-q(A,B).\n"
+			"q(A,B,C*):-q(A,B,C).\n"
+			"_(A,B,C*):-q(A,B,C).\n"
+			"_:-q(1,2,3).\n"
+			"r:-w01<-q,w01<<r,w02?s.\n"
+			"r(A,B,C)=V:-q(A,B,C,V).\n"
+			"V(A,100,C):-s(V),q(A,C).\n"
+			"]",
+			'positive'),
+		test(	"class 'ClassA':\n"
+			"[\n"
+			"SOURCE:\n"
+			"\"JavaClassName1\";\n"
+			"CLAUSES:\n"
+			"p(1,2,3).\n"
+			"SOURCE:\n"
+			"\"JavaClassName2\";\n"
+			"]",
+			'negative'),
+		test(	"class 'ClassA':\n"
+			"w01:'WorldX';\n"
+			"w02:'WorldY';\n"
+			"w03:'WorldZ';\n"
+			"[\n"
+			"DOMAINS:\n"
+			"reference:\n"
+			"D1=INTEGER.\n"
+			"D2=REAL.\n"
+			"PREDICATES:\n"
+			"nondeterm:\n"
+			"p(A,B,C);\n"
+			"DOMAINS:\n"
+			"ground:\n"
+			"D3=functor('ClassX').\n"
+			"D4=functor('ArrayX'of'ClassY').\n"
+			"DOMAINS:\n"
+			"reference:\n"
+			"ground:\n"
+			"D5=functor(A).\n"
+			"lazy:\n"
+			"ground:\n"
+			"D6=functor(_).\n"
+			"mixed:\n"
+			"D7=functor(#).\n"
+			"CLAUSES:\n"
+			"P(A,B,C*):-s(P,C),q(A,B,C*),r(C).\n"
+			"P(A,B,_*):-q(A),s(P),r(B).\n"
+			"P:-q,w01?P,r.\n"
+			"P:-q,s(w01?P),r.\n"
+			"P:-q,w01<-P,r.\n"
+			"P:-q,w01<<P,r.\n"
+			"P(A,B,R*):-q,w01?P(B,R*),r(A).\n"
+			"P(A,B,R*):-q,s(w01?P(B,R*)),r(A).\n"
+			"P(A,B,w01?P(B,R*),R*):-q,r(A).\n"
+			"P(A,B,R*)=w01?P(A,R*):-q(B),r.\n"
+			"P(A,B,R*):-q(B),w01<-P(A,R*),r.\n"
+			"P(A,B,R*):-q(B),w01<<P(R*),r(A).\n"
+			"p:-a(V),q(w01?f(1,2,3)),z(V).\n"
+			"p(w01?f(1,2,3)):-q().\n"
+			"p(w01?f(1,2,3)).\n"
+			"q:-a(V),q(w01?f(1,w02?g(),3)),z(V).\n"
+			"]",
+			'positive'),
+		test(	"class 'ClassA':\n"
+			"w01:'WorldA';\n"
+			"w02:'WorldB';\n"
+			"w03:'WorldC';\n"
+			"w04:'WorldD';\n"
+			"w05:'WorldE';\n"
+			"w06:'WorldX';\n"
+			"w07:'WorldY';\n"
+			"w08:'WorldY';\n"
+			"[\n"
+			"DOMAINS:\n"
+			"D1=functor('A'of'B').\n"
+			"DOMAINS:\n"
+			"ground:\n"
+			"D2=functor('ClassX').\n"
+			"D3=functor('ArrayX'of'ClassY').\n"
+			"DOMAINS:\n"
+			"reference:\n"
+			"ground:\n"
+			"D4=functor(A).\n"
+			"lazy:\n"
+			"ground:\n"
+			"D5=functor(_).\n"
+			"mixed:\n"
+			"D6=functor(#).\n"
+			"CLAUSES:\n"
+			"p(w03?h(w04?i()),w05?j(w06?k())):-a(V),q(w01?f(1,w02?g(),3)),z(V).\n"
+			"p(w03?h(w04?i()),w05?j(w06?k()))=w07?n(w08?m()):-a(V),q(w01?f(w02?g())),z(V).\n"
+			"p(A,B,C):[external\"p\"].\n"
+			"p(A,B,C)=V:[external\"p\"].\n"
+			"p(A,B,C)=V:[external].\n"
+			"]",
+			'positive'),
+		test(	"class 'ClassA':\n"
+			"visible:\n"
+			"s01:INTEGER;\n"
+			"s02:REAL;\n"
+			"s03;\n"
+			"private:\n"
+			"s04:D1;\n"
+			"s05:D2;\n"
+			"visible:\n"
+			"private:\n"
+			"s06;\n"
+			"visible:\n"
+			"s07;\n"
+			"s08:D3;\n"
+			"protecting:\n"
+			"s09:'MyClass';\n"
+			"internal:\n"
+			"s10:'MyClass';\n"
+			"[\n"
+			"DOMAINS:\n"
+			"D1=INTEGER.\n"
+			"IMPERATIVES:\n"
+			"visible:\n"
+			"p1(A,B,C)-(i,o,_);\n"
+			"PREDICATES:\n"
+			"nondeterm:\n"
+			"p2(A,B,C*)-(_,o,i);\n"
+			"private:\n"
+			"p2;\n"
+			"determ:\n"
+			"p2();\n"
+			"imperative:\n"
+			"p2(A,B,C,D,E);\n"
+			"DOMAINS:\n"
+			"D2,D3=REAL.\n"
+			"PREDICATES:\n"
+			"determ:\n"
+			"{A};\n"
+			"{A}-(i);\n"
+			"visible:\n"
+			"{_}-(i);\n"
+			"{A}=F;\n"
+			"visible:\n"
+			"determ:\n"
+			"{A}=F-(i);\n"
+			"IMPERATIVES:\n"
+			"q(A,B)-(i,i)(i,o);\n"
+			"q(A)-(i)(o);\n"
+			"q(A,B,C,D,E,F*);\n"
+			"MODEL:\n"
+			"?p(A,B,C).\n"
+			"?p(A,B,C)=V.\n"
+			"]",
+			'positive'),
+		test(	"class 'ClassA' "
+			"(specialized 'ClassB'):\n"
+			"s01:'ClassA';\n"
+			"[\n"
+			"DOMAINS:\n"
+			"D1,D2,D3=STRING.\n"
+			"ground:\n"
+			"D4=INTEGER;REAL.\n"
+			"reference:\n"
+			"D5=STRING;SYMBOL;BINARY.\n"
+			"D6='symbol'.\n"
+			"lazy:\n"
+			"D7=functor(INTEGER).\n"
+			"mixed:\n"
+			"D8=functor(A,B).\n"
+			"D9=functor(A,B,C).\n"
+			"PREDICATES:\n"
+			"imperative:\n"
+			"private:\n"
+			"p()=E;\n"
+			"determ:\n"
+			"visible:\n"
+			"p(A,B,C)=F;\n"
+			"p(A,_,C)=_;\n"
+			"nondeterm:\n"
+			"visible:\n"
+			"p(A,B,C*)=F;\n"
+			"private:\n"
+			"p(A,B,_*)=F;\n"
+			"p(A)=B-(i)(o);\n"
+			"IMPERATIVES:\n"
+			"DOMAINS:\n"
+			"PREDICATES:\n"
+			"]",
+			'positive'),
+		test(	"class 'ClassA' "
+			"(specialized 'ClassB', 'ClassC'):\n"
+			"s01:'ClassA';\n"
+			"[\n"
+			"]",
+			'negative'),
+		test(	"class 'ClassA':\n"
+			"visible:\n"
+			"constant:\n"
+			"s01:'MyClass';\n"
+			"s02:'MyClass';\n"
+			"private:\n"
+			"s03:'MyClass';\n"
+			"s04;\n"
+			"variable:\n"
+			"s05;\n"
+			"s06:_;\n"
+			"internal:\n"
+			"s07;\n"
+			"suspending:\n"
+			"s08;\n"
+			"protecting:\n"
+			"s09;\n"
+			"protecting:\n"
+			"s10;\n"
+			"variable:\n"
+			"s11;\n"
+			"s12;\n"
+			"[\n"
+			"DOMAINS:\n"
+			"reference:\n"
+			"D1=INTEGER.\n"
+			"D2=REAL.\n"
+			"PREDICATES:\n"
+			"nondeterm:\n"
+			"p(A,B,C);\n"
+			"DOMAINS:\n"
+			"ground:\n"
+			"D3=functor('ClassX').\n"
+			"D4=functor('ArrayX'of'ClassY').\n"
+			"DOMAINS:\n"
+			"reference:\n"
+			"ground:\n"
+			"D5=functor(A).\n"
+			"lazy:\n"
+			"ground:\n"
+			"D6=functor(_).\n"
+			"mixed:\n"
+			"D7=functor(#).\n"
+			"]",
+			'positive'),
+		test(	"class 'ClassA':\n"
+			"s01:'Array';\n"
+			"s02:'Array'of'Class';\n"
+			"[\n"
+			"PREDICATES:\n"
+			"p(INTEGER)-(i);\n"
+			"DOMAINS:\n"
+			"D1='ArrayX'of'ClassY'.\n"
+			"D2=MyDomain.\n"
+			"D3=f(A,_,C,D,E).\n"
+			"D4=D2{}.\n"
+			"reference:\n"
+			"D5=D2{x:D3,100:D5}.\n"
+			"D6=D2*.\n"
+			"D7={}.\n"
+			"ground:\n"
+			"D8={1:A,2:B,3:C}.\n"
+			"D9={'x':A,'y':B,'z':C}.\n"
+			"D10={_}.\n"
+			"D11=#.\n"
+			"DOMAINS:\n"
+			"D12=100.\n"
+			"D13=-100.\n"
+			"D14=16#ABCDEF#.\n"
+			"D15=3.14.\n"
+			"D16=-3.14.\n"
+			"D17=16#ABCD.EF#.\n"
+			"D18=\"TEXT\".\n"
+			"D19=~AB_CD_EF.\n"
+			"D20=('ClassA').\n"
+			"D21=[1..24].\n"
+			"ground:\n"
+			"reference:\n"
+			"D22=[-100..-1].\n"
+			"D23=[-1.0..10.0].\n"
+			"D24=[-100.0..-1.0].\n"
+			"D25=[16#A#..16#F#].\n"
+			"D26=[16#0.0#..16#FF.0#].\n"
+			"]",
+			'positive'),
+		test(	"class 'Main':\n"
+			"[\n"
+			"PREDICATES:\n"
+			"p;\n"
+			"p(INTEGER);\n"
+			"q;\n"
+			"q(INTEGER);\n"
+			"DOMAINS:\n"
+			"D1=INTEGER.\n"
+			"CLAUSES:\n"
+			"p:-q.\n"
+			"PREDICATES:\n"
+			"p;\n"
+			"]",
+			'negative'),
+		test(	"class 'Main':\n"
+			"[\n"
+			"IMPERATIVES:\n"
+			"p;\n"
+			"p(INTEGER);\n"
+			"q;\n"
+			"q(INTEGER);\n"
+			"DOMAINS:\n"
+			"D1=INTEGER.\n"
+			"PREDICATES:\n"
+			"q;\n"
+			"]",
+			'negative'),
+		test(	"class 'Main':\n"
+			"[\n"
+			"IMPERATIVES:\n"
+			"p;\n"
+			"p(INTEGER);\n"
+			"q;\n"
+			"q(INTEGER);\n"
+			"CLAUSES:\n"
+			"p:-q.\n"
+			"IMPERATIVES:\n"
+			"q(INTEGER);\n"
+			"]",
+			'negative'),
+		test(	"class 'Main':\n"
+			"[\n"
+			"IMPERATIVES:\n"
+			"q;\n"
+			"q(INTEGER);\n"
+			"p;\n"
+			"q(INTEGER);\n"
+			"]",
+			'negative'),
+		test(	"class 'Main':\n"
+			"[\n"
+			"IMPERATIVES:\n"
+			"q;\n"
+			"q(INTEGER);\n"
+			"q;\n"
+			"]",
+			'negative'),
+		test(	"class 'Main':\n"
+			"[\n"
+			"CLAUSES:\n"
+			"p.\n"
+			"q.\n"
+			"q(1).\n"
+			"PREDICATES:\n"
+			"w(INTEGER);\n"
+			"CLAUSES:\n"
+			"p.\n"
+			"]",
+			'negative'),
+		test(	"class 'Main':\n"
+			"[\n"
+			"CLAUSES:\n"
+			"p.\n"
+			"q.\n"
+			"q(1).\n"
+			"PREDICATES:\n"
+			"w(INTEGER);\n"
+			"CLAUSES:\n"
+			"q.\n"
+			"]",
+			'negative'),
+		test(	"class 'Main':\n"
+			"[\n"
+			"CLAUSES:\n"
+			"p.\n"
+			"q.\n"
+			"q(1).\n"
+			"PREDICATES:\n"
+			"w(INTEGER);\n"
+			"CLAUSES:\n"
+			"q(_).\n"
+			"]",
+			'negative'),
+		test(	"class 'Main':\n"
+			"[\n"
+			"CLAUSES:\n"
+			"q.\n"
+			"q(1).\n"
+			"q.\n"
+			"]",
+			'negative')
+		],1,0,NumberOfErrors),
+	report_total_results(NumberOfErrors).
+--
+test_loop([Test|Rest],N1,E1,E3):-
+	test_example(Test,N1,N2,E1,E2),
+	test_loop(Rest,N2,E2,E3).
+test_loop([],_,NumberOfErrors,NumberOfErrors).
+--
+test_example(title(Text),N,N,E,E):-!,
+	set_text_color('Black'),
+	writeln("===== TESTING ",
+		?upper(Text),
+		" =====").
+test_example(test(Text,ExpectedResult),N,N+1,E1,E2):-
+	set_text_color('Black'),
+	writeln("Test #",N,":"),
+	test_bench ? parse_text(Text),!,
+	report_positive_result(ExpectedResult,E1,E2).
+test_example(test(_,ExpectedResult),N,N+1,E1,E2):-
+	report_negative_result(ExpectedResult,E1,E2).
+--
+parse_text(Text):-
+	parser ? scan_text(Text),
+	TP== parser?pop_class(
+		ClassName,
+		Ancestor,
+		SlotDefinitions,
+		ActingClauses,
+		ModelClauses,
+		JavaClassName,
+		ClassInterface,
+		VariableNames),
+	parser ? check_end_of_text(),
+	set_text_color('Black'),
+	write("     Text:\n"),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Position:         "),
+	set_text_color('Violet'),
+	writeln(TP),
+	set_text_color('Black'),
+	write("     Class name:       "),
+	set_text_color('RoyalBlue'),
+	writeln(ClassName),
+	set_text_color('Black'),
+	write("     Ancestor:         "),
+	set_text_color('RoyalBlue'),
+	writeln(Ancestor),
+	set_text_color('Black'),
+	write("     Slot definitions: "),
+	set_text_color('RoyalBlue'),
+	writeln(SlotDefinitions),
+	set_text_color('Black'),
+	write("     Acting clauses:   "),
+	set_text_color('RoyalBlue'),
+	writeln(ActingClauses),
+	write("     Model clauses:    "),
+	set_text_color('RoyalBlue'),
+	writeln(ModelClauses),
+	write("     Java class name:  "),
+	set_text_color('RoyalBlue'),
+	writeln(JavaClassName),
+	-- Table== parser?get_function_call_table(),
+	Mode== {print_text_positions:'yes',
+		-- variable_names:VariableNames,
+		unroll_function_calls:'no',
+		-- function_call_table:Table,
+		print_position_indent:'yes',
+		extra_left_indent:7,
+		indent_constructor_arguments:'yes',
+		tabulator_size:5},
+	report ? print_interface(
+		ClassInterface,
+		Mode),
+	report ? print_class(
+		ClassName,
+		Ancestor,
+		SlotDefinitions,
+		ActingClauses,
+		ModelClauses,
+		JavaClassName,
+		VariableNames,
+		TP,
+		Mode).
+--
+report_positive_result('positive',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_positive_result('negative',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False positive!").
+--
+report_negative_result('negative',E,E):-!,
+	set_text_color('DkGreen'),
+	writeln("Test O.K.").
+report_negative_result('positive',E,E+1):-!,
+	set_text_color('Red'),
+	writeln("False negative!").
+--
+report_total_results(0):-!,
+	set_text_color('DkGreen'),
+	writeln("All tests are completed with success.").
+report_total_results(NumberOfErrors):-
+	set_text_color('Red'),
+	writeln("One or more tests are completed with failure."),
+	writeln("Number of test failures: ",NumberOfErrors,".").
+--
+alarm(Exception,_,Text):-
+	set_text_color('Black'),
+	write("     Text:\n"),
+	set_text_color('DkGray'),
+	writeln(Text),
+	set_text_color('Black'),
+	write("     Error:            "),
+	set_text_color('Orange'),
+	writeln(Exception).
+]
+---------------------------------------------------------------------

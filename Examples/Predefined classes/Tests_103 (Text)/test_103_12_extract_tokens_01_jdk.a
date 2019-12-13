@@ -16,10 +16,12 @@ test11;
 test12;
 test13;
 test14;
+test15;
 test21;
 test22;
 test23;
 test24;
+test25;
 --
 write_tokens(S_List,N)		- (i,i);
 
@@ -36,10 +38,12 @@ goal:-!,
 	test12,
 	test13,
 	test14,
+	test15,
 	test21,
 	test22,
 	test23,
-	test24.
+	test24,
+	test25.
 --
 test0:-
 	con ? set_color('Black'),
@@ -111,6 +115,21 @@ test14:-
 	fail.
 test14.
 --
+test15:-
+	con ? set_color('Black'),
+	con ? writeln("Test 1.5"),
+	Text== "1..3.5",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	Tokens== ?extract_tokens(Text),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test15.
+--
 test21:-
 	con ? set_color('Black'),
 	con ? writeln("Test 2.1"),
@@ -174,6 +193,22 @@ test24:-
 	write_tokens(Tokens,1),
 	fail.
 test24.
+--
+test25:-
+	con ? set_color('Black'),
+	con ? writeln("Test 2.5"),
+	Text== "1..3.5",
+	con ? writeln("\tInput argument:"),
+	con ? set_color('Blue'),
+	con ? writeln("\tText: >>>",Text,"<<<"),
+	set_string(Text),
+	Tokens== ?extract_tokens(),
+	con ? set_color('Black'),
+	con ? writeln("\tOutput tokens:"),
+	con ? set_color('Green'),
+	write_tokens(Tokens,1),
+	fail.
+test25.
 --
 write_tokens([Token|Rest],N):-!,
 	con ? writeln("\tToken ",N,": >>>",Token,"<<<"),

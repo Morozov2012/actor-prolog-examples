@@ -5,6 +5,8 @@
 
 package "Morozov/Kinect":
 
+--------------------------------------------------------------------
+
 import 'DataAcquisitionBuffer' from "Morozov/VideoBuffer";
 
 --------------------------------------------------------------------
@@ -73,6 +75,7 @@ maximal_chronicle_length	= -1;
 --
 scene_depth_threshold		= 0.05;
 scene_surface_type		= 'default';
+color_substitution_mode		= {};
 --
 -- The implementation of the 'ReadWriteBuffer' interface:
 --
@@ -209,4 +212,9 @@ set_scene_surface_type(KinectSurfaceType):
 	[external "setSceneSurfaceType"].
 get_scene_surface_type() = KinectSurfaceType:
 	[external "getSceneSurfaceType"].
+--
+set_color_substitution_mode(ColorSubstitutionMode):
+	[external "setColorSubstitutionMode"].
+get_color_substitution_mode() = ColorSubstitutionMode:
+	[external "getColorSubstitutionMode"].
 ]

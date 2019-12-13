@@ -1,0 +1,80 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+
+import .. from "morozov/Sound";
+
+PREDICATES:
+
+imperative:
+
+test0;
+test1;
+write_data_line(MicrophoneDataLine)		- (i);
+test2(MicrophoneDataLine)			- (i);
+
+class 'Main' (specialized 'Microphone'):
+--
+internal:
+--
+	con		= ('Console');
+--
+[
+goal:-!,
+	test0,
+	test1,
+	test2({format:{
+		channels:2,
+		encoding:"PCM_SIGNED",
+		frameSize:4,
+		sampleSizeInBits:16,
+		isBigEndian:'yes'}}),
+	test1,
+	test2('default'),
+	test1.
+--
+test0:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 0."),
+	con ? set_color('default'),
+	?get_default_data_line(),!,
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test0:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+test1:-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 1."),
+	con ? set_color('default'),
+	M== ?get_default_data_line(),!,
+	con ? write("Target data line: "),
+	con ? set_color('Violet'),
+	write_data_line(M),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+test1:-
+	con ? set_color('Red'),
+	con ? writeln("Failed!"),
+	con ? set_color('default').
+--
+write_data_line(Name):-
+	symbol(Name),!,
+	con ? writeln("'",Name,"'").
+write_data_line(Name):-
+	con ? writeln(Name).
+--
+test2(Name):-
+	con ? set_color('RoyalBlue'),
+	con ? writeln("Test 2."),
+	con ? set_color('default'),
+	set_default_data_line(Name),
+	con ? set_color('DkGreen'),
+	con ? writeln("O.K."),
+	con ? set_color('default').
+]

@@ -1,0 +1,25 @@
+-----------------------------------------------------------------------
+-- An example of Actor Prolog program.                               --
+-- (c) 2019 IRE RAS Alexei A. Morozov                                --
+-----------------------------------------------------------------------
+--
+import .. from "morozov/Java2D";
+import .. from "morozov/FFmpeg";
+--
+-----------------------------------------------------------------------
+interface 'Main' (specialized 'FFmpeg'):
+--
+internal:
+--
+	window	: 'Canvas2D';
+	image	: 'BufferedImage';
+	con	: 'Console';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+print_movie_attributes(FrameNumber)		- (i);
+]
+-----------------------------------------------------------------------

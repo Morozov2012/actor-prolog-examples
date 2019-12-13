@@ -1,0 +1,552 @@
+---------------------------------------------------------------------
+-- (c) 2019 Alexei A. Morozov                                      --
+-- Actor Prolog self-compiling compiler                            --
+---------------------------------------------------------------------
+-- package "ProgramReader":
+---------------------------------------------------------------------
+import 'ActorPrologBacktrackableParser'
+	from "morozov/ActorPrologSyntax";
+import 'PrettyPrinter'
+	from "PrettyPrinter";
+---------------------------------------------------------------------
+--
+DOMAINS:
+--
+ground:
+--
+ActorPrologPackage = program_package(
+	STRING,				-- Actual package name
+	MetaTerm,			-- Title package name
+	FileExtension,
+	ActorPrologPackageParameters,
+	ActorPrologPackagePragmaList,
+	ActorPrologPackageImportCommands,
+	ActorPrologDomainDefinitions,
+	ActorPrologPredicateDeclarations,
+	ActorPrologClassesAndInterfaces,
+	TextPosition).
+--
+ActorPrologProject = program_project(
+	STRING,				-- Actual package name
+	MetaTerm,			-- Title package name
+	FileExtension,
+	ActorPrologInitializer,		-- Project
+	BalancedNameTree).		-- Project variable names
+--
+FileExtension	= 'A'; 'DEF'.
+--
+ActorPrologCluster = program_cluster(
+	MetaTerm,			-- Package name
+	ClusterNumber).
+--
+ClusterNumber	= INTEGER.
+--
+---------------------------------------------------------------------
+interface 'ProgramReader' (specialized 'Alpha', 'ParsingProcedures'):
+--
+internal:
+--
+	import_queue		: 'ImportQueueDatabase';
+	clustering_queue	: 'ClusteringQueueDatabase';
+	file_operations		: 'File';
+	parser			: 'ActorPrologBacktrackableParser';
+	error_trap		: 'ParsingProcedures';
+	package_database	: 'PackageDatabase';
+	cluster_database	: 'ClusterDatabase';
+	stored_DEF_files	: 'Stored_DEF_Files';
+	domain_database		: 'DomainDatabase';
+	predicate_database	: 'PredicateDatabase';
+	class_database		: 'ClassDatabase';
+	interface_database	: 'InterfaceDatabase';
+	class_aliases		: 'ClassAliases';
+	domain_aliases		: 'DomainAliases';
+	project_database	: 'ProjectDatabase';
+	pretty_printer		: 'PrettyPrinter';
+	report			: 'Report';
+	text_operations		: 'Text';
+--
+[
+PREDICATES:
+--
+imperative:
+--
+read_program(STRING,STRING)			- (i,i);
+--
+load_and_cluster_packages(STRING)		- (i);
+load_package(STRING,STRING,FileExtension)	- (i,i,i);
+form_file_name
+	(STRING,STRING,FileExtension,FileName)	- (i,i,i,o);
+load_and_parse_text
+	(FileName,STRING,STRING,FileExtension)	- (i,i,i,i);
+check_package_title(STRING,MetaTerm,INTEGER)	- (i,i,i);
+--
+save_package_project(
+	STRING,		-- Actual package name
+	MetaTerm,	-- Title package name
+	FileExtension,
+	ActorPrologInitializer,
+	BalancedNameTree)			- (i,i,i,i,i);
+save_program_project(
+	STRING,		-- Actual package name
+	MetaTerm,	-- Title package name
+	FileExtension,
+	ActorPrologInitializer,
+	BalancedNameTree)			- (i,i,i,i,i);
+--
+request_package_import(
+	ActorPrologPackageImportCommands,
+	STRING)					- (i,i);
+request_import_of_package(
+	ActorPrologPackageImportCommand,
+	STRING)					- (i,i);
+request_package_import_by_name
+	(STRING,STRING)				- (i,i);
+check_whether_DEF_file_does_exist
+	(STRING,STRING)				- (i,i);
+--
+cluster_package(
+	ClusterNumber,
+	STRING)					- (i,i);
+cluster_project(
+	ClusterNumber,
+	STRING)					- (i,i);
+--
+rename_initializer(
+	ActorPrologInitializer,
+	ActorPrologInitializer,
+	ClusterNumber)				- (i,o,i);
+rename_constructor_arguments(
+	ActorPrologConstructorArguments,
+	ActorPrologConstructorArguments,
+	ClusterNumber)				- (i,o,i);
+--
+check_formal_parameters(
+	STRING,
+	ActorPrologPackageParameters)		- (i,i);
+check_package_parameters(
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters,
+	STRING,
+	INTEGER)				- (i,i,i,i);
+extract_formal_parameter(
+	ActorPrologPackageParameter,
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters,
+	STRING)					- (i,i,o,i);
+get_formal_parameter_name(
+	ActorPrologPackageParameter,
+	STRING)					- (i,o);
+--
+import_DEF_files(
+	ActorPrologPackageImportCommands,
+	ClusterNumber)				- (i,i);
+import_DEF_file(
+	ActorPrologPackageImportCommand,
+	ClusterNumber)				- (i,i);
+--
+rename_parameters(
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters,
+	ClusterNumber)				- (i,o,i);
+rename_parameter(
+	ActorPrologPackageParameter,
+	ActorPrologPackageParameter,
+	ClusterNumber)				- (i,o,i);
+--
+sort_parameters(
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters)		- (i,o,i);
+partition_parameters(
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameter,
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters)		- (i,i,o,o);
+--
+determ:
+--
+is_less_or_equal_parameter(
+	ActorPrologPackageParameter,
+	ActorPrologPackageParameter)		- (i,i);
+--
+imperative:
+--
+register_cluster(
+	STRING,
+	ActorPrologPackageParameters)
+	= ClusterNumber				- (i,i);
+--
+import_all_classes_and_domains(
+	ClusterNumber,
+	ActorPrologPackageParameters,
+	ClusterNumber)				- (i,i,i);
+import_domains_only(
+	ClusterNumber,
+	ActorPrologPackageParameters,
+	ClusterNumber)				- (i,i,i);
+import_given_classes_and_domains(
+	ClusterNumber,
+	ActorPrologPackageParameters,
+	ClusterNumber)				- (i,i,i);
+--
+accept_package_parameters(
+	ClusterNumber,
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters)		- (i,i,i);
+--
+accept_actual_parameters(
+	ClusterNumber,
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters)		- (i,i,i);
+accept_actual_parameter(
+	ClusterNumber,
+	ActorPrologPackageParameter,
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters)		- (i,i,i,o);
+--
+extract_class_parameter(
+	SYMBOL,
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters,
+	INTEGER)				- (i,i,o,i);
+extract_domain_parameter(
+	STRING,
+	ActorPrologPackageParameters,
+	ActorPrologPackageParameters,
+	INTEGER)				- (i,i,o,i);
+--
+set_default_parameters(
+	ActorPrologPackageParameters,
+	ClusterNumber)				- (i,i);
+set_default_parameter(
+	ActorPrologPackageParameter,
+	ClusterNumber)				- (i,i);
+--
+rename_and_save_domains(
+	ActorPrologDomainDefinitions,
+	ClusterNumber,
+	ClusterNumber,
+	FileExtension)				- (i,i,i,i);
+rename_and_save_domain(
+	ActorPrologDomainDefinition,
+	ClusterNumber,
+	ClusterNumber,
+	FileExtension)				- (i,i,i,i);
+--
+rename_alternatives(
+	ActorPrologDomainAlternatives,
+	ActorPrologDomainAlternatives,
+	ClusterNumber)				- (i,o,i);
+rename_alternative(
+	ActorPrologDomainAlternative,
+	ActorPrologDomainAlternative,
+	ClusterNumber)				- (i,o,i);
+rename_argument_domain_name(
+	ActorPrologArgumentDomainName,
+	ActorPrologArgumentDomainName,
+	ClusterNumber)				- (i,o,i);
+--
+rename_argument_domains(
+	ActorPrologArgumentDomains,
+	ActorPrologArgumentDomains,
+	ClusterNumber)				- (i,o,i);
+rename_argument_domain(
+	ActorPrologArgumentDomain,
+	ActorPrologArgumentDomain,
+	ClusterNumber)				- (i,o,i);
+--
+rename_set_argument_domains(
+	ActorPrologSetArgumentDomains,
+	ActorPrologSetArgumentDomains,
+	ClusterNumber)				- (i,o,i);
+rename_set_argument_domain(
+	ActorPrologSetArgumentDomain,
+	ActorPrologSetArgumentDomain,
+	ClusterNumber)				- (i,o,i);
+--
+store_domain(
+	STRING,
+	ActorPrologDomainDefinition,
+	FileExtension,
+	ClusterNumber)				- (i,i,i,i);
+store_domain(
+	STRING,
+	ActorPrologDomainDefinition)		- (i,i);
+--
+store_domain_aliase_if_necessary(
+	STRING,
+	ClusterNumber,
+	ClusterNumber,
+	STRING)					- (i,i,i,i);
+--
+rename_and_save_predicates(
+	ActorPrologPredicateDeclarations,
+	ClusterNumber,
+	FileExtension)				- (i,i,i);
+rename_and_save_predicate(
+	ActorPrologPredicateDeclaration,
+	ClusterNumber,
+	FileExtension)				- (i,i,i);
+--
+rename_predicate_arguments(
+	ActorPrologPredicateArgumentDeclarations,
+	ActorPrologPredicateArgumentDeclarations,
+	ClusterNumber)				- (i,o,i);
+rename_predicate_argument(
+	ActorPrologPredicateArgumentDeclaration,
+	ActorPrologPredicateArgumentDeclaration,
+	ClusterNumber)				- (i,o,i);
+--
+store_predicate(
+	ActorPrologPredicateDeclaration,
+	FileExtension,
+	ClusterNumber)				- (i,i,i);
+--
+rename_and_save_units(
+	ActorPrologClassesAndInterfaces,
+	ClusterNumber,
+	ClusterNumber,
+	FileExtension)				- (i,i,i,i);
+rename_and_save_unit(
+	ActorPrologClassOrInterface,
+	ClusterNumber,
+	ClusterNumber,
+	FileExtension)				- (i,i,i,i);
+rename_and_save_interface(
+	ActorPrologInterface,
+	ActorPrologInterface,
+	ClusterNumber,
+	ClusterNumber,
+	FileExtension)				- (i,o,i,i,i);
+--
+rename_slot_definitions(
+	ActorPrologSlotDefinitions,
+	ActorPrologSlotDefinitions,
+	ClusterNumber)				- (i,o,i);
+rename_slot_definition(
+	ActorPrologSlotDefinition,
+	ActorPrologSlotDefinition,
+	ClusterNumber)				- (i,o,i);
+--
+rename_domain(STRING,ClusterNumber,STRING)	- (i,i,o);
+--
+determ:
+--
+is_built_in_domain(STRING)			- (i);
+--
+imperative:
+--
+rename_unit(SYMBOL,ClusterNumber,SYMBOL)	- (i,i,o);
+rename_ancestor_if_necessary(
+	ActorPrologAncestorName,
+	ClusterNumber,
+	ActorPrologAncestorName)		- (i,i,o);
+rename_ancestor(
+	SYMBOL,
+	ClusterNumber,
+	SYMBOL)					- (i,i,o);
+rename_ancestors(
+	SymbolList,
+	ClusterNumber,
+	SymbolList)				- (i,i,o);
+--
+store_class(
+	SYMBOL,
+	ActorPrologClass,
+	FileExtension,
+	ClusterNumber)				- (i,i,i,i);
+store_class(
+	SYMBOL,
+	ActorPrologClass)			- (i,i);
+--
+create_dummy_interface_if_necessary(
+	SYMBOL,
+	ActorPrologClass)			- (i,i);
+create_ancestor_list
+	(ActorPrologAncestorName,SymbolList)	- (i,o);
+create_dummy_slot_declarations(
+	ActorPrologSlotDefinitions,
+	ActorPrologSlotDeclarations)		- (i,o);
+create_dummy_slot_declaration(
+	ActorPrologSlotDefinition,
+	ActorPrologSlotDeclaration)		- (i,o);
+--
+store_interface(
+	SYMBOL,
+	ActorPrologInterface,
+	FileExtension,
+	ClusterNumber)				- (i,i,i,i);
+store_interface(
+	SYMBOL,
+	ActorPrologInterface)			- (i,i);
+--
+store_class_aliase_if_necessary(
+	SYMBOL,
+	ClusterNumber,
+	ClusterNumber,
+	SYMBOL)					- (i,i,i,i);
+--
+print_stored_DEF_files;
+print_packages;
+--
+determ:
+--
+alarm(	ExceptionName,
+	SYMBOL,
+	STRING,
+	STRING,
+	FileName,
+	FileExtension)				- (i,i,i,i,i,i);
+]
+---------------------------------------------------------------------
+interface 'ParsingProcedures':
+[
+PREDICATES:
+--
+determ:
+--
+parse_text(STRING,STRING,STRING,FileExtension)	- (i,i,i,i);
+]
+---------------------------------------------------------------------
+interface 'PackageDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+ground:
+--
+Target		=
+		ActorPrologPackage;
+		ActorPrologProject.
+]
+---------------------------------------------------------------------
+interface 'ImportQueueDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+ground:
+--
+Target 	= STRING.
+]
+---------------------------------------------------------------------
+interface 'ClusteringQueueDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+ground:
+--
+Target 	= ClusterNumber.
+]
+---------------------------------------------------------------------
+interface 'ClusterDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+ground:
+--
+Target 	=
+	recent_cluster(ClusterNumber);
+	cluster(ClusterNumber,
+		STRING,
+		ActorPrologPackageParameters).
+--
+PREDICATES:
+--
+imperative:
+--
+get_new_cluster_number() = ClusterNumber;
+--
+get_cluster_package(
+	ClusterNumber,
+	STRING,
+	ActorPrologPackageParameters)			- (i,o,o);
+]
+---------------------------------------------------------------------
+interface 'Stored_DEF_Files' (specialized 'HashSet'):
+[
+DOMAINS:
+--
+ground:
+--
+Target		= ClusterNumber.
+--
+]
+---------------------------------------------------------------------
+interface 'DomainDatabase' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+ground:
+--
+TargetKey	= STRING.
+TargetValue	= ActorPrologDomainDefinition.
+--
+PREDICATES:
+--
+nondeterm:
+--
+get_any_domain_definition
+	(TargetValue)			- (o);
+--
+imperative:
+--
+convert_value(TargetValue,ActorPrologDomainDefinition)	- (i,o);
+]
+---------------------------------------------------------------------
+interface 'PredicateDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+ground:
+--
+Target		= ActorPrologPredicateDeclaration.
+]
+---------------------------------------------------------------------
+interface 'ClassDatabase' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+ground:
+--
+TargetKey	= SYMBOL.
+TargetValue	= ActorPrologClass.
+]
+---------------------------------------------------------------------
+interface 'InterfaceDatabase' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+ground:
+--
+TargetKey	= SYMBOL.
+TargetValue	= ActorPrologInterface.
+]
+---------------------------------------------------------------------
+interface 'ClassAliases' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+ground:
+--
+TargetKey	= c(SYMBOL,ClusterNumber).
+TargetValue	= SYMBOL.
+]
+---------------------------------------------------------------------
+interface 'DomainAliases' (specialized 'HashMap'):
+[
+DOMAINS:
+--
+ground:
+--
+TargetKey	= d(STRING,ClusterNumber).
+TargetValue	= STRING.
+]
+---------------------------------------------------------------------
+interface 'ProjectDatabase' (specialized 'Database'):
+[
+DOMAINS:
+--
+ground:
+--
+Target		= ActorPrologProject.
+]
+---------------------------------------------------------------------

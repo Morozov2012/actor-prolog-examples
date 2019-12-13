@@ -83,14 +83,16 @@ switch_save_button;
 --
 record_data;
 export_data(STRING)					- (i);
+tune_up_writer(STRING)					- (i);
 continue_export;
-export_image_if_necessary(FrameNumber,'Canvas2D')	- (i,i);
-continue_reading_if_necessary;
 --
 get_buffer_image_size_and_frame_rate(
 	STRING,INTEGER,INTEGER,REAL)			- (i,o,o,o);
 get_inspector_image_size_and_frame_rate(
 	STRING,INTEGER,INTEGER,REAL)			- (i,o,o,o);
+--
+export_image_if_necessary(FrameNumber,'Canvas2D')	- (i,i);
+continue_reading_if_necessary;
 --
 on_off(YesNo) = OnOff					- (i);
 create_new_file_name() = STRING;

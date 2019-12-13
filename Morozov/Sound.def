@@ -1,9 +1,139 @@
 --------------------------------------------------------------------
 -- Predefined Classes of Actor Prolog                             --
--- (c) 2012 IRE RAS Alexei A. Morozov                             --
+-- (c) 2012-2019 IRE RAS Alexei A. Morozov                        --
 --------------------------------------------------------------------
 
 package "Morozov/Sound":
+
+import 'DataAcquisitionBuffer' from "Morozov/VideoBuffer";
+
+--------------------------------------------------------------------
+
+DOMAINS:
+
+MicrophoneDataLineList	= MicrophoneDataLine*.
+--
+MicrophoneDataLine = {	-- The name of the mixer.
+			mixerName: STRING,
+			-- The vendor of the mixer.
+			mixerVendor: STRING,
+			-- The description of the mixer.
+			mixerDescription: STRING,
+			-- The version of the mixer.
+			mixerVersion: STRING,
+			-- The number of the target data line.
+			dataLine: INTEGER,
+			-- The list of supported audio formats.
+			formats: AudioFormats,
+			-- Requested audio format.
+			format: AudioFormat
+			};
+			'default'.
+--
+AudioFormats		= AudioFormat*.
+--
+AudioFormat	= {	-- The number of audio channels in this
+			-- format (1 for mono, 2 for stereo).
+			channels: INTEGER,
+			-- The audio encoding technique used by
+			-- this format. For instance,
+			-- "ALAW" specifies a-law encoded data;
+			-- "PCM_FLOAT" specifies floating-point
+			-- pulse-code modulation (PCM) data;
+			-- "PCM_SIGNED" specifies signed, linear
+			-- PCM data; "PCM_UNSIGNED" specifies
+			-- unsigned, linear PCM data; "ULAW"
+			-- specifies u-law encoded data.
+			-- PCM is simply a linear (proportional)
+			-- representation of the sound waveform.
+			-- With PCM, the number stored in each
+			-- sample is proportional to the
+			-- instantaneous amplitude of the sound
+			-- pressure at that point in time. The
+			-- numbers may be signed or unsigned
+			-- integers or floats. Besides PCM, other
+			-- encodings include mu-law and a-law,
+			-- which are nonlinear mappings of the
+			-- sound amplitude that are often used
+			-- for recording speech.
+			encoding: STRING,
+			-- The number of frames played or recorded
+			-- per second, for sounds that have this
+			-- format.
+			frameRate: REAL,
+			-- The number of bytes in each frame of a
+			-- sound that has this format.
+			frameSize: INTEGER,
+			-- The number of samples played or recorded
+			-- per second, for sounds that have this
+			-- format. The sample rate measures how many
+			-- "snapshots" (samples) of the sound
+			-- pressure are taken per second, per
+			-- channel. If the sound is stereo rather
+			-- than mono, two samples are actually
+			-- measured at each instant of time: one for
+			-- the left channel, and another for the
+			-- right channel; however, the sample rate
+			-- still measures the number per channel, so
+			-- the rate is the same regardless of the
+			-- number of channels. This is the standard
+			-- use of the term.
+			sampleRate: REAL,
+			-- The number of bits in each sample of a
+			-- sound that has this format. The sample
+			-- size indicates how many bits are used
+			-- to store each snapshot; 8 and 16 are
+			-- typical values. For encodings like
+			-- pulse-code modulation (PCM), a frame
+			-- consists of the set of samples for all
+			-- channels at a given point in time, and so
+			-- the size of a frame (in bytes) is always
+			-- equal to the size of a sample (in bytes)
+			-- times the number of channels. However,
+			-- with some other sorts of encodings a frame
+			-- can contain a bundle of compressed data
+			-- for a whole series of samples, as well as
+			-- additional, non-sample data. For such
+			-- encodings, the sample rate and sample size
+			-- refer to the data after it is decoded into
+			-- PCM, and so they are completely different
+			-- from the frame rate and frame size.
+			sampleSizeInBits: INTEGER,
+			-- Indicates whether the audio data is
+			-- stored in big-endian or little-endian
+			-- order. For 16-bit samples (or any other
+			-- sample size larger than a byte), byte
+			-- order is important; the bytes in each
+			-- sample are arranged in either the
+			-- "little-endian" or "big-endian" style.
+			isBigEndian: YesNo
+			}.
+
+--------------------------------------------------------------------
+-- The 'Microphone' class is specialized                          --
+-- class 'DataAcquisitionBuffer'.                                 --
+--------------------------------------------------------------------
+
+interface 'Microphone' (specialized 'DataAcquisitionBuffer'):
+--
+default_data_line		: MicrophoneDataLine;
+--
+[
+PREDICATES:
+--
+imperative:
+--
+start(MicrophoneDataLine)				- (i);
+--
+get_actual_data_line() = MicrophoneDataLine;
+--
+-- Get list of microphones to use.
+--
+get_microphone_list = MicrophoneDataLineList;
+--
+set_default_data_line(MicrophoneDataLine)		- (i);
+get_default_data_line() = MicrophoneDataLine;
+]
 
 --------------------------------------------------------------------
 -- The 'Clip' class is specialized class 'DataAbstraction'.       --
@@ -50,6 +180,7 @@ close;
 -- resumes I/O starting with the first frame that was unprocessed at
 -- the time the line was stopped.
 start;
+
 -- The stop predicate stops the line. A stopped line should cease
 -- I/O activity. If the line is open and running, however, it should
 -- retain the resources required to resume activity. A stopped line
@@ -57,6 +188,7 @@ start;
 -- it, so that upon resumption the I/O can continue where it left
 -- off, if possible.
 stop;
+
 -- The loop predicate starts looping playback from the current
 -- position. Playback will continue to the loop's end point, then
 -- loop back to the loop start point count times, and finally
@@ -80,6 +212,7 @@ loop(INTEGER/*Count*/)					- (i);
 -- Returns: the media length, expressed in sample frames, or -1
 -- if the line is not open.
 get_frame_length() = INTEGER;
+
 -- The get_microsecond_length function obtains the media duration
 -- in microseconds.
 -- Returns: the media duration, expressed in microseconds, or -1
@@ -94,6 +227,7 @@ get_microsecond_length() = INTEGER; /*Microseconds*/
 -- using the getLongFramePosition Java method. Returns: the number
 -- of frames already processed since the line was opened.
 get_frame_position() = INTEGER;
+
 -- The get_microsecond_position function obtains the current
 -- position in the audio data, in microseconds. The microsecond
 -- position measures the time corresponding to the number of sample
@@ -113,6 +247,7 @@ get_microsecond_position() = INTEGER; /*Microseconds*/
 -- Parameters: Frames - the desired new media position, expressed in
 -- sample frames.
 set_frame_position(INTEGER/*Frames*/)			- (i);
+
 -- The set_microsecond_position predicate sets the media position in
 -- microseconds. When the clip begins playing the next time, it will
 -- start at this position. The level of precision is not guaranteed.

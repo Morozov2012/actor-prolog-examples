@@ -1,0 +1,11 @@
+package	"Examples/Translation/Compiler tests/Packages/"
+	"package001" ('A'):
+
+class 'A' (specialized 'DemoConsole'):
+[
+CLAUSES:
+goal:-!,
+	writeln("package001::A: goal").
+p(X):-
+	writeln("package001::A: p(X=",X,")").
+]

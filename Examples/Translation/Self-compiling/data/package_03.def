@@ -1,0 +1,19 @@
+package "package_03":
+
+DOMAINS:
+
+D_3_1	= SYMBOL; ('MyClass3').
+D_3_2	= D_3_1*; s3(D_3_1); {y:D_3_1}.
+
+interface 'MyClass3' (specialized 'DemoConsole'):
+visible:
+my_slot		: 'MyClass3';
+x		: INTEGER;
+y		: INTEGER;
+z		: INTEGER;
+[
+PREDICATES:
+p03(INTEGER)			- (i)(o);
+q03(INTEGER)			- (i)(o);
+f03(INTEGER) = INTEGER		- (i)(o);
+]
