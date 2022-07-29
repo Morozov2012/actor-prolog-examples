@@ -1,1 +1,1 @@
-*.a linguist-language=Prolog
+*.def;*.a linguist-language=Prolog
